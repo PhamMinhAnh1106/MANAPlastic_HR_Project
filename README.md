@@ -8,10 +8,3 @@ Dự án này bao gồm một website và ứng dụng di động chấm công.
 
 ## Giảng viên hướng dẫn
 * Thầy Nguyễn Minh Sang - Lecturer at FPT University
-
-## Cấu trúc dự án
-* `/backend`: Chứa code BE-Spring Boot
-* `/frontend`: Chứa code FE-Angular
-* `/mobile-app`: Chứa code App Chấm Công
-* `/database`: Chứa script SQL và versions DB
-* `/docs`: Chứa file báo cáo luận văn
