@@ -1,0 +1,36 @@
+# Tệp tin hệ điều hành
+.DS_Store
+Thumbs.db
+
+# Tệp tin của IDE (IntelliJ, VSCode)
+.idea/
+.vscode/
+*.iml
+
+# ----------------
+# BACKEND (Spring Boot / Java)
+# ----------------
+/backend/target/
+/backend/build/
+*.jar
+*.war
+
+# ----------------
+# FRONTEND (Angular / Node.js)
+# ----------------
+/frontend/node_modules/
+/frontend/dist/
+/frontend/npm-debug.log*
+/frontend/.angular/cache/
+
+# ----------------
+# MOBILE APP (Flutter)
+# ----------------
+/mobile-app/build/
+/mobile-app/.dart_tool/
+
+# ----------------
+# !! QUAN TRỌNG !!
+# Lờ đi file đóng gói của FE sang BE (Giao diện)
+# ----------------
+/backend/src/main/resources/static/
