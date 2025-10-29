@@ -1,4 +1,4 @@
-package com.manaplastic.backend.Entity;
+package com.manaplastic.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -43,6 +43,6 @@ public class LeaverequestEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "userID")
-    private com.manaplastic.backend.Entity.UserEntity userID;
+    private com.manaplastic.backend.entity.UserEntity userID;
 
 }

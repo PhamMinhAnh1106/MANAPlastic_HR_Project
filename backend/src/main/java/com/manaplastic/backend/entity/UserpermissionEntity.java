@@ -1,4 +1,4 @@
-package com.manaplastic.backend.Entity;
+package com.manaplastic.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -19,7 +19,7 @@ public class UserpermissionEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "userID", nullable = false)
-    private com.manaplastic.backend.Entity.UserEntity userID;
+    private com.manaplastic.backend.entity.UserEntity userID;
 
     @MapsId("permissionID")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

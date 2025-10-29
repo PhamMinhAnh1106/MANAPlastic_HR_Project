@@ -1,4 +1,4 @@
-package com.manaplastic.backend.Entity;
+package com.manaplastic.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -63,11 +63,11 @@ public class UserEntity implements UserDetails {
     @Column(name = "status", nullable = false)
     private String status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "roleID")
     private RoleEntity roleID;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "departmentID")
     private DepartmentEntity departmentID;
 

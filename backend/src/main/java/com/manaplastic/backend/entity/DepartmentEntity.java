@@ -1,4 +1,4 @@
-package com.manaplastic.backend.Entity;
+package com.manaplastic.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -22,6 +22,6 @@ public class DepartmentEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "managerID")
-    private com.manaplastic.backend.Entity.UserEntity managerID;
+    private com.manaplastic.backend.entity.UserEntity managerID;
 
 }

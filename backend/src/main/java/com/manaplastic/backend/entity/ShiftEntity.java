@@ -1,4 +1,4 @@
-package com.manaplastic.backend.Entity;
+package com.manaplastic.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

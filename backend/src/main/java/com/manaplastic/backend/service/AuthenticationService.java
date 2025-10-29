@@ -1,8 +1,8 @@
-package com.manaplastic.backend.Service;
+package com.manaplastic.backend.service;
 
 import com.manaplastic.backend.DTO.AuthenticationRequest;
 import com.manaplastic.backend.DTO.AuthenticationResponse;
-import com.manaplastic.backend.Repository.UserRepository;
+import com.manaplastic.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

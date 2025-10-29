@@ -1,6 +1,6 @@
 package com.manaplastic.backend.config;
 
-import com.manaplastic.backend.Repository.UserRepository;
+import com.manaplastic.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

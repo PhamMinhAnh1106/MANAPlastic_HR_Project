@@ -1,4 +1,4 @@
-package com.manaplastic.backend.Entity;
+package com.manaplastic.backend.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -12,10 +12,10 @@ import java.util.Objects;
 @Getter
 @Setter
 @Embeddable
-public class UserpermissionEntityId implements Serializable {
-    private static final long serialVersionUID = 1037581269161480380L;
-    @Column(name = "userID", nullable = false)
-    private Integer userID;
+public class RolespermissionEntityId implements Serializable {
+    private static final long serialVersionUID = 2886046708955238402L;
+    @Column(name = "roleID", nullable = false)
+    private Integer roleID;
 
     @Column(name = "permissionID", nullable = false)
     private Integer permissionID;
@@ -24,14 +24,14 @@ public class UserpermissionEntityId implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        UserpermissionEntityId entity = (UserpermissionEntityId) o;
+        RolespermissionEntityId entity = (RolespermissionEntityId) o;
         return Objects.equals(this.permissionID, entity.permissionID) &&
-                Objects.equals(this.userID, entity.userID);
+                Objects.equals(this.roleID, entity.roleID);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(permissionID, userID);
+        return Objects.hash(permissionID, roleID);
     }
 
 }

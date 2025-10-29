@@ -1,4 +1,4 @@
-package com.manaplastic.backend.Entity;
+package com.manaplastic.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -31,6 +31,6 @@ public class PayrolldetailEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "payID")
-    private com.manaplastic.backend.Entity.PayrollEntity payID;
+    private com.manaplastic.backend.entity.PayrollEntity payID;
 
 }

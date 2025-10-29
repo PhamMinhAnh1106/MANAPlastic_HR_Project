@@ -1,4 +1,4 @@
-package com.manaplastic.backend.Service;
+package com.manaplastic.backend.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
