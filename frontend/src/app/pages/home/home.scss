@@ -1,0 +1,66 @@
+.task-bar {
+    position: fixed; // Cố định thanh bar ở trên cùng
+    top: 0;
+    left: 0;
+
+    width: 100%; // Chiếm toàn bộ chiều rộng
+
+    background-color: #333; // Màu nền tối
+    color: white;
+
+    padding: 0 20px;
+    height: 60px; // Chiều cao cố định
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // Thêm bóng đổ nhẹ
+
+    display: flex;
+    justify-content: space-between; // Căn cách đều các phần
+    align-items: center; // Căn giữa theo chiều dọc
+    z-index: 1000; // Đảm bảo thanh bar nằm trên các nội dung khác
+}
+
+.logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+}
+
+.nav-links {
+    display: flex;
+    gap: 25px; // Khoảng cách giữa các mục menu
+}
+
+.nav-item {
+    color: white;
+    text-decoration: none;
+    padding: 10px 0;
+    transition: color 0.3s ease;
+    font-size: 1em;
+
+    &:hover {
+        color: #f7b731; // Màu khi hover
+    }
+
+    // 💡 Style cho trang hiện tại
+    // &.active {
+    //     color: #f7b731;
+    //     border-bottom: 2px solid #f7b731;
+    // }
+}
+
+.logout-btn {
+    margin-right: 1.5rem;
+    background-color: #f7b731;
+    color: #333;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+
+    &:hover {
+        background-color: #e0a32c;
+    }
+}

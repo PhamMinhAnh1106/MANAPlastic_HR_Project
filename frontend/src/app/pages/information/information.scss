@@ -1,0 +1,63 @@
+.user-profile-card {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #f7f9fc;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profile-title {
+    text-align: center;
+    color: #007bff;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 15px;
+}
+
+.info-details {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.info-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed #ced4da;
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.info-label {
+    font-weight: 600;
+    color: #495057;
+    flex-basis: 40%; // Chiếm 40% chiều rộng
+}
+
+.info-value {
+    color: #343a40;
+    text-align: right;
+    flex-basis: 60%; // Chiếm 60% chiều rộng
+}
+
+.role-tag {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    // Tùy chỉnh màu sắc dựa trên vai trò
+    background-color: #ffc107;
+    color: #343a40;
+}
+
+.loading-state,
+.error-state {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+}

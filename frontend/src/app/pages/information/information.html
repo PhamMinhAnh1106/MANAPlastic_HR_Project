@@ -1,0 +1,72 @@
+<div class="user-profile-card">
+    
+    <h2 class="profile-title">Thông Tin Cá Nhân</h2>
+    
+    <div *ngIf="!userInfo" class="loading-state">
+        Đang tải dữ liệu người dùng hoặc không tìm thấy thông tin...
+    </div>
+
+    <div *ngIf="userInfo" class="info-details">
+        
+        <div class="info-group">
+            <span class="info-label">Họ và Tên:</span>
+            <span class="info-value" 
+                  [class.info-missing]="!userInfo.fullname">
+                {{ userInfo.fullname || 'Chưa có thông tin' }}
+            </span>
+        </div>
+        
+        <div class="info-group">
+            <span class="info-label">Tên đăng nhập:</span>
+            <span class="info-value">{{ userInfo.username || 'Chưa có thông tin' }}</span>
+        </div>
+        
+        <div class="info-group">
+            <span class="info-label">Email:</span>
+            <span class="info-value" 
+                  [class.info-missing]="!userInfo.email">
+                {{ userInfo.email || 'Chưa có thông tin' }}
+            </span>
+        </div>
+        
+        <div class="info-group">
+            <span class="info-label">Số điện thoại:</span>
+            <span class="info-value" 
+                  [class.info-missing]="!userInfo.phonenumber">
+                {{ userInfo.phonenumber || 'Chưa có thông tin' }}
+            </span>
+        </div>
+        
+        <div class="info-group">
+            <span class="info-label">Địa chỉ:</span>
+            <span class="info-value" 
+                  [class.info-missing]="!userInfo.address">
+                {{ userInfo.address || 'Chưa có thông tin' }}
+            </span>
+        </div>
+        
+        <div class="info-group">
+            <span class="info-label">Vai trò:</span>
+            <span class="info-value role-tag"
+                  [class.info-missing]="!userInfo.roleName"
+                  [class.role-tag]="!!userInfo.roleName">
+                {{ userInfo.roleName || 'Chưa có vai trò' }}
+            </span>
+        </div>
+        
+        <div class="info-group">
+            <span class="info-label">Mã Phòng Ban:</span>
+            <span class="info-value"
+                  [class.info-missing]="!userInfo.departmentID">
+                {{ userInfo.departmentID || 'Chưa có thông tin' }}
+            </span>
+        </div>
+
+        <div class="info-group">
+            <span class="info-label">ID Người Dùng:</span>
+            <span class="info-value">{{ userInfo.userID }}</span>
+        </div>
+        
+    </div>
+
+</div>

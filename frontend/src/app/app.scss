@@ -1,0 +1,52 @@
+$color-success: #4CAF50; // Xanh lá cây
+$color-error: #F44336; // Đỏ
+$color-text-light: #fff; // Chữ trắng
+
+@mixin box_response {
+    position: relative;
+    z-index: 1000;
+    top: 1rem;
+    right: 1rem;
+
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        font-weight: bold;
+        text-align: center;
+        // Đặt transition để thông báo xuất hiện mượt mà hơn
+        transition: background-color 0.3s ease;
+    }
+
+    .alert-success {
+        background-color: $color-success;
+        color: $color-text-light;
+        border: 1px solid $color-success;
+    }
+
+    .alert-error {
+        background-color: $color-error;
+        color: $color-text-light;
+        border: 1px solid $color-error
+    }
+}
+
+%loader-typing {
+    width: fit-content;
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 30px;
+    clip-path: inset(0 3ch 0 0);
+    animation: l4 1s steps(4) infinite;
+
+    // Áp dụng :before trực tiếp cho selector này
+    &:before {
+        content: "Loading..."
+    }
+}
+
+@keyframes l4 {
+    to {
+        clip-path: inset(0 -1ch 0 0)
+    }
+}

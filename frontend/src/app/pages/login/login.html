@@ -1,0 +1,36 @@
+<div class="container">
+  <div class="item"></div>
+  <div class="item">
+        <div class="layer"  *ngIf="isloading">
+            <div class="loading"></div>
+        </div>   
+    
+        <div class="form_login">    
+
+            <div class="form_login_head">
+                <p>Login</p>
+            </div>            
+            <div class="form_login_body">
+                <div class="form_login_text">
+                    <span>username</span>
+                    <input type="text" [(ngModel)]="username">
+                    <span>password</span>
+                    <input type="password" [(ngModel)]="password">
+                    <button class="login_button" (click)="login()">Login</button>
+                </div>
+            </div>
+        </div>
+  
+
+  </div>
+  <div class="item">
+    <div class="box_response">
+        <div *ngIf="message" 
+                 class="alert"
+                 [class.alert-success]="isSuccess"
+                 [class.alert-error]="!isSuccess">
+                 {{ message }}
+            </div>
+    </div>
+  </div>
+</div>

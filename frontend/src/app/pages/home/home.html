@@ -1,0 +1,22 @@
+<header class="task-bar">
+
+
+    <nav class="nav-links">
+        <a 
+            *ngFor="let item of navItems"
+            [routerLink]="item.path" 
+            routerLinkActive="active" 
+            class="nav-item">
+            {{ item.label }}
+        </a>
+    </nav>
+
+    <div class="actions">
+        <button class="logout-btn" (click)="logout()">
+            Đăng Xuất
+        </button>
+    </div>
+</header>
+<body>
+    <router-outlet></router-outlet>
+</body>
