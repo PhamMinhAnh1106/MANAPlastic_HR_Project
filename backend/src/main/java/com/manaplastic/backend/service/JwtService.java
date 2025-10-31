@@ -5,14 +5,17 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
@@ -22,7 +25,14 @@ public class JwtService {
 
     // tạo TOKEN
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> extraClaims = new HashMap<>();
+
+        List<String> roles = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+        extraClaims.put("roles", roles);
+        return generateToken(extraClaims, userDetails);
     }
 
 //    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
@@ -34,9 +44,11 @@ public class JwtService {
 //                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
 //                .compact();
 //    }
+
+
    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-//        return buildToken(extraClaims, userDetails,  1000*60*10); //10 Phut
-       return buildToken(extraClaims, userDetails,  1000*20); // test
+        return buildToken(extraClaims, userDetails,  1000*60*15); //15 Phut
+//       return buildToken(extraClaims, userDetails,  1000*20); // test
    }
 
    public String generateRefreshToken(UserDetails userDetails) {
