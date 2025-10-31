@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/Quản Lý Trực Tiếp")
+@RequestMapping("/Manager")
 @PreAuthorize("hasRole('Quản Lý Trực Tiếp')")
 public class ManagerController {
     @GetMapping("/homePage")

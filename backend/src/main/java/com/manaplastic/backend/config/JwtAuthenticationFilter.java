@@ -1,6 +1,7 @@
 package com.manaplastic.backend.config;
 
 import com.manaplastic.backend.service.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +31,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
+        final String requestURI = request.getRequestURI();
+
+        if (requestURI.equals("/login") || requestURI.equals("/refresh")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response); // bỏ qua và cho đi tiếp
@@ -37,10 +45,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // lấy JWT Token từ Header
-        final String jwt = authHeader.substring(7); // bỏ "Bearer " đồ đi
+        final String jwt = authHeader.substring(7); // bỏ "Bearer "
 
         // lấy username từ token
-        final String username = jwtService.extractUsername(jwt);
+//        final String username = jwtService.extractUsername(jwt);
+        final String username;
+        try {
+            username = jwtService.extractUsername(jwt);
+        } catch (ExpiredJwtException e) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         // bước kiểm tra (Nếu user chưa được xác thực)
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

@@ -2,11 +2,13 @@ package com.manaplastic.backend.service;
 
 import com.manaplastic.backend.DTO.AuthenticationRequest;
 import com.manaplastic.backend.DTO.AuthenticationResponse;
+import com.manaplastic.backend.DTO.RefreshTokenRequest;
 import com.manaplastic.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,10 +35,37 @@ public class AuthenticationService {
 
         // tạo JWT token
         var jwtToken = jwtService.generateToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
 
         // trả về token
         return AuthenticationResponse.builder()
                 .token(jwtToken)
+                .refreshToken(refreshToken)
                 .build();
+    }
+
+    //refesh token
+    public AuthenticationResponse refreshToken(RefreshTokenRequest request) {
+        final String refreshToken =request.getRefreshToken();
+
+        if(refreshToken == null || refreshToken.isEmpty()) {
+            throw new IllegalArgumentException("Refresh token missing");
+        }
+
+        final String username = jwtService.extractUsername(refreshToken);
+
+        if(username != null){
+            var user = this.userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+            if(jwtService.isTokenValid(refreshToken,user)){
+                var accessToken = jwtService.generateToken(user);
+
+                return AuthenticationResponse.builder()
+                        .token(accessToken)
+                        .refreshToken(refreshToken)
+                        .build();
+            }
+        }
+        throw new IllegalArgumentException("Invalid refresh token");
     }
 }

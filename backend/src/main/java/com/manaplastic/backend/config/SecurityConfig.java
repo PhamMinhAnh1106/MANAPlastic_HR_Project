@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/login", "/refresh").permitAll()
                         .requestMatchers(SWAGGER_UI_PATHS).permitAll() // swagger API doc
                         .anyRequest().authenticated()
                 )
@@ -52,20 +52,14 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Cho phép Angular (chạy ở port 4200) truy cập
+        // Cho phép Angular :
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-
-        // Các phương thức cho phép
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-
-        // Các header cho phép (Quan trọng là "Authorization" cho JWT)
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
-
-        // Cho phép gửi cookie (nếu cần thôi)
-        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(true); // cokkie neu can
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Áp dụng cho tất cả đường dẫn
+        source.registerCorsConfiguration("/**", configuration); // ap dung tat ca dg dan
         return source;
     }
 

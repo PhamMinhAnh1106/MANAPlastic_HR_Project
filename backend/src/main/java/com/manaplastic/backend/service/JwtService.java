@@ -25,15 +25,33 @@ public class JwtService {
         return generateToken(new HashMap<>(), userDetails);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return Jwts.builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 1 ngày = 86M400k Mili giây
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
+//    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+//        return Jwts.builder()
+//                .setClaims(extraClaims)
+//                .setSubject(userDetails.getUsername())
+//                .setIssuedAt(new Date(System.currentTimeMillis()))
+//                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 1 ngày = 86M400k Mili giây
+//                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+//                .compact();
+//    }
+   public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+//        return buildToken(extraClaims, userDetails,  1000*60*10); //10 Phut
+       return buildToken(extraClaims, userDetails,  1000*20); // test
+   }
+
+   public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(),userDetails, 1000 * 60 * 60 * 24 * 7); // 7 ngay
+   }
+
+   public String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
+       return Jwts.builder()
+               .setClaims(extraClaims)
+               .setSubject(userDetails.getUsername())
+               .setIssuedAt(new Date(System.currentTimeMillis()))
+               .setExpiration(new Date(System.currentTimeMillis() + expiration))
+               .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+               .compact();
+   }
 
     // check TOKEN
     public boolean isTokenValid(String token, UserDetails userDetails) {
