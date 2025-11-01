@@ -15,7 +15,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-//    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserProfileDTO updateUserProfile(int userId, UserUpdatein4DTO request) {
@@ -72,6 +72,19 @@ public class UserService {
         return mapToUserProfileDTO(updatedUser);
     }
 
+    @Transactional
+    public void changeUserPassword(UserEntity currentUser, String oldPassword, String newPassword) {
+        if (!passwordEncoder.matches(oldPassword, currentUser.getPassword())) {
+            throw new IllegalArgumentException("Mật khẩu cũ không chính xác.");
+        }
+
+        if (passwordEncoder.matches(newPassword, currentUser.getPassword())) {
+            throw new IllegalArgumentException("Mật khẩu mới không được trùng với mật khẩu cũ.");
+        }
+
+        currentUser.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(currentUser);
+    }
     private UserProfileDTO mapToUserProfileDTO(UserEntity entity) {
         return UserProfileDTO.builder()
                 .userID(entity.getId())

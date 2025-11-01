@@ -1,6 +1,7 @@
 
 package com.manaplastic.backend.controller;
 
+import com.manaplastic.backend.DTO.ChangePasswordDTO;
 import com.manaplastic.backend.DTO.UserProfileDTO;
 import com.manaplastic.backend.DTO.UserUpdatein4DTO;
 import com.manaplastic.backend.entity.UserEntity;
@@ -65,6 +66,16 @@ public class AdminController {
             userService.updateUserProfile(currentUser.getId(), updateRequest);
             String responseMessage = "Tài khoản đã được cập nhật thành công.";
             return ResponseEntity.ok(responseMessage);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/changePass")
+    public ResponseEntity<String> changePassword(@AuthenticationPrincipal UserEntity currentUser, @RequestBody ChangePasswordDTO request) {
+        try {
+            userService.changeUserPassword(currentUser, request.getOldPassword(), request.getNewPassword());
+            return ResponseEntity.ok("Đổi mật khẩu thành công.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
