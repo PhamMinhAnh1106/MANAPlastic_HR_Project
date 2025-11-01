@@ -11,4 +11,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     //  tạo câu lệnh "SELECT * FROM users WHERE username = ?" tựdđong
     Optional<UserEntity> findByUsername(String username);
+
+    Optional<Object> findByEmail(String email);
 }

@@ -46,13 +46,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // lấy JWT Token từ Header
         final String jwt = authHeader.substring(7); // bỏ "Bearer "
-
+        if (jwt.isEmpty()) {
+            System.err.println("Lỗi JWT không hợp lệ: Token rỗng sau khi cắt 'Bearer '");
+            filterChain.doFilter(request, response);
+            return;
+        }
         // lấy username từ token
 //        final String username = jwtService.extractUsername(jwt);
         final String username;
         try {
             username = jwtService.extractUsername(jwt);
-        } catch (ExpiredJwtException e) {
+        } catch (io.jsonwebtoken.JwtException e) {
+            System.err.println("Lỗi JWT không hợp lệ: " + e.getMessage());
             filterChain.doFilter(request, response);
             return;
         }

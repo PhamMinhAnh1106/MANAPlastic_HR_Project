@@ -22,19 +22,19 @@ public class UserEntity implements UserDetails {
     @Column(name = "userID", nullable = false)
     private Integer id;
 
-    @Column(name = "username", nullable = false, length = 100)
+    @Column(name = "username",nullable = false ,length = 100)
     private String username;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = false ,length = 100)
     private String password;
 
     @Column(name = "fullname", nullable = false)
     private String fullname;
 
-    @Column(name = "cccd", length = 20)
-    private String cccd;
+    @Column(name = "cccd", nullable = false)
+    private Long cccd;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email")
     private String email;
 
     @Column(name = "phonenumber", length = 20)
@@ -73,8 +73,7 @@ public class UserEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Thêm "ROLE_" là để quy ước của Spring Security cho nó hiểu
-        return List.of(new SimpleGrantedAuthority("ROLE_" + this.roleID.getRolename()));
+        return List.of(new SimpleGrantedAuthority(this.roleID.getRolename()));
     }
 
 }

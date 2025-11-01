@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/login", "/refresh").permitAll()
+                        .requestMatchers("/", "/browser/**", "/*.js", "/*.css", "/*.ico").permitAll() // FE
                         .requestMatchers(SWAGGER_UI_PATHS).permitAll() // swagger API doc
                         .anyRequest().authenticated()
                 )
