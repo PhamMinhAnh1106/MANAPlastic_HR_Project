@@ -1,63 +1,131 @@
 .user-profile-card {
-    max-width: 500px;
-    margin: 40px auto;
-    padding: 30px;
-    background-color: #f7f9fc;
+    max-width: 50rem;
+    margin: 2.8rem auto;
+    padding: 2rem 8.5rem;
+    background-color: #ffffff;
     border-radius: 12px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    position: relative;
+}
+
+/* --- HEADER --- */
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+    margin-bottom: 25px;
 }
 
 .profile-title {
-    text-align: center;
     color: #007bff;
-    margin-bottom: 30px;
-    border-bottom: 2px solid #e9ecef;
-    padding-bottom: 15px;
+    font-size: 1.6rem;
+    font-weight: 600;
 }
 
+.edit-btn {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: #0056b3;
+    }
+}
+
+/* --- THÔNG TIN NGƯỜI DÙNG --- */
 .info-details {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 cột */
+    gap: 1.5rem 2rem;
+    /* khoảng cách hàng và cột */
 }
 
 .info-group {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px dashed #ced4da;
-
-    &:last-child {
-        border-bottom: none;
-    }
+    flex-direction: column;
+    gap: 4px;
 }
 
 .info-label {
     font-weight: 600;
     color: #495057;
-    flex-basis: 40%; // Chiếm 40% chiều rộng
+    font-size: 0.95rem;
 }
 
 .info-value {
     color: #343a40;
-    text-align: right;
-    flex-basis: 60%; // Chiếm 60% chiều rộng
+    font-size: 0.95rem;
+    background-color: #f8f9fa;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
 }
 
+/* Input và Select khi chỉnh sửa */
+input,
+select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    outline: none;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+
+    &:focus {
+        border-color: #007bff;
+    }
+}
+
+/* --- Nút Lưu / Hủy --- */
+.action-buttons {
+    display: flex;
+    gap: 12px;
+
+}
+
+.save-btn,
+.cancel-btn {
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.save-btn {
+    background-color: #28a745;
+    color: #fff;
+
+    &:hover {
+        background-color: #218838;
+    }
+}
+
+.cancel-btn {
+    background-color: #dc3545;
+    color: #fff;
+
+    &:hover {
+        background-color: #c82333;
+    }
+}
+
+/* --- Vai trò (role tag) --- */
 .role-tag {
     display: inline-block;
     padding: 4px 8px;
     border-radius: 4px;
     font-weight: bold;
-    // Tùy chỉnh màu sắc dựa trên vai trò
     background-color: #ffc107;
     color: #343a40;
-}
-
-.loading-state,
-.error-state {
-    text-align: center;
-    padding: 20px;
-    color: #6c757d;
 }

@@ -1,72 +1,143 @@
 <div class="user-profile-card">
-    
+  <div class="profile-header">
     <h2 class="profile-title">Thông Tin Cá Nhân</h2>
-    
-    <div *ngIf="!userInfo" class="loading-state">
-        Đang tải dữ liệu người dùng hoặc không tìm thấy thông tin...
+    <button
+      *ngIf="!isEditing"
+      class="edit-btn"
+      (click)="startEdit()"
+    >
+       Sửa
+    </button>
+  </div>
+
+  <div *ngIf="!userInfo" class="loading-state">
+    Đang tải dữ liệu người dùng hoặc không tìm thấy thông tin...
+  </div>
+
+  <div *ngIf="userInfo" class="info-details">
+    <!-- Họ và tên -->
+    <div class="info-group">
+      <span class="info-label">Họ và Tên:</span>
+      <ng-container *ngIf="!isEditing; else editFullname">
+        <span class="info-value">{{ userInfo.fullname || 'Chưa có thông tin' }}</span>
+      </ng-container>
+      <ng-template #editFullname>
+        <input type="text" [(ngModel)]="formdata.fullname" />
+      </ng-template>
     </div>
 
-    <div *ngIf="userInfo" class="info-details">
-        
-        <div class="info-group">
-            <span class="info-label">Họ và Tên:</span>
-            <span class="info-value" 
-                  [class.info-missing]="!userInfo.fullname">
-                {{ userInfo.fullname || 'Chưa có thông tin' }}
-            </span>
-        </div>
-        
-        <div class="info-group">
-            <span class="info-label">Tên đăng nhập:</span>
-            <span class="info-value">{{ userInfo.username || 'Chưa có thông tin' }}</span>
-        </div>
-        
-        <div class="info-group">
-            <span class="info-label">Email:</span>
-            <span class="info-value" 
-                  [class.info-missing]="!userInfo.email">
-                {{ userInfo.email || 'Chưa có thông tin' }}
-            </span>
-        </div>
-        
-        <div class="info-group">
-            <span class="info-label">Số điện thoại:</span>
-            <span class="info-value" 
-                  [class.info-missing]="!userInfo.phonenumber">
-                {{ userInfo.phonenumber || 'Chưa có thông tin' }}
-            </span>
-        </div>
-        
-        <div class="info-group">
-            <span class="info-label">Địa chỉ:</span>
-            <span class="info-value" 
-                  [class.info-missing]="!userInfo.address">
-                {{ userInfo.address || 'Chưa có thông tin' }}
-            </span>
-        </div>
-        
-        <div class="info-group">
-            <span class="info-label">Vai trò:</span>
-            <span class="info-value role-tag"
-                  [class.info-missing]="!userInfo.roleName"
-                  [class.role-tag]="!!userInfo.roleName">
-                {{ userInfo.roleName || 'Chưa có vai trò' }}
-            </span>
-        </div>
-        
-        <div class="info-group">
-            <span class="info-label">Mã Phòng Ban:</span>
-            <span class="info-value"
-                  [class.info-missing]="!userInfo.departmentID">
-                {{ userInfo.departmentID || 'Chưa có thông tin' }}
-            </span>
-        </div>
-
-        <div class="info-group">
-            <span class="info-label">ID Người Dùng:</span>
-            <span class="info-value">{{ userInfo.userID }}</span>
-        </div>
-        
+    <!-- CCCD -->
+    <div class="info-group">
+      <span class="info-label">CCCD:</span>
+      <ng-container *ngIf="!isEditing; else editCCCD">
+        <span class="info-value">{{ userInfo.cccd || 'Chưa có thông tin' }}</span>
+      </ng-container>
+      <ng-template #editCCCD>
+        <input type="number" [(ngModel)]="formdata.cccd" maxlength="12" />
+      </ng-template>
     </div>
 
+    <!-- Email -->
+    <div class="info-group">
+      <span class="info-label">Email:</span>
+      <ng-container *ngIf="!isEditing; else editEmail">
+        <span class="info-value">{{ userInfo.email || 'Chưa có thông tin' }}</span>
+      </ng-container>
+      <ng-template #editEmail>
+        <input type="email" [(ngModel)]="formdata.email" />
+      </ng-template>
+    </div>
+
+    <!-- Số điện thoại -->
+    <div class="info-group">
+      <span class="info-label">Số điện thoại:</span>
+      <ng-container *ngIf="!isEditing; else editPhone">
+        <span class="info-value">{{ userInfo.phonenumber || 'Chưa có thông tin' }}</span>
+      </ng-container>
+      <ng-template #editPhone>
+        <input type="text" [(ngModel)]="formdata.phonenumber" maxlength="10" />
+      </ng-template>
+    </div>
+
+    <!-- Giới tính -->
+    <div class="info-group">
+      <span class="info-label">Giới tính:</span>
+      <ng-container *ngIf="!isEditing; else editGender">
+          <span class="info-value">
+    {{ userInfo.gender === true ? 'Nam' : userInfo.gender === false ? 'Nữ' : 'Chưa có thông tin' }}
+  </span>
+      </ng-container>
+      <ng-template #editGender>
+        <select [(ngModel)]="formdata.gender">
+          <option value="true">Nam</option>
+          <option value="false">Nữ</option>
+        </select>
+      </ng-template>
+    </div>
+
+    <!-- Ngày sinh -->
+    <div class="info-group">
+      <span class="info-label">Ngày sinh:</span>
+      <ng-container *ngIf="!isEditing; else editBirth">
+        <span class="info-value">{{ userInfo.birth || 'Chưa có thông tin' }}</span>
+      </ng-container>
+      <ng-template #editBirth>
+        <input type="date" [(ngModel)]="formdata.birth" />
+      </ng-template>
+    </div>
+
+    <!-- Địa chỉ -->
+    <div class="info-group">
+      <span class="info-label">Địa chỉ:</span>
+      <ng-container *ngIf="!isEditing; else editAddress">
+        <span class="info-value">{{ userInfo.address || 'Chưa có thông tin' }}</span>
+      </ng-container>
+      <ng-template #editAddress>
+        <input type="text" [(ngModel)]="formdata.address" />
+      </ng-template>
+    </div>
+
+    <!-- Số tài khoản -->
+    <div class="info-group">
+      <span class="info-label">Số tài khoản:</span>
+      <ng-container *ngIf="!isEditing; else editBankAcc">
+        <span class="info-value">{{ userInfo.bankAccount || 'Chưa có thông tin' }}</span>
+      </ng-container>
+      <ng-template #editBankAcc>
+        <input type="number" [(ngModel)]="formdata.bankAccount" />
+      </ng-template>
+    </div>
+
+    <!-- Ngân hàng -->
+    <div class="info-group">
+      <span class="info-label">Ngân hàng:</span>
+      <ng-container *ngIf="!isEditing; else editBankName">
+        <span class="info-value">{{ userInfo.bankName || 'Chưa có thông tin' }}</span>
+      </ng-container>
+      <ng-template #editBankName>
+        <input type="text" [(ngModel)]="formdata.bankName" />
+      </ng-template>
+    </div>
+
+    <!-- Ngày vào làm -->
+    <div class="info-group">
+      <span class="info-label">Ngày vào làm:</span>
+      <ng-container >
+        <span class="info-value">{{ userInfo.hireDate || 'Chưa có thông tin' }}</span>
+      </ng-container>
+      <ng-template #editHireDate>
+        <input type="date" [(ngModel)]="formdata.hireDate" />
+      </ng-template>
+    </div>
+
+   
+
+    <!-- Nút lưu & hủy -->
+    <div *ngIf="isEditing" class="action-buttons">
+      <button class="save-btn" (click)="saveChanges()"> Lưu</button>
+      <button class="cancel-btn" (click)="cancelEdit()"> Hủy</button>
+    </div>
+  </div>
+  
 </div>
+

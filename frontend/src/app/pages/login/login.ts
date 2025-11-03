@@ -39,7 +39,7 @@ export class Login {
         this.message = "Đăng nhập thành công";
         this.cookieService.set("access_token", token, { path: "/" });
         this.cookieService.set("refreshToken", refreshToken, { path: "/" });
-        this.router.navigate(['/home']);
+        this.router.navigate(['/home/info']);
       }
     } catch (error) {
       this.message = "Tài khoản mật khẩu sai";

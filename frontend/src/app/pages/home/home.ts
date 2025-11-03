@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { isEmpty } from 'rxjs';
@@ -14,9 +14,13 @@ import { information } from '../../interface/user/user.interface';
   styleUrl: './home.scss',
 })
 export class Home implements OnInit {
-  constructor(private cookieService: CookieService, private router: Router) { }
+  constructor(private cookieService: CookieService, private router: Router, private cdr: ChangeDetectorRef) { }
   token: string = "";
   role: string[] = [];
+  icon_handleBar: any;
+
+
+
   CheckLogin() {
     this.token = this.cookieService.get('access_token');
     if (this.token == '') {
@@ -26,21 +30,41 @@ export class Home implements OnInit {
   }
   navItems = [
     { label: 'Trang Chủ', path: '/home' },
-    { label: 'Thông tin cá nhân', path: '/home/info' },
+
 
   ];
 
   checkrole() {
+    const icon = [{ iconName: "person", path: "/home/info", task: [{ name: "xem tai khoan", path: "/home/info" }, { name: "doi mat khau", path: "/home/changepassword" }] }];
     this.role = DecodeTokenRole(this.token);
     if (this.role.length > 0)
       this.cookieService.set("role", this.role[0], { path: "/" });
+    switch (this.role[0]) {
+      case "Admin":
+        const icon_admin = [{ iconName: "group", path: "/", task: [] }];
+        icon.push(...icon_admin)
+        this.icon_handleBar = icon;
+        break;
+      case "HR":
+        this.icon_handleBar = icon;
+        break;
+      case "Manager":
+        this.icon_handleBar = icon;
+        break;
+      case "Employee":
+        this.icon_handleBar = icon;
+        break;
+    }
   }
 
 
-  logout() {
+  async logout() {
     this.cookieService.delete("access_token");
     this.cookieService.delete("refreshToken");
     this.cookieService.delete("role");
+    this.cdr.detectChanges();
+    await this.router.navigate(['/login']);
+
   }
 
   async ngOnInit(): Promise<void> {

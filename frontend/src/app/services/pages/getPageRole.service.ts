@@ -1,10 +1,10 @@
 import { api } from "../api.service";
 
 const role_name = [
-    "ROLE_Admin",
-    "ROLE_Employee",
-    "ROLE_HR",
-    "ROLE_Manager"
+    "Admin",
+    "Employee",
+    "HR",
+    "Manager"
 ] as const;
 type singleRole = typeof role_name[number];
 
@@ -12,18 +12,18 @@ export async function getdataRole(role: string) {
     const checkrole = role_name.includes(role as singleRole);
     if (checkrole) {
         switch (role) {
-            case "ROLE_Admin":
+            case "Admin":
                 return await AdminHomepage();
 
-            case "ROLE_Employee":
+            case "Employee":
                 return await EmployeeHomepage();
 
 
-            case "ROLE_HR":
+            case "HR":
                 return await HrHomepage();
 
 
-            case "ROLE_Manager":
+            case "Manager":
                 return await ManagerHomepage();
 
 
@@ -33,7 +33,7 @@ export async function getdataRole(role: string) {
 
 async function AdminHomepage() {
     try {
-        const res = await api.get("/admin/homePage");
+        const res = await api.get("/admin/profile");
         return res.data;
     } catch (e) {
         return e;
@@ -41,7 +41,7 @@ async function AdminHomepage() {
 }
 async function HrHomepage() {
     try {
-        const res = await api.get("/hr/homePage");
+        const res = await api.get("/hr/profile");
         return res.data;
     } catch (e) {
         return e;
@@ -49,7 +49,7 @@ async function HrHomepage() {
 }
 async function EmployeeHomepage() {
     try {
-        const res = await api.get("/employee/homePage");
+        const res = await api.get("/employee/profile");
         return res.data;
     } catch (e) {
         return e;
@@ -57,7 +57,7 @@ async function EmployeeHomepage() {
 }
 async function ManagerHomepage() {
     try {
-        const res = await api.get("/manager/homePage");
+        const res = await api.get("/manager/profile");
         return res.data;
     } catch (e) {
         return e;

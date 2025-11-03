@@ -18,5 +18,33 @@
     </div>
 </header>
 <body>
+    <div class="left_handle">
+  <div *ngFor="let item of icon_handleBar" class="menu-item">
+    <!-- Icon chính -->
+    <a
+      [routerLink]="item.path"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="menu-icon"
+    >
+      <span class="material-symbols-outlined icon">{{ item.iconName }}</span>
+    </a>
+
+    <!-- Danh sách task con -->
+    <div class="submenu">
+      <a
+        *ngFor="let taskname of item.task"
+        [routerLink]="taskname.path"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="submenu-link"
+      >
+        {{ taskname.name }}
+      </a>
+    </div>
+  </div>
+</div>
+
+
     <router-outlet></router-outlet>
 </body>
