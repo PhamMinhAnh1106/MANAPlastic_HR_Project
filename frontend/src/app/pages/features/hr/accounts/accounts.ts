@@ -2,26 +2,8 @@ import { CommonModule, NgFor } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GetAccountInfo, UpdateAccounthr } from '../../../../services/pages/features/hr/accountManager.service';
+import { information } from '../../../../interface/user/user.interface';
 
-
-
-// {
-//     userID: 0,
-//     username: "",
-//     fullname: "",
-//     cccd: BigInt(0),
-//     email: "",
-//     phonenumber: "",
-//     gender: false,
-//     birth: "",
-//     address: "",
-//     bankAccount: "",
-//     bankName: "",
-//     hireDate: "",
-//     roleName: "",
-//     status: "",
-//     departmentID: 0
-//   }
 
 @Component({
   selector: 'app-accounts',
@@ -47,7 +29,10 @@ export class Accounts implements OnInit {
   async filterEmployees() {
     const userID = Number(this.filter.userID);
     const res = await GetAccountInfo(userID);
-    this.employee.push(...[res]);
+    const exists = this.employee.some((item: information) => item.userID === res.userID);
+    if (!exists) {
+      this.employee.push(res);
+    }
     this.cdr.detectChanges();
   }
 

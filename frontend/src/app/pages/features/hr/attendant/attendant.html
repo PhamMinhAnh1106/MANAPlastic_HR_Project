@@ -1,0 +1,88 @@
+<div class="attendance-container">
+  <!-- Bộ lọc -->
+  <div class="filter-section">
+    <input type="date" placeholder="Chọn ngày" [(ngModel)]="filter.date" />
+    <select [(ngModel)]="filter.month">
+      <option value="">Chọn tháng</option>
+      <option *ngFor="let m of months" [value]="m">{{ m }}</option>
+    </select>
+
+    <select [(ngModel)]="filter.year">
+      <option value="">Chọn năm</option>
+      <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+    </select>
+
+    <select [(ngModel)]="filter.departmentID">
+      <option value="">Chọn phòng ban</option>
+      <option *ngFor="let dep of departments" [value]="dep.id">
+        {{ dep.name }}
+      </option>
+    </select>
+
+    <select [(ngModel)]="filter.status">
+      <option value="">Chọn trạng thái</option>
+      <option value="PRESENT">Có mặt</option>
+      <option value="MISSING_OUTPUT_DATA">Thiếu giờ ra</option>
+      <option value="MISSING_INPUT_DATA">Thiếu giờ vào</option>
+      <option value="ABSENT">Vắng mặt</option>
+      <option value="ON_LEAVE">Nghỉ phép</option>
+    </select>
+
+    <button (click)="filterAttendance()">Lọc</button>
+  </div>
+
+  <!-- Bảng dữ liệu -->
+  <div class="table-section">
+    <table *ngIf="attendance && attendance.length > 0; else noData">
+      <thead>
+        <tr>
+          <th>Mã chấm công</th>
+          <th>Ngày</th>
+          <th>Giờ vào</th>
+          <th>Giờ ra</th>
+          <th>Ảnh vào</th>
+          <th>Ảnh ra</th>
+          <th>Ca làm</th>
+          <th>Trạng thái</th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let att of attendance">
+          <td>{{ att.attendanceId }}</td>
+          <td>{{ att.attendanceDate }}</td>
+          <td>{{ att.checkIn || 'Chưa có' }}</td>
+          <td>{{ att.checkOut || 'Chưa có' }}</td>
+          <td>
+            <img
+              *ngIf="att.checkInImg; else noInImg"
+              [src]="att.checkInImg"
+              alt="Check-in"
+              class="img-preview"
+            />
+            <ng-template #noInImg>Không có</ng-template>
+          </td>
+          <td>
+            <img
+              *ngIf="att.checkOutImg; else noOutImg"
+              [src]="att.checkOutImg"
+              alt="Check-out"
+              class="img-preview"
+            />
+            <ng-template #noOutImg>Không có</ng-template>
+          </td>
+          <td>{{ att.shiftId || 'Chưa có' }}</td>
+          <td>{{ att.status || 'Chưa có' }}</td>
+          <td>
+            <button class="delete-btn" (click)="deleteAttendance(att.attendanceId)">Xóa</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #noData>
+      <div class="no-data">Không có dữ liệu chấm công</div>
+    </ng-template>
+  </div>
+</div>

@@ -1,0 +1,113 @@
+.attendance-container {
+    z-index: 1;
+    position: relative;
+    top: 4rem;
+    margin-left: 5rem;
+    padding: 20px;
+    background: #f9f9f9;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* Bộ lọc */
+.filter-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+
+    input,
+    select {
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        width: 180px;
+        outline: none;
+
+        &:focus {
+            border-color: #007bff;
+        }
+    }
+
+    button {
+        background-color: #007bff;
+        color: #fff;
+        padding: 8px 14px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+
+        &:hover {
+            background-color: #0056b3;
+        }
+    }
+}
+
+/* Bảng dữ liệu */
+.table-section {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+        font-size: 14px;
+
+        th {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background-color: #f3f7ff;
+        }
+
+        .img-preview {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+
+            &:hover {
+                background-color: #c82333;
+            }
+        }
+    }
+
+    .no-data {
+        text-align: center;
+        font-size: 18px;
+        color: #666;
+        padding: 50px 0;
+        font-weight: 500;
+    }
+}

@@ -2,10 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
-import { isEmpty } from 'rxjs';
 import { DecodeTokenRole } from '../../utils/token.utils';
-import { getdataRole } from '../../services/pages/getPageRole.service';
-import { information } from '../../interface/user/user.interface';
 
 @Component({
   selector: 'app-home',
@@ -70,7 +67,7 @@ export class Home implements OnInit {
     const icon = [{
       iconName: "person", path: "/home/info", task: [{ name: "Xem tài khoản", path: "/home/info" },
       { name: "Đổi mật khẩu", path: "/home/changepassword" }]
-    }, { iconName: "calendar_month", path: "/", task: [{ name: "Quản Lí chấm công", path: "/" }] },];
+    }, { iconName: "calendar_month", path: "/home/user/attendant", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendant" }] },];
     this.role = DecodeTokenRole(this.token);
     if (this.role.length > 0)
       this.cookieService.set("role", this.role[0], { path: "/" });

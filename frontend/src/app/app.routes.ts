@@ -6,6 +6,7 @@ import { Information } from './pages/user/information/information';
 import { ChangePassword } from './pages/user/change-password/change-password';
 import { AddAccount } from './pages/features/admin/add-account/add-account';
 import { Accounts } from './pages/features/hr/accounts/accounts';
+import { Attendant } from './pages/features/hr/attendant/attendant';
 
 
 export const routes: Routes = [
@@ -17,7 +18,9 @@ export const routes: Routes = [
             //admin
             { path: 'add/account', component: AddAccount },
             //hr
-            { path: 'user/account', component: Accounts }
+            { path: 'user/account', component: Accounts },
+            { path: 'user/attendant', component: Attendant }
+
 
         ]
     },
