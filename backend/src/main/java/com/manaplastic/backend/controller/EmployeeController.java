@@ -2,7 +2,7 @@ package com.manaplastic.backend.controller;
 
 import com.manaplastic.backend.DTO.ChangePasswordDTO;
 import com.manaplastic.backend.DTO.UserProfileDTO;
-import com.manaplastic.backend.DTO.UserUpdatein4DTO;
+import com.manaplastic.backend.DTO.UpdateSelfIn4DTO;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/employee")
-@PreAuthorize("hasRole('Employee')")
+@PreAuthorize("hasAuthority('Employee')")
 public class EmployeeController {
 
     @Autowired
@@ -44,8 +44,8 @@ public class EmployeeController {
     }
 
     //sửa thông tin cá nhân
-    @PutMapping("/updateAccount")
-    public ResponseEntity<String> updateMyProfile(@AuthenticationPrincipal UserEntity currentUser, @RequestBody UserUpdatein4DTO updateRequest) {
+    @PutMapping("/updateProfile")
+    public ResponseEntity<String> updateMyProfile(@AuthenticationPrincipal UserEntity currentUser, @RequestBody UpdateSelfIn4DTO updateRequest) {
         try {
             userService.updateUserProfile(currentUser.getId(), updateRequest);
             String responseMessage = "Tài khoản đã được cập nhật thành công.";

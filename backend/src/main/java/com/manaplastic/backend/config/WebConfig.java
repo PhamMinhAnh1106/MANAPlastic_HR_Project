@@ -15,7 +15,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Serve static files from /static folder
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/")
                 .resourceChain(true)

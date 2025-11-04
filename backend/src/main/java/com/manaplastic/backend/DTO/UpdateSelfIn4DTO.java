@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserUpdatein4DTO {
+public class UpdateSelfIn4DTO {
 //    private String password;
     private String fullname;
     private Long cccd;
