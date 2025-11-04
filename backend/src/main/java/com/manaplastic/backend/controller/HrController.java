@@ -2,6 +2,7 @@ package com.manaplastic.backend.controller;
 
 import com.manaplastic.backend.DTO.*;
 import com.manaplastic.backend.entity.UserEntity;
+import com.manaplastic.backend.service.AttendanceService;
 import com.manaplastic.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,9 @@ import java.util.List;
 public class HrController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AttendanceService attendanceService;
 
     //Xem thông tin
     @GetMapping("/profile")
@@ -108,5 +112,28 @@ public class HrController {
         return ResponseEntity.ok("Cập nhật tài khoản thành công!");
 
         //return ResponseEntity.ok(updatedUser);
+    }
+
+    //Xem và lọc dữ liueeuj chấm công theo tháng năm
+    @GetMapping("/chamCong")
+    public ResponseEntity<List<AttendanceDTO>> getMyAttendance(
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Integer departmentId) {
+
+        AttendanceFilterCriteria criteria = new AttendanceFilterCriteria(
+                month, year, departmentId, null, status
+        );
+
+        List<AttendanceDTO> list = attendanceService.getFilteredAttendance(criteria);
+
+        return ResponseEntity.ok(list);
+    }
+
+    @DeleteMapping("/chamCong/{attendanceId}")
+    public ResponseEntity<String> deleteAttendance(@PathVariable int attendanceId) {
+        attendanceService.deleteAttendance(attendanceId);
+        return ResponseEntity.ok("Xóa thành công!");
     }
 }

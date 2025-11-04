@@ -15,6 +15,11 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "attendances")
 public class AttendanceEntity {
+
+    public enum AttendanceStatus {
+        PRESENT, ABSENT, LATE_AND_EARLY,ON_LEAVE, MISSING_OUTPUT_DATA, MISSING_INPUT_DATA
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "attendanceID", nullable = false)
@@ -35,10 +40,11 @@ public class AttendanceEntity {
     @Column(name = "checkout_img_url")
     private String checkoutImgUrl;
 
+    @Enumerated(EnumType.STRING)
     @ColumnDefault("'absent'")
     @Lob
     @Column(name = "status", nullable = false)
-    private String status;
+    private AttendanceStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shiftID")

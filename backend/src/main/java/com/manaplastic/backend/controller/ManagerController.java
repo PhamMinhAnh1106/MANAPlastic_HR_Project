@@ -1,9 +1,8 @@
 package com.manaplastic.backend.controller;
 
-import com.manaplastic.backend.DTO.ChangePasswordDTO;
-import com.manaplastic.backend.DTO.UserProfileDTO;
-import com.manaplastic.backend.DTO.UpdateSelfIn4DTO;
+import com.manaplastic.backend.DTO.*;
 import com.manaplastic.backend.entity.UserEntity;
+import com.manaplastic.backend.service.AttendanceService;
 import com.manaplastic.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/manager")
 @PreAuthorize("hasAuthority('Manager')")
@@ -19,6 +20,9 @@ public class ManagerController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AttendanceService attendanceService;
 
     //Xem thông tin
     @GetMapping("/profile")
@@ -64,5 +68,22 @@ public class ManagerController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+    //Xem và lọc dữ liueeuj chấm công
+    @GetMapping("/chamCong")
+    public ResponseEntity<List<AttendanceDTO>> getMyAttendance(
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) String status,
+            @AuthenticationPrincipal UserEntity currentUser) {
+
+        AttendanceFilterCriteria criteria = new AttendanceFilterCriteria(
+                month, year, null, currentUser.getId() , status// userId là bắt buộc
+        );
+
+        List<AttendanceDTO> list = attendanceService.getFilteredAttendance(criteria);
+
+        return ResponseEntity.ok(list);
     }
 }
