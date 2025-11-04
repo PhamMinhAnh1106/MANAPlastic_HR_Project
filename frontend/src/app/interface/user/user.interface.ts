@@ -1,6 +1,6 @@
 export interface information {
-    userID: number,
-    username: string,
+    userID?: number,
+    username?: string,
     password?: string,
     fullname: string,
     cccd: bigint,

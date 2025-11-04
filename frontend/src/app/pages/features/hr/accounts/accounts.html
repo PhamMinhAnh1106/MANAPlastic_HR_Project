@@ -1,0 +1,131 @@
+<div class="employee-container">
+  <!-- Thanh lọc -->
+  <div class="filter-section">
+    <input type="text" placeholder="Mã nhân viên" [(ngModel)]="filter.userID" />
+    <input type="text" placeholder="Username" [(ngModel)]="filter.username" />
+    <input type="text" placeholder="Mã phòng ban" [(ngModel)]="filter.departmentID" />
+    <button (click)="filterEmployees()">Lọc</button>
+  </div>
+
+  <!-- Bảng dữ liệu -->
+  <div class="table-section">
+    <table *ngIf="employee && employee.length > 0; else noData">
+      <thead>
+        <tr>
+          <th>Mã NV</th>
+          <th>Username</th>
+          <th>Họ tên</th>
+          <th>CCCD</th>
+          <th>Email</th>
+          <th>SĐT</th>
+          <th>Giới tính</th>
+          <th>Ngày sinh</th>
+          <th>Phòng ban</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let emp of employee" >
+          <td>{{ emp.userID }}</td>
+          <td>{{ emp.username }}</td>
+          <td>{{ emp.fullname || 'Chưa có thông tin' }}</td>
+          <td>{{ emp.cccd || 'Chưa có thông tin' }}</td>
+          <td>{{ emp.email || 'Chưa có thông tin' }}</td>
+          <td>{{ emp.phonenumber || 'Chưa có thông tin' }}</td>
+          <td>
+  {{
+    emp.gender === true
+      ? 'Nam'
+      : emp.gender === false
+        ? 'Nữ'
+        : 'Chưa có thông tin'
+  }}
+</td>
+          <td>{{ emp.birth || 'Chưa có thông tin' }}</td>
+          <td>{{ emp.departmentID || 'Chưa có thông tin' }}</td>
+          <td>
+            <button class="edit-btn" (click)="openEditModal(emp)">Sửa</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Không có dữ liệu -->
+    <ng-template #noData>
+      <div class="no-data">Chưa có dữ liệu nhân viên</div>
+    </ng-template>
+  </div>
+
+  <!-- Overlay + Modal -->
+  <div class="overlay" *ngIf="selectedEmployee">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Chỉnh sửa thông tin nhân viên</h3>
+        <span class="close-icon" (click)="cancelEdit()">×</span>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-grid">
+          <label>Mã NV</label>
+          <input [(ngModel)]="selectedEmployee.userID" disabled />
+
+          <label>Username</label>
+          <input [(ngModel)]="selectedEmployee.username" disabled />
+
+          <label>Họ tên</label>
+          <input [(ngModel)]="selectedEmployee.fullname" />
+
+          <label>CCCD</label>
+          <input [(ngModel)]="selectedEmployee.cccd" />
+
+          <label>Email</label>
+          <input [(ngModel)]="selectedEmployee.email" />
+
+          <label>SĐT</label>
+          <input [(ngModel)]="selectedEmployee.phonenumber" />
+
+          <label>Giới tính</label>
+<select [(ngModel)]="selectedEmployee.gender">
+  <option [ngValue]="true">Nam</option>
+  <option [ngValue]="false">Nữ</option>
+</select>
+
+          <label>Ngày sinh</label>
+          <input [(ngModel)]="selectedEmployee.birth" type="date" />
+
+          <label>Địa chỉ</label>
+          <input [(ngModel)]="selectedEmployee.address" />
+
+          <label>Tài khoản NH</label>
+          <input [(ngModel)]="selectedEmployee.bankAccount" />
+
+          <label>Tên ngân hàng</label>
+          <input [(ngModel)]="selectedEmployee.bankName" />
+
+          <label>Ngày vào làm</label>
+          <input [(ngModel)]="selectedEmployee.hireDate" type="date" />
+
+          <label>Chức vụ</label>
+         <select [(ngModel)]="selectedEmployee.roleName">
+  <option value="Admin">Admin</option>
+  <option value="HR">HR</option>
+  <option value="Manager">Manager</option>
+  <option value="Employee">Employee</option>
+</select>
+
+          <label>Trạng thái</label>
+          <input [(ngModel)]="selectedEmployee.status" />
+
+          <label>Phòng ban</label>
+          <input [(ngModel)]="selectedEmployee.departmentID" />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="save-btn" (click)="saveEmployee(selectedEmployee)">Lưu</button>
+        <button class="cancel-btn" (click)="cancelEdit()">Hủy</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -37,8 +37,7 @@ export class Home implements OnInit {
     if (this.isAddOpen == true) {
       switch (this.role[0].toLowerCase()) {
         case "admin":
-          this.featureAdd = [{ name: "Cấp tài khoản", path: "/home/add/account" },
-          { name: "xyz", path: "/home/info" }
+          this.featureAdd = [{ name: "Cấp tài khoản", path: "/home/add/account" }
           ];
           break;
         case "hr":
@@ -68,7 +67,10 @@ export class Home implements OnInit {
   ];
 
   checkrole() {
-    const icon = [{ iconName: "person", path: "/home/info", task: [{ name: "xem tai khoan", path: "/home/info" }, { name: "doi mat khau", path: "/home/changepassword" }] }];
+    const icon = [{
+      iconName: "person", path: "/home/info", task: [{ name: "Xem tài khoản", path: "/home/info" },
+      { name: "Đổi mật khẩu", path: "/home/changepassword" }]
+    }, { iconName: "calendar_month", path: "/", task: [{ name: "Quản Lí chấm công", path: "/" }] },];
     this.role = DecodeTokenRole(this.token);
     if (this.role.length > 0)
       this.cookieService.set("role", this.role[0], { path: "/" });
@@ -79,6 +81,10 @@ export class Home implements OnInit {
         this.icon_handleBar = icon;
         break;
       case "HR":
+        const icon_admin = [
+          { iconName: "group", path: "/home/user/account", task: [{ name: "Quản Lí Nhân sự", path: "/home/user/account" }] }
+        ];
+        icon.push(...icon_admin)
         this.icon_handleBar = icon;
         break;
       case "Manager":
