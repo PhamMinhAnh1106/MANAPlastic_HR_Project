@@ -1,10 +1,10 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { information } from '../../interface/user/user.interface';
 import { CookieService } from 'ngx-cookie-service';
-import { getdataRole } from '../../services/pages/getPageRole.service';
 import { CommonModule, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UpdateAccount } from '../../services/pages/user.service';
+import { information } from '../../../interface/user/user.interface';
+import { getdataRole } from '../../../services/pages/getPageRole.service';
+import { UpdateAccount } from '../../../services/pages/user.service';
 
 @Component({
   selector: 'app-information',
@@ -64,6 +64,7 @@ export class Information implements OnInit {
       roleName: res.roleName,
       departmentID: res.departmentID
     }
+    this.cdr.detectChanges();
   }
   startEdit() {
     this.isEditing = true;
@@ -83,8 +84,9 @@ export class Information implements OnInit {
     }
     const res = await UpdateAccount(this.formdata, this.role) as { data: any; status: number };
     if (res.status == 200) {
-      this.isEditing = false;
       alert("them thanh cong");
+      this.isEditing = false;
+      this.cdr.detectChanges();
     } else {
       alert("them that bai");
     }

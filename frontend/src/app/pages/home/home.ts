@@ -15,11 +15,44 @@ import { information } from '../../interface/user/user.interface';
 })
 export class Home implements OnInit {
   constructor(private cookieService: CookieService, private router: Router, private cdr: ChangeDetectorRef) { }
+
+  //cac thuoc tinh khoi tao de luu tru 
   token: string = "";
   role: string[] = [];
   icon_handleBar: any;
+  isUserOpen = false;
+  isAddOpen = false;
+  featureAdd: any = [{ name: "", path: "" }]
 
 
+  toggleUserDropdown() {
+    this.isUserOpen = !this.isUserOpen;
+    this.isAddOpen = false; // đóng dropdown khác nếu mở
+  }
+
+  toggleAddDropdown() {
+    this.isAddOpen = !this.isAddOpen;
+    this.isUserOpen = false;
+    this.cdr.detectChanges();
+    if (this.isAddOpen == true) {
+      switch (this.role[0].toLowerCase()) {
+        case "admin":
+          this.featureAdd = [{ name: "Cấp tài khoản", path: "/home/add/account" },
+          { name: "xyz", path: "/home/info" }
+          ];
+          break;
+        case "hr":
+          break;
+        case "employee":
+          break;
+        case "manager":
+          break;
+      }
+    }
+  }
+  openAddAccount() {
+    console.log("Cấp tài khoản");
+  }
 
   CheckLogin() {
     this.token = this.cookieService.get('access_token');
@@ -41,8 +74,8 @@ export class Home implements OnInit {
       this.cookieService.set("role", this.role[0], { path: "/" });
     switch (this.role[0]) {
       case "Admin":
-        const icon_admin = [{ iconName: "group", path: "/", task: [] }];
-        icon.push(...icon_admin)
+        // const icon_admin = [{ iconName: "group", path: "/", task: [] }];
+        // icon.push(...icon_admin)
         this.icon_handleBar = icon;
         break;
       case "HR":

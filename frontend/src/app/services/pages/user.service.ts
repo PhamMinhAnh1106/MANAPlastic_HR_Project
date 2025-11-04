@@ -6,7 +6,7 @@ interface updateaccount extends Pick<information, "fullname" | "cccd" | "email" 
 export async function UpdateAccount(formdata: updateaccount, role: string) {
     const roleuser = role.toLowerCase();
     try {
-        const res = await api.put(`/${roleuser}/updateAccount`, {
+        const res = await api.put(`/${roleuser}/updateProfile`, {
             fullname: formdata.fullname,
             cccd: formdata.cccd == null ? 0 : formdata.cccd,
             email: formdata.email,
