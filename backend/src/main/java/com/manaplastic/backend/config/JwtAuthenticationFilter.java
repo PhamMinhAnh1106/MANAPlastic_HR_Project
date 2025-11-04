@@ -32,6 +32,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         final String requestURI = request.getRequestURI();
+        final String method = request.getMethod();
+
+        // Skip cho OPTIONS (CORS preflight)
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Skip cho public endpoints
+        if (requestURI.equals("/login") || requestURI.equals("/refresh")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Skip cho static resources (JS, CSS, images, fonts)
+        if (requestURI.matches(".*\\.(js|css|ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|map)$") ||
+                requestURI.startsWith("/assets/") ||
+                requestURI.startsWith("/browser/") ||
+                requestURI.equals("/") ||
+                requestURI.equals("/index.html")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Skip cho Swagger
+        if (requestURI.startsWith("/swagger-ui") ||
+                requestURI.startsWith("/v3/api-docs") ||
+                requestURI.startsWith("/webjars")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (requestURI.equals("/login") || requestURI.equals("/refresh")) {
             filterChain.doFilter(request, response);
