@@ -1,12 +1,61 @@
 <div class="employee-container">
-  <!-- Thanh lọc -->
-  <div class="filter-section">
+   <div class="filter-section">
     <input type="text" placeholder="Mã nhân viên" [(ngModel)]="filter.userID" />
-    <input type="text" placeholder="Username" [(ngModel)]="filter.username" />
-    <input type="text" placeholder="Mã phòng ban" [(ngModel)]="filter.departmentID" />
     <button (click)="filterEmployees()">Lọc</button>
+    <button class="advanced-btn" (click)="toggleAdvancedFilter()">
+      Tùy chọn nâng cao
+    </button>
   </div>
 
+  <!-- Box lọc nâng cao -->
+  <div class="advanced-filter" *ngIf="showAdvancedFilter">
+    <div class="form-row">
+      <label>Từ khóa</label>
+      <input
+        type="text"
+        placeholder="Username, Họ tên, CCCD, Email..."
+        [(ngModel)]="filter.keyword"
+      />
+    </div>
+
+
+    <div class="form-row">
+      <label>Phòng ban</label>
+      <select [(ngModel)]="filter.departmentId" >
+        <span *ngFor="let dept of department">
+
+        
+          <option value={{dept.departmentId}}>{{dept.departmentName}}</option>
+        </span>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <label>Trạng thái</label>
+      <select [(ngModel)]="filter.status">
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+    </div>
+
+    <!-- Hai ngày chung một hàng -->
+    <div class="form-row double-date">
+      <div class="date-group">
+        <label>Ngày vào làm (từ)</label>
+        <input type="date" [(ngModel)]="filter.hireDateStart" />
+      </div>
+      <div class="date-group">
+        <label>Ngày vào làm (đến)</label>
+        <input type="date" [(ngModel)]="filter.hireDateEnd" />
+      </div>
+    </div>
+
+    <!-- Nút áp dụng & đóng chung một hàng -->
+    <div class="form-row button-row">
+      <button class="apply-btn" (click)="applyAdvancedFilter()">Áp dụng</button>
+      <button class="cancel-btn" (click)="toggleAdvancedFilter()">Đóng</button>
+    </div>
+  </div>
   <!-- Bảng dữ liệu -->
   <div class="table-section">
     <table *ngIf="employee && employee.length > 0; else noData">
@@ -26,7 +75,7 @@
       </thead>
 
       <tbody>
-        <tr *ngFor="let emp of employee" >
+        <tr *ngFor="let emp of employee[0]" >
           <td>{{ emp.userID }}</td>
           <td>{{ emp.username }}</td>
           <td>{{ emp.fullname || 'Chưa có thông tin' }}</td>

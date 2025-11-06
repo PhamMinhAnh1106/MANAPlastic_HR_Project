@@ -1,8 +1,8 @@
-import { A } from '@angular/cdk/keycodes';
 import { CommonModule, NgFor } from '@angular/common';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DeleteAttendant, GetAttendants } from '../../../../services/pages/features/hr/attendant.service';
+import { CookieService } from 'ngx-cookie-service';
 
 interface attendance {
   attendanceId: number,
@@ -22,12 +22,12 @@ interface attendance {
   styleUrl: './attendant.scss',
 })
 export class Attendant {
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(private cdr: ChangeDetectorRef, private cookie: CookieService) { }
   filter = {
     date: '',
     month: '',
     year: '',
-    departmentID: '',
+    departmentId: '',
     status: ''
   };
 
@@ -54,6 +54,7 @@ export class Attendant {
       .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
       .join('&');
     if (query.length > 0) {
+      console.log(query)
       const res = await GetAttendants(query) as attendance[];
       this.attendance = [...res];
       this.cdr.detectChanges();

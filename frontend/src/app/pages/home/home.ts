@@ -68,21 +68,22 @@ export class Home implements OnInit {
     const icon = [{
       iconName: "person", path: "/home/info", task: [{ name: "Xem tài khoản", path: "/home/info" },
       { name: "Đổi mật khẩu", path: "/home/changepassword" }]
-    }, { iconName: "calendar_month", path: "/home/user/attendant", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendant" }] },];
+    },];
     this.role = DecodeTokenRole(this.token);
     if (this.role.length > 0)
       this.cookieService.set("role", this.role[0], { path: "/" });
     switch (this.role[0]) {
       case "Admin":
-        // const icon_admin = [{ iconName: "group", path: "/", task: [] }];
-        // icon.push(...icon_admin)
+        const icon_admin = [{ iconName: "group", path: "/home/user/account", task: [{ name: "Quản Lí Nhân sự", path: "/home/user/account" }] }];
+        icon.push(...icon_admin)
         this.icon_handleBar = icon;
         break;
       case "HR":
-        const icon_admin = [
-          { iconName: "group", path: "/home/user/account", task: [{ name: "Quản Lí Nhân sự", path: "/home/user/account" }] }
+        const icon_hr = [
+          { iconName: "group", path: "/home/user/account", task: [{ name: "Quản Lí Nhân sự", path: "/home/user/account" }], },
+          { iconName: "calendar_month", path: "/home/user/attendant", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendant" }] },
         ];
-        icon.push(...icon_admin)
+        icon.push(...icon_hr)
         this.icon_handleBar = icon;
         break;
       case "Manager":
