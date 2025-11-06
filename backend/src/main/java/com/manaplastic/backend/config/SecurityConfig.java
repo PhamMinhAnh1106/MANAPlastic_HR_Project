@@ -33,11 +33,17 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/login", "/refresh").permitAll()
+                        .requestMatchers("/login", "/refresh", "/logout").permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/", "/index.html", "/*.js", "/*.css", "/*.ico", "/*.png", "/*.jpg", "/assets/**", "/browser/**").permitAll()                        .requestMatchers(SWAGGER_UI_PATHS).permitAll() // swagger API doc
+                        .requestMatchers("/**", "/index.html",
+                                "/*.js", "/*.css", "/*.ico",
+                                "/*.png", "/*.jpg", "/assets/**",
+                                "/browser/**").permitAll()
+                        .requestMatchers(SWAGGER_UI_PATHS).permitAll() // swagger API doc
                         .anyRequest().authenticated()
                 )
+                .logout(logout -> logout
+                        .disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )

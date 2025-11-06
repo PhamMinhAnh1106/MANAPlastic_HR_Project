@@ -1,5 +1,6 @@
 package com.manaplastic.backend.config;
 
+import com.manaplastic.backend.service.JwtBlacklistService;
 import com.manaplastic.backend.service.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -24,6 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final JwtBlacklistService jwtBlacklistService;
 
     @Override
     protected void doFilterInternal(
@@ -75,11 +77,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+//        jwt = authHeader.substring(7);
+
         // lấy JWT Token từ Header
         final String jwt = authHeader.substring(7); // bỏ "Bearer "
         if (jwt.isEmpty()) {
             System.err.println("Lỗi JWT không hợp lệ: Token rỗng sau khi cắt 'Bearer '");
             filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (jwtBlacklistService.isBlacklisted(jwt)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+//            response.getWriter().write("Token Blacklist => Logged out .");
+            response.getWriter().write("Tài khoản này đã Logout, xin hãy Login lại.");
             return;
         }
         // lấy username từ token

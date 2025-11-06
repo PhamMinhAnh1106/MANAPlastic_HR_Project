@@ -1,0 +1,21 @@
+# Định nghĩa phiên bản file compose
+version: '3.8'
+
+# Nơi định nghĩa các dịch vụ (containers)
+services:
+  # Tên dịch vụ: 'redis'
+  redis:
+    # Sử dụng image 'redis' phiên bản 'alpine' (siêu nhẹ)
+    image: redis:alpine
+    # Tên của container (giống --name)
+    container_name: manaplastic-redis
+    # Ánh xạ cổng: 6379 (máy thật) vào 6379 (trong container)
+    ports:
+      - "6379:6379"
+    # (Tùy chọn) Thêm volume để giữ dữ liệu redis ngay cả khi xóa container
+    volumes:
+      - redis_data:/data
+
+# (Tùy chọn) Định nghĩa volume
+volumes:
+  redis_data:

@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -14,14 +15,18 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
 
-    // Secret key: tạo trên-https://generate-random.org/encryption-keys
-    private static final String SECRET_KEY = "288f3daf469d8760689c5fd497669bbc0c41b93d3695ab354b72cabc090034dc"; // sẽ giấu sau
+//    // Secret key: tạo trên-https://generate-random.org/encryption-keys
+//    private static final String SECRET_KEY = "288f3daf469d8760689c5fd497669bbc0c41b93d3695ab354b72cabc090034dc"; // sẽ giấu sau
+
+    @Value("${application.security.jwt.secret-key}")
+    private String secretKey;
 
     // tạo TOKEN
     public String generateToken(UserDetails userDetails) {
@@ -32,7 +37,7 @@ public class JwtService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         extraClaims.put("roles", roles);
-        return generateToken(extraClaims, userDetails);
+        return buildToken(extraClaims, userDetails, 1000*60*15);
     }
 
 //    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
@@ -46,10 +51,10 @@ public class JwtService {
 //    }
 
 
-   public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return buildToken(extraClaims, userDetails,  1000*60*15); //15 Phut
-//       return buildToken(extraClaims, userDetails,  1000*20); // test
-   }
+//   public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+//        return buildToken(extraClaims, userDetails,  1000*60*15); //15 Phut
+////       return buildToken(extraClaims, userDetails,  1000*20); // test
+//   }
 
    public String generateRefreshToken(UserDetails userDetails) {
         return buildToken(new HashMap<>(),userDetails, 1000 * 60 * 60 * 24 * 7); // 7 ngay
@@ -72,12 +77,16 @@ public class JwtService {
     }
 
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
+//    private boolean isTokenExpired(String token) {
+//        return extractExpiration(token).before(new Date());
+//    }
+//
+//    private Date extractExpiration(String token) {
+//        return extractClaim(token, Claims::getExpiration);
+//    }
 
     // lấy thông tin từ TOKEN
     public String extractUsername(String token) {
@@ -89,17 +98,45 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
+//    private Claims extractAllClaims(String token) {
+//        return Jwts.parserBuilder()
+//                .setSigningKey(getSignInKey())
+//                .build()
+//                .parseClaimsJws(token)
+//                .getBody();
+//    }
+
+    // ký xác nhận bằng key
+    private Key getSignInKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(getSignInKey())
+                .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
 
-    // ký xác nhận bằng key
-    private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
+
+     //Tính toán thời gian còn lại (giây) cho đến khi token hết hạn.
+
+    public long getRemainingTokenExpirationSeconds(String token) {
+        try {
+            Date expiration = extractAllClaims(token).getExpiration();
+            long now = new Date().getTime();
+            long expiryTime = expiration.getTime();
+
+            // Tính thời gian còn lại (milliseconds) và chuyển sang seconds
+            if (expiryTime > now) {
+                return TimeUnit.MILLISECONDS.toSeconds(expiryTime - now);
+            }
+            return 0; // Đã hết hạn
+        } catch (Exception e) {
+            // Token không hợp lệ hoặc lỗi parse
+            return 0;
+        }
     }
 }
