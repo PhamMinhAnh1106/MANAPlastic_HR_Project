@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { CommonModule, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { information } from '../../../interface/user/user.interface';
+import { Department, department, information } from '../../../interface/user/user.interface';
 import { getdataRole } from '../../../services/pages/getPageRole.service';
 import { UpdateAccount } from '../../../services/pages/user.service';
 
@@ -14,6 +14,7 @@ import { UpdateAccount } from '../../../services/pages/user.service';
 })
 export class Information implements OnInit {
   constructor(private cookieService: CookieService, private cdr: ChangeDetectorRef) { }
+  //////////////////////////////////////////////
   isEditing = false;
   formdata: any = {
     fullname: "",
@@ -24,7 +25,9 @@ export class Information implements OnInit {
     birth: "",
     address: "",
     bankAccount: "",
-    bankName: ""
+    bankName: "",
+    departmentID: 0
+
   }
 
   userInfo: information = {
@@ -46,6 +49,10 @@ export class Information implements OnInit {
   role: string = "";
 
 
+
+
+  /////////////////////////////////
+
   async getInformation() {
     const res = await getdataRole(this.role);
     this.userInfo = {
@@ -66,6 +73,13 @@ export class Information implements OnInit {
     }
     this.cdr.detectChanges();
   }
+  getDepartment(id: number) {
+    const dept = Department.find(d => d.departmentId === id);
+    return dept ? dept.departmentName : 'Chưa có thông tin';
+  }
+
+
+
   startEdit() {
     this.isEditing = true;
     this.formdata = { ...this.userInfo };
@@ -91,10 +105,10 @@ export class Information implements OnInit {
       alert("them that bai");
     }
   }
-  async ngOnInit(): Promise<void> {
-    this.role = await this.cookieService.get("role");
+  ngOnInit() {
+    this.role = this.cookieService.get("role");
 
-    await this.getInformation();
+    this.getInformation();
     this.cdr.detectChanges();
   }
 }

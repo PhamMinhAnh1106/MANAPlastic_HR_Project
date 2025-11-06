@@ -10,3 +10,12 @@ export async function Login_service(username: string, password: string) {
     }
 
 }
+
+export async function Loout_service() {
+
+    const res = await api.post("/logout");
+    return {
+        status: res.status
+    }
+
+}

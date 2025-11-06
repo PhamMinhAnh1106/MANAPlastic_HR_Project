@@ -111,11 +111,11 @@
     <!-- Ngân hàng -->
     <div class="info-group">
       <span class="info-label">Ngân hàng:</span>
-      <ng-container *ngIf="!isEditing; else editBankName">
-        <span class="info-value">{{ userInfo.bankName || 'Chưa có thông tin' }}</span>
+      <ng-container *ngIf="!isEditing; else editdepartmentID">
+        <span class="info-value">{{ userInfo.departmentID || 'Chưa có thông tin' }}</span>
       </ng-container>
-      <ng-template #editBankName>
-        <input type="text" [(ngModel)]="formdata.bankName" />
+      <ng-template #editdepartmentID>
+        <input type="text" [(ngModel)]="formdata.editdepartmentID" />
       </ng-template>
     </div>
 
@@ -130,7 +130,16 @@
       </ng-template>
     </div>
 
-   
+<div class="info-group">
+  <span class="info-label">Phòng Ban:</span>
+  <ng-container>
+    <span class="info-value">
+      {{
+        getDepartment(userInfo.departmentID)
+      }}
+    </span>
+  </ng-container>
+    </div>
 
     <!-- Nút lưu & hủy -->
     <div *ngIf="isEditing" class="action-buttons">

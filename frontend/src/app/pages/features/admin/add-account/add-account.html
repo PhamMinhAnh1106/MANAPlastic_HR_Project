@@ -30,6 +30,16 @@
         <option value="4">Employee</option>
       </select>
     </div>
+    <div class="form-group">
+      <label>phòng ban</label>
+      <select [(ngModel)]="account.department" >
+        <option value="">Chọn phòng ban</option>
+        <span *ngFor="let item of department">
+
+          <option value={{item.departmentId}}>{{item.departmentName}}</option>
+        </span>
+      </select>
+    </div>
   </div>
 
   <div class="modal-footer">

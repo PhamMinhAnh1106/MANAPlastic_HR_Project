@@ -3,6 +3,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { DecodeTokenRole } from '../../utils/token.utils';
+import { Loout_service } from '../../services/pages/login.service';
 
 @Component({
   selector: 'app-home',
@@ -95,17 +96,21 @@ export class Home implements OnInit {
 
 
   async logout() {
-    this.cookieService.delete("access_token");
-    this.cookieService.delete("refreshToken");
-    this.cookieService.delete("role");
-    this.cdr.detectChanges();
-    await this.router.navigate(['/login']);
+    const res = await Loout_service() as { status: number };
+    if (res.status == 200) {
+
+      this.cookieService.delete("access_token");
+      this.cookieService.delete("refreshToken");
+      this.cookieService.delete("role");
+      this.cdr.detectChanges();
+      this.router.navigate(['/login']);
+    }
 
   }
 
-  async ngOnInit(): Promise<void> {
-    await this.CheckLogin();
-    await this.checkrole();
+  ngOnInit() {
+    this.CheckLogin();
+    this.checkrole();
 
   }
 }

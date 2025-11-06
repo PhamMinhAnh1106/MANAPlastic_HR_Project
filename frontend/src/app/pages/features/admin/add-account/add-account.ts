@@ -3,6 +3,7 @@ import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { addAccount } from '../../../../services/pages/features/admin/addAccount.service';
+import { Department } from '../../../../interface/user/user.interface';
 
 @Component({
   selector: 'app-add-account',
@@ -15,11 +16,12 @@ export class AddAccount {
   account = {
     fullname: '',
     cccd: BigInt(0),
-    role: 0
+    role: 0,
+    department: 0
   };
-
+  department = Department;
   async saveAccount() {
-    if (this.account.fullname == '' || this.account.cccd.toString().length < 10 || this.account.role.toString() == "")
+    if (this.account.fullname == '' || this.account.cccd.toString().length < 10 || this.account.role.toString() == "" || this.account.department.toString() == "")
       alert("vui long dien du thong tin");
     const res = await addAccount(this.account) as { data: string, status: number };
     if (res.status == 201) {
@@ -27,7 +29,8 @@ export class AddAccount {
       this.account = {
         fullname: '',
         cccd: BigInt(0),
-        role: 0
+        role: 0,
+        department: 0
       };
       this.cdr.detectChanges();
       return;

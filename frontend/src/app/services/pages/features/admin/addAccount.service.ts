@@ -3,7 +3,8 @@ import { api } from "../../../api.service";
 interface addaccount {
     fullname: string,
     cccd: bigint,
-    role: number
+    role: number,
+    department: number
 }
 export async function addAccount(formdata: addaccount) {
     const roleName = ["Admin", "HR", "Manager", "Employee"]
@@ -14,7 +15,10 @@ export async function addAccount(formdata: addaccount) {
             cccd: formdata.cccd, roleID: {
                 id: formdata.role,
                 rolename: roleName[formdata.role - 1]
-            }, status: "active"
+            }, status: "active",
+            departmentID: {
+                id: formdata.department
+            }
         });
         return {
             data: res.data,
