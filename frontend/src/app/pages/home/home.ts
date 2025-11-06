@@ -59,16 +59,16 @@ export class Home implements OnInit {
 
   }
   navItems = [
-    { label: 'Trang Chủ', path: '/home' },
+    { label: 'Trang Chủ', path: '/home/info' },
 
 
   ];
 
   checkrole() {
     const icon = [{
-      iconName: "person", path: "/home/info", task: [{ name: "Xem tài khoản", path: "/home/info" },
-      { name: "Đổi mật khẩu", path: "/home/changepassword" }]
-    },];
+      iconName: "person", path: "/home/info", task: [{ name: "Xem tài khoản", path: "/home/info" }]
+    },
+    ];
     this.role = DecodeTokenRole(this.token);
     if (this.role.length > 0)
       this.cookieService.set("role", this.role[0], { path: "/" });
@@ -94,7 +94,19 @@ export class Home implements OnInit {
         break;
     }
   }
+  activeIndex: number | null = 0;
 
+  toggleSubmenu(index: number) {
+    if (this.activeIndex === index) {
+      this.activeIndex = null; // nếu click lại cùng icon → đóng submenu
+    } else {
+      this.activeIndex = index; // mở submenu icon khác
+    }
+  }
+
+  changepass() {
+    this.router.navigate(["/home/changepassword"])
+  }
 
   async logout() {
     const res = await Loout_service() as { status: number };

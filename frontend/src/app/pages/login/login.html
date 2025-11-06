@@ -1,36 +1,52 @@
 <div class="container">
-  <div class="item"></div>
-  <div class="item">
-        <div class="layer"  *ngIf="isloading">
-            <div class="loading"></div>
-        </div>   
-    
-        <div class="form_login">    
-
-            <div class="form_login_head">
-                <p>Login</p>
-            </div>            
-            <div class="form_login_body">
-                <div class="form_login_text">
-                    <span>username</span>
-                    <input type="text" [(ngModel)]="username">
-                    <span>password</span>
-                    <input type="password" [(ngModel)]="password">
-                    <button class="login_button" (click)="login()">Login</button>
-                </div>
-            </div>
-        </div>
-  
-
+  <!-- Left side: Welcome -->
+  <div class="item left-banner">
+    <h1 class="welcome-title">
+      Welcome to <span>ManaPlastic</span>
+    </h1>
   </div>
-  <div class="item">
+
+  <!-- Right side: Login -->
+  <div class="item right-login">
+    <div class="layer" *ngIf="isloading">
+      <div class="loading"></div>
+    </div>
+
+    <div class="form_login">
+      <div class="form_login_head">
+        <p>Login</p>
+      </div>
+
+      <div class="form_login_body">
+        <div class="form_login_text">
+          <span>Username</span>
+          <input
+            type="text"
+            [(ngModel)]="username"
+            placeholder="Enter your username"
+          />
+
+          <span>Password</span>
+          <input
+            type="password"
+            [(ngModel)]="password"
+            placeholder="Enter your password"
+          />
+
+          <button class="login_button" (click)="login()">Login</button>
+        </div>
+      </div>
+    </div>
+
     <div class="box_response">
-        <div *ngIf="message" 
-                 class="alert"
-                 [class.alert-success]="isSuccess"
-                 [class.alert-error]="!isSuccess">
-                 {{ message }}
-            </div>
+      <div
+        *ngIf="message"
+        class="alert"
+        [class.alert-success]="isSuccess"
+        [class.alert-error]="!isSuccess"
+      >
+        {{ message }}
+      </div>
     </div>
   </div>
 </div>

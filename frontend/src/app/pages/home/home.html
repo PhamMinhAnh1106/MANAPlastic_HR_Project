@@ -27,8 +27,9 @@
   <!-- Avatar người dùng -->
   <div class="user-dropdown" (click)="toggleUserDropdown()">
     <img src="assets/avatar.png" alt="User Avatar" class="avatar" />
-
+    
     <div class="dropdown-menu" *ngIf="isUserOpen" (click)="$event.stopPropagation()">
+      <button class="menu-btn" (click)="changepass()">Đổi mật khẩu</button>
       <button class="logout-btn" (click)="logout()">Đăng xuất</button>
     </div>
   </div>
@@ -37,19 +38,24 @@
 </header>
 <body>
     <div class="left_handle">
-  <div *ngFor="let item of icon_handleBar" class="menu-item">
+  <div
+    *ngFor="let item of icon_handleBar; let i = index"
+    class="menu-item"
+  >
     <!-- Icon chính -->
     <a
-      [routerLink]="item.path"
-      routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
+      href="javascript:void(0)"
       class="menu-icon"
+      (click)="toggleSubmenu(i)"
+      [class.active]="activeIndex === i"
     >
-      <span class="material-symbols-outlined icon">{{ item.iconName }}</span>
+      <span class="material-symbols-outlined icon">
+        {{ item.iconName }}
+      </span>
     </a>
 
     <!-- Danh sách task con -->
-    <div class="submenu">
+    <div class="submenu" *ngIf="activeIndex === i">
       <a
         *ngFor="let taskname of item.task"
         [routerLink]="taskname.path"
@@ -62,6 +68,7 @@
     </div>
   </div>
 </div>
+
 
 
     <router-outlet></router-outlet>
