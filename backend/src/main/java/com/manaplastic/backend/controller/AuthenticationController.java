@@ -62,7 +62,7 @@ public class AuthenticationController {
             }
         }
 
-        // 4. Xóa Cookie (Logic cũ của bạn)
+        // 4. Xóa Cookie
         Cookie jwtCookie = new Cookie("access_token", null);
         jwtCookie.setPath("/");
         jwtCookie.setHttpOnly(true);
@@ -75,8 +75,6 @@ public class AuthenticationController {
         refreshCookie.setHttpOnly(true);
         refreshCookie.setMaxAge(0);
         response.addCookie(refreshCookie);
-
-        // Bạn có thể thêm logic thu hồi Refresh Token trong DB nếu bạn lưu Refresh Token ở đó
 
         return ResponseEntity.ok("Logout successful. Token blacklisted.");
     }

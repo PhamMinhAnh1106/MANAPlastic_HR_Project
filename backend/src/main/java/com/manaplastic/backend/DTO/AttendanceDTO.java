@@ -13,6 +13,8 @@ import java.time.LocalDate;
 @Builder
 public class AttendanceDTO {
     private int attendanceId;
+    private String userName;
+    private String fullNameUser;
     private String attendanceDate;
     private LocalDate checkIn;
     private LocalDate checkOut;

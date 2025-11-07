@@ -1,6 +1,7 @@
 package com.manaplastic.backend.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,5 +25,9 @@ public class ShiftEntity {
 
     @Column(name = "endtime", nullable = false)
     private LocalTime endtime;
+
+    @NotNull
+    @Column(name = "duration_hours", nullable = false)
+    private Integer durationHours;
 
 }

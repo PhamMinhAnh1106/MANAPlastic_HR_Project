@@ -41,6 +41,8 @@ public class AttendanceService {
 
         return AttendanceDTO.builder()
                 .attendanceId(entity.getId())
+                .userName(entity.getUserID().getUsername())
+                .fullNameUser(entity.getUserID().getFullname())
                 .attendanceDate(String.valueOf(entity.getDate()))
                 .checkIn(entity.getCheckin() != null
                         ? entity.getCheckin().atZone(zoneId).toLocalDate()
