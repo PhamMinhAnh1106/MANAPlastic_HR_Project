@@ -4,16 +4,16 @@ import { api } from "../../../api.service";
 
 export async function GetAccountInfo(id: number, role: string) {
     try {
-        const res = await api.get(`/${role.toLowerCase()}/user/${id}`, {});
+        const res = await api.get(`/${role.toLowerCase()}/userFilter?keyword=${id}`, {});
         return res.data;
     } catch (error) {
         return "co loi xay ra " + error;
     }
 }
 
-export async function UpdateAccounthr(formdata: information) {
+export async function UpdateAccounthr(formdata: information, role: string) {
     try {
-        const res = await api.put(`/hr/user/${formdata.userID}`, {
+        const res = await api.put(`/${role.toLowerCase()}/user/${formdata.userID}`, {
             fullname: formdata.fullname,
             cccd: formdata.cccd,
             email: formdata.email,

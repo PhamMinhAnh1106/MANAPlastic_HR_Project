@@ -1,31 +1,36 @@
 <div class="attendance-container">
   <!-- Bộ lọc -->
   <div class="filter-section">
+    <!-- Chọn tháng -->
     <select [(ngModel)]="filter.month">
       <option value="">Chọn tháng</option>
       <option *ngFor="let m of months" [value]="m">{{ m }}</option>
     </select>
 
+    <!-- Chọn năm -->
     <select [(ngModel)]="filter.year">
       <option value="">Chọn năm</option>
       <option *ngFor="let y of years" [value]="y">{{ y }}</option>
     </select>
 
-    <select [(ngModel)]="filter.departmentId">
-      <option value="">Chọn phòng ban</option>
-      <option *ngFor="let dep of departments" [value]="dep.id">
-        {{ dep.name }}
-      </option>
-    </select>
+    <!-- Chỉ hiển thị với HR -->
+    <ng-container *ngIf="role === 'hr'">
+      <select [(ngModel)]="filter.departmentId">
+        <option value="">Chọn phòng ban</option>
+        <option *ngFor="let dep of departments" [value]="dep.id">
+          {{ dep.name }}
+        </option>
+      </select>
 
-    <select [(ngModel)]="filter.status">
-      <option value="">Chọn trạng thái</option>
-      <option value="PRESENT">PRESENT</option>
-      <option value="MISSING_OUTPUT_DATA">MISSING_OUTPUT_DATA</option>
-      <option value="MISSING_INPUT_DATA">MISSING_INPUT_DATA</option>
-      <option value="ABSENT">ABSENT</option>
-      <option value="ON_LEAVE">ON_LEAVE</option>
-    </select>
+      <select [(ngModel)]="filter.status">
+        <option value="">Chọn trạng thái</option>
+        <option value="PRESENT">PRESENT</option>
+        <option value="MISSING_OUTPUT_DATA">MISSING_OUTPUT_DATA</option>
+        <option value="MISSING_INPUT_DATA">MISSING_INPUT_DATA</option>
+        <option value="ABSENT">ABSENT</option>
+        <option value="ON_LEAVE">ON_LEAVE</option>
+      </select>
+    </ng-container>
 
     <button (click)="filterAttendance()">Lọc</button>
   </div>
@@ -36,44 +41,34 @@
       <thead>
         <tr>
           <th>Mã chấm công</th>
+          <th>Tên đăng nhập</th>
+          <th>Họ tên</th>
           <th>Ngày</th>
           <th>Giờ vào</th>
           <th>Giờ ra</th>
-          <th>Ảnh vào</th>
-          <th>Ảnh ra</th>
           <th>Ca làm</th>
           <th>Trạng thái</th>
-          <th></th>
+          <th>Minh chứng</th>
+          <!-- Cột Xóa chỉ cho HR -->
+          <th *ngIf="role === 'hr'"></th>
         </tr>
       </thead>
 
       <tbody>
         <tr *ngFor="let att of attendance">
           <td>{{ att.attendanceId }}</td>
+          <td>{{ att.userName || 'Chưa có' }}</td>
+          <td>{{ att.fullNameUser || 'Chưa có' }}</td>
           <td>{{ att.attendanceDate }}</td>
           <td>{{ att.checkIn || 'Chưa có' }}</td>
           <td>{{ att.checkOut || 'Chưa có' }}</td>
-          <td>
-            <img
-              *ngIf="att.checkInImg; else noInImg"
-              [src]="att.checkInImg"
-              alt="Check-in"
-              class="img-preview"
-            />
-            <ng-template #noInImg>Không có</ng-template>
-          </td>
-          <td>
-            <img
-              *ngIf="att.checkOutImg; else noOutImg"
-              [src]="att.checkOutImg"
-              alt="Check-out"
-              class="img-preview"
-            />
-            <ng-template #noOutImg>Không có</ng-template>
-          </td>
           <td>{{ att.shiftId || 'Chưa có' }}</td>
           <td>{{ att.status || 'Chưa có' }}</td>
           <td>
+            <button class="proof-btn" (click)="showProof(att)">Xem</button>
+          </td>
+          <!-- Nút xóa chỉ cho HR -->
+          <td *ngIf="role === 'hr'">
             <button class="delete-btn" (click)="deleteAttendance(att.attendanceId)">Xóa</button>
           </td>
         </tr>
@@ -83,5 +78,35 @@
     <ng-template #noData>
       <div class="no-data">Không có dữ liệu chấm công</div>
     </ng-template>
+  </div>
+
+  <!-- Popup hiển thị minh chứng -->
+  <div class="proof-overlay" *ngIf="selectedProof" (click)="closeProof()"></div>
+  <div class="proof-box" *ngIf="selectedProof">
+    <div class="proof-header">
+      <h3>Minh chứng chấm công</h3>
+      <span class="close-icon" (click)="closeProof()">×</span>
+    </div>
+    <div class="proof-content">
+      <div class="proof-image">
+        <h4>Ảnh vào</h4>
+        <img
+          *ngIf="selectedProof.checkInImg; else noInImg"
+          [src]="selectedProof.checkInImg"
+          alt="Check-in"
+        />
+        <ng-template #noInImg><p>Không có ảnh</p></ng-template>
+      </div>
+
+      <div class="proof-image">
+        <h4>Ảnh ra</h4>
+        <img
+          *ngIf="selectedProof.checkOutImg; else noOutImg"
+          [src]="selectedProof.checkOutImg"
+          alt="Check-out"
+        />
+        <ng-template #noOutImg><p>Không có ảnh</p></ng-template>
+      </div>
+    </div>
   </div>
 </div>

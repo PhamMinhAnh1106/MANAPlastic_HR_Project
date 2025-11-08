@@ -1,5 +1,5 @@
 import { CommonModule, NgFor } from '@angular/common';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DeleteAttendant, GetAttendants } from '../../../../services/pages/features/hr/attendant.service';
 import { CookieService } from 'ngx-cookie-service';
@@ -7,6 +7,8 @@ import { CookieService } from 'ngx-cookie-service';
 interface attendance {
   attendanceId: number,
   attendanceDate: string,
+  userName: string,
+  fullNameUser: string
   checkIn: string,
   checkOut: string,
   checkInImg: string,
@@ -21,8 +23,9 @@ interface attendance {
   templateUrl: './attendant.html',
   styleUrl: './attendant.scss',
 })
-export class Attendant {
+export class Attendant implements OnInit {
   constructor(private cdr: ChangeDetectorRef, private cookie: CookieService) { }
+  role: string = "";
   filter = {
     date: '',
     month: '',
@@ -30,6 +33,15 @@ export class Attendant {
     departmentId: '',
     status: ''
   };
+  selectedProof: any = null;
+
+  showProof(att: any) {
+    this.selectedProof = att;
+  }
+
+  closeProof() {
+    this.selectedProof = null;
+  }
 
   months = Array.from({ length: 12 }, (_, i) => i + 1);
   years = [2023, 2024, 2025];
@@ -54,8 +66,7 @@ export class Attendant {
       .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
       .join('&');
     if (query.length > 0) {
-      console.log(query)
-      const res = await GetAttendants(query) as attendance[];
+      const res = await GetAttendants(query, this.role) as attendance[];
       this.attendance = [...res];
       this.cdr.detectChanges();
     }
@@ -75,15 +86,19 @@ export class Attendant {
     this.selectedAttendance = null;
   }
   async deleteAttendance(id: number) {
-    if (confirm('Bạn có chắc chắn muốn xóa chấm công này không?')) {
-      const res = await DeleteAttendant(id) as { data: string, status: number };
-      if (res.status == 200) {
-        this.filterAttendance();
-        alert(res.data);
-        return;
+    if (this.role == "hr")
+      if (confirm('Bạn có chắc chắn muốn xóa chấm công này không?')) {
+        const res = await DeleteAttendant(id) as { data: string, status: number };
+        if (res.status == 200) {
+          this.filterAttendance();
+          alert(res.data);
+          return;
+        }
+        alert("xoa that bai")
       }
-      alert("xoa that bai")
-    }
+  }
+  ngOnInit(): void {
+    this.role = this.cookie.get("role").toLowerCase();
   }
 
 }

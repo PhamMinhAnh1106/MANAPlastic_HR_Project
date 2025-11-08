@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { GetAccountInfo, UpdateAccounthr } from '../../../../services/pages/features/hr/accountManager.service';
 import { Department, information } from '../../../../interface/user/user.interface';
 import { CookieService } from 'ngx-cookie-service';
-import { R } from '@angular/cdk/keycodes';
 import { FilterUser } from '../../../../utils/filters.utils';
 
 
@@ -50,7 +49,6 @@ export class Accounts implements OnInit {
       .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
       .join('&');
     if (query.length > 0) {
-      console.log(query)
       if (this.employee.length > 0) {
         this.employee.length = [];
       }
@@ -66,20 +64,17 @@ export class Accounts implements OnInit {
     this.selectedEmployee = { ...emp };
   }
   async filterEmployees() {
-    console.log(this.role)
-    const userID = Number(this.filter.userID);
-    const res = await GetAccountInfo(userID, this.role);
-    const exists = this.employee.some((item: information) => item.userID === res.userID);
-    if (!exists) {
-      if (this.employee.length > 0)
-        this.employee = [];
-      this.employee.push([res]);
-    }
+    const keyword = Number(this.filter.userID);
+    const res = await GetAccountInfo(keyword, this.role);
+
+    if (this.employee.length > 0)
+      this.employee = [];
+    this.employee.push(res);
     this.cdr.detectChanges();
   }
 
   async saveEmployee(emp: any) {
-    const res = await UpdateAccounthr(emp) as { data: string, status: number };
+    const res = await UpdateAccounthr(emp, this.role) as { data: string, status: number };
     if (res.status == 200) {
       alert(res.data);
       this.selectedEmployee = null;

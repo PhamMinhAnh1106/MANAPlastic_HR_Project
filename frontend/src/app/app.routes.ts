@@ -19,7 +19,7 @@ export const routes: Routes = [
             { path: 'add/account', component: AddAccount },
             //hr
             { path: 'user/account', component: Accounts },
-            { path: 'user/attendant', component: Attendant }
+            { path: 'user/attendance', component: Attendant }
 
 
         ]
