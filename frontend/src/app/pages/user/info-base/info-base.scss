@@ -1,0 +1,81 @@
+.main_body {
+    padding: 3rem 7rem;
+
+    .body {
+        width: 100%;
+        display: flex;
+
+        .left_body {
+            width: 15%;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            min-height: 24rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+            .avatar {
+                width: 4rem;
+                height: 4rem;
+                border-radius: 50%;
+                background-color: #000;
+                margin-bottom: 1rem;
+            }
+
+            .name {
+                text-align: center;
+                color: #000;
+                font-weight: 600;
+                font-size: 1rem;
+
+            }
+        }
+
+        .right_body {
+            width: 85%;
+            margin-left: 1rem;
+
+            .head {
+                background-color: #f8f9fa;
+                padding: 0.5rem 1rem;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+                button {
+                    background-color: transparent;
+                    border: none;
+                    padding: 0.6rem 1rem;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    color: #333;
+                    transition: all 0.2s ease;
+
+                    &:hover {
+                        background-color: #007bff;
+                        color: #fff;
+                    }
+
+                    &.active {
+                        background-color: #007bff;
+                        color: #fff;
+                    }
+                }
+            }
+
+            .main_info {
+                margin-top: 1rem;
+                padding: 1rem;
+                min-height: 20rem;
+                background-color: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            }
+        }
+    }
+}

@@ -1,0 +1,23 @@
+ 
+<div class="main_body">
+  <div class="body">
+    <div class="left_body">
+      <div class="avatar"></div>
+      <div class="name">{{name}}</div>
+    </div>
+
+    <div class="right_body">
+      <div class="head">
+<button routerLink="/home/info" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Trang chủ</button>
+<button routerLink="/home/info/user" routerLinkActive="active">Hồ sơ</button>
+
+   
+      </div>
+
+<div class="main_info">
+  <ng-container *ngIf="!hasChildRoute">
+    <div class="welcome-text">Chào mừng đến với ManaPlastic </div>
+  </ng-container>
+
+  <router-outlet (activate)="onActivate()" (deactivate)="onDeactivate()"></router-outlet>
+</div>

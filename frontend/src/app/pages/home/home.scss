@@ -177,19 +177,18 @@ body {
         }
 
         .icon {
-            font-size: 1.8rem;
+            font-size: 1.3rem;
             margin-left: 0.3rem;
-            /* 👈 cách viền trái 0.3rem */
             margin-bottom: 0.2rem;
-            /* 👈 cách chữ 0.2rem */
         }
     }
 
     .submenu {
         display: flex;
         flex-direction: column;
-        padding-left: 0.3rem;
         animation: fadeIn 0.2s ease-in-out;
+        text-align: center;
+        width: 100%;
     }
 
     @keyframes fadeIn {
@@ -220,4 +219,7 @@ body {
     .active {
         color: greenyellow;
     }
+
+
+
 }

@@ -14,6 +14,7 @@ interface attendance {
   checkInImg: string,
   checkOutImg: string
   shiftId: number,
+  shiftName: string,
   status: string
 }
 

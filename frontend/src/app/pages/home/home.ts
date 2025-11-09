@@ -4,6 +4,7 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { CookieService } from 'ngx-cookie-service';
 import { DecodeTokenRole } from '../../utils/token.utils';
 import { Loout_service } from '../../services/pages/login.service';
+import { getdataRole } from '../../services/pages/getPageRole.service';
 
 @Component({
   selector: 'app-home',
@@ -21,7 +22,7 @@ export class Home implements OnInit {
   isUserOpen = false;
   isAddOpen = false;
   featureAdd: any = [{ name: "", path: "" }]
-
+  name: string = "";
 
   toggleUserDropdown() {
     this.isUserOpen = !this.isUserOpen;
@@ -66,7 +67,7 @@ export class Home implements OnInit {
 
   checkrole() {
     const icon = [{
-      iconName: "person", path: "/home/info", task: [{ name: "Xem tài khoản", path: "/home/info" }]
+      iconName: "home", path: "/home/info", task: [{ name: "Trang chủ", path: "/home/info" }]
     },
     ];
     this.role = DecodeTokenRole(this.token);
@@ -129,7 +130,7 @@ export class Home implements OnInit {
 
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.CheckLogin();
     this.checkrole();
 

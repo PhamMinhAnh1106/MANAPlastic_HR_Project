@@ -1,9 +1,10 @@
 import { NgIf } from '@angular/common';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Login_service } from '../../services/pages/login.service';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
+import { Loading } from '../shared/loading/loading';
 
 interface response_api {
   status: number,
@@ -12,22 +13,21 @@ interface response_api {
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   imports: [NgIf, FormsModule,],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login {
+export class Login implements OnInit {
   constructor(private cdr: ChangeDetectorRef, private router: Router, private cookieService: CookieService) { }
   username: string = "";
   password: string = "";
   message: string = "";
   isSuccess: boolean = true;
-  isloading: boolean = false;
 
   async login() {
     try {
       const res = await Login_service(this.username, this.password);
-
       if (typeof res === 'string') {
         this.message = res;
         this.isSuccess = false;
@@ -45,7 +45,6 @@ export class Login {
       this.message = "Tài khoản mật khẩu sai";
       this.isSuccess = false;
     } finally {
-      this.isloading = false;
       this.cdr.detectChanges();
     }
 
@@ -58,5 +57,7 @@ export class Login {
 
 
 
+  }
+  ngOnInit(): void {
   }
 }

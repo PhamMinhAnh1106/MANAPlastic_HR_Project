@@ -7,13 +7,19 @@ import { ChangePassword } from './pages/user/change-password/change-password';
 import { AddAccount } from './pages/features/admin/add-account/add-account';
 import { Accounts } from './pages/features/hr/accounts/accounts';
 import { Attendant } from './pages/features/hr/attendant/attendant';
+import { InfoBase } from './pages/user/info-base/info-base';
 
 
 export const routes: Routes = [
     {
         path: 'home', component: Home,
         children: [
-            { path: 'info', component: Information },
+            {
+                path: 'info', component: InfoBase,
+                children: [
+                    { path: 'user', component: Information },
+                ]
+            },
             { path: 'changepassword', component: ChangePassword },
             //admin
             { path: 'add/account', component: AddAccount },

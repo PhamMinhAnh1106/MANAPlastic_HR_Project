@@ -14,9 +14,9 @@ import { changePassword } from '../../../services/pages/user.service';
 export class ChangePassword {
   constructor(private cookie: CookieService) { }
   role: string = "";
-  showForm = false;
   oldPassword = '';
   newPassword = '';
+  RenewPassword = '';
 
   async savePassword() {
     this.role = this.cookie.get("role");
@@ -28,7 +28,6 @@ export class ChangePassword {
     const res = await changePassword(this.oldPassword, this.newPassword, this.role) as { data: string, status: number };
     if (res.status == 200) {
       alert(res.data);
-      this.showForm = false;
     }
     alert(res.data);
 
