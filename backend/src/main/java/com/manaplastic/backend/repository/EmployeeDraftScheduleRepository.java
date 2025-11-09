@@ -23,5 +23,7 @@ public interface EmployeeDraftScheduleRepository extends JpaRepository<Employeed
     @Transactional
     @Modifying
     void deleteByEmployeeIDInAndMonthYear(List<UserEntity> employees, String monthYear);
+
+    List<EmployeedraftscheduleEntity> findByEmployeeIDInAndMonthYearAndIsDayOff(List<UserEntity> employees, String monthYear, boolean b);
 }
 

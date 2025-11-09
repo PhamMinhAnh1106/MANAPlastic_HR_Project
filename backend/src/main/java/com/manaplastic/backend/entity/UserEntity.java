@@ -52,6 +52,10 @@ public class UserEntity implements UserDetails {
     @Column(name = "bankaccount", length = 50)
     private String bankaccount;
 
+    @ColumnDefault("1")
+    @Column(name = "skillGrade")
+    private Integer skillGrade;
+
     @Column(name = "bankname", length = 100)
     private String bankname;
 
@@ -70,6 +74,8 @@ public class UserEntity implements UserDetails {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "departmentID")
     private DepartmentEntity departmentID;
+
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
