@@ -45,16 +45,17 @@ public class AttendanceService {
                 .fullNameUser(entity.getUserID().getFullname())
                 .attendanceDate(String.valueOf(entity.getDate()))
                 .checkIn(entity.getCheckin() != null
-                        ? entity.getCheckin().atZone(zoneId).toLocalDate()
+                        ? entity.getCheckin().atZone(zoneId).toLocalDateTime()
                         : null)
 
                 .checkOut(entity.getCheckout() != null
-                        ? entity.getCheckout().atZone(zoneId).toLocalDate()
+                        ? entity.getCheckout().atZone(zoneId).toLocalDateTime()
                         : null)
 
                 .checkInImg(entity.getCheckinImgUrl())
                 .checkOutImg(entity.getCheckoutImgUrl())
                 .shiftId(entity.getShiftID() != null ? entity.getShiftID().getId() : null)
+                .shiftName(entity.getShiftID().getShiftname() == null ? "Trống" : entity.getShiftID().getShiftname())
                 .status(String.valueOf(entity.getStatus()))
                 .build();
     }

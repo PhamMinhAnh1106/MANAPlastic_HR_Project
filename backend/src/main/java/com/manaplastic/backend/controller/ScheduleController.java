@@ -2,6 +2,7 @@ package com.manaplastic.backend.controller;
 
 import com.manaplastic.backend.DTO.*;
 import com.manaplastic.backend.entity.UserEntity;
+import com.manaplastic.backend.service.ScheduleRequirementService;
 import com.manaplastic.backend.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.List;
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
+//    private final ScheduleRequirementService requirementService;
 
     //Role Nhân viên - employee và quản lý - manager dùng chung
     // vì nhân viên hay quản lý đều có thể dăng ky lịch làm việc
@@ -98,5 +100,28 @@ public class ScheduleController {
     ) {
         scheduleService.updateOfficialScheduleBatch(dtos, manager.getId());
         return ResponseEntity.ok("Đã cập nhật lịch chính thức.");
+    }
+
+
+    // Auto xếp ca
+    @PostMapping("/manager/shiftSchedule/auto-assign")
+    @PreAuthorize("hasAuthority('Manager')")
+    public ResponseEntity<?> autoAssignBlanks(
+            @AuthenticationPrincipal UserEntity manager,
+            @RequestBody FinalizeScheduleDTO dto // Dùng lại DTO (chỉ cần month_year)
+    ) {
+        scheduleService.autoAssignBlankSchedules(dto.month_year(), manager.getId());
+        return ResponseEntity.ok("Đã tự động xếp ca cho các ngày trống. Vui lòng kiểm tra lại bảng nháp.");
+    }
+
+
+    @GetMapping("/manager/shiftSchedule/drafts/validate")
+    @PreAuthorize("hasAuthority('Manager')")
+    public ResponseEntity<List<ScheduleValidationDTO>> validateDepartmentDraft(
+            @AuthenticationPrincipal UserEntity manager,
+            @RequestParam("month_year") String monthYear
+    ) {
+        List<ScheduleValidationDTO> validationResults = scheduleService.validateDraftSchedule(monthYear, manager.getId());
+        return ResponseEntity.ok(validationResults);
     }
 }
