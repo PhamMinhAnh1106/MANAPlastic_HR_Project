@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th10 04, 2025 lúc 03:09 PM
+-- Thời gian đã tạo: Th10 09, 2025 lúc 04:40 PM
 -- Phiên bản máy phục vụ: 8.2.0
 -- Phiên bản PHP: 8.2.13
 
@@ -177,6 +177,183 @@ INSERT INTO `departments` (`departmentID`, `departmentname`, `managerID`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `employeedraftschedule`
+--
+
+DROP TABLE IF EXISTS `employeedraftschedule`;
+CREATE TABLE IF NOT EXISTS `employeedraftschedule` (
+  `draftID` int NOT NULL AUTO_INCREMENT,
+  `employeeID` int NOT NULL COMMENT 'Nhân viên đăng ký (FK từ bảng users)',
+  `date` date NOT NULL COMMENT 'Ngày làm việc đăng ký',
+  `shiftID` int DEFAULT NULL COMMENT 'Ca làm việc muốn đăng ký (FK từ bảng shifts). NULL nếu để trống.',
+  `is_day_off` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1 = muốn xin nghỉ, 0 = đi làm',
+  `month_year` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Tháng/Năm áp dụng lịch (ví dụ: 2025-12)',
+  `registration_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Thời gian gửi đăng ký',
+  PRIMARY KEY (`draftID`),
+  UNIQUE KEY `UQ_Employee_Date_Preference` (`employeeID`,`date`) COMMENT 'Mỗi nhân viên chỉ có 1 đăng ký/ngày',
+  KEY `IX_preference_month_year` (`month_year`),
+  KEY `FK_preferences_shift` (`shiftID`)
+) ENGINE=InnoDB AUTO_INCREMENT=291 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `employeedraftschedule`
+--
+
+INSERT INTO `employeedraftschedule` (`draftID`, `employeeID`, `date`, `shiftID`, `is_day_off`, `month_year`, `registration_date`) VALUES
+(164, 16, '2025-12-01', NULL, 1, '2025-12', '2025-11-09 16:24:04'),
+(165, 16, '2025-12-03', 41, 0, '2025-12', '2025-11-09 16:24:04'),
+(166, 15, '2025-12-04', NULL, 1, '2025-12', '2025-11-09 16:24:51'),
+(167, 15, '2025-12-03', 36, 0, '2025-12', '2025-11-09 16:24:51'),
+(168, 9, '2025-12-01', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(169, 10, '2025-12-01', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(170, 15, '2025-12-01', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(171, 18, '2025-12-01', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(172, 9, '2025-12-02', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(173, 10, '2025-12-02', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(174, 15, '2025-12-02', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(175, 16, '2025-12-02', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(176, 9, '2025-12-03', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(177, 10, '2025-12-03', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(178, 18, '2025-12-03', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(179, 9, '2025-12-04', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(180, 10, '2025-12-04', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(181, 16, '2025-12-04', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(182, 18, '2025-12-04', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(183, 9, '2025-12-05', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(184, 10, '2025-12-05', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(185, 15, '2025-12-05', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(186, 16, '2025-12-05', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(187, 9, '2025-12-06', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(188, 10, '2025-12-06', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(189, 15, '2025-12-06', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(190, 16, '2025-12-06', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(191, 9, '2025-12-07', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(192, 10, '2025-12-07', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(193, 15, '2025-12-07', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(194, 16, '2025-12-07', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(195, 9, '2025-12-08', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(196, 10, '2025-12-08', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(197, 15, '2025-12-08', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(198, 16, '2025-12-08', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(199, 9, '2025-12-09', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(200, 10, '2025-12-09', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(201, 15, '2025-12-09', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(202, 16, '2025-12-09', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(203, 9, '2025-12-10', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(204, 10, '2025-12-10', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(205, 15, '2025-12-10', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(206, 16, '2025-12-10', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(207, 9, '2025-12-11', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(208, 10, '2025-12-11', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(209, 15, '2025-12-11', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(210, 16, '2025-12-11', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(211, 9, '2025-12-12', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(212, 10, '2025-12-12', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(213, 15, '2025-12-12', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(214, 16, '2025-12-12', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(215, 9, '2025-12-13', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(216, 10, '2025-12-13', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(217, 15, '2025-12-13', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(218, 16, '2025-12-13', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(219, 9, '2025-12-14', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(220, 10, '2025-12-14', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(221, 15, '2025-12-14', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(222, 16, '2025-12-14', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(223, 9, '2025-12-15', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(224, 10, '2025-12-15', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(225, 15, '2025-12-15', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(226, 16, '2025-12-15', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(227, 9, '2025-12-16', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(228, 10, '2025-12-16', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(229, 15, '2025-12-16', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(230, 16, '2025-12-16', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(231, 9, '2025-12-17', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(232, 10, '2025-12-17', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(233, 15, '2025-12-17', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(234, 16, '2025-12-17', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(235, 9, '2025-12-18', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(236, 10, '2025-12-18', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(237, 15, '2025-12-18', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(238, 16, '2025-12-18', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(239, 9, '2025-12-19', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(240, 10, '2025-12-19', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(241, 15, '2025-12-19', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(242, 16, '2025-12-19', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(243, 9, '2025-12-20', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(244, 10, '2025-12-20', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(245, 15, '2025-12-20', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(246, 16, '2025-12-20', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(247, 9, '2025-12-21', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(248, 10, '2025-12-21', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(249, 15, '2025-12-21', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(250, 16, '2025-12-21', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(251, 9, '2025-12-22', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(252, 10, '2025-12-22', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(253, 15, '2025-12-22', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(254, 16, '2025-12-22', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(255, 9, '2025-12-23', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(256, 10, '2025-12-23', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(257, 15, '2025-12-23', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(258, 16, '2025-12-23', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(259, 9, '2025-12-24', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(260, 10, '2025-12-24', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(261, 15, '2025-12-24', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(262, 16, '2025-12-24', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(263, 9, '2025-12-25', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(264, 10, '2025-12-25', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(265, 15, '2025-12-25', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(266, 16, '2025-12-25', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(267, 9, '2025-12-26', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(268, 10, '2025-12-26', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(269, 15, '2025-12-26', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(270, 16, '2025-12-26', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(271, 9, '2025-12-27', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(272, 10, '2025-12-27', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(273, 15, '2025-12-27', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(274, 16, '2025-12-27', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(275, 9, '2025-12-28', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(276, 10, '2025-12-28', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(277, 15, '2025-12-28', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(278, 16, '2025-12-28', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(279, 9, '2025-12-29', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(280, 10, '2025-12-29', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(281, 15, '2025-12-29', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(282, 16, '2025-12-29', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(283, 9, '2025-12-30', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(284, 10, '2025-12-30', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(285, 15, '2025-12-30', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(286, 16, '2025-12-30', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(287, 9, '2025-12-31', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(288, 10, '2025-12-31', 36, 0, '2025-12', '2025-11-09 16:25:26'),
+(289, 15, '2025-12-31', 41, 0, '2025-12', '2025-11-09 16:25:26'),
+(290, 16, '2025-12-31', 41, 0, '2025-12', '2025-11-09 16:25:26');
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `employeeofficialschedule`
+--
+
+DROP TABLE IF EXISTS `employeeofficialschedule`;
+CREATE TABLE IF NOT EXISTS `employeeofficialschedule` (
+  `officialID` int NOT NULL AUTO_INCREMENT,
+  `employeeID` int NOT NULL COMMENT 'Nhân viên được xếp lịch (FK từ bảng users)',
+  `date` date NOT NULL COMMENT 'Ngày làm việc',
+  `shiftID` int DEFAULT NULL COMMENT 'Ca làm việc chính thức (FK từ bảng shifts). NULL nếu là ngày nghỉ.',
+  `is_day_off` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1 = ngày nghỉ, 0 = đi làm',
+  `month_year` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Tháng/Năm áp dụng lịch (ví dụ: 2025-12)',
+  `approved_by_managerID` int DEFAULT NULL COMMENT 'Manager đã duyệt (FK từ bảng users)',
+  `published_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Ngày hoàn tất/công bố',
+  PRIMARY KEY (`officialID`),
+  UNIQUE KEY `UQ_Employee_Date_Schedule` (`employeeID`,`date`) COMMENT 'Mỗi nhân viên chỉ có 1 lịch/ngày',
+  KEY `IX_schedule_month_year` (`month_year`),
+  KEY `FK_schedule_shift` (`shiftID`),
+  KEY `FK_schedule_manager` (`approved_by_managerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `leaverequests`
 --
 
@@ -291,6 +468,30 @@ INSERT INTO `permissions` (`permissionID`, `permissionname`, `description`) VALU
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `requirementrules`
+--
+
+DROP TABLE IF EXISTS `requirementrules`;
+CREATE TABLE IF NOT EXISTS `requirementrules` (
+  `ruleID` int NOT NULL AUTO_INCREMENT COMMENT 'Khóa chính',
+  `requirementID` int NOT NULL COMMENT 'Liên kết tới schedule_requirements',
+  `required_skillGrade` int NOT NULL COMMENT 'Cấp kỹ năng yêu cầu (ví dụ: 3)',
+  `min_staff_count` int NOT NULL DEFAULT '1' COMMENT 'Số lượng nhân viên TỐI THIỂU phải có kỹ năng này (ví dụ: 1)',
+  PRIMARY KEY (`ruleID`),
+  KEY `FK_rule_req` (`requirementID`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Quy tắc kỹ năng chi tiết cho một yêu cầu nhân sự';
+
+--
+-- Đang đổ dữ liệu cho bảng `requirementrules`
+--
+
+INSERT INTO `requirementrules` (`ruleID`, `requirementID`, `required_skillGrade`, `min_staff_count`) VALUES
+(1, 2, 3, 1),
+(2, 3, 3, 1);
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `roles`
 --
 
@@ -354,6 +555,31 @@ INSERT INTO `rolespermissions` (`roleID`, `permissionID`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `schedulerequirements`
+--
+
+DROP TABLE IF EXISTS `schedulerequirements`;
+CREATE TABLE IF NOT EXISTS `schedulerequirements` (
+  `requirementID` int NOT NULL AUTO_INCREMENT COMMENT 'Khóa chính',
+  `departmentID` int NOT NULL COMMENT 'FK - Áp dụng cho phòng ban nào (ví dụ: In ấn)',
+  `shiftID` int NOT NULL COMMENT 'FK - Áp dụng cho ca nào (ví dụ: C808)',
+  `total_staff_needed` int NOT NULL DEFAULT '0' COMMENT 'Tổng số nhân viên cần (ví dụ: 3)',
+  PRIMARY KEY (`requirementID`),
+  UNIQUE KEY `UQ_Dept_Shift` (`departmentID`,`shiftID`) COMMENT 'Mỗi phòng ban/ca chỉ có 1 yêu cầu',
+  KEY `FK_schedule_req_shift` (`shiftID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Nhu cầu nhân sự cơ bản cho ca làm việc của phòng ban';
+
+--
+-- Đang đổ dữ liệu cho bảng `schedulerequirements`
+--
+
+INSERT INTO `schedulerequirements` (`requirementID`, `departmentID`, `shiftID`, `total_staff_needed`) VALUES
+(2, 5, 36, 2),
+(3, 5, 41, 2);
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `shifts`
 --
 
@@ -363,18 +589,67 @@ CREATE TABLE IF NOT EXISTS `shifts` (
   `shiftname` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `starttime` time NOT NULL,
   `endtime` time NOT NULL,
+  `duration_hours` int NOT NULL,
   PRIMARY KEY (`shiftID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `shifts`
 --
 
-INSERT INTO `shifts` (`shiftID`, `shiftname`, `starttime`, `endtime`) VALUES
-(1, 'Hành chính', '08:00:00', '17:00:00'),
-(2, 'Ca Sáng (SX)', '06:00:00', '14:00:00'),
-(3, 'Ca Chiều (SX)', '14:00:00', '22:00:00'),
-(4, 'Ca Đêm (SX)', '22:00:00', '06:00:00');
+INSERT INTO `shifts` (`shiftID`, `shiftname`, `starttime`, `endtime`, `duration_hours`) VALUES
+(1, 'Hành chính', '08:00:00', '17:00:00', 0),
+(2, 'Ca Sáng (SX)', '06:00:00', '14:00:00', 0),
+(3, 'Ca Chiều (SX)', '14:00:00', '22:00:00', 0),
+(4, 'Ca Đêm (SX)', '22:00:00', '06:00:00', 0),
+(5, 'C601', '01:00:00', '07:00:00', 6),
+(6, 'C602', '02:00:00', '08:00:00', 6),
+(7, 'C603', '03:00:00', '09:00:00', 6),
+(8, 'C604', '04:00:00', '10:00:00', 6),
+(9, 'C605', '05:00:00', '11:00:00', 6),
+(10, 'C606', '06:00:00', '12:00:00', 6),
+(11, 'C607', '07:00:00', '13:00:00', 6),
+(12, 'C608', '08:00:00', '14:00:00', 6),
+(13, 'C609', '09:00:00', '15:00:00', 6),
+(14, 'C610', '10:00:00', '16:00:00', 6),
+(15, 'C611', '11:00:00', '17:00:00', 6),
+(16, 'C612', '12:00:00', '18:00:00', 6),
+(17, 'C613', '13:00:00', '19:00:00', 6),
+(18, 'C614', '14:00:00', '20:00:00', 6),
+(19, 'C615', '15:00:00', '21:00:00', 6),
+(20, 'C616', '16:00:00', '22:00:00', 6),
+(21, 'C617', '17:00:00', '23:00:00', 6),
+(22, 'C618', '18:00:00', '00:00:00', 6),
+(23, 'C619', '19:00:00', '01:00:00', 6),
+(24, 'C620', '20:00:00', '02:00:00', 6),
+(25, 'C621', '21:00:00', '03:00:00', 6),
+(26, 'C622', '22:00:00', '04:00:00', 6),
+(27, 'C623', '23:00:00', '05:00:00', 6),
+(28, 'C624', '00:00:00', '06:00:00', 6),
+(29, 'C801', '01:00:00', '10:00:00', 8),
+(30, 'C802', '02:00:00', '11:00:00', 8),
+(31, 'C803', '03:00:00', '12:00:00', 8),
+(32, 'C804', '04:00:00', '13:00:00', 8),
+(33, 'C805', '05:00:00', '14:00:00', 8),
+(34, 'C806', '06:00:00', '15:00:00', 8),
+(35, 'C807', '07:00:00', '16:00:00', 8),
+(36, 'C808', '08:00:00', '17:00:00', 8),
+(37, 'C809', '09:00:00', '18:00:00', 8),
+(38, 'C810', '10:00:00', '19:00:00', 8),
+(39, 'C811', '11:00:00', '20:00:00', 8),
+(40, 'C812', '12:00:00', '21:00:00', 8),
+(41, 'C813', '13:00:00', '22:00:00', 8),
+(42, 'C814', '14:00:00', '23:00:00', 8),
+(43, 'C815', '15:00:00', '00:00:00', 8),
+(44, 'C816', '16:00:00', '01:00:00', 8),
+(45, 'C817', '17:00:00', '02:00:00', 8),
+(46, 'C818', '18:00:00', '03:00:00', 8),
+(47, 'C819', '19:00:00', '04:00:00', 8),
+(48, 'C820', '20:00:00', '05:00:00', 8),
+(49, 'C821', '21:00:00', '06:00:00', 8),
+(50, 'C822', '22:00:00', '07:00:00', 8),
+(51, 'C823', '23:00:00', '08:00:00', 8),
+(52, 'C824', '00:00:00', '09:00:00', 8);
 
 -- --------------------------------------------------------
 
@@ -415,33 +690,37 @@ CREATE TABLE IF NOT EXISTS `users` (
   `status` enum('active','inactive','on_leave') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
   `roleID` int DEFAULT NULL,
   `departmentID` int DEFAULT NULL,
+  `skillGrade` int DEFAULT '1',
   PRIMARY KEY (`userID`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`),
   KEY `roleID` (`roleID`),
   KEY `departmentID` (`departmentID`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `users`
 --
 
-INSERT INTO `users` (`userID`, `username`, `password`, `fullname`, `cccd`, `email`, `phonenumber`, `birth`, `gender`, `address`, `bankaccount`, `bankname`, `hiredate`, `status`, `roleID`, `departmentID`) VALUES
-(1, 'admin', '$2a$10$2sQzJxjvMcMeSNOSsysqjOQZzWIpwvHKIdwdeZ.EqQDM6QKcufj0q', 'Phạm Minh Anh', 123456789874, 'admin@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-01-01', 'active', 1, 2),
-(2, 'it_support', '$2a$10$skyfJgN4n.Z2GMTP7GLnneUFL4cSm1DWoJdSsYGvF06flQTGz1GBC', 'Lê Hỗ Trợ IT', NULL, 'it.support@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-05-10', 'active', 1, 2),
-(3, 'hr_manager', '$2a$10$yVs4Kv0e36Kcb8wesofM3enjSu/Kicj5TFJm6YavsG5TDd2kLtsqy', 'Nguyễn Thị Nhân Sự', NULL, 'hr.manager@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-02-15', 'active', 2, 1),
-(4, 'hr_staff', '$2a$10$wnTMZHPSgAkKLfwNCY3cE.ufDKVPHrdWvaJ5oL.o0dKj7kxBMJNXG', 'Phạm Văn Tuyển Dụng', NULL, 'hr.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-08-01', 'active', 2, 1),
-(5, 'kythuat_lead', '$2a$10$QP/JCd6cnNgRkFr3BYzbKOSRMIbdI6Y1fE6D.w.p1xfbvQV9y5UJe', 'Võ Văn Kỹ Thuật', NULL, 'kythuat.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-03-01', 'active', 3, 3),
-(6, 'kythuat_staff', '$2a$10$TXgpVb3lT7f/1YQxy2i/he2wiepriI6XqcPO2WcxG2xBLt0V9T8HO', 'Hoàng Thị Máy Móc', NULL, 'kythuat.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-09-10', 'active', 4, 3),
-(7, 'sanxuat_lead', '$2a$10$4b25FwYYUWVDgrItKmyyJ.ntqK6S6SJFqLHabuDL.xsoP/yScAov.', 'Trịnh Hữu Sản Xuất', NULL, 'sanxuat.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-03-02', 'active', 3, 4),
-(8, 'sanxuat_staff', '$2a$10$TxHjoxC0uVKLIDznDhNWmuF73p7LTpVr1Lf1uGdn1lw2lo8gR0ApS', 'Đặng Văn Vận Hành', NULL, 'sanxuat.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-09-15', 'active', 4, 4),
-(9, 'inan_lead', '$2a$10$6v5RYvb1wRZZ333NkxGDLuVRAgXeG0xHcfsxiBQHV0tXRpvai2yYS', 'Bùi Văn Mực', NULL, 'inan.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-04-01', 'active', 3, 5),
-(10, 'inan_staff', '$2a$10$JN0oA3nYZmxvy4FXcXyMHuTBXs4xWWzcoFkXTgSbwgoqyHGmEG3Pm', 'Lý Thị In', NULL, 'inan.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-10-01', 'active', 4, 5),
-(11, 'cskh_lead', '$2a$10$bm/qxbS1udqc01zrB/p/HuNdfz1kH9oFBVpfuLoTaGFLZKEuysMF.', 'Đỗ Thị Khách Hàng', NULL, 'cskh.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-05-01', 'active', 3, 6),
-(12, 'cskh_staff', '$2a$10$tHV/qqOG68rkmYyYL82LIe5v1hnm.lzY.SlZclzOZoV6j13l6LtD.', 'Mạc Văn Hài Lòng', NULL, 'cskh.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-11-01', 'active', 4, 6),
-(13, '57540101', '$2a$10$xPIdXJigdb91ZNCAFFtTu.4RLJpIYAaQGJ70VlaE2wSblfQznOlDi', 'Phạm Minh Anh HR', 123456789876, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 2, 1),
-(14, '52082901', '$2a$10$jeaJPcpV3IQMoxGHBLw2teRExwzuD0ZB9ubxat7yzrqgAgfWn.CvS', 'testAddAccountHR', 79203031165, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 2, 1),
-(15, '71939801', '$2a$10$U0qh1Bel43Hp2K6CbsOCXefQQRgRqPJMU5Sah3eIflWTGeSkZlrPG', 'testAddAccountNV', 123456789000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, 5);
+INSERT INTO `users` (`userID`, `username`, `password`, `fullname`, `cccd`, `email`, `phonenumber`, `birth`, `gender`, `address`, `bankaccount`, `bankname`, `hiredate`, `status`, `roleID`, `departmentID`, `skillGrade`) VALUES
+(1, 'admin', '$2a$10$2sQzJxjvMcMeSNOSsysqjOQZzWIpwvHKIdwdeZ.EqQDM6QKcufj0q', 'Phạm Minh Anh', 123456789874, 'admin@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-01-01', 'active', 1, 2, 3),
+(2, 'it_support', '$2a$10$skyfJgN4n.Z2GMTP7GLnneUFL4cSm1DWoJdSsYGvF06flQTGz1GBC', 'Lê Hỗ Trợ IT', NULL, 'it.support@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-05-10', 'active', 1, 2, 3),
+(3, 'hr_manager', '$2a$10$yVs4Kv0e36Kcb8wesofM3enjSu/Kicj5TFJm6YavsG5TDd2kLtsqy', 'Nguyễn Thị Nhân Sự', NULL, 'hr.manager@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-02-15', 'active', 2, 1, 1),
+(4, 'hr_staff', '$2a$10$wnTMZHPSgAkKLfwNCY3cE.ufDKVPHrdWvaJ5oL.o0dKj7kxBMJNXG', 'Phạm Văn Tuyển Dụng', NULL, 'hr.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-08-01', 'active', 2, 1, 1),
+(5, 'kythuat_lead', '$2a$10$QP/JCd6cnNgRkFr3BYzbKOSRMIbdI6Y1fE6D.w.p1xfbvQV9y5UJe', 'Võ Văn Kỹ Thuật', NULL, 'kythuat.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-03-01', 'active', 3, 3, 3),
+(6, 'kythuat_staff', '$2a$10$TXgpVb3lT7f/1YQxy2i/he2wiepriI6XqcPO2WcxG2xBLt0V9T8HO', 'Hoàng Thị Máy Móc', NULL, 'kythuat.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-09-10', 'active', 4, 3, 1),
+(7, 'sanxuat_lead', '$2a$10$4b25FwYYUWVDgrItKmyyJ.ntqK6S6SJFqLHabuDL.xsoP/yScAov.', 'Trịnh Hữu Sản Xuất', NULL, 'sanxuat.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-03-02', 'active', 3, 4, 3),
+(8, 'sanxuat_staff', '$2a$10$TxHjoxC0uVKLIDznDhNWmuF73p7LTpVr1Lf1uGdn1lw2lo8gR0ApS', 'Đặng Văn Vận Hành', NULL, 'sanxuat.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-09-15', 'active', 4, 4, 1),
+(9, 'inan_lead', '$2a$10$6v5RYvb1wRZZ333NkxGDLuVRAgXeG0xHcfsxiBQHV0tXRpvai2yYS', 'Bùi Văn Mực', NULL, 'inan.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-04-01', 'active', 3, 5, 3),
+(10, 'inan_staff', '$2a$10$JN0oA3nYZmxvy4FXcXyMHuTBXs4xWWzcoFkXTgSbwgoqyHGmEG3Pm', 'Lý Thị In', NULL, 'inan.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-10-01', 'active', 4, 5, 1),
+(11, 'cskh_lead', '$2a$10$bm/qxbS1udqc01zrB/p/HuNdfz1kH9oFBVpfuLoTaGFLZKEuysMF.', 'Đỗ Thị Khách Hàng', NULL, 'cskh.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-05-01', 'active', 3, 6, 3),
+(12, 'cskh_staff', '$2a$10$tHV/qqOG68rkmYyYL82LIe5v1hnm.lzY.SlZclzOZoV6j13l6LtD.', 'Mạc Văn Hài Lòng', NULL, 'cskh.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-11-01', 'active', 4, 6, 1),
+(13, '57540101', '$2a$10$xPIdXJigdb91ZNCAFFtTu.4RLJpIYAaQGJ70VlaE2wSblfQznOlDi', 'Phạm Minh Anh HR', 123456789876, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 2, 1, 3),
+(14, '52082901', '$2a$10$jeaJPcpV3IQMoxGHBLw2teRExwzuD0ZB9ubxat7yzrqgAgfWn.CvS', 'testAddAccountHR', 79203031165, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 2, 1, 3),
+(15, '71939801', '$2a$10$U0qh1Bel43Hp2K6CbsOCXefQQRgRqPJMU5Sah3eIflWTGeSkZlrPG', 'testAddAccountNV', 123456789000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, 5, 3),
+(16, '83637905', '$2a$10$IHOeCVrioPATwf9X9s3wh.zNbCKAEHubkZxk8uPfqEWrmUb8mJCGm', 'Phạm Nhân Viên', 12345678922, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, 5, 2),
+(17, '72001905', '$2a$10$eQmfti7ZY3a5TXk4xqfSaOc25bW6d1.bScjcFq5pabC7b6D5WTtSK', 'testAddAccountNVinan', 123456789000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, NULL, 1),
+(18, '56885905', '$2a$10$4WtXYERXuVRu89Fh1KVm4uc0PuMsuHbwMg7/32dl9/qbrsFZvin3m', 'testAddAccountNVinan', 123456789000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, 5, 2);
 
 --
 -- Các ràng buộc cho các bảng đã đổ
@@ -479,6 +758,21 @@ ALTER TABLE `departments`
   ADD CONSTRAINT `FK_Department_Manager` FOREIGN KEY (`managerID`) REFERENCES `users` (`userID`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
+-- Các ràng buộc cho bảng `employeedraftschedule`
+--
+ALTER TABLE `employeedraftschedule`
+  ADD CONSTRAINT `FK_preferences_shift` FOREIGN KEY (`shiftID`) REFERENCES `shifts` (`shiftID`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_preferences_user` FOREIGN KEY (`employeeID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `employeeofficialschedule`
+--
+ALTER TABLE `employeeofficialschedule`
+  ADD CONSTRAINT `FK_schedule_manager` FOREIGN KEY (`approved_by_managerID`) REFERENCES `users` (`userID`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_schedule_shift` FOREIGN KEY (`shiftID`) REFERENCES `shifts` (`shiftID`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_schedule_user` FOREIGN KEY (`employeeID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Các ràng buộc cho bảng `leaverequests`
 --
 ALTER TABLE `leaverequests`
@@ -497,11 +791,24 @@ ALTER TABLE `payrolls`
   ADD CONSTRAINT `payrolls_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Các ràng buộc cho bảng `requirementrules`
+--
+ALTER TABLE `requirementrules`
+  ADD CONSTRAINT `FK_rule_req` FOREIGN KEY (`requirementID`) REFERENCES `schedulerequirements` (`requirementID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Các ràng buộc cho bảng `rolespermissions`
 --
 ALTER TABLE `rolespermissions`
   ADD CONSTRAINT `rolespermissions_ibfk_1` FOREIGN KEY (`roleID`) REFERENCES `roles` (`roleID`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `rolespermissions_ibfk_2` FOREIGN KEY (`permissionID`) REFERENCES `permissions` (`permissionID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `schedulerequirements`
+--
+ALTER TABLE `schedulerequirements`
+  ADD CONSTRAINT `FK_schedule_req_dept` FOREIGN KEY (`departmentID`) REFERENCES `departments` (`departmentID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_schedule_req_shift` FOREIGN KEY (`shiftID`) REFERENCES `shifts` (`shiftID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `userpermissions`
