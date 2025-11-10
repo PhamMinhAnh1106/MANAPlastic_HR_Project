@@ -34,3 +34,9 @@ Thumbs.db
 # Lờ đi file đóng gói của FE sang BE (Giao diện)
 # ----------------
 /backend/src/main/resources/static/
+
+# ----------------
+# ENVIRONMENT CONFIG (Ẩn thông tin nhạy cảm)
+# ----------------
+.env
+*.env
