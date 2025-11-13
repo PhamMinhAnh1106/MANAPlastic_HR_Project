@@ -14,6 +14,11 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "leaverequests")
 public class LeaverequestEntity {
+
+    public enum LeaverequestStatus {
+        PENDING, APPROVED, REJECTED
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "leaverequestID", nullable = false)
@@ -32,10 +37,11 @@ public class LeaverequestEntity {
     @Column(name = "reason")
     private String reason;
 
-    @ColumnDefault("'pending'")
+    @ColumnDefault("'PENDING'")
     @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
+    private LeaverequestStatus status;
 
     @Column(name = "requestdate")
     private LocalDate requestdate;

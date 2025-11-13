@@ -75,8 +75,6 @@ public class UserEntity implements UserDetails {
     @JoinColumn(name = "departmentID")
     private DepartmentEntity departmentID;
 
-
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(this.roleID.getRolename()));

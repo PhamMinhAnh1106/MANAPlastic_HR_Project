@@ -30,4 +30,5 @@ public class UpdateAccountDTO {
     private Integer roleID;
     private String status;
     private LocalDate hireDate;
+    private Integer skillGrade;
 }

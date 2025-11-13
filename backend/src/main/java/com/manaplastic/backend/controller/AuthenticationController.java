@@ -53,16 +53,16 @@ public class AuthenticationController {
         }
 
         if (token != null) {
-            // 2. Tính toán thời gian hết hạn còn lại
+            // Tính toán thời gian hết hạn còn lại
             long expirationSeconds = jwtService.getRemainingTokenExpirationSeconds(token);
 
-            // 3. Đưa Token vào Blacklist
+            // Đưa Token vào Blacklist
             if (expirationSeconds > 0) {
                 jwtBlacklistService.blacklistToken(token, expirationSeconds);
             }
         }
 
-        // 4. Xóa Cookie
+        // Xóa Cookie
         Cookie jwtCookie = new Cookie("access_token", null);
         jwtCookie.setPath("/");
         jwtCookie.setHttpOnly(true);

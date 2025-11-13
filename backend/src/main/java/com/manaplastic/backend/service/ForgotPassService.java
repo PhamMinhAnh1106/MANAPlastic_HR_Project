@@ -21,6 +21,8 @@ public class ForgotPassService {
     private StringRedisTemplate redisTemplate;
     @Autowired
     private JavaMailSender mailSender;
+    @Autowired
+    private  EmailService emailService;
      @Autowired
      private UserRepository userRepository;
      @Autowired
@@ -48,7 +50,8 @@ public class ForgotPassService {
 
         redisTemplate.opsForValue().set(redisKey, otp, OTP_EXPIRATION_MINUTES, TimeUnit.MINUTES);
 
-        sendOtpEmail(email, otp);
+        // sendOtpEmail(email, otp);
+        emailService.sendOtpEmail(email, otp, OTP_EXPIRATION_MINUTES);
     }
 
     public String verifyOtp(String email, String otp) {
@@ -120,17 +123,18 @@ public class ForgotPassService {
         return String.format("%06d", new Random().nextInt(999999));
     }
 
-    private void sendOtpEmail(String toEmail, String otp) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(toEmail);
-        message.setSubject("[MANAPlastic] Yêu Cầu Đặt Lại Mật Khẩu");
-        message.setText("Mã OTP của bạn là: " + otp + "\n" +
-                "Mã này sẽ hết hạn sau " + OTP_EXPIRATION_MINUTES + " phút.");
-
-        try {
-            mailSender.send(message);
-        } catch (Exception e) {
-            throw new RuntimeException("Không thể gửi email OTP. Lỗi: " + e.getMessage());
-        }
-    }
+    // Mang qua EmailService
+//    private void sendOtpEmail(String toEmail, String otp) {
+//        SimpleMailMessage message = new SimpleMailMessage();
+//        message.setTo(toEmail);
+//        message.setSubject("[MANAPlastic] Yêu Cầu Đặt Lại Mật Khẩu");
+//        message.setText("Mã OTP của bạn là: " + otp + "\n" +
+//                "Mã này sẽ hết hạn sau " + OTP_EXPIRATION_MINUTES + " phút.");
+//
+//        try {
+//            mailSender.send(message);
+//        } catch (Exception e) {
+//            throw new RuntimeException("Không thể gửi email OTP. Lỗi: " + e.getMessage());
+//        }
+//    }
 }

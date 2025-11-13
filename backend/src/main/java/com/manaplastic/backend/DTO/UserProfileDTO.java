@@ -30,5 +30,6 @@ public class UserProfileDTO {
     private String roleName;
     private String status;
     private Integer departmentID;
+    private Integer skillGrade;
 
 }

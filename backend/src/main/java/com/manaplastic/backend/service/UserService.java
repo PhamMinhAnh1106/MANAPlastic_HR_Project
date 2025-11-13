@@ -190,6 +190,10 @@ public class UserService {
             }
         }
 
+        if(request.getSkillGrade()!=null && (isAdmin || isHR)){
+            userToUpdate.setSkillGrade(request.getSkillGrade());
+        }
+
         UserEntity updatedUser = userRepository.save(userToUpdate);
 
         return mapToUserProfileDTO(updatedUser);
@@ -224,6 +228,7 @@ public class UserService {
                 .bankAccount(entity.getBankaccount())
                 .bankName(entity.getBankname())
                 .status(entity.getStatus())
+                .skillGrade(entity.getSkillGrade())
                 .build();
     }
 }
