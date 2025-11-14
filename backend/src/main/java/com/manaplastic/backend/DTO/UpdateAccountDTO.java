@@ -31,4 +31,5 @@ public class UpdateAccountDTO {
     private String status;
     private LocalDate hireDate;
     private Integer skillGrade;
+    private String jobType;
 }

@@ -194,6 +194,10 @@ public class UserService {
             userToUpdate.setSkillGrade(request.getSkillGrade());
         }
 
+        if(request.getJobType()!=null && (isAdmin || isHR)){
+            userToUpdate.setJobType(request.getJobType());
+        }
+
         UserEntity updatedUser = userRepository.save(userToUpdate);
 
         return mapToUserProfileDTO(updatedUser);
@@ -229,6 +233,7 @@ public class UserService {
                 .bankName(entity.getBankname())
                 .status(entity.getStatus())
                 .skillGrade(entity.getSkillGrade())
+                .jobType(entity.getJobType())
                 .build();
     }
 }

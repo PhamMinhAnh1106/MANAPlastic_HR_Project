@@ -36,25 +36,37 @@ public class AdminService {
             throw new IllegalArgumentException("Trường 'fullName' không được để trống.");
         }
 
+        newUser.setHiredate(LocalDate.now());
+        newUser.setJobType("NORMAL");
+        newUser.setSkillGrade(1);
+
         // lấy username = random + ngày hienej tại
-        final int MAX_RETRIES = 5;
-        for (int i = 0; i < MAX_RETRIES; i++) {
-            int randomNumber = ThreadLocalRandom.current().nextInt(100000, 1000000);
-            String randomNumericId = String.valueOf(randomNumber);
-            String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd"));
-            String generatedUsername = randomNumericId + currentDate;
+//        final int MAX_RETRIES = 5;
+//        for (int i = 0; i < MAX_RETRIES; i++) {
+//            int randomNumber = ThreadLocalRandom.current().nextInt(100000, 1000000);
+//            String randomNumericId = String.valueOf(randomNumber);
+//            String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd"));
+//            String generatedUsername = randomNumericId + currentDate;
+//
+//            newUser.setUsername(generatedUsername);
+//
+//            try {
+//                return userRepository.save(newUser);
+//            } catch (DataIntegrityViolationException e) {
+//                if (i == MAX_RETRIES - 1) {
+//                    throw new RuntimeException("Không thể tạo username duy nhất sau " + MAX_RETRIES + " lần thử. Vui lòng thử lại sau.", e);
+//                }
+//            }
+//        }
+//       throw new RuntimeException("Không thể tạo người dùng.");
+        Integer maxId = userRepository.findMaxId();
+        int nextId = (maxId == null) ? 1 : maxId + 1;
 
-            newUser.setUsername(generatedUsername);
+        // Format username 6 số
+        String generatedUsername = String.format("%06d", nextId);
+        newUser.setUsername(generatedUsername);
 
-            try {
-                return userRepository.save(newUser);
-            } catch (DataIntegrityViolationException e) {
-                if (i == MAX_RETRIES - 1) {
-                    throw new RuntimeException("Không thể tạo username duy nhất sau " + MAX_RETRIES + " lần thử. Vui lòng thử lại sau.", e);
-                }
-            }
-        }
-       throw new RuntimeException("Không thể tạo người dùng.");
+        return userRepository.save(newUser);
     }
 
 }

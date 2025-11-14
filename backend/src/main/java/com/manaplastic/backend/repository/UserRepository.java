@@ -16,6 +16,9 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer>, JpaS
     //  tạo câu lệnh "SELECT * FROM users WHERE username = ?" tựdđong
     Optional<UserEntity> findByUsername(String username);
 
+    @Query("SELECT MAX(u.id) FROM UserEntity u") // cho chức năng tạo username/ mã nhân viên tự động
+    Integer findMaxId();
+
     Optional<UserEntity> findByEmail(String email);
 
     List<UserEntity> findByDepartmentID(DepartmentEntity departmentId);

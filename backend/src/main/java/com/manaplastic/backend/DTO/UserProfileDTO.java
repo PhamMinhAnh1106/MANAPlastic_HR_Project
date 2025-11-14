@@ -31,6 +31,7 @@ public class UserProfileDTO {
     private String status;
     private Integer departmentID;
     private Integer skillGrade;
+    private String jobType;
 //    private String constractName;
 
 }
