@@ -1,6 +1,8 @@
 package com.manaplastic.backend.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -74,6 +76,12 @@ public class UserEntity implements UserDetails {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "departmentID")
     private DepartmentEntity departmentID;
+
+    @Size(max = 100)
+    @NotNull
+    @ColumnDefault("'NORMAL'")
+    @Column(name = "job_type", nullable = false, length = 100)
+    private String jobType;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

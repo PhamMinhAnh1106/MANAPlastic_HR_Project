@@ -30,4 +30,25 @@ public class ShiftEntity {
     @Column(name = "duration_hours", nullable = false)
     private Integer durationHours;
 
+    @Transient // Đánh dấu để JPA biết không map cột này vào DB
+    public LeavepolicyEntity.LeaveType getShiftnameAsEnum() { // Chuyển Shiftname (String) sang LeaveType (Enum) để so sánh
+        if (this.shiftname == null) {
+            return null;
+        }
+        if (this.shiftname.startsWith("AL")) {
+            return LeavepolicyEntity.LeaveType.ANNUAL;
+        }
+        if (this.shiftname.startsWith("SL")) {
+            return LeavepolicyEntity.LeaveType.SICK;
+        }
+        if (this.shiftname.startsWith("PL")) {
+            // Giả định PL (Personal Leave) dùng chung chính sách PATERNITY
+            return LeavepolicyEntity.LeaveType.PATERNITY;
+        }
+        if (this.shiftname.startsWith("ML")) {
+            return LeavepolicyEntity.LeaveType.MATERNITY;
+        }
+
+        return null; // nếu ca làm việc là C808,C809,...
+    }
 }

@@ -19,7 +19,7 @@ public class UpdateAccountDTO {
     private String email;
     private String phonenumber;
     private String address;
-    private Long cccd;
+    private String cccd;
     private Boolean gender;
     private LocalDate birth;
     private String bankAccount;

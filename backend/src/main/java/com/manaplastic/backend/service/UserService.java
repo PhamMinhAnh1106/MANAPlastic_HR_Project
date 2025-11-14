@@ -165,7 +165,7 @@ public class UserService {
         }
 
         if (request.getCccd() != null) {
-            userToUpdate.setCccd(String.valueOf(request.getCccd()));
+            userToUpdate.setCccd(request.getCccd());
         }
 
         if (request.getDepartmentID() != null) {

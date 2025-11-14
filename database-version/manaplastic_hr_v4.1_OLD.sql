@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th10 14, 2025 lúc 05:46 PM
+-- Thời gian đã tạo: Th10 14, 2025 lúc 07:54 AM
 -- Phiên bản máy phục vụ: 8.2.0
 -- Phiên bản PHP: 8.2.13
 
@@ -173,55 +173,6 @@ INSERT INTO `departments` (`departmentID`, `departmentname`, `managerID`) VALUES
 (4, 'Phòng Ban Sản Xuất', 7),
 (5, 'Phòng Ban In Ấn', 9),
 (6, 'Phòng Ban Chăm Sóc Khách Hàng', 11);
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `dependents`
---
-
-DROP TABLE IF EXISTS `dependents`;
-CREATE TABLE IF NOT EXISTS `dependents` (
-  `dependentID` int NOT NULL AUTO_INCREMENT,
-  `userID` int NOT NULL COMMENT 'FK: Nhân viên liên quan (từ bảng users)',
-  `fullname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Họ tên người phụ thuộc',
-  `relationship` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mối quan hệ (Vợ, Chồng, Con...)',
-  `birth` date DEFAULT NULL COMMENT 'Ngày sinh',
-  `gender` tinyint(1) DEFAULT NULL COMMENT '0=Nữ, 1=Nam',
-  `id_card_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CCCD hoặc Giấy khai sinh',
-  `phonenumber` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `is_tax_deductible` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1=Có đăng ký giảm trừ gia cảnh, 0=Không',
-  PRIMARY KEY (`dependentID`),
-  KEY `FK_Dependent_User` (`userID`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Người phụ thuộc của nhân viên';
-
---
--- Đang đổ dữ liệu cho bảng `dependents`
---
-
-INSERT INTO `dependents` (`dependentID`, `userID`, `fullname`, `relationship`, `birth`, `gender`, `id_card_number`, `phonenumber`, `is_tax_deductible`) VALUES
-(1, 1, 'Phạm Minh Anh Vợ', 'Vợ', '1990-05-10', 0, '001090001234', '0901000101', 1),
-(2, 1, 'Phạm Minh Anh Con', 'Con', '2020-08-20', 1, '001220005678', '0901000102', 1),
-(3, 2, 'Lê Hỗ Trợ IT Cha', 'Cha', '1965-02-15', 1, '002065001111', '0902000201', 1),
-(4, 3, 'Nguyễn Thị Nhân Sự Chồng', 'Chồng', '1988-11-30', 1, '003088002222', '0903000301', 1),
-(5, 4, 'Phạm Văn Tuyển Dụng Con', 'Con', '2021-03-14', 0, '004221003333', '0904000401', 1),
-(6, 5, 'Võ Văn Kỹ Thuật Vợ', 'Vợ', '1992-07-25', 0, '005092004444', '0905000501', 1),
-(7, 5, 'Võ Văn Kỹ Thuật Con', 'Con', '2023-01-10', 1, '005223005555', '0905000502', 1),
-(8, 6, 'Hoàng Thị Máy Móc Con', 'Con', '2020-12-01', 1, '006220006666', '0906000601', 1),
-(9, 7, 'Trịnh Hữu Sản Xuất Vợ', 'Vợ', '1993-01-20', 0, '007093007777', '0907000701', 1),
-(10, 8, 'Đặng Văn Vận Hành Mẹ', 'Mẹ', '1970-04-05', 0, '008070008888', '0908000801', 1),
-(11, 9, 'Bùi Văn Mực Vợ', 'Vợ', '1994-06-18', 0, '009094009999', '0909000901', 1),
-(12, 9, 'Bùi Văn Mực Con Trai', 'Con', '2022-09-02', 1, '009222001010', '0909000902', 1),
-(13, 10, 'Lý Thị In Con Gái', 'Con', '2024-01-07', 0, '010224001212', '0910000101', 1),
-(14, 11, 'Đỗ Thị Khách Hàng Chồng', 'Chồng', '1991-08-11', 1, '011091001313', '0911000111', 1),
-(15, 12, 'Mạc Văn Hài Lòng Vợ', 'Vợ', '1995-10-03', 0, '012095001414', '0912000121', 1),
-(16, 13, 'Phạm Minh Anh HR Con', 'Con', '2021-11-11', 0, '013221001515', '0913000131', 1),
-(17, 14, 'testAddAccountHR Cha', 'Cha', '1968-02-22', 1, '014068001616', '0914000141', 1),
-(18, 15, 'testAddAccountNV Mẹ', 'Mẹ', '1972-03-23', 0, '015072001717', '0915000151', 1),
-(19, 16, 'Phạm Nhân Viên Vợ', 'Vợ', '1998-04-24', 0, '016098001818', '0916000161', 1),
-(20, 17, 'testAddAccountNVinan 17 Con', 'Con', '2023-05-25', 1, '017223001919', '0917000171', 1),
-(21, 18, 'testAddAccountNVinan 18 Vợ', 'Vợ', '1999-06-26', 0, '018099002020', '0918000181', 1),
-(22, 19, 'Phạm Minh Anh Test Pass Vợ', 'Vợ', '2000-07-27', 0, '019000002121', '0919000191', 1);
 
 -- --------------------------------------------------------
 
@@ -399,123 +350,6 @@ CREATE TABLE IF NOT EXISTS `employeeofficialschedule` (
   KEY `FK_schedule_shift` (`shiftID`),
   KEY `FK_schedule_manager` (`approved_by_managerID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `leavebalance`
---
-
-DROP TABLE IF EXISTS `leavebalance`;
-CREATE TABLE IF NOT EXISTS `leavebalance` (
-  `userID` int NOT NULL COMMENT 'FK: Bảng users',
-  `leave_type_id` int NOT NULL COMMENT 'FK: Bảng shifts (tham chiếu ID của AL, SL, PL...)',
-  `year` int NOT NULL COMMENT 'Năm áp dụng (VD: 2025)',
-  `total_granted` int NOT NULL DEFAULT '0',
-  `carried_over` int NOT NULL DEFAULT '0',
-  `days_used` int NOT NULL DEFAULT '0',
-  `last_updated` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`userID`,`leave_type_id`,`year`) COMMENT 'Mỗi NV chỉ có 1 số dư cho 1 loại phép/năm',
-  KEY `FK_leavebalance_Shift` (`leave_type_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Số dư phép của từng nhân viên';
-
---
--- Đang đổ dữ liệu cho bảng `leavebalance`
---
-
-INSERT INTO `leavebalance` (`userID`, `leave_type_id`, `year`, `total_granted`, `carried_over`, `days_used`, `last_updated`) VALUES
-(1, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(1, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(1, 55, 2025, 14, 0, 0, '2025-11-14 22:14:46'),
-(2, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(2, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(2, 55, 2025, 14, 0, 0, '2025-11-14 22:14:46'),
-(3, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(3, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(3, 56, 2025, 180, 0, 0, '2025-11-14 22:14:46'),
-(4, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(4, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(4, 55, 2025, 14, 0, 0, '2025-11-14 22:14:46'),
-(5, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(5, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(5, 56, 2025, 180, 0, 0, '2025-11-14 22:14:46'),
-(6, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(6, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(6, 55, 2025, 14, 0, 0, '2025-11-14 22:14:46'),
-(7, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(7, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(7, 55, 2025, 14, 0, 0, '2025-11-14 22:14:46'),
-(8, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(8, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(8, 56, 2025, 180, 0, 0, '2025-11-14 22:14:46'),
-(9, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(9, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(9, 56, 2025, 180, 0, 0, '2025-11-14 22:14:46'),
-(10, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(10, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(10, 55, 2025, 14, 0, 0, '2025-11-14 22:14:46'),
-(11, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(11, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(11, 55, 2025, 14, 0, 0, '2025-11-14 22:14:46'),
-(12, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(12, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(12, 56, 2025, 180, 0, 0, '2025-11-14 22:14:46'),
-(13, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(13, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(13, 56, 2025, 180, 0, 0, '2025-11-14 22:14:46'),
-(14, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(14, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(14, 55, 2025, 14, 0, 0, '2025-11-14 22:14:46'),
-(15, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(15, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(15, 56, 2025, 180, 0, 0, '2025-11-14 22:14:46'),
-(16, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(16, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(16, 56, 2025, 180, 0, 0, '2025-11-14 22:14:46'),
-(17, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(17, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(17, 56, 2025, 180, 0, 0, '2025-11-14 22:14:46'),
-(18, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(18, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(18, 56, 2025, 180, 0, 0, '2025-11-14 22:14:46'),
-(19, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
-(19, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
-(19, 55, 2025, 14, 0, 0, '2025-11-14 22:14:46');
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `leavepolicy`
---
-
-DROP TABLE IF EXISTS `leavepolicy`;
-CREATE TABLE IF NOT EXISTS `leavepolicy` (
-  `policyID` int NOT NULL AUTO_INCREMENT,
-  `leave_type` enum('ANNUAL','SICK','MATERNITY','PATERNITY') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `min_years_service` int NOT NULL COMMENT 'Thâm niên tối thiểu (năm)',
-  `max_years_service` int DEFAULT NULL,
-  `job_type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `days` int NOT NULL,
-  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Mô tả (VD: "Nhân viên dưới 5 năm")',
-  PRIMARY KEY (`policyID`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Chính sách phép năm theo thâm niên';
-
---
--- Đang đổ dữ liệu cho bảng `leavepolicy`
---
-
-INSERT INTO `leavepolicy` (`policyID`, `leave_type`, `min_years_service`, `max_years_service`, `job_type`, `days`, `description`) VALUES
-(1, 'ANNUAL', 0, 5, NULL, 12, 'Nhân viên có thâm niên dưới 5 năm'),
-(2, 'ANNUAL', 5, 10, NULL, 13, 'Nhân viên có thâm niên từ 5 đến dưới 10 năm'),
-(3, 'ANNUAL', 10, NULL, NULL, 14, 'Nhân viên có thâm niên từ 10 năm trở lên'),
-(7, 'SICK', 0, 15, 'NORMAL', 30, 'Phép ốm cho nhân viên đóng BHXH dưới 15 năm'),
-(8, 'SICK', 15, 30, 'NORMAL', 40, 'Phép ốm cho nhân viên đóng BHXH từ 15 năm - 30 năm'),
-(9, 'SICK', 30, NULL, 'NORMAL', 60, 'Phép ốm cho nhân viên đóng BHXH từ 30 năm trở lên'),
-(10, 'MATERNITY', 0, NULL, NULL, 180, 'Nghỉ thai sản'),
-(11, 'PATERNITY', 0, NULL, NULL, 14, 'Nhân viên có vợ sinh con'),
-(12, 'SICK', 0, 15, 'DANGER', 40, 'Phép ốm (Độc hại) cho nhân viên đóng BHXH dưới 15 năm'),
-(13, 'SICK', 15, 30, 'DANGER', 50, 'Phép ốm (Độc hại) cho nhân viên đóng BHXH từ 15 năm - 30 năm'),
-(14, 'SICK', 30, NULL, 'DANGER', 70, 'Phép ốm (Độc hại) cho nhân viên đóng BHXH từ 30 năm trở lên');
 
 -- --------------------------------------------------------
 
@@ -759,7 +593,7 @@ CREATE TABLE IF NOT EXISTS `shifts` (
   `endtime` time NOT NULL,
   `duration_hours` int NOT NULL,
   PRIMARY KEY (`shiftID`)
-) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `shifts`
@@ -820,9 +654,7 @@ INSERT INTO `shifts` (`shiftID`, `shiftname`, `starttime`, `endtime`, `duration_
 (52, 'C824', '00:00:00', '09:00:00', 8),
 (53, 'AL (Anually Leave)', '00:00:00', '00:00:00', 0),
 (54, 'SL (Sick Leave)', '00:00:00', '00:00:00', 0),
-(55, 'PL (Paternity Leave)', '00:00:00', '00:00:00', 0),
-(56, 'ML (Maternity Leave)', '00:00:00', '00:00:00', 0),
-(57, 'UL (Unpaid Leave)', '00:00:00', '00:00:00', 0);
+(55, 'PL (Personal Leave)', '00:00:00', '00:00:00', 0);
 
 -- --------------------------------------------------------
 
@@ -864,7 +696,6 @@ CREATE TABLE IF NOT EXISTS `users` (
   `roleID` int DEFAULT NULL,
   `departmentID` int DEFAULT NULL,
   `skillGrade` int DEFAULT '1',
-  `job_type` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'NORMAL',
   PRIMARY KEY (`userID`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`),
@@ -876,26 +707,26 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- Đang đổ dữ liệu cho bảng `users`
 --
 
-INSERT INTO `users` (`userID`, `username`, `password`, `fullname`, `cccd`, `email`, `phonenumber`, `birth`, `gender`, `address`, `bankaccount`, `bankname`, `hiredate`, `status`, `roleID`, `departmentID`, `skillGrade`, `job_type`) VALUES
-(1, 'admin', '$2a$10$2sQzJxjvMcMeSNOSsysqjOQZzWIpwvHKIdwdeZ.EqQDM6QKcufj0q', 'Phạm Minh Anh', '123456789874', 'admin@manaplastic.com', NULL, NULL, 1, NULL, NULL, NULL, '2023-01-01', 'active', 1, 2, 3, 'NORMAL'),
-(2, 'it_support', '$2a$10$skyfJgN4n.Z2GMTP7GLnneUFL4cSm1DWoJdSsYGvF06flQTGz1GBC', 'Lê Hỗ Trợ IT', NULL, 'it.support@manaplastic.com', NULL, NULL, 1, NULL, NULL, NULL, '2023-05-10', 'active', 1, 2, 3, 'NORMAL'),
-(3, 'hr_manager', '$2a$10$yVs4Kv0e36Kcb8wesofM3enjSu/Kicj5TFJm6YavsG5TDd2kLtsqy', 'Nguyễn Thị Nhân Sự', '1234567890', 'hr.manager@manaplastic.com', '0123456789', NULL, 0, NULL, NULL, NULL, '2023-02-15', 'active', 2, 1, 1, 'NORMAL'),
-(4, 'hr_staff', '$2a$10$wnTMZHPSgAkKLfwNCY3cE.ufDKVPHrdWvaJ5oL.o0dKj7kxBMJNXG', 'Phạm Văn Tuyển Dụng', NULL, 'hr.staff@manaplastic.com', NULL, NULL, 1, NULL, NULL, NULL, '2023-08-01', 'active', 2, 1, 1, 'NORMAL'),
-(5, 'kythuat_lead', '$2a$10$QP/JCd6cnNgRkFr3BYzbKOSRMIbdI6Y1fE6D.w.p1xfbvQV9y5UJe', 'Võ Văn Kỹ Thuật', NULL, 'kythuat.lead@manaplastic.com', NULL, NULL, 0, NULL, NULL, NULL, '2023-03-01', 'active', 3, 3, 3, 'NORMAL'),
-(6, 'kythuat_staff', '$2a$10$TXgpVb3lT7f/1YQxy2i/he2wiepriI6XqcPO2WcxG2xBLt0V9T8HO', 'Hoàng Thị Máy Móc', NULL, 'kythuat.staff@manaplastic.com', NULL, NULL, 1, NULL, NULL, NULL, '2023-09-10', 'active', 4, 3, 1, 'NORMAL'),
-(7, 'sanxuat_lead', '$2a$10$4b25FwYYUWVDgrItKmyyJ.ntqK6S6SJFqLHabuDL.xsoP/yScAov.', 'Trịnh Hữu Sản Xuất', NULL, 'sanxuat.lead@manaplastic.com', NULL, NULL, 1, NULL, NULL, NULL, '2023-03-02', 'active', 3, 4, 3, 'NORMAL'),
-(8, 'sanxuat_staff', '$2a$10$TxHjoxC0uVKLIDznDhNWmuF73p7LTpVr1Lf1uGdn1lw2lo8gR0ApS', 'Đặng Văn Vận Hành', NULL, 'sanxuat.staff@manaplastic.com', NULL, NULL, 0, NULL, NULL, NULL, '2023-09-15', 'active', 4, 4, 1, 'NORMAL'),
-(9, 'inan_lead', '$2a$10$6v5RYvb1wRZZ333NkxGDLuVRAgXeG0xHcfsxiBQHV0tXRpvai2yYS', 'Bùi Văn Mực', '123456789876', 'inan.lead@manaplastic.com', NULL, NULL, 0, NULL, NULL, 'Vietcombank', '2023-04-01', 'active', 3, 5, 3, 'NORMAL'),
-(10, 'inan_staff', '$2a$10$JN0oA3nYZmxvy4FXcXyMHuTBXs4xWWzcoFkXTgSbwgoqyHGmEG3Pm', 'Lý Thị In', NULL, 'inan.staff@manaplastic.com', NULL, NULL, 1, NULL, NULL, NULL, '2023-10-01', 'active', 4, 5, 1, 'NORMAL'),
-(11, 'cskh_lead', '$2a$10$bm/qxbS1udqc01zrB/p/HuNdfz1kH9oFBVpfuLoTaGFLZKEuysMF.', 'Đỗ Thị Khách Hàng', NULL, 'cskh.lead@manaplastic.com', NULL, NULL, 1, NULL, NULL, NULL, '2023-05-01', 'active', 3, 6, 3, 'NORMAL'),
-(12, 'cskh_staff', '$2a$10$tHV/qqOG68rkmYyYL82LIe5v1hnm.lzY.SlZclzOZoV6j13l6LtD.', 'Mạc Văn Hài Lòng', NULL, 'cskh.staff@manaplastic.com', NULL, NULL, 0, NULL, NULL, NULL, '2023-11-01', 'active', 4, 6, 1, 'NORMAL'),
-(13, '57540101', '$2a$10$xPIdXJigdb91ZNCAFFtTu.4RLJpIYAaQGJ70VlaE2wSblfQznOlDi', 'Phạm Minh Anh HR', '123456789876', NULL, NULL, NULL, 0, NULL, NULL, NULL, '2024-04-28', 'active', 2, 1, 3, 'NORMAL'),
-(14, '52082901', '$2a$10$jeaJPcpV3IQMoxGHBLw2teRExwzuD0ZB9ubxat7yzrqgAgfWn.CvS', 'testAddAccountHR', '79203031165', NULL, NULL, NULL, 1, NULL, NULL, NULL, '2023-02-09', 'active', 2, 1, 3, 'NORMAL'),
-(15, '71939801', '$2a$10$U0qh1Bel43Hp2K6CbsOCXefQQRgRqPJMU5Sah3eIflWTGeSkZlrPG', 'testAddAccountNV', '079203031168', NULL, NULL, NULL, 0, NULL, NULL, NULL, '2023-02-23', 'active', 4, 5, 3, 'NORMAL'),
-(16, '83637905', '$2a$10$IHOeCVrioPATwf9X9s3wh.zNbCKAEHubkZxk8uPfqEWrmUb8mJCGm', 'Phạm Nhân Viên', '12345678922', NULL, NULL, NULL, 0, NULL, NULL, NULL, '2024-10-13', 'active', 4, 5, 2, 'NORMAL'),
-(17, '72001905', '$2a$10$eQmfti7ZY3a5TXk4xqfSaOc25bW6d1.bScjcFq5pabC7b6D5WTtSK', 'testAddAccountNVinan', '123456789000', NULL, NULL, NULL, 0, NULL, NULL, NULL, '2023-08-03', 'active', 4, NULL, 1, 'NORMAL'),
-(18, '56885905', '$2a$10$4WtXYERXuVRu89Fh1KVm4uc0PuMsuHbwMg7/32dl9/qbrsFZvin3m', 'testAddAccountNVinan', '123456789000', 'pminhanh1106@gmail.com', NULL, NULL, 0, NULL, NULL, NULL, '2024-02-17', 'active', 4, 5, 2, 'NORMAL'),
-(19, '79753710', '$2a$10$vHtQqmnZ0POJYFnxD42L4O./uv5SHW5viV3DZdBCXAa8vpYdD1MQG', 'Phạm Minh Anh Test Pass', '12345678922', 'phamminhanh11623@gmail.com', '0395168006', '2003-06-11', 1, NULL, '1023765488', NULL, '2024-11-27', 'active', 2, 1, 1, 'NORMAL');
+INSERT INTO `users` (`userID`, `username`, `password`, `fullname`, `cccd`, `email`, `phonenumber`, `birth`, `gender`, `address`, `bankaccount`, `bankname`, `hiredate`, `status`, `roleID`, `departmentID`, `skillGrade`) VALUES
+(1, 'admin', '$2a$10$2sQzJxjvMcMeSNOSsysqjOQZzWIpwvHKIdwdeZ.EqQDM6QKcufj0q', 'Phạm Minh Anh', '123456789874', 'admin@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-01-01', 'active', 1, 2, 3),
+(2, 'it_support', '$2a$10$skyfJgN4n.Z2GMTP7GLnneUFL4cSm1DWoJdSsYGvF06flQTGz1GBC', 'Lê Hỗ Trợ IT', NULL, 'it.support@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-05-10', 'active', 1, 2, 3),
+(3, 'hr_manager', '$2a$10$yVs4Kv0e36Kcb8wesofM3enjSu/Kicj5TFJm6YavsG5TDd2kLtsqy', 'Nguyễn Thị Nhân Sự', '1234567890', 'hr.manager@manaplastic.com', '0123456789', NULL, NULL, NULL, NULL, NULL, '2023-02-15', 'active', 2, 1, 1),
+(4, 'hr_staff', '$2a$10$wnTMZHPSgAkKLfwNCY3cE.ufDKVPHrdWvaJ5oL.o0dKj7kxBMJNXG', 'Phạm Văn Tuyển Dụng', NULL, 'hr.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-08-01', 'active', 2, 1, 1),
+(5, 'kythuat_lead', '$2a$10$QP/JCd6cnNgRkFr3BYzbKOSRMIbdI6Y1fE6D.w.p1xfbvQV9y5UJe', 'Võ Văn Kỹ Thuật', NULL, 'kythuat.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-03-01', 'active', 3, 3, 3),
+(6, 'kythuat_staff', '$2a$10$TXgpVb3lT7f/1YQxy2i/he2wiepriI6XqcPO2WcxG2xBLt0V9T8HO', 'Hoàng Thị Máy Móc', NULL, 'kythuat.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-09-10', 'active', 4, 3, 1),
+(7, 'sanxuat_lead', '$2a$10$4b25FwYYUWVDgrItKmyyJ.ntqK6S6SJFqLHabuDL.xsoP/yScAov.', 'Trịnh Hữu Sản Xuất', NULL, 'sanxuat.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-03-02', 'active', 3, 4, 3),
+(8, 'sanxuat_staff', '$2a$10$TxHjoxC0uVKLIDznDhNWmuF73p7LTpVr1Lf1uGdn1lw2lo8gR0ApS', 'Đặng Văn Vận Hành', NULL, 'sanxuat.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-09-15', 'active', 4, 4, 1),
+(9, 'inan_lead', '$2a$10$6v5RYvb1wRZZ333NkxGDLuVRAgXeG0xHcfsxiBQHV0tXRpvai2yYS', 'Bùi Văn Mực', '123456789876', 'inan.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, 'Vietcombank', '2023-04-01', 'active', 3, 5, 3),
+(10, 'inan_staff', '$2a$10$JN0oA3nYZmxvy4FXcXyMHuTBXs4xWWzcoFkXTgSbwgoqyHGmEG3Pm', 'Lý Thị In', NULL, 'inan.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-10-01', 'active', 4, 5, 1),
+(11, 'cskh_lead', '$2a$10$bm/qxbS1udqc01zrB/p/HuNdfz1kH9oFBVpfuLoTaGFLZKEuysMF.', 'Đỗ Thị Khách Hàng', NULL, 'cskh.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-05-01', 'active', 3, 6, 3),
+(12, 'cskh_staff', '$2a$10$tHV/qqOG68rkmYyYL82LIe5v1hnm.lzY.SlZclzOZoV6j13l6LtD.', 'Mạc Văn Hài Lòng', NULL, 'cskh.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-11-01', 'active', 4, 6, 1),
+(13, '57540101', '$2a$10$xPIdXJigdb91ZNCAFFtTu.4RLJpIYAaQGJ70VlaE2wSblfQznOlDi', 'Phạm Minh Anh HR', '123456789876', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 2, 1, 3),
+(14, '52082901', '$2a$10$jeaJPcpV3IQMoxGHBLw2teRExwzuD0ZB9ubxat7yzrqgAgfWn.CvS', 'testAddAccountHR', '79203031165', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 2, 1, 3),
+(15, '71939801', '$2a$10$U0qh1Bel43Hp2K6CbsOCXefQQRgRqPJMU5Sah3eIflWTGeSkZlrPG', 'testAddAccountNV', '079203031168', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, 5, 3),
+(16, '83637905', '$2a$10$IHOeCVrioPATwf9X9s3wh.zNbCKAEHubkZxk8uPfqEWrmUb8mJCGm', 'Phạm Nhân Viên', '12345678922', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, 5, 2),
+(17, '72001905', '$2a$10$eQmfti7ZY3a5TXk4xqfSaOc25bW6d1.bScjcFq5pabC7b6D5WTtSK', 'testAddAccountNVinan', '123456789000', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, NULL, 1),
+(18, '56885905', '$2a$10$4WtXYERXuVRu89Fh1KVm4uc0PuMsuHbwMg7/32dl9/qbrsFZvin3m', 'testAddAccountNVinan', '123456789000', 'pminhanh1106@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, 5, 2),
+(19, '79753710', '$2a$10$vHtQqmnZ0POJYFnxD42L4O./uv5SHW5viV3DZdBCXAa8vpYdD1MQG', 'Phạm Minh Anh Test Pass', '12345678922', 'phamminhanh11623@gmail.com', '0395168006', '2003-06-11', 1, NULL, '1023765488', NULL, NULL, 'active', 2, 1, 1);
 
 --
 -- Các ràng buộc cho các bảng đã đổ
@@ -933,12 +764,6 @@ ALTER TABLE `departments`
   ADD CONSTRAINT `FK_Department_Manager` FOREIGN KEY (`managerID`) REFERENCES `users` (`userID`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `dependents`
---
-ALTER TABLE `dependents`
-  ADD CONSTRAINT `FK_dependent_User` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
 -- Các ràng buộc cho bảng `employeedraftschedule`
 --
 ALTER TABLE `employeedraftschedule`
@@ -952,13 +777,6 @@ ALTER TABLE `employeeofficialschedule`
   ADD CONSTRAINT `FK_schedule_manager` FOREIGN KEY (`approved_by_managerID`) REFERENCES `users` (`userID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_schedule_shift` FOREIGN KEY (`shiftID`) REFERENCES `shifts` (`shiftID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_schedule_user` FOREIGN KEY (`employeeID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Các ràng buộc cho bảng `leavebalance`
---
-ALTER TABLE `leavebalance`
-  ADD CONSTRAINT `FK_leavebalance_Shift` FOREIGN KEY (`leave_type_id`) REFERENCES `shifts` (`shiftID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_leavebalance_User` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `leaverequests`

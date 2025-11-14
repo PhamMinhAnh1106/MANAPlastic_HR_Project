@@ -1,6 +1,7 @@
 package com.manaplastic.backend.controller;
 
 import com.manaplastic.backend.DTO.AddLeaverequestDTO;
+import com.manaplastic.backend.DTO.LeaveBalanceDTO;
 import com.manaplastic.backend.DTO.LeaveRequestFilterCriteria;
 import com.manaplastic.backend.DTO.LeaverequestDTO;
 import com.manaplastic.backend.entity.UserEntity;
@@ -123,5 +124,18 @@ public class LeaverequestController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/user/leaverequest/myBalances")
+    public ResponseEntity<List<LeaveBalanceDTO>> getMyLeaveBalances(
+            @AuthenticationPrincipal UserEntity currentUser
+    ) {
+
+        if (currentUser == null) {
+            return ResponseEntity.status(401).build(); // Chưa đăng nhập
+        }
+
+        List<LeaveBalanceDTO> balances = leaverequestService.getMyLeaveBalances(currentUser);
+        return ResponseEntity.ok(balances);
     }
 }
