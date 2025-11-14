@@ -79,7 +79,7 @@ public class UserService {
 
 
         if (request.getCccd() != null) {
-            userToUpdate.setCccd(Long.valueOf(request.getCccd()));
+            userToUpdate.setCccd(request.getCccd());
         }
 
 
@@ -165,7 +165,7 @@ public class UserService {
         }
 
         if (request.getCccd() != null) {
-            userToUpdate.setCccd(Long.valueOf(request.getCccd()));
+            userToUpdate.setCccd(String.valueOf(request.getCccd()));
         }
 
         if (request.getDepartmentID() != null) {

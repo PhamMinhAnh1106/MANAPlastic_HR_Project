@@ -32,7 +32,7 @@ public class UserEntity implements UserDetails {
     private String fullname;
 
     @Column(name = "cccd", nullable = false)
-    private Long cccd;
+    private String cccd;
 
     @Column(name = "email")
     private String email;

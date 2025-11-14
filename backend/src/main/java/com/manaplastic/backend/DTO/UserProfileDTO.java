@@ -18,7 +18,7 @@ public class UserProfileDTO {
     private String username;
 //    private String password;
     private String fullname;
-    private Long cccd;
+    private String cccd;
     private String email;
     private String phonenumber;
     private Boolean gender;
@@ -31,5 +31,6 @@ public class UserProfileDTO {
     private String status;
     private Integer departmentID;
     private Integer skillGrade;
+//    private String constractName;
 
 }

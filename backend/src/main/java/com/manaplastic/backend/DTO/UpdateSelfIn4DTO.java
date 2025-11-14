@@ -14,7 +14,7 @@ import java.time.LocalDate;
 public class UpdateSelfIn4DTO {
 //    private String password;
     private String fullname;
-    private Long cccd;
+    private String cccd;
     private String email;
     private String phonenumber;
     private Boolean gender;

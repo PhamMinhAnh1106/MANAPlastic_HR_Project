@@ -95,13 +95,16 @@ public class ScheduleService {
 
     private DraftRegistrationDTO mapEntityToDTO(EmployeedraftscheduleEntity entity) {
         Integer shiftId = null;
+        String shiftName= null;
         if (entity.getShiftID() != null) {
             shiftId = entity.getShiftID().getId();
+            shiftName = entity.getShiftID().getShiftname();
         }
 
         return new DraftRegistrationDTO(
                 entity.getDate(),
                 shiftId,
+                shiftName,
                 entity.getIsDayOff()
         );
     }
@@ -122,13 +125,16 @@ public class ScheduleService {
    //y chang map to của lịch nháp
     private DraftRegistrationDTO mapOfficialEntityToDTO(EmployeeofficialscheduleEntity entity) {
         Integer shiftId = null;
+        String shiftName= null;
         if (entity.getShiftID() != null) {
             shiftId = entity.getShiftID().getId();
+            shiftName = entity.getShiftID().getShiftname();
         }
 
         return new DraftRegistrationDTO(
                 entity.getDate(),
                 shiftId,
+                shiftName,
                 entity.getIsDayOff()
         );
     }

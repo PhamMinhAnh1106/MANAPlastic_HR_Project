@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th10 14, 2025 lúc 07:54 AM
+-- Thời gian đã tạo: Th10 09, 2025 lúc 04:40 PM
 -- Phiên bản máy phục vụ: 8.2.0
 -- Phiên bản PHP: 8.2.13
 
@@ -364,23 +364,21 @@ CREATE TABLE IF NOT EXISTS `leaverequests` (
   `startdate` date NOT NULL,
   `enddate` date NOT NULL,
   `reason` text COLLATE utf8mb4_unicode_ci,
-  `status` enum('PENDING','APPROVED','REJECTED') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `status` enum('pending','approved','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `requestdate` date DEFAULT NULL,
   `userID` int DEFAULT NULL,
   PRIMARY KEY (`leaverequestID`),
   KEY `userID` (`userID`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `leaverequests`
 --
 
 INSERT INTO `leaverequests` (`leaverequestID`, `leavetype`, `startdate`, `enddate`, `reason`, `status`, `requestdate`, `userID`) VALUES
-(1, 'Nghỉ ốm', '2025-10-29', '2025-10-29', 'Bị sốt', 'APPROVED', '2025-10-28', 6),
-(2, 'Nghỉ phép năm', '2025-11-05', '2025-11-06', 'Gia đình có việc', 'PENDING', '2025-10-28', 12),
-(3, 'Nghỉ phép năm', '2025-10-20', '2025-10-20', 'Việc cá nhân', 'REJECTED', '2025-10-19', 8),
-(5, 'Nghỉ ốm (Test)', '2025-12-01', '2025-12-02', 'Test API tạo đơn từ Postman', 'PENDING', '2025-11-13', 15),
-(6, 'Nghỉ ốm (Test mail)', '2025-12-06', '2025-12-06', 'Test API tạo đơn từ Postman', 'REJECTED', '2025-11-13', 18);
+(1, 'Nghỉ ốm', '2025-10-29', '2025-10-29', 'Bị sốt', 'approved', '2025-10-28', 6),
+(2, 'Nghỉ phép năm', '2025-11-05', '2025-11-06', 'Gia đình có việc', 'pending', '2025-10-28', 12),
+(3, 'Nghỉ phép năm', '2025-10-20', '2025-10-20', 'Việc cá nhân', 'rejected', '2025-10-19', 8);
 
 -- --------------------------------------------------------
 
@@ -593,7 +591,7 @@ CREATE TABLE IF NOT EXISTS `shifts` (
   `endtime` time NOT NULL,
   `duration_hours` int NOT NULL,
   PRIMARY KEY (`shiftID`)
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `shifts`
@@ -651,10 +649,7 @@ INSERT INTO `shifts` (`shiftID`, `shiftname`, `starttime`, `endtime`, `duration_
 (49, 'C821', '21:00:00', '06:00:00', 8),
 (50, 'C822', '22:00:00', '07:00:00', 8),
 (51, 'C823', '23:00:00', '08:00:00', 8),
-(52, 'C824', '00:00:00', '09:00:00', 8),
-(53, 'AL (Anually Leave)', '00:00:00', '00:00:00', 0),
-(54, 'SL (Sick Leave)', '00:00:00', '00:00:00', 0),
-(55, 'PL (Personal Leave)', '00:00:00', '00:00:00', 0);
+(52, 'C824', '00:00:00', '09:00:00', 8);
 
 -- --------------------------------------------------------
 
@@ -683,7 +678,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `username` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `fullname` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `cccd` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cccd` bigint DEFAULT NULL,
   `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `phonenumber` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `birth` date DEFAULT NULL,
@@ -701,32 +696,31 @@ CREATE TABLE IF NOT EXISTS `users` (
   UNIQUE KEY `email` (`email`),
   KEY `roleID` (`roleID`),
   KEY `departmentID` (`departmentID`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `users`
 --
 
 INSERT INTO `users` (`userID`, `username`, `password`, `fullname`, `cccd`, `email`, `phonenumber`, `birth`, `gender`, `address`, `bankaccount`, `bankname`, `hiredate`, `status`, `roleID`, `departmentID`, `skillGrade`) VALUES
-(1, 'admin', '$2a$10$2sQzJxjvMcMeSNOSsysqjOQZzWIpwvHKIdwdeZ.EqQDM6QKcufj0q', 'Phạm Minh Anh', '123456789874', 'admin@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-01-01', 'active', 1, 2, 3),
+(1, 'admin', '$2a$10$2sQzJxjvMcMeSNOSsysqjOQZzWIpwvHKIdwdeZ.EqQDM6QKcufj0q', 'Phạm Minh Anh', 123456789874, 'admin@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-01-01', 'active', 1, 2, 3),
 (2, 'it_support', '$2a$10$skyfJgN4n.Z2GMTP7GLnneUFL4cSm1DWoJdSsYGvF06flQTGz1GBC', 'Lê Hỗ Trợ IT', NULL, 'it.support@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-05-10', 'active', 1, 2, 3),
-(3, 'hr_manager', '$2a$10$yVs4Kv0e36Kcb8wesofM3enjSu/Kicj5TFJm6YavsG5TDd2kLtsqy', 'Nguyễn Thị Nhân Sự', '1234567890', 'hr.manager@manaplastic.com', '0123456789', NULL, NULL, NULL, NULL, NULL, '2023-02-15', 'active', 2, 1, 1),
+(3, 'hr_manager', '$2a$10$yVs4Kv0e36Kcb8wesofM3enjSu/Kicj5TFJm6YavsG5TDd2kLtsqy', 'Nguyễn Thị Nhân Sự', NULL, 'hr.manager@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-02-15', 'active', 2, 1, 1),
 (4, 'hr_staff', '$2a$10$wnTMZHPSgAkKLfwNCY3cE.ufDKVPHrdWvaJ5oL.o0dKj7kxBMJNXG', 'Phạm Văn Tuyển Dụng', NULL, 'hr.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-08-01', 'active', 2, 1, 1),
 (5, 'kythuat_lead', '$2a$10$QP/JCd6cnNgRkFr3BYzbKOSRMIbdI6Y1fE6D.w.p1xfbvQV9y5UJe', 'Võ Văn Kỹ Thuật', NULL, 'kythuat.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-03-01', 'active', 3, 3, 3),
 (6, 'kythuat_staff', '$2a$10$TXgpVb3lT7f/1YQxy2i/he2wiepriI6XqcPO2WcxG2xBLt0V9T8HO', 'Hoàng Thị Máy Móc', NULL, 'kythuat.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-09-10', 'active', 4, 3, 1),
 (7, 'sanxuat_lead', '$2a$10$4b25FwYYUWVDgrItKmyyJ.ntqK6S6SJFqLHabuDL.xsoP/yScAov.', 'Trịnh Hữu Sản Xuất', NULL, 'sanxuat.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-03-02', 'active', 3, 4, 3),
 (8, 'sanxuat_staff', '$2a$10$TxHjoxC0uVKLIDznDhNWmuF73p7LTpVr1Lf1uGdn1lw2lo8gR0ApS', 'Đặng Văn Vận Hành', NULL, 'sanxuat.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-09-15', 'active', 4, 4, 1),
-(9, 'inan_lead', '$2a$10$6v5RYvb1wRZZ333NkxGDLuVRAgXeG0xHcfsxiBQHV0tXRpvai2yYS', 'Bùi Văn Mực', '123456789876', 'inan.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, 'Vietcombank', '2023-04-01', 'active', 3, 5, 3),
+(9, 'inan_lead', '$2a$10$6v5RYvb1wRZZ333NkxGDLuVRAgXeG0xHcfsxiBQHV0tXRpvai2yYS', 'Bùi Văn Mực', NULL, 'inan.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-04-01', 'active', 3, 5, 3),
 (10, 'inan_staff', '$2a$10$JN0oA3nYZmxvy4FXcXyMHuTBXs4xWWzcoFkXTgSbwgoqyHGmEG3Pm', 'Lý Thị In', NULL, 'inan.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-10-01', 'active', 4, 5, 1),
 (11, 'cskh_lead', '$2a$10$bm/qxbS1udqc01zrB/p/HuNdfz1kH9oFBVpfuLoTaGFLZKEuysMF.', 'Đỗ Thị Khách Hàng', NULL, 'cskh.lead@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-05-01', 'active', 3, 6, 3),
 (12, 'cskh_staff', '$2a$10$tHV/qqOG68rkmYyYL82LIe5v1hnm.lzY.SlZclzOZoV6j13l6LtD.', 'Mạc Văn Hài Lòng', NULL, 'cskh.staff@manaplastic.com', NULL, NULL, NULL, NULL, NULL, NULL, '2023-11-01', 'active', 4, 6, 1),
-(13, '57540101', '$2a$10$xPIdXJigdb91ZNCAFFtTu.4RLJpIYAaQGJ70VlaE2wSblfQznOlDi', 'Phạm Minh Anh HR', '123456789876', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 2, 1, 3),
-(14, '52082901', '$2a$10$jeaJPcpV3IQMoxGHBLw2teRExwzuD0ZB9ubxat7yzrqgAgfWn.CvS', 'testAddAccountHR', '79203031165', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 2, 1, 3),
-(15, '71939801', '$2a$10$U0qh1Bel43Hp2K6CbsOCXefQQRgRqPJMU5Sah3eIflWTGeSkZlrPG', 'testAddAccountNV', '079203031168', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, 5, 3),
-(16, '83637905', '$2a$10$IHOeCVrioPATwf9X9s3wh.zNbCKAEHubkZxk8uPfqEWrmUb8mJCGm', 'Phạm Nhân Viên', '12345678922', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, 5, 2),
-(17, '72001905', '$2a$10$eQmfti7ZY3a5TXk4xqfSaOc25bW6d1.bScjcFq5pabC7b6D5WTtSK', 'testAddAccountNVinan', '123456789000', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, NULL, 1),
-(18, '56885905', '$2a$10$4WtXYERXuVRu89Fh1KVm4uc0PuMsuHbwMg7/32dl9/qbrsFZvin3m', 'testAddAccountNVinan', '123456789000', 'pminhanh1106@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, 5, 2),
-(19, '79753710', '$2a$10$vHtQqmnZ0POJYFnxD42L4O./uv5SHW5viV3DZdBCXAa8vpYdD1MQG', 'Phạm Minh Anh Test Pass', '12345678922', 'phamminhanh11623@gmail.com', '0395168006', '2003-06-11', 1, NULL, '1023765488', NULL, NULL, 'active', 2, 1, 1);
+(13, '57540101', '$2a$10$xPIdXJigdb91ZNCAFFtTu.4RLJpIYAaQGJ70VlaE2wSblfQznOlDi', 'Phạm Minh Anh HR', 123456789876, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 2, 1, 3),
+(14, '52082901', '$2a$10$jeaJPcpV3IQMoxGHBLw2teRExwzuD0ZB9ubxat7yzrqgAgfWn.CvS', 'testAddAccountHR', 79203031165, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 2, 1, 3),
+(15, '71939801', '$2a$10$U0qh1Bel43Hp2K6CbsOCXefQQRgRqPJMU5Sah3eIflWTGeSkZlrPG', 'testAddAccountNV', 123456789000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, 5, 3),
+(16, '83637905', '$2a$10$IHOeCVrioPATwf9X9s3wh.zNbCKAEHubkZxk8uPfqEWrmUb8mJCGm', 'Phạm Nhân Viên', 12345678922, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, 5, 2),
+(17, '72001905', '$2a$10$eQmfti7ZY3a5TXk4xqfSaOc25bW6d1.bScjcFq5pabC7b6D5WTtSK', 'testAddAccountNVinan', 123456789000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, NULL, 1),
+(18, '56885905', '$2a$10$4WtXYERXuVRu89Fh1KVm4uc0PuMsuHbwMg7/32dl9/qbrsFZvin3m', 'testAddAccountNVinan', 123456789000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'active', 4, 5, 2);
 
 --
 -- Các ràng buộc cho các bảng đã đổ
