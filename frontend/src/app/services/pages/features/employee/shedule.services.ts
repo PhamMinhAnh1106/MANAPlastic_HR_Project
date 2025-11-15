@@ -1,4 +1,4 @@
-import { schedule } from "../../../../interface/schedule.interface";
+import { ChangeSchedule, schedule } from "../../../../interface/schedule.interface";
 import { api } from "../../../api.service";
 
 
@@ -50,5 +50,35 @@ export async function GetScheduleManageroffice(month_year: string) {
         return res.data;
     } catch (error) {
         return `co loi xay ra ` + error;
+    }
+}
+
+export async function ChangeScheduleManager(forms: ChangeSchedule) {
+    try {
+        const res = await api.post("/manager/shiftSchedule/drafts/batch", [{
+            employeeId: forms.employeeId,
+            date: forms.date,
+            shiftId: forms.shiftId,
+            isDayOff: forms.isDayOff
+        }]);
+        return {
+            data: res.data,
+            status: res.status
+        }
+    } catch (error) {
+        return `co loi xay ra ` + error;
+    }
+}
+
+export async function UpSchedule(month_year: string) {
+    try {
+        const res = await api.post("/manager/shiftSchedule/finalize", { month_year: month_year })
+        return {
+            data: res.data,
+            status: res.status
+        }
+    } catch (error) {
+        return `co loi xay ra ` + error;
+
     }
 }
