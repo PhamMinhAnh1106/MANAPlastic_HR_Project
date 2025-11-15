@@ -1,0 +1,85 @@
+.attendance-container {
+    z-index: 1;
+    position: relative;
+    top: 4rem;
+    margin-left: 5rem;
+    padding: 20px;
+    background: #f9f9f9;
+    min-height: 100vh;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* Bộ lọc chỉ chọn tháng */
+.filter-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+
+    select {
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        width: 180px;
+        outline: none;
+
+        &:focus {
+            border-color: #007bff;
+        }
+    }
+
+    button {
+        background-color: #007bff;
+        color: #fff;
+        padding: 8px 14px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #0056b3;
+        }
+    }
+}
+
+/* Bảng ca làm */
+.table-section {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+
+        th {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #f3f7ff;
+        }
+    }
+
+    .no-data {
+        text-align: center;
+        font-size: 18px;
+        color: #666;
+        padding: 40px 0;
+    }
+}
+
+.day-off {
+    color: red;
+    font-weight: bold;
+}

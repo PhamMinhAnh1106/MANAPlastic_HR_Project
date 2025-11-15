@@ -1,0 +1,202 @@
+/* -------------------------------------
+   1. OVERLAY VÀ POPUP CHUNG
+------------------------------------- */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 1000;
+}
+
+.overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup {
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 600px;
+    /* Tăng chiều rộng để giống ảnh */
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    /* Cho nút đóng */
+    overflow: hidden;
+    /* Cắt góc tròn */
+}
+
+/* -------------------------------------
+   2. HEADER VÀ NÚT ĐÓNG
+------------------------------------- */
+.popup-header {
+    background-color: #f7f7f7;
+    /* Màu nền xám nhạt */
+    padding: 1rem 20px;
+    border-bottom: 1px solid #eee;
+
+    h3 {
+        font-size: 1.2rem;
+        color: #333;
+        font-weight: 700;
+        margin: 0;
+        text-align: left;
+    }
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #555;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+
+    &:hover {
+        color: #000;
+    }
+}
+
+/* -------------------------------------
+   3. NỘI DUNG FORM
+------------------------------------- */
+.popup-content {
+    flex-grow: 1;
+    padding: 20px 30px;
+
+    // Bắt chước phần Chi Tiết Tài Khoản
+    h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+    }
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: 500;
+    margin-top: 0.8rem;
+    margin-bottom: 0.3rem;
+    display: block;
+    text-align: left;
+}
+
+input[type="date"],
+select {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    /* Góc bo tròn nhẹ hơn */
+    font-size: 0.95rem;
+    box-sizing: border-box;
+
+    &:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+    }
+}
+
+/* Ẩn placeholder của nút submit cũ */
+.hidden-submit-placeholder {
+    display: none;
+}
+
+/* -------------------------------------
+   4. RADIO BUTTON GROUP (Giữ nguyên style cơ bản)
+------------------------------------- */
+.type-group {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+
+    &>label {
+        display: flex;
+        align-items: center;
+        font-weight: 400;
+        margin-top: 0;
+        cursor: pointer;
+        color: #555;
+
+        input[type="radio"] {
+            margin-right: 8px;
+            accent-color: #007bff;
+        }
+    }
+}
+
+/* -------------------------------------
+   5. POPUP FOOTER VÀ NÚT HÀNH ĐỘNG
+------------------------------------- */
+.popup-footer {
+    padding: 1rem 20px;
+    background-color: #f7f7f7;
+    /* Màu nền footer giống header */
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    /* Nút nằm bên phải */
+    gap: 10px;
+    position: sticky;
+    /* Giữ footer cố định */
+    bottom: 0;
+}
+
+.btn {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.btn-save {
+    background-color: #007bff;
+    /* Màu Xanh dương (giống nút Lưu trong ảnh) */
+    color: white;
+
+    &:hover {
+        background-color: #0056b3;
+    }
+
+    &:disabled {
+        background-color: #a0c3e8;
+        cursor: not-allowed;
+    }
+}
+
+.btn-cancel {
+    background-color: #ccc;
+    /* Màu xám (giống nút Hủy trong ảnh) */
+    color: #333;
+
+    &:hover {
+        background-color: #bbb;
+    }
+}

@@ -4,7 +4,6 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { CookieService } from 'ngx-cookie-service';
 import { DecodeTokenRole } from '../../utils/token.utils';
 import { Loout_service } from '../../services/pages/login.service';
-import { getdataRole } from '../../services/pages/getPageRole.service';
 
 @Component({
   selector: 'app-home',
@@ -42,8 +41,11 @@ export class Home implements OnInit {
         case "hr":
           break;
         case "employee":
+          this.featureAdd = [{ name: "Đăng ký lịch làm việc", path: "/home/schedule/register" }];
           break;
         case "manager":
+          this.featureAdd = [{ name: "Lịch làm việc", path: "/home/schedule" }]
+
           break;
       }
     }
@@ -59,11 +61,7 @@ export class Home implements OnInit {
     }
 
   }
-  navItems = [
-    { label: 'Trang Chủ', path: '/home/info' },
 
-
-  ];
 
   checkrole() {
     const icon = [{
@@ -89,14 +87,20 @@ export class Home implements OnInit {
         break;
       case "Manager":
         const icon_manager = [
-          { iconName: "calendar_month", path: "/home/user/attendance", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" }] }
+          {
+            iconName: "calendar_month", path: "/home/user/attendance", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" },
+            { name: "Lịch làm việc", path: "/home/schedule" }]
+          }
         ]
         icon.push(...icon_manager)
         this.icon_handleBar = icon;
         break;
       case "Employee":
         const icon_employee = [
-          { iconName: "calendar_month", path: "/home/user/attendance", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" }] }
+          {
+            iconName: "calendar_month", path: "/home/user/attendance", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" },
+            { name: "Lịch làm việc", path: "/home/schedule" }]
+          }
         ]
         icon.push(...icon_employee)
         this.icon_handleBar = icon;

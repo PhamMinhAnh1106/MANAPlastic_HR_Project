@@ -1,15 +1,7 @@
 <header class="task-bar">
 
 
-    <nav class="nav-links">
-        <a 
-            *ngFor="let item of navItems"
-            [routerLink]="item.path" 
-            routerLinkActive="active" 
-            class="nav-item">
-            {{ item.label }}
-        </a>
-    </nav>
+
     <div class="user-actions">
   <!-- Nút thêm tài khoản -->
   <div class="add-dropdown" (click)="toggleAddDropdown()">
@@ -38,6 +30,13 @@
 </header>
 <body>
     <div class="left_handle">
+          <nav class="nav-links">
+        <a  [routerLink]="['/home', 'info']" 
+            routerLinkActive="active" 
+            class="nav-item">
+            <img src="assets/logo.png" alt="">
+        </a>
+    </nav>
   <div
     *ngFor="let item of icon_handleBar; let i = index"
     class="menu-item"

@@ -8,6 +8,8 @@ import { AddAccount } from './pages/features/admin/add-account/add-account';
 import { Accounts } from './pages/features/hr/accounts/accounts';
 import { Attendant } from './pages/features/hr/attendant/attendant';
 import { InfoBase } from './pages/user/info-base/info-base';
+import { Schedule } from './pages/features/manager/schedule/schedule';
+import { RegisterSchedule } from './pages/features/manager/register-schedule/register-schedule';
 
 
 export const routes: Routes = [
@@ -25,7 +27,12 @@ export const routes: Routes = [
             { path: 'add/account', component: AddAccount },
             //hr
             { path: 'user/account', component: Accounts },
-            { path: 'user/attendance', component: Attendant }
+            { path: 'user/attendance', component: Attendant },
+            //manager 
+            { path: 'schedule', component: Schedule },
+            //employee
+            { path: 'schedule/register', component: RegisterSchedule },
+
 
 
         ]

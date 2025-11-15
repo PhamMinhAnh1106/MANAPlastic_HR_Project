@@ -111,11 +111,11 @@
     <!-- Ngân hàng -->
     <div class="info-group">
       <span class="info-label">Ngân hàng:</span>
-      <ng-container *ngIf="!isEditing; else editdepartmentID">
-        <span class="info-value">{{ userInfo.departmentID || 'Chưa có thông tin' }}</span>
+      <ng-container *ngIf="!isEditing; else editbankName">
+        <span class="info-value">{{ userInfo.bankName || 'Chưa có thông tin' }}</span>
       </ng-container>
-      <ng-template #editdepartmentID>
-        <input type="text" [(ngModel)]="formdata.editdepartmentID" />
+      <ng-template #editbankName>
+        <input type="text" [(ngModel)]="formdata.editbankName" />
       </ng-template>
     </div>
 

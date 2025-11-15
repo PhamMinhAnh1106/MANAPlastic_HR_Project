@@ -1,0 +1,67 @@
+<div class="attendance-container">
+  <!-- Bộ lọc chỉ chọn tháng -->
+  <div class="filter-section">
+    <select [(ngModel)]="filter.month">
+      <option value="">Chọn tháng</option>
+      <option *ngFor="let m of months" [value]="m">{{ m }}</option>
+    </select>
+    <select [(ngModel)]="filter.year">
+      <option value="">Chọn năm</option>
+      <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+    </select>   
+     <select [(ngModel)]="filter.schedule">
+      <option value="">Chọn loại lịch</option>
+      <option *ngFor="let y of schedule" [value]="y.value">{{ y.name }}</option>
+    </select>   
+    <button (click)="filterAttendance()">Lọc</button>
+  </div>
+
+  <!-- Bảng dữ liệu -->
+  <div class="table-section">
+    <table *ngIf="filteredData && filteredData.length > 0 || role == 'employee' ">
+      <thead>
+        <tr>
+          <th>Ngày</th>
+          <th>Mã ca</th>
+          <th>Tên ca</th>
+          <th>Nghỉ phép</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let att of filteredData">
+          <td>{{ att.date }}</td>
+          <td>{{ att.shiftId || '—' }}</td>
+          <td>{{ att.shiftName || '—' }}</td>
+          <td>
+            <span [class.day-off]="att.isDayOff">
+              {{ att.isDayOff ? 'Nghỉ' : 'Làm việc' }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table *ngIf="filterManagerData && filterManagerData.length > 0 || role == 'manager'">
+      <thead>
+        <tr>
+          <th>Mã Nhân Viên</th>
+          <th>Tên Nhân viên</th>
+          <th>Ca làm</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let att of filterManagerData">
+          <td>{{ att.employeeId }}</td>
+          <td>{{ att.employeeFullName || '—' }}</td>
+          <td><select>
+            <option >Ca làm việc</option>
+            <option  *ngFor="let d of att.drafts" value="d.shiftId">{{d.shiftName}}</option>
+          </select></td>
+         
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>

@@ -1,0 +1,71 @@
+<div class="overlay" [class.show]="isOpen">
+  <div class="popup">
+    <button class="close-btn" (click)="closePopup()">&times;</button>
+    
+    <div class="popup-header">
+      <h3>Đăng ký ca làm</h3>
+    </div>
+    
+    <div class="popup-content">
+      <form #f="ngForm" (ngSubmit)="submit()">
+
+        <label>Chọn ngày:</label>
+        <input 
+          type="date"
+          [(ngModel)]="date"
+          name="date"
+          required
+        />
+
+        <label>Loại ca:</label>
+        <div class="type-group">
+          <label>
+            <input 
+              type="radio"
+              name="type"
+              (change)="changeType(8)"
+              value="8"
+            />
+            Ca 8 tiếng
+          </label>
+
+          <label>
+            <input 
+              type="radio"
+              name="type"
+              (change)="changeType(6)"
+              value="6"
+            />
+            Ca 6 tiếng
+          </label>
+        </div>
+
+        <label>Chọn ca:</label>
+        <select 
+          [(ngModel)]="shiftId" 
+          name="shiftId"
+          required
+        >
+          <option [ngValue]="null" disabled selected>-- Chọn ca làm việc --</option>
+
+          <option *ngFor="let s of list" [value]="s.shift_id">
+            {{ s.shift_name }} | {{ s.start_time }} → {{ s.end_time }}
+          </option>
+          <option value="53">AL (Anually Leave)</option>
+          <option value="54">SL (Sick Leave)</option>
+          <option value="55">PL (Paternity Leave)</option>
+          <option value="56">ML (Maternity Leave)</option>
+          <option value="57">UL (Unpaid Leave)</option>
+
+        </select>
+        
+        <div class="hidden-submit-placeholder"></div>
+      </form>
+    </div>
+    
+    <div class="popup-footer">
+      <button class="btn btn-cancel" (click)="closePopup()">Hủy</button>
+      <button class="btn btn-save" (click)="f.ngSubmit.emit()" [disabled]="f.invalid">Lưu</button>
+    </div>
+  </div>
+</div>
