@@ -226,6 +226,7 @@ public class UserService {
                 .address(entity.getAddress())
                 .roleName(entity.getRoleID().getRolename())
                 .departmentID(deptId)
+                .departmentName(entity.getDepartmentID().getDepartmentname())
                 .cccd(entity.getCccd())
                 .gender(entity.getGender())
                 .birth(entity.getBirth())
