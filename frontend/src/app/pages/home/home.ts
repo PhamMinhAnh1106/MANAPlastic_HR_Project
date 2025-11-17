@@ -21,7 +21,6 @@ export class Home implements OnInit {
   isUserOpen = false;
   isAddOpen = false;
   featureAdd: any = [{ name: "", path: "" }]
-  name: string = "";
 
   toggleUserDropdown() {
     this.isUserOpen = !this.isUserOpen;
@@ -41,10 +40,10 @@ export class Home implements OnInit {
         case "hr":
           break;
         case "employee":
-          this.featureAdd = [{ name: "Đăng ký lịch làm việc", path: "/home/schedule/register" }];
+          this.featureAdd = [{ name: "Đăng ký lịch làm việc", path: "/home/calender/schedule/register" }];
           break;
         case "manager":
-          this.featureAdd = [{ name: "Lịch làm việc", path: "/home/schedule" }]
+          this.featureAdd = [{ name: "Lịch làm việc", path: "/home/calender/schedule" }]
 
           break;
       }
@@ -89,7 +88,7 @@ export class Home implements OnInit {
         const icon_manager = [
           {
             iconName: "calendar_month", path: "/home/user/attendance", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" },
-            { name: "Lịch làm việc", path: "/home/schedule" }]
+            { name: "Lịch làm việc", path: "/home/calender/schedule" }]
           }
         ]
         icon.push(...icon_manager)
@@ -99,7 +98,7 @@ export class Home implements OnInit {
         const icon_employee = [
           {
             iconName: "calendar_month", path: "/home/user/attendance", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" },
-            { name: "Lịch làm việc", path: "/home/schedule" }]
+            { name: "Lịch làm việc", path: "/home/calender/schedule" }]
           }
         ]
         icon.push(...icon_employee)
@@ -137,6 +136,5 @@ export class Home implements OnInit {
   async ngOnInit() {
     this.CheckLogin();
     this.checkrole();
-
   }
 }

@@ -22,7 +22,7 @@ export async function RegisterScheduleEmployee(forms: schedule) {
 }
 export async function GetScheduleEmployeeDraft(month_year: string) {
     try {
-        const res = await api.get(`/user/shiftSchedule/myDraft?month_year=${month_year}`,)
+        const res = await api.get(`/user/shiftSchedule/myDraft?month_year=${month_year}`)
         return res.data;
     } catch (error) {
         return `co loi xay ra ` + error;

@@ -10,6 +10,7 @@ import { Attendant } from './pages/features/hr/attendant/attendant';
 import { InfoBase } from './pages/user/info-base/info-base';
 import { Schedule } from './pages/features/manager/schedule/schedule';
 import { RegisterSchedule } from './pages/features/manager/register-schedule/register-schedule';
+import { Tablemonth } from './pages/shared/tablemonth/tablemonth';
 
 
 export const routes: Routes = [
@@ -29,10 +30,15 @@ export const routes: Routes = [
             { path: 'user/account', component: Accounts },
             { path: 'user/attendance', component: Attendant },
             //manager 
-            { path: 'schedule', component: Schedule },
             //employee
-            { path: 'schedule/register', component: RegisterSchedule },
+            {
+                path: 'calender', component: Tablemonth,
+                children: [
+                    { path: 'schedule/register', component: RegisterSchedule },
+                    { path: 'schedule', component: Schedule },
 
+                ]
+            },
 
 
         ]

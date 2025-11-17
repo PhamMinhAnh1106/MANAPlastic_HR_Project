@@ -1,5 +1,5 @@
 import { CommonModule, NgFor } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { schedule } from '../../../../interface/schedule.interface';
@@ -12,7 +12,7 @@ import { scheduleList } from '../../../../utils/listSchedule.utils';
   templateUrl: './register-schedule.html',
   styleUrl: './register-schedule.scss',
 })
-export class RegisterSchedule {
+export class RegisterSchedule implements OnInit {
   constructor(private router: Router) { }
 
   date: string = "";
@@ -49,5 +49,6 @@ export class RegisterSchedule {
     }
     alert("dang ky that bai")
   }
-
+  ngOnInit(): void {
+  }
 }

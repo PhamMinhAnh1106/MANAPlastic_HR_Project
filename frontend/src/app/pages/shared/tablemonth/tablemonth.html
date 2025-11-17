@@ -1,0 +1,52 @@
+<div class="container">
+  <div class="header">
+    <div class="controls">
+      <select [(ngModel)]="month">
+        <option *ngFor="let m of months; let i = index" [value]="i + 1">
+          {{ m }}
+        </option>
+      </select>
+
+      <select [(ngModel)]="year">
+        <option *ngFor="let y of years" [value]="y">
+          {{ y }}
+        </option>
+      </select>
+      <button (click)="setMonth()">Select</button>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Sun</th>
+        <th>Mon</th>
+        <th>Tue</th>
+        <th>Wed</th>
+        <th>Thu</th>
+        <th>Fri</th>
+        <th>Sat</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let week of weeks">
+        <td *ngFor="let d of week"
+            [class.out]="!d.inMonth"
+            [class.active]="selectedDay?.dateObj.getTime() === d.dateObj.getTime()"
+            (click)="selectDay(d)">
+          <div class="td-content">
+            <span class="day-number">{{ d.inMonth ? d.day : '' }}</span>
+            <span *ngIf="d.inMonth" class="box-form">
+              <div *ngIf="getShiftForDay(d) as shift">
+                <div *ngFor="let s of shift">
+                  {{ s.shiftName }}
+                </div>
+              </div>
+            </span>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
