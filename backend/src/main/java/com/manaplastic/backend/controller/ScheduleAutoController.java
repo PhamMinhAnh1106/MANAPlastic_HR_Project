@@ -1,7 +1,10 @@
 package com.manaplastic.backend.controller;
 
+import com.manaplastic.backend.DTO.FinalizeScheduleDTO;
 import com.manaplastic.backend.DTO.ScheduleRequirementDTO;
+import com.manaplastic.backend.DTO.ScheduleValidationDTO;
 import com.manaplastic.backend.entity.UserEntity;
+import com.manaplastic.backend.service.AutoAssignScheduleService;
 import com.manaplastic.backend.service.ScheduleRequirementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,14 +16,37 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/manager/requirements")
+@RequestMapping("/manager")
 @PreAuthorize("hasAuthority('Manager')")
 @RequiredArgsConstructor
 public class ScheduleAutoController {
 
     private final ScheduleRequirementService requirementService;
+    private final AutoAssignScheduleService autoAssignScheduleService;
 
-    @GetMapping
+    // Auto xếp ca
+    @PostMapping("/shiftSchedule/auto-assign")
+    @PreAuthorize("hasAuthority('Manager')")
+    public ResponseEntity<?> autoAssignBlanks(
+            @AuthenticationPrincipal UserEntity manager,
+            @RequestBody FinalizeScheduleDTO dto // Dùng lại DTO (chỉ cần month_year)
+    ) {
+        autoAssignScheduleService.autoAssignBlankSchedules(dto.month_year(), manager.getId());
+        return ResponseEntity.ok("Đã tự động xếp ca cho các ngày trống. Vui lòng kiểm tra lại bảng nháp.");
+    }
+
+
+    @GetMapping("/shiftSchedule/drafts/validate")
+    @PreAuthorize("hasAuthority('Manager')")
+    public ResponseEntity<List<ScheduleValidationDTO>> validateDepartmentDraft(
+            @AuthenticationPrincipal UserEntity manager,
+            @RequestParam("month_year") String monthYear
+    ) {
+        List<ScheduleValidationDTO> validationResults = autoAssignScheduleService.validateDraftSchedule(monthYear, manager.getId());
+        return ResponseEntity.ok(validationResults);
+    }
+
+    @GetMapping("/requirements")
     public ResponseEntity<List<ScheduleRequirementDTO>> getRequirements(
             @AuthenticationPrincipal UserEntity manager) {
 
@@ -28,7 +54,7 @@ public class ScheduleAutoController {
         return ResponseEntity.ok(requirements);
     }
 
-    @PostMapping
+    @PostMapping("/requirements")
     public ResponseEntity<ScheduleRequirementDTO> createRequirement(
             @AuthenticationPrincipal UserEntity manager,
             @RequestBody ScheduleRequirementDTO requirementDTO) {
@@ -38,7 +64,7 @@ public class ScheduleAutoController {
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/requirements/{id}")
     public ResponseEntity<ScheduleRequirementDTO> updateRequirement(
             @AuthenticationPrincipal UserEntity manager,
             @PathVariable Integer id,
@@ -48,7 +74,7 @@ public class ScheduleAutoController {
         return ResponseEntity.ok(updatedDto);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/requirements/{id}")
     public ResponseEntity<Void> deleteRequirement(
             @AuthenticationPrincipal UserEntity manager,
             @PathVariable Integer id) {
