@@ -1,0 +1,78 @@
+.table-container {
+    margin-top: 3rem;
+    padding: 2rem 0.5rem 0 4.5rem;
+}
+
+.remain_leave {
+    display: flex;
+    align-items: center;
+
+    span {
+        margin: 0.5rem 1rem 0.5rem 0;
+    }
+
+    .add_btn {
+        margin-left: auto;
+        background-color: #0d6efd;
+        color: #fff;
+        padding: 0.2rem;
+        border-radius: 3rem;
+        cursor: pointer;
+
+        &:hover {
+            opacity: 0.8;
+            /* giảm độ mờ khi hover */
+        }
+    }
+}
+
+.leave-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Segoe UI', sans-serif;
+
+    th {
+        background: #0d6efd;
+        color: white;
+        padding: 10px;
+        text-align: left;
+    }
+
+    td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    tr:hover {
+        background: #f5f5f5;
+    }
+}
+
+.status {
+    font-weight: 600;
+
+    &.approved {
+        color: green;
+    }
+
+    &.pending {
+        color: orange;
+    }
+
+    &.rejected {
+        color: red;
+    }
+}
+
+.delete-btn {
+    padding: 6px 12px;
+    background: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+
+    &:hover {
+        background: #d9363e;
+    }
+}

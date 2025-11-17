@@ -11,6 +11,8 @@ import { InfoBase } from './pages/user/info-base/info-base';
 import { Schedule } from './pages/features/manager/schedule/schedule';
 import { RegisterSchedule } from './pages/features/manager/register-schedule/register-schedule';
 import { Tablemonth } from './pages/shared/tablemonth/tablemonth';
+import { Leaverequests } from './pages/features/employee/leaverequests/leaverequests';
+import { ADdleaverequest } from './pages/features/employee/addleaverequest/addleaverequest';
 
 
 export const routes: Routes = [
@@ -39,6 +41,9 @@ export const routes: Routes = [
 
                 ]
             },
+            { path: 'leaverequest', component: Leaverequests },
+            { path: 'leaverequest/add', component: ADdleaverequest },
+
 
 
         ]

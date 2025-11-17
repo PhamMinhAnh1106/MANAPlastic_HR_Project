@@ -1,0 +1,46 @@
+<!-- Overlay -->
+<div class="overlay" (click)="closeForm()"></div>
+
+<!-- Modal Box -->
+<div class="modal-box">
+  <div class="modal-header">
+    <h3>Đăng ký nghỉ phép</h3>
+    <span class="material-symbols-outlined close-icon" (click)="closeForm()">close</span>
+  </div>
+
+  <div class="modal-body">
+    <!-- Loại phép -->
+    <div class="form-group">
+      <label>Loại phép <span class="required">*</span></label>
+      <select [(ngModel)]="leaveRequest.leavetype">
+        <option value="">Chọn loại phép</option>
+        <option *ngFor="let leave of leaveBalance" [value]="leave.leaveType">
+          {{ leave.leaveType }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Ngày bắt đầu -->
+    <div class="form-group">
+      <label>Ngày bắt đầu <span class="required">*</span></label>
+      <input type="date" [(ngModel)]="leaveRequest.startdate" />
+    </div>
+
+    <!-- Ngày kết thúc -->
+    <div class="form-group">
+      <label>Ngày kết thúc <span class="required">*</span></label>
+      <input type="date" [(ngModel)]="leaveRequest.enddate" />
+    </div>
+
+    <!-- Lý do -->
+    <div class="form-group">
+      <label>Lý do <span class="required">*</span></label>
+      <textarea placeholder="Nhập lý do" [(ngModel)]="leaveRequest.reason"></textarea>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" (click)="submitLeaveRequest()">Lưu</button>
+    <button class="btn btn-cancel" (click)="closeForm()">Hủy</button>
+  </div>
+</div>
