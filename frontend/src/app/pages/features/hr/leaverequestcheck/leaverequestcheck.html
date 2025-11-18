@@ -1,0 +1,66 @@
+<div class="attendance-container">
+
+  <!-- Bộ lọc theo username -->
+  <div class="filter-section">
+    <input
+      type="text"
+      [(ngModel)]="filter.username"
+      placeholder="Nhập username để lọc"
+    />
+
+    <button (click)="filterLeave()">Lọc</button>
+  </div>
+
+  <!-- Bảng dữ liệu nghỉ phép -->
+  <div class="table-section">
+    <table *ngIf="leaveRequests && leaveRequests.length > 0; else noData">
+      <thead>
+        <tr>
+          <th>Mã đơn</th>
+          <th>Username</th>
+          <th>Họ tên</th>
+          <th>Loại nghỉ</th>
+          <th>Bắt đầu</th>
+          <th>Kết thúc</th>
+          <th>Lý do</th>
+          <th>Ngày yêu cầu</th>
+          <th>Trạng thái</th>
+          <th *ngIf="role === 'hr'"></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let item of leaveRequests">
+          <td>{{ item.leaverequestID }}</td>
+          <td>{{ item.username }}</td>
+          <td>{{ item.fullname }}</td>
+          <td>{{ item.leavetype }}</td>
+          <td>{{ item.startdate }}</td>
+          <td>{{ item.enddate }}</td>
+          <td>{{ item.reason }}</td>
+          <td>{{ item.requestdate }}</td>
+
+          <td>
+            <span [ngClass]="{
+              'status-approved': item.status === 'APPROVED',
+              'status-rejected': item.status === 'REJECTED',
+              'status-pending': item.status === 'PENDING'
+            }">
+              {{ item.status }}
+            </span>
+          </td>
+
+          <!-- Nút duyệt / từ chối -->
+          <td *ngIf="item.status === 'PENDING'">
+            <button class="approve-btn" (click)="approve(item.leaverequestID)">Duyệt</button>
+            <button class="reject-btn" (click)="reject(item.leaverequestID)">Từ chối</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #noData>
+      <div class="no-data">Không có dữ liệu nghỉ phép</div>
+    </ng-template>
+  </div>
+</div>

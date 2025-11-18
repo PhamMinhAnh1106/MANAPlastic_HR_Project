@@ -24,3 +24,14 @@ export interface leaverequestBalance {
     daysUsed: number
     remaining: number
 }
+export interface leaveRequestManage {
+    leaverequestID: number,
+    username: string
+    fullname: string
+    leavetype: string
+    startdate: string
+    enddate: string
+    reason: string
+    status: string
+    requestdate: string
+}

@@ -13,6 +13,7 @@ import { RegisterSchedule } from './pages/features/manager/register-schedule/reg
 import { Tablemonth } from './pages/shared/tablemonth/tablemonth';
 import { Leaverequests } from './pages/features/employee/leaverequests/leaverequests';
 import { ADdleaverequest } from './pages/features/employee/addleaverequest/addleaverequest';
+import { Leaverequestcheck } from './pages/features/hr/leaverequestcheck/leaverequestcheck';
 
 
 export const routes: Routes = [
@@ -32,6 +33,8 @@ export const routes: Routes = [
             { path: 'user/account', component: Accounts },
             { path: 'user/attendance', component: Attendant },
             //manager 
+            { path: 'leaverequest/manage', component: Leaverequestcheck },
+
             //employee
             {
                 path: 'calender', component: Tablemonth,

@@ -1,0 +1,119 @@
+.attendance-container {
+    padding: 20px;
+    margin: 2rem 0 0 4rem;
+}
+
+/* Bộ lọc */
+.filter-section {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+
+    input {
+        padding: 6px 10px;
+        width: 220px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    button {
+        padding: 6px 14px;
+        background: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.25s ease;
+
+        &:hover {
+            background: #0069d9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        &:active {
+            transform: scale(0.96);
+        }
+    }
+}
+
+/* Bảng */
+.table-section table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: center;
+    }
+}
+
+.no-data {
+    margin-top: 20px;
+    text-align: center;
+    color: gray;
+    font-style: italic;
+}
+
+/* Trạng thái */
+.status-approved {
+    color: green;
+    font-weight: bold;
+}
+
+.status-rejected {
+    color: red;
+    font-weight: bold;
+}
+
+.status-pending {
+    color: orange;
+    font-weight: bold;
+}
+
+/* Nút Duyệt */
+.approve-btn {
+    background: #28a745;
+    color: #fff;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s ease;
+    margin-right: 5px;
+
+    &:hover {
+        background: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.4);
+    }
+
+    &:active {
+        transform: scale(0.96);
+    }
+}
+
+/* Nút Từ Chối */
+.reject-btn {
+    background: #dc3545;
+    color: #fff;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s ease;
+
+    &:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.4);
+    }
+
+    &:active {
+        transform: scale(0.96);
+    }
+}

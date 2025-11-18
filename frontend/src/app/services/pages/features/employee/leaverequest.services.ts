@@ -1,6 +1,6 @@
 import { leaverequestRegister } from "../../../../interface/leaverequest.interface";
 import { api } from "../../../api.service";
-
+//nhan vien
 //lay don phep nghi
 export async function getleaverequest() {
     try {
@@ -43,6 +43,39 @@ export async function Registerleaverequest(forms: leaverequestRegister) {
 export async function Deleteleaverequest(idRequest: number) {
     try {
         const res = await api.delete(`/user/leaverequest/myRequest/${idRequest}`);
+        return {
+            status: res.status,
+            data: res.data
+        }
+    } catch (error) {
+        return "co loi xay ra " + error;
+    }
+}
+
+///////////////////////// hr , manager
+export async function getleaverequestManage(username: string) {
+    try {
+        const res = await api.get(`/user/leaverequest/filter?username=${username}`);
+        return res.data;
+
+    } catch (error) {
+        return "co loi xay ra " + error;
+    }
+}
+export async function Approveleaverequest(idRequest: number) {
+    try {
+        const res = await api.patch(`/user/leaverequest/approve/${idRequest}`);
+        return {
+            status: res.status,
+            data: res.data
+        }
+    } catch (error) {
+        return "co loi xay ra " + error;
+    }
+}
+export async function Rejectleaverequest(idRequest: number) {
+    try {
+        const res = await api.patch(`/user/leaverequest/approve/${idRequest}`);
         return {
             status: res.status,
             data: res.data

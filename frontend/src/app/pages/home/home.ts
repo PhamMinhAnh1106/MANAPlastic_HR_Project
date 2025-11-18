@@ -81,7 +81,10 @@ export class Home implements OnInit {
       case "HR":
         const icon_hr = [
           { iconName: "group", path: "/home/user/account", task: [{ name: "Quản Lí Nhân sự", path: "/home/user/account" }], },
-          { iconName: "calendar_month", path: "/home/user/attendance", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" }] },
+          {
+            iconName: "calendar_month", path: "/home/user/attendance", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" },
+            { name: "Quản lí phép", path: "/home/leaverequest/manage" }]
+          },
         ];
         icon.push(...icon_hr)
         this.icon_handleBar = icon;
@@ -90,7 +93,7 @@ export class Home implements OnInit {
         const icon_manager = [
           {
             iconName: "calendar_month", path: "/home/user/attendance", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" },
-            { name: "Lịch làm việc", path: "/home/calender/schedule" }]
+            { name: "Lịch làm việc", path: "/home/calender/schedule" }, { name: "Quản lí phép", path: "/home/leaverequest/manage" }]
           }
         ]
         icon.push(...icon_manager)
