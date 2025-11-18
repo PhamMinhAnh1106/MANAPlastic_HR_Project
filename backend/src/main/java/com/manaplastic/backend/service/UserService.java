@@ -195,7 +195,7 @@ public class UserService {
         }
 
         if(request.getJobType()!=null && (isAdmin || isHR)){
-            userToUpdate.setJobType(request.getJobType());
+            userToUpdate.setJobtype(request.getJobType());
         }
 
         UserEntity updatedUser = userRepository.save(userToUpdate);
@@ -234,7 +234,7 @@ public class UserService {
                 .bankName(entity.getBankname())
                 .status(entity.getStatus())
                 .skillGrade(entity.getSkillGrade())
-                .jobType(entity.getJobType())
+                .jobType(entity.getJobtype())
                 .build();
     }
 }

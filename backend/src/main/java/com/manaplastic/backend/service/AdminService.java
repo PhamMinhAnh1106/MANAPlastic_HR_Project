@@ -37,7 +37,7 @@ public class AdminService {
         }
 
         newUser.setHiredate(LocalDate.now());
-        newUser.setJobType("NORMAL");
+        newUser.setJobtype("NORMAL");
         newUser.setSkillGrade(1);
 
         // lấy username = random + ngày hienej tại

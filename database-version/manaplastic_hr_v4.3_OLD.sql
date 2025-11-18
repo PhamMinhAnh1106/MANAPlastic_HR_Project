@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th10 18, 2025 lúc 05:42 PM
+-- Thời gian đã tạo: Th10 16, 2025 lúc 01:35 PM
 -- Phiên bản máy phục vụ: 8.2.0
 -- Phiên bản PHP: 8.2.13
 
@@ -47,7 +47,7 @@ DROP TABLE IF EXISTS `attendancelogs`;
 CREATE TABLE IF NOT EXISTS `attendancelogs` (
   `attendanceLogID` int NOT NULL AUTO_INCREMENT,
   `timestamp` datetime NOT NULL,
-  `imgurl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `img_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `userID` int DEFAULT NULL,
   PRIMARY KEY (`attendanceLogID`),
   KEY `userID` (`userID`)
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `attendancelogs` (
 -- Đang đổ dữ liệu cho bảng `attendancelogs`
 --
 
-INSERT INTO `attendancelogs` (`attendanceLogID`, `timestamp`, `imgurl`, `userID`) VALUES
+INSERT INTO `attendancelogs` (`attendanceLogID`, `timestamp`, `img_url`, `userID`) VALUES
 (1, '2025-11-01 07:58:15', 'https://img.url/checkin_6_1.jpg', 6),
 (2, '2025-11-01 17:02:30', 'https://img.url/checkout_6_1.jpg', 6),
 (3, '2025-11-01 05:55:10', 'https://img.url/checkin_8_1.jpg', 8),
@@ -82,8 +82,8 @@ CREATE TABLE IF NOT EXISTS `attendances` (
   `date` date NOT NULL,
   `checkin` datetime DEFAULT NULL,
   `checkout` datetime DEFAULT NULL,
-  `checkinimgurl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `checkoutimgurl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `checkin_img_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `checkout_img_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` enum('PRESENT','ABSENT','LATE_AND_EARLY','ON_LEAVE','MISSING_OUTPUT_DATA','MISSING_INPUT_DATA') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ABSENT',
   `shiftID` int DEFAULT NULL,
   `userID` int DEFAULT NULL,
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS `attendances` (
 -- Đang đổ dữ liệu cho bảng `attendances`
 --
 
-INSERT INTO `attendances` (`attendanceID`, `date`, `checkin`, `checkout`, `checkinimgurl`, `checkoutimgurl`, `status`, `shiftID`, `userID`) VALUES
+INSERT INTO `attendances` (`attendanceID`, `date`, `checkin`, `checkout`, `checkin_img_url`, `checkout_img_url`, `status`, `shiftID`, `userID`) VALUES
 (6, '2025-11-01', '2025-11-01 07:58:15', '2025-11-01 17:02:30', 'https://img.url/checkin_6_1.jpg', 'https://img.url/checkout_6_1.jpg', 'PRESENT', 1, 6),
 (7, '2025-11-01', '2025-11-01 05:55:10', '2025-11-01 14:01:00', 'https://img.url/checkin_8_1.jpg', 'https://img.url/checkout_8_1.jpg', 'PRESENT', 2, 8),
 (8, '2025-11-01', '2025-11-01 08:22:45', '2025-11-01 17:01:00', 'https://img.url/checkin_12_1.jpg', 'https://img.url/checkout_12_1.jpg', 'PRESENT', 1, 12),
@@ -188,9 +188,9 @@ CREATE TABLE IF NOT EXISTS `dependents` (
   `relationship` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mối quan hệ (Vợ, Chồng, Con...)',
   `birth` date DEFAULT NULL COMMENT 'Ngày sinh',
   `gender` tinyint(1) DEFAULT NULL COMMENT '0=Nữ, 1=Nam',
-  `idcardnumber` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CCCD hoặc Giấy khai sinh',
+  `id_card_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CCCD hoặc Giấy khai sinh',
   `phonenumber` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `istaxdeductible` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1=Có đăng ký giảm trừ gia cảnh, 0=Không',
+  `is_tax_deductible` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1=Có đăng ký giảm trừ gia cảnh, 0=Không',
   PRIMARY KEY (`dependentID`),
   KEY `FK_Dependent_User` (`userID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Người phụ thuộc của nhân viên';
@@ -199,7 +199,7 @@ CREATE TABLE IF NOT EXISTS `dependents` (
 -- Đang đổ dữ liệu cho bảng `dependents`
 --
 
-INSERT INTO `dependents` (`dependentID`, `userID`, `fullname`, `relationship`, `birth`, `gender`, `idcardnumber`, `phonenumber`, `istaxdeductible`) VALUES
+INSERT INTO `dependents` (`dependentID`, `userID`, `fullname`, `relationship`, `birth`, `gender`, `id_card_number`, `phonenumber`, `is_tax_deductible`) VALUES
 (1, 1, 'Phạm Minh Anh Vợ', 'Vợ', '1990-05-10', 0, '001090001234', '0901000101', 1),
 (2, 1, 'Phạm Minh Anh Con', 'Con', '2020-08-20', 1, '001220005678', '0901000102', 1),
 (3, 2, 'Lê Hỗ Trợ IT Cha', 'Cha', '1965-02-15', 1, '002065001111', '0902000201', 1),
@@ -235,12 +235,12 @@ CREATE TABLE IF NOT EXISTS `employeedraftschedule` (
   `employeeID` int NOT NULL COMMENT 'Nhân viên đăng ký (FK từ bảng users)',
   `date` date NOT NULL COMMENT 'Ngày làm việc đăng ký',
   `shiftID` int DEFAULT NULL COMMENT 'Ca làm việc muốn đăng ký (FK từ bảng shifts). NULL nếu để trống.',
-  `isdayoff` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1 = muốn xin nghỉ, 0 = đi làm',
-  `monthyear` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Tháng/Năm áp dụng lịch (ví dụ: 2025-12)',
-  `registrationdate` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Thời gian gửi đăng ký',
+  `is_day_off` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1 = muốn xin nghỉ, 0 = đi làm',
+  `month_year` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Tháng/Năm áp dụng lịch (ví dụ: 2025-12)',
+  `registration_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Thời gian gửi đăng ký',
   PRIMARY KEY (`draftID`),
   UNIQUE KEY `UQ_Employee_Date_Preference` (`employeeID`,`date`) COMMENT 'Mỗi nhân viên chỉ có 1 đăng ký/ngày',
-  KEY `IX_preference_month_year` (`monthyear`),
+  KEY `IX_preference_month_year` (`month_year`),
   KEY `FK_preferences_shift` (`shiftID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=218 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -248,7 +248,7 @@ CREATE TABLE IF NOT EXISTS `employeedraftschedule` (
 -- Đang đổ dữ liệu cho bảng `employeedraftschedule`
 --
 
-INSERT INTO `employeedraftschedule` (`draftID`, `employeeID`, `date`, `shiftID`, `isdayoff`, `monthyear`, `registrationdate`) VALUES
+INSERT INTO `employeedraftschedule` (`draftID`, `employeeID`, `date`, `shiftID`, `is_day_off`, `month_year`, `registration_date`) VALUES
 (1, 15, '2025-12-04', NULL, 1, '2025-12', '2025-11-16 13:10:08'),
 (2, 15, '2025-12-03', 36, 0, '2025-12', '2025-11-16 13:10:08'),
 (3, 9, '2025-12-01', 36, 0, '2025-12', '2025-11-16 13:10:23'),
@@ -479,15 +479,15 @@ CREATE TABLE IF NOT EXISTS `employeeofficialschedule` (
   `employeeID` int NOT NULL COMMENT 'Nhân viên được xếp lịch (FK từ bảng users)',
   `date` date NOT NULL COMMENT 'Ngày làm việc',
   `shiftID` int DEFAULT NULL COMMENT 'Ca làm việc chính thức (FK từ bảng shifts). NULL nếu là ngày nghỉ.',
-  `isdayoff` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1 = ngày nghỉ, 0 = đi làm',
-  `monthyear` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Tháng/Năm áp dụng lịch (ví dụ: 2025-12)',
-  `approvedbymanagerID` int DEFAULT NULL COMMENT 'Manager đã duyệt (FK từ bảng users)',
-  `publisheddate` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Ngày hoàn tất/công bố',
+  `is_day_off` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1 = ngày nghỉ, 0 = đi làm',
+  `month_year` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Tháng/Năm áp dụng lịch (ví dụ: 2025-12)',
+  `approved_by_managerID` int DEFAULT NULL COMMENT 'Manager đã duyệt (FK từ bảng users)',
+  `published_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Ngày hoàn tất/công bố',
   PRIMARY KEY (`officialID`),
   UNIQUE KEY `UQ_Employee_Date_Schedule` (`employeeID`,`date`) COMMENT 'Mỗi nhân viên chỉ có 1 lịch/ngày',
-  KEY `IX_schedule_month_year` (`monthyear`),
+  KEY `IX_schedule_month_year` (`month_year`),
   KEY `FK_schedule_shift` (`shiftID`),
-  KEY `FK_schedule_manager` (`approvedbymanagerID`)
+  KEY `FK_schedule_manager` (`approved_by_managerID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -499,21 +499,21 @@ CREATE TABLE IF NOT EXISTS `employeeofficialschedule` (
 DROP TABLE IF EXISTS `leavebalance`;
 CREATE TABLE IF NOT EXISTS `leavebalance` (
   `userID` int NOT NULL COMMENT 'FK: Bảng users',
-  `leavetypeid` int NOT NULL COMMENT 'FK: Bảng shifts (tham chiếu ID của AL, SL, PL...)',
+  `leave_type_id` int NOT NULL COMMENT 'FK: Bảng shifts (tham chiếu ID của AL, SL, PL...)',
   `year` int NOT NULL COMMENT 'Năm áp dụng (VD: 2025)',
-  `totalgranted` int NOT NULL DEFAULT '0',
-  `carriedover` int NOT NULL DEFAULT '0',
-  `daysused` int NOT NULL DEFAULT '0',
-  `lastupdated` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`userID`,`leavetypeid`,`year`) COMMENT 'Mỗi NV chỉ có 1 số dư cho 1 loại phép/năm',
-  KEY `FK_leavebalance_Shift` (`leavetypeid`)
+  `total_granted` int NOT NULL DEFAULT '0',
+  `carried_over` int NOT NULL DEFAULT '0',
+  `days_used` int NOT NULL DEFAULT '0',
+  `last_updated` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`userID`,`leave_type_id`,`year`) COMMENT 'Mỗi NV chỉ có 1 số dư cho 1 loại phép/năm',
+  KEY `FK_leavebalance_Shift` (`leave_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Số dư phép của từng nhân viên';
 
 --
 -- Đang đổ dữ liệu cho bảng `leavebalance`
 --
 
-INSERT INTO `leavebalance` (`userID`, `leavetypeid`, `year`, `totalgranted`, `carriedover`, `daysused`, `lastupdated`) VALUES
+INSERT INTO `leavebalance` (`userID`, `leave_type_id`, `year`, `total_granted`, `carried_over`, `days_used`, `last_updated`) VALUES
 (1, 53, 2025, 12, 0, 0, '2025-11-14 22:14:46'),
 (1, 54, 2025, 30, 0, 0, '2025-11-14 22:14:46'),
 (1, 55, 2025, 14, 0, 0, '2025-11-14 22:14:46'),
@@ -581,33 +581,31 @@ INSERT INTO `leavebalance` (`userID`, `leavetypeid`, `year`, `totalgranted`, `ca
 DROP TABLE IF EXISTS `leavepolicy`;
 CREATE TABLE IF NOT EXISTS `leavepolicy` (
   `policyID` int NOT NULL AUTO_INCREMENT,
-  `leavetype` enum('ANNUAL','SICK','MATERNITY','PATERNITY') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `minyearsservice` int NOT NULL COMMENT 'Thâm niên tối thiểu (năm)',
-  `maxyearsservice` int DEFAULT NULL,
-  `jobtype` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `leave_type` enum('ANNUAL','SICK','MATERNITY','PATERNITY') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `min_years_service` int NOT NULL COMMENT 'Thâm niên tối thiểu (năm)',
+  `max_years_service` int DEFAULT NULL,
+  `job_type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `days` int NOT NULL,
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Mô tả (VD: "Nhân viên dưới 5 năm")',
-  `leavetypeid` int DEFAULT NULL,
-  PRIMARY KEY (`policyID`),
-  KEY `FK_Policy_Shift` (`leavetypeid`)
+  PRIMARY KEY (`policyID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Chính sách phép năm theo thâm niên';
 
 --
 -- Đang đổ dữ liệu cho bảng `leavepolicy`
 --
 
-INSERT INTO `leavepolicy` (`policyID`, `leavetype`, `minyearsservice`, `maxyearsservice`, `jobtype`, `days`, `description`, `leavetypeid`) VALUES
-(1, 'ANNUAL', 0, 5, NULL, 12, 'Nhân viên có thâm niên dưới 5 năm', 53),
-(2, 'ANNUAL', 5, 10, NULL, 13, 'Nhân viên có thâm niên từ 5 đến dưới 10 năm', 53),
-(3, 'ANNUAL', 10, NULL, NULL, 14, 'Nhân viên có thâm niên từ 10 năm trở lên', 53),
-(7, 'SICK', 0, 15, 'NORMAL', 30, 'Phép ốm cho nhân viên đóng BHXH dưới 15 năm', 54),
-(8, 'SICK', 15, 30, 'NORMAL', 40, 'Phép ốm cho nhân viên đóng BHXH từ 15 năm - 30 năm', 54),
-(9, 'SICK', 30, NULL, 'NORMAL', 60, 'Phép ốm cho nhân viên đóng BHXH từ 30 năm trở lên', 54),
-(10, 'MATERNITY', 0, NULL, NULL, 180, 'Nghỉ thai sản', 56),
-(11, 'PATERNITY', 0, NULL, NULL, 14, 'Nhân viên có vợ sinh con', 55),
-(12, 'SICK', 0, 15, 'DANGER', 40, 'Phép ốm (Độc hại) cho nhân viên đóng BHXH dưới 15 năm', 54),
-(13, 'SICK', 15, 30, 'DANGER', 50, 'Phép ốm (Độc hại) cho nhân viên đóng BHXH từ 15 năm - 30 năm', 54),
-(14, 'SICK', 30, NULL, 'DANGER', 70, 'Phép ốm (Độc hại) cho nhân viên đóng BHXH từ 30 năm trở lên', 54);
+INSERT INTO `leavepolicy` (`policyID`, `leave_type`, `min_years_service`, `max_years_service`, `job_type`, `days`, `description`) VALUES
+(1, 'ANNUAL', 0, 5, NULL, 12, 'Nhân viên có thâm niên dưới 5 năm'),
+(2, 'ANNUAL', 5, 10, NULL, 13, 'Nhân viên có thâm niên từ 5 đến dưới 10 năm'),
+(3, 'ANNUAL', 10, NULL, NULL, 14, 'Nhân viên có thâm niên từ 10 năm trở lên'),
+(7, 'SICK', 0, 15, 'NORMAL', 30, 'Phép ốm cho nhân viên đóng BHXH dưới 15 năm'),
+(8, 'SICK', 15, 30, 'NORMAL', 40, 'Phép ốm cho nhân viên đóng BHXH từ 15 năm - 30 năm'),
+(9, 'SICK', 30, NULL, 'NORMAL', 60, 'Phép ốm cho nhân viên đóng BHXH từ 30 năm trở lên'),
+(10, 'MATERNITY', 0, NULL, NULL, 180, 'Nghỉ thai sản'),
+(11, 'PATERNITY', 0, NULL, NULL, 14, 'Nhân viên có vợ sinh con'),
+(12, 'SICK', 0, 15, 'DANGER', 40, 'Phép ốm (Độc hại) cho nhân viên đóng BHXH dưới 15 năm'),
+(13, 'SICK', 15, 30, 'DANGER', 50, 'Phép ốm (Độc hại) cho nhân viên đóng BHXH từ 15 năm - 30 năm'),
+(14, 'SICK', 30, NULL, 'DANGER', 70, 'Phép ốm (Độc hại) cho nhân viên đóng BHXH từ 30 năm trở lên');
 
 -- --------------------------------------------------------
 
@@ -618,29 +616,27 @@ INSERT INTO `leavepolicy` (`policyID`, `leavetype`, `minyearsservice`, `maxyears
 DROP TABLE IF EXISTS `leaverequests`;
 CREATE TABLE IF NOT EXISTS `leaverequests` (
   `leaverequestID` int NOT NULL AUTO_INCREMENT,
-  `leavetype` enum('ANNUAL','SICK','MATERNITY','PATERNITY','UNPAID') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ANNUAL',
+  `leavetype` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `startdate` date NOT NULL,
   `enddate` date NOT NULL,
   `reason` text COLLATE utf8mb4_unicode_ci,
   `status` enum('PENDING','APPROVED','REJECTED') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
   `requestdate` date DEFAULT NULL,
   `userID` int DEFAULT NULL,
-  `shiftID` int DEFAULT NULL,
   PRIMARY KEY (`leaverequestID`),
-  KEY `userID` (`userID`),
-  KEY `FK_Request_Shift` (`shiftID`)
+  KEY `userID` (`userID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `leaverequests`
 --
 
-INSERT INTO `leaverequests` (`leaverequestID`, `leavetype`, `startdate`, `enddate`, `reason`, `status`, `requestdate`, `userID`, `shiftID`) VALUES
-(1, 'SICK', '2025-10-29', '2025-10-29', 'Bị sốt', 'APPROVED', '2025-10-28', 6, 54),
-(2, 'ANNUAL', '2025-11-05', '2025-11-06', 'Gia đình có việc', 'PENDING', '2025-10-28', 12, 53),
-(3, 'ANNUAL', '2025-10-20', '2025-10-20', 'Việc cá nhân', 'REJECTED', '2025-10-19', 8, 53),
-(5, 'SICK', '2025-12-01', '2025-12-02', 'Test API tạo đơn từ Postman', 'PENDING', '2025-11-13', 15, 54),
-(6, 'SICK', '2025-12-06', '2025-12-06', 'Test API tạo đơn từ Postman', 'REJECTED', '2025-11-13', 18, 54);
+INSERT INTO `leaverequests` (`leaverequestID`, `leavetype`, `startdate`, `enddate`, `reason`, `status`, `requestdate`, `userID`) VALUES
+(1, 'Nghỉ ốm', '2025-10-29', '2025-10-29', 'Bị sốt', 'APPROVED', '2025-10-28', 6),
+(2, 'Nghỉ phép năm', '2025-11-05', '2025-11-06', 'Gia đình có việc', 'PENDING', '2025-10-28', 12),
+(3, 'Nghỉ phép năm', '2025-10-20', '2025-10-20', 'Việc cá nhân', 'REJECTED', '2025-10-19', 8),
+(5, 'Nghỉ ốm (Test)', '2025-12-01', '2025-12-02', 'Test API tạo đơn từ Postman', 'PENDING', '2025-11-13', 15),
+(6, 'Nghỉ ốm (Test mail)', '2025-12-06', '2025-12-06', 'Test API tạo đơn từ Postman', 'REJECTED', '2025-11-13', 18);
 
 -- --------------------------------------------------------
 
@@ -737,8 +733,8 @@ DROP TABLE IF EXISTS `requirementrules`;
 CREATE TABLE IF NOT EXISTS `requirementrules` (
   `ruleID` int NOT NULL AUTO_INCREMENT COMMENT 'Khóa chính',
   `requirementID` int NOT NULL COMMENT 'Liên kết tới schedule_requirements',
-  `requiredskillGrade` int NOT NULL COMMENT 'Cấp kỹ năng yêu cầu (ví dụ: 3)',
-  `minstaffcount` int NOT NULL DEFAULT '1' COMMENT 'Số lượng nhân viên TỐI THIỂU phải có kỹ năng này (ví dụ: 1)',
+  `required_skillGrade` int NOT NULL COMMENT 'Cấp kỹ năng yêu cầu (ví dụ: 3)',
+  `min_staff_count` int NOT NULL DEFAULT '1' COMMENT 'Số lượng nhân viên TỐI THIỂU phải có kỹ năng này (ví dụ: 1)',
   PRIMARY KEY (`ruleID`),
   KEY `FK_rule_req` (`requirementID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Quy tắc kỹ năng chi tiết cho một yêu cầu nhân sự';
@@ -747,7 +743,7 @@ CREATE TABLE IF NOT EXISTS `requirementrules` (
 -- Đang đổ dữ liệu cho bảng `requirementrules`
 --
 
-INSERT INTO `requirementrules` (`ruleID`, `requirementID`, `requiredskillGrade`, `minstaffcount`) VALUES
+INSERT INTO `requirementrules` (`ruleID`, `requirementID`, `required_skillGrade`, `min_staff_count`) VALUES
 (7, 2, 3, 1),
 (9, 3, 3, 1);
 
@@ -825,7 +821,7 @@ CREATE TABLE IF NOT EXISTS `schedulerequirements` (
   `requirementID` int NOT NULL AUTO_INCREMENT COMMENT 'Khóa chính',
   `departmentID` int NOT NULL COMMENT 'FK - Áp dụng cho phòng ban nào (ví dụ: In ấn)',
   `shiftID` int NOT NULL COMMENT 'FK - Áp dụng cho ca nào (ví dụ: C808)',
-  `totalstaffneeded` int NOT NULL DEFAULT '0' COMMENT 'Tổng số nhân viên cần (ví dụ: 3)',
+  `total_staff_needed` int NOT NULL DEFAULT '0' COMMENT 'Tổng số nhân viên cần (ví dụ: 3)',
   PRIMARY KEY (`requirementID`),
   UNIQUE KEY `UQ_Dept_Shift` (`departmentID`,`shiftID`) COMMENT 'Mỗi phòng ban/ca chỉ có 1 yêu cầu',
   KEY `FK_schedule_req_shift` (`shiftID`)
@@ -835,7 +831,7 @@ CREATE TABLE IF NOT EXISTS `schedulerequirements` (
 -- Đang đổ dữ liệu cho bảng `schedulerequirements`
 --
 
-INSERT INTO `schedulerequirements` (`requirementID`, `departmentID`, `shiftID`, `totalstaffneeded`) VALUES
+INSERT INTO `schedulerequirements` (`requirementID`, `departmentID`, `shiftID`, `total_staff_needed`) VALUES
 (2, 5, 36, 3),
 (3, 5, 41, 3);
 
@@ -851,7 +847,7 @@ CREATE TABLE IF NOT EXISTS `shifts` (
   `shiftname` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `starttime` time NOT NULL,
   `endtime` time NOT NULL,
-  `durationhours` int NOT NULL,
+  `duration_hours` int NOT NULL,
   PRIMARY KEY (`shiftID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -859,7 +855,7 @@ CREATE TABLE IF NOT EXISTS `shifts` (
 -- Đang đổ dữ liệu cho bảng `shifts`
 --
 
-INSERT INTO `shifts` (`shiftID`, `shiftname`, `starttime`, `endtime`, `durationhours`) VALUES
+INSERT INTO `shifts` (`shiftID`, `shiftname`, `starttime`, `endtime`, `duration_hours`) VALUES
 (1, 'Hành chính', '08:00:00', '17:00:00', 0),
 (2, 'Ca Sáng (SX)', '06:00:00', '14:00:00', 0),
 (3, 'Ca Chiều (SX)', '14:00:00', '22:00:00', 0),
@@ -958,7 +954,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `roleID` int DEFAULT NULL,
   `departmentID` int DEFAULT NULL,
   `skillGrade` int DEFAULT '1',
-  `jobtype` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'NORMAL',
+  `job_type` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'NORMAL',
   PRIMARY KEY (`userID`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`),
@@ -970,7 +966,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- Đang đổ dữ liệu cho bảng `users`
 --
 
-INSERT INTO `users` (`userID`, `username`, `password`, `fullname`, `cccd`, `email`, `phonenumber`, `birth`, `gender`, `address`, `bankaccount`, `bankname`, `hiredate`, `status`, `roleID`, `departmentID`, `skillGrade`, `jobtype`) VALUES
+INSERT INTO `users` (`userID`, `username`, `password`, `fullname`, `cccd`, `email`, `phonenumber`, `birth`, `gender`, `address`, `bankaccount`, `bankname`, `hiredate`, `status`, `roleID`, `departmentID`, `skillGrade`, `job_type`) VALUES
 (1, 'admin', '$2a$10$2sQzJxjvMcMeSNOSsysqjOQZzWIpwvHKIdwdeZ.EqQDM6QKcufj0q', 'Phạm Minh Anh', '123456789874', 'admin@manaplastic.com', NULL, NULL, 1, NULL, NULL, NULL, '2023-01-01', 'active', 1, 2, 3, 'NORMAL'),
 (2, 'it_support', '$2a$10$skyfJgN4n.Z2GMTP7GLnneUFL4cSm1DWoJdSsYGvF06flQTGz1GBC', 'Lê Hỗ Trợ IT', NULL, 'it.support@manaplastic.com', NULL, NULL, 1, NULL, NULL, NULL, '2023-05-10', 'active', 1, 2, 3, 'NORMAL'),
 (3, 'hr_manager', '$2a$10$yVs4Kv0e36Kcb8wesofM3enjSu/Kicj5TFJm6YavsG5TDd2kLtsqy', 'Nguyễn Thị Nhân Sự', '1234567890', 'hr.manager@manaplastic.com', '0123456789', NULL, 0, NULL, NULL, NULL, '2023-02-15', 'active', 2, 1, 1, 'NORMAL'),
@@ -985,7 +981,7 @@ INSERT INTO `users` (`userID`, `username`, `password`, `fullname`, `cccd`, `emai
 (12, 'cskh_staff', '$2a$10$tHV/qqOG68rkmYyYL82LIe5v1hnm.lzY.SlZclzOZoV6j13l6LtD.', 'Mạc Văn Hài Lòng', NULL, 'cskh.staff@manaplastic.com', NULL, NULL, 0, NULL, NULL, NULL, '2023-11-01', 'active', 4, 6, 1, 'NORMAL'),
 (13, '57540101', '$2a$10$xPIdXJigdb91ZNCAFFtTu.4RLJpIYAaQGJ70VlaE2wSblfQznOlDi', 'Phạm Minh Anh HR', '123456789876', NULL, NULL, NULL, 0, NULL, NULL, NULL, '2024-04-28', 'active', 2, 1, 3, 'NORMAL'),
 (14, '52082901', '$2a$10$jeaJPcpV3IQMoxGHBLw2teRExwzuD0ZB9ubxat7yzrqgAgfWn.CvS', 'testAddAccountHR', '79203031165', NULL, NULL, NULL, 1, NULL, NULL, NULL, '2023-02-09', 'active', 2, 1, 3, 'NORMAL'),
-(15, '71939801', '$2a$10$U0qh1Bel43Hp2K6CbsOCXefQQRgRqPJMU5Sah3eIflWTGeSkZlrPG', 'testAddAccountNV', '79203031168', 'test@gmail.com', NULL, NULL, 0, NULL, NULL, NULL, '2023-02-23', 'active', 4, 5, 3, 'NORMAL'),
+(15, '71939801', '$2a$10$U0qh1Bel43Hp2K6CbsOCXefQQRgRqPJMU5Sah3eIflWTGeSkZlrPG', 'testAddAccountNV', '079203031168', NULL, NULL, NULL, 0, NULL, NULL, NULL, '2023-02-23', 'active', 4, 5, 3, 'NORMAL'),
 (16, '83637905', '$2a$10$IHOeCVrioPATwf9X9s3wh.zNbCKAEHubkZxk8uPfqEWrmUb8mJCGm', 'Phạm Nhân Viên', '12345678922', NULL, NULL, NULL, 0, NULL, NULL, NULL, '2024-10-13', 'active', 4, 5, 2, 'NORMAL'),
 (17, '72001905', '$2a$10$eQmfti7ZY3a5TXk4xqfSaOc25bW6d1.bScjcFq5pabC7b6D5WTtSK', 'testAddAccountNVinan', '123456789000', NULL, NULL, NULL, 0, NULL, NULL, NULL, '2023-08-03', 'active', 4, 5, 1, 'NORMAL'),
 (18, '56885905', '$2a$10$4WtXYERXuVRu89Fh1KVm4uc0PuMsuHbwMg7/32dl9/qbrsFZvin3m', 'testAddAccountNVinan', '12345678900', 'pminhanh1106@gmail.com', NULL, NULL, 0, NULL, NULL, NULL, '2024-02-17', 'active', 4, 5, 2, 'NORMAL'),
@@ -1044,7 +1040,7 @@ ALTER TABLE `employeedraftschedule`
 -- Các ràng buộc cho bảng `employeeofficialschedule`
 --
 ALTER TABLE `employeeofficialschedule`
-  ADD CONSTRAINT `FK_schedule_manager` FOREIGN KEY (`approvedbymanagerID`) REFERENCES `users` (`userID`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_schedule_manager` FOREIGN KEY (`approved_by_managerID`) REFERENCES `users` (`userID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_schedule_shift` FOREIGN KEY (`shiftID`) REFERENCES `shifts` (`shiftID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_schedule_user` FOREIGN KEY (`employeeID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -1052,20 +1048,13 @@ ALTER TABLE `employeeofficialschedule`
 -- Các ràng buộc cho bảng `leavebalance`
 --
 ALTER TABLE `leavebalance`
-  ADD CONSTRAINT `FK_leavebalance_Shift` FOREIGN KEY (`leavetypeid`) REFERENCES `shifts` (`shiftID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_leavebalance_Shift` FOREIGN KEY (`leave_type_id`) REFERENCES `shifts` (`shiftID`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_leavebalance_User` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Các ràng buộc cho bảng `leavepolicy`
---
-ALTER TABLE `leavepolicy`
-  ADD CONSTRAINT `FK_Policy_Shift` FOREIGN KEY (`leavetypeid`) REFERENCES `shifts` (`shiftID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `leaverequests`
 --
 ALTER TABLE `leaverequests`
-  ADD CONSTRAINT `FK_Request_Shift` FOREIGN KEY (`shiftID`) REFERENCES `shifts` (`shiftID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `leaverequests_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --

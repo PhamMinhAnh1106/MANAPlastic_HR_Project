@@ -39,16 +39,17 @@ public class EmployeedraftscheduleEntity {
 
     @NotNull
     @ColumnDefault("0")
-    @Column(name = "is_day_off", nullable = false)
+    @Column(name = "isdayoff", nullable = false)
     private Boolean isDayOff = false;
 
     @Size(max = 7)
     @NotNull
-    @Column(name = "month_year", nullable = false, length = 7)
+    @Column(name = "monthyear", nullable = false, length = 7)
     private String monthYear;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "registration_date")
+    @Column(name = "registrationdate")
     private Instant registrationDate;
+
 
 }

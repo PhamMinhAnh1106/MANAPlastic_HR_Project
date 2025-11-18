@@ -21,7 +21,7 @@ public class AttendancelogEntity {
     @Column(name = "timestamp", nullable = false)
     private Instant timestamp;
 
-    @Column(name = "img_url")
+    @Column(name = "imgurl")
     private String imgUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)

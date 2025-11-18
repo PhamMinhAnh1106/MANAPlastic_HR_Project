@@ -77,11 +77,12 @@ public class UserEntity implements UserDetails {
     @JoinColumn(name = "departmentID")
     private DepartmentEntity departmentID;
 
+
     @Size(max = 100)
     @NotNull
     @ColumnDefault("'NORMAL'")
-    @Column(name = "job_type", nullable = false, length = 100)
-    private String jobType;
+    @Column(name = "jobtype", nullable = false, length = 100)
+    private String jobtype;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -1,11 +1,12 @@
 package com.manaplastic.backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -20,8 +21,8 @@ public class LeavebalanceEntityId implements Serializable {
     private Integer userID;
 
     @NotNull
-    @Column(name = "leave_type_id", nullable = false)
-    private Integer leaveTypeId;
+    @Column(name = "leavetypeid", nullable = false)
+    private Integer leavetypeid;
 
     @NotNull
     @Column(name = "year", nullable = false)
@@ -33,13 +34,13 @@ public class LeavebalanceEntityId implements Serializable {
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         LeavebalanceEntityId entity = (LeavebalanceEntityId) o;
         return Objects.equals(this.year, entity.year) &&
-                Objects.equals(this.leaveTypeId, entity.leaveTypeId) &&
+                Objects.equals(this.leavetypeid, entity.leavetypeid) &&
                 Objects.equals(this.userID, entity.userID);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(year, leaveTypeId, userID);
+        return Objects.hash(year, leavetypeid, userID);
     }
 
 }

@@ -25,12 +25,14 @@ public class RequirementrulesEntity {
     private com.manaplastic.backend.entity.SchedulerequirementEntity requirementID;
 
     @NotNull
-    @Column(name = "required_skillGrade", nullable = false)
+    @Column(name = "requiredskillGrade", nullable = false)
     private Integer requiredSkillgrade;
 
     @NotNull
     @ColumnDefault("1")
-    @Column(name = "min_staff_count", nullable = false)
+    @Column(name = "minstaffcount", nullable = false)
     private Integer minStaffCount;
+
+
 
 }

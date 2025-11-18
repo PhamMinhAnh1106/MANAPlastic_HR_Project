@@ -44,7 +44,7 @@ public class DependentEntity {
     private Boolean gender;
 
     @Size(max = 20)
-    @Column(name = "id_card_number", length = 20)
+    @Column(name = "idcardnumber", length = 20)
     private String idCardNumber;
 
     @Size(max = 20)
@@ -53,7 +53,8 @@ public class DependentEntity {
 
     @NotNull
     @ColumnDefault("0")
-    @Column(name = "is_tax_deductible", nullable = false)
+    @Column(name = "istaxdeductible", nullable = false)
     private Boolean isTaxDeductible = false;
+
 
 }

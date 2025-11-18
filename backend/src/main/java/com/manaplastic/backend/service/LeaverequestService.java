@@ -35,13 +35,32 @@ public class LeaverequestService {
     @Autowired
     private LeavePolicyRepository leavePolicyRepository;
 
+    private String getShiftNameFromEnum(LeaverequestEntity.LeaveType type) {
+        switch (type) {
+            case ANNUAL: return "AL (Anually Leave)";
+            case SICK: return "SL (Sick Leave)";
+            case MATERNITY: return "ML (Maternity Leave)";
+            case PATERNITY: return "PL (Paternity Leave)";
+            case UNPAID: return "UL (Unpaid Leave)";
+            default: throw new RuntimeException("Không tìm thấy Ca làm việc tương ứng với: " + type);
+        }
+    }
 
     //Tạo đơn - đăng ký đơn
     @Transactional
     public LeaverequestDTO createLeaveRequest(AddLeaverequestDTO dto, UserEntity currentUserId) {
         //Buoccws kiểm tra số dư ngày phép
-        ShiftEntity leaveTypeShift = shiftRepository.findByShiftname(dto.leavetype())
-                .orElseThrow(() -> new RuntimeException("Loại phép " + dto.leavetype() + " không tồn tại."));
+        LeaverequestEntity.LeaveType reqType;
+        try {
+            reqType = LeaverequestEntity.LeaveType.valueOf(dto.leavetype());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Loại phép không hợp lệ: " + dto.leavetype());
+        }
+
+        // 2. Tìm ShiftEntity dựa trên Enum đã map
+        String shiftNameInDB = getShiftNameFromEnum(reqType);
+        ShiftEntity leaveTypeShift = shiftRepository.findByShiftname(shiftNameInDB)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy loại ca trong DB: " + shiftNameInDB));
 
         int shiftId = leaveTypeShift.getId();
         int year = dto.startdate().getYear();
@@ -55,7 +74,7 @@ public class LeaverequestService {
         // Tìm số dư phép tương ứng (VD: AL của năm 2025)
         LeavebalanceEntityId balanceId = new LeavebalanceEntityId();
         balanceId.setUserID(currentUserId.getId());
-        balanceId.setLeaveTypeId(shiftId);
+        balanceId.setLeavetypeid(shiftId);
         balanceId.setYear(year);
 
         Optional<LeavebalanceEntity> balanceOpt = leaveBalanceRepository.findById(balanceId);
@@ -76,7 +95,8 @@ public class LeaverequestService {
         //Sau khi đã kiểm tra các số dư ngày phép, nếu trường hopj nhân viên nghỉ không lương (UL - Unpaid Leave) thì vẫn tạo được voiws leaveType là UL
         LeaverequestEntity newRequest = new LeaverequestEntity();
 
-        newRequest.setLeavetype(dto.leavetype());
+        newRequest.setLeavetype(reqType);
+        newRequest.setShiftID(leaveTypeShift);
         newRequest.setStartdate(dto.startdate());
         newRequest.setEnddate(dto.enddate());
         newRequest.setReason(dto.reason());
@@ -95,7 +115,7 @@ public class LeaverequestService {
                 entity.getId(),
                 entity.getUserID().getUsername(),
                 entity.getUserID().getFullname(),
-                entity.getLeavetype(),
+                entity.getLeavetype().name(),
                 entity.getStartdate(),
                 entity.getEnddate(),
                 entity.getReason(),
@@ -160,8 +180,12 @@ public class LeaverequestService {
     }
 
     private void updateLeaveBalanceOnApproval(LeaverequestEntity approvedRequest) {
-        ShiftEntity leaveTypeShift = shiftRepository.findByShiftname(approvedRequest.getLeavetype())
-                .orElse(null);
+        ShiftEntity leaveTypeShift = approvedRequest.getShiftID();
+
+        if (leaveTypeShift == null) {
+            String shiftName = getShiftNameFromEnum(approvedRequest.getLeavetype());
+            leaveTypeShift = shiftRepository.findByShiftname(shiftName).orElse(null);
+        } // cho db cũ khi chưa có cột shiftID mới trong leaverequest
 
         if (leaveTypeShift == null) return;
 
@@ -195,7 +219,7 @@ public class LeaverequestService {
 
         LeavebalanceEntityId id = new LeavebalanceEntityId();
         id.setUserID(user.getId());
-        id.setLeaveTypeId(leaveType.getId());
+        id.setLeavetypeid(leaveType.getId());
         id.setYear(year);
 
         Optional<LeavebalanceEntity> opt = leaveBalanceRepository.findById(id);
@@ -256,7 +280,7 @@ public class LeaverequestService {
             List<LeavepolicyEntity> policies = leavePolicyRepository.findPolicyMatches(
                     leaveType.getShiftnameAsEnum(),
                     0,
-                    user.getJobType()
+                    user.getJobtype()
             );
             Optional<LeavepolicyEntity> policyOpt = policies.stream().findFirst();
 
@@ -267,7 +291,7 @@ public class LeaverequestService {
             // Tạo bản ghi số dư
             LeavebalanceEntityId id = new LeavebalanceEntityId();
             id.setUserID(user.getId());
-            id.setLeaveTypeId(leaveType.getId());
+            id.setLeavetypeid(leaveType.getId());
             id.setYear(currentYear);
 
             LeavebalanceEntity newBalance = new LeavebalanceEntity();
@@ -291,7 +315,7 @@ public class LeaverequestService {
 
         LeavebalanceEntityId oldId = new LeavebalanceEntityId();
         oldId.setUserID(userId);
-        oldId.setLeaveTypeId(alShiftOpt.get().getId());
+        oldId.setLeavetypeid(alShiftOpt.get().getId());
         oldId.setYear(previousYear);
 
         Optional<LeavebalanceEntity> oldBalanceOpt = leaveBalanceRepository.findById(oldId);
@@ -326,7 +350,7 @@ public class LeaverequestService {
                 List<LeavepolicyEntity> policies = leavePolicyRepository.findPolicyMatches(
                         leaveType.getShiftnameAsEnum(),
                         thamNien,
-                        user.getJobType()
+                        user.getJobtype()
                 );
                 Optional<LeavepolicyEntity> policyOpt = policies.stream().findFirst();
 
@@ -336,7 +360,7 @@ public class LeaverequestService {
 
                 LeavebalanceEntityId id = new LeavebalanceEntityId();
                 id.setUserID(user.getId());
-                id.setLeaveTypeId(leaveType.getId());
+                id.setLeavetypeid(leaveType.getId());
                 id.setYear(newYear);
 
                 // Tìm xem bản ghi năm mới đã tồn tại chưa

@@ -34,9 +34,11 @@ public class SchedulerequirementEntity {
 
     @NotNull
     @ColumnDefault("0")
-    @Column(name = "total_staff_needed", nullable = false)
+    @Column(name = "totalstaffneeded", nullable = false)
     private Integer totalStaffNeeded;
 
     @OneToMany(mappedBy = "requirementID", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RequirementrulesEntity> rules;
+
+
 }

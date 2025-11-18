@@ -24,29 +24,30 @@ public class LeavebalanceEntity {
     @JoinColumn(name = "userID", nullable = false)
     private UserEntity userID;
 
-    @MapsId("leaveTypeId")
+    @MapsId("leavetypeid")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "leave_type_id", nullable = false)
+    @JoinColumn(name = "leavetypeid", nullable = false)
     private ShiftEntity leaveType;
 
     @NotNull
     @ColumnDefault("0")
-    @Column(name = "total_granted", nullable = false)
+    @Column(name = "totalgranted", nullable = false)
     private Integer totalGranted;
 
     @NotNull
     @ColumnDefault("0")
-    @Column(name = "carried_over", nullable = false)
+    @Column(name = "carriedover", nullable = false)
     private Integer carriedOver;
 
     @NotNull
     @ColumnDefault("0")
-    @Column(name = "days_used", nullable = false)
+    @Column(name = "daysused", nullable = false)
     private Integer daysUsed;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "last_updated")
+    @Column(name = "lastupdated")
     private Instant lastUpdated;
+
 
 }

@@ -1,6 +1,7 @@
 package com.manaplastic.backend.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "attendances")
 public class AttendanceEntity {
+
 
     public enum AttendanceStatus {
         PRESENT, ABSENT, LATE_AND_EARLY,ON_LEAVE, MISSING_OUTPUT_DATA, MISSING_INPUT_DATA
@@ -34,10 +36,10 @@ public class AttendanceEntity {
     @Column(name = "checkout")
     private Instant checkout;
 
-    @Column(name = "checkin_img_url")
+    @Column(name = "checkinimgurl")
     private String checkinImgUrl;
 
-    @Column(name = "checkout_img_url")
+    @Column(name = "checkoutimgurl")
     private String checkoutImgUrl;
 
     @Enumerated(EnumType.STRING)

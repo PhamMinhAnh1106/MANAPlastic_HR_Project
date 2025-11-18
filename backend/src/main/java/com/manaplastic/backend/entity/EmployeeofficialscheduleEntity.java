@@ -39,21 +39,23 @@ public class EmployeeofficialscheduleEntity {
 
     @NotNull
     @ColumnDefault("0")
-    @Column(name = "is_day_off", nullable = false)
+    @Column(name = "isdayoff", nullable = false)
     private Boolean isDayOff = false;
 
     @Size(max = 7)
     @NotNull
-    @Column(name = "month_year", nullable = false, length = 7)
+    @Column(name = "monthyear", nullable = false, length = 7)
     private String monthYear;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "approved_by_managerID")
+    @JoinColumn(name = "approvedbymanagerID")
     private UserEntity approvedByManagerid;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "published_date")
+    @Column(name = "publisheddate")
     private Instant publishedDate;
+
+
 
 }

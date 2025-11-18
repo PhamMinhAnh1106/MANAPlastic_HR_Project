@@ -15,8 +15,17 @@ import java.time.LocalDate;
 @Table(name = "leaverequests")
 public class LeaverequestEntity {
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "shiftID")
+    private ShiftEntity shiftID;
+
     public enum LeaverequestStatus {
         PENDING, APPROVED, REJECTED
+    }
+
+    public enum LeaveType {
+        ANNUAL, SICK, MATERNITY, PATERNITY, UNPAID
     }
 
     @Id
@@ -24,8 +33,10 @@ public class LeaverequestEntity {
     @Column(name = "leaverequestID", nullable = false)
     private Integer id;
 
-    @Column(name = "leavetype", length = 100)
-    private String leavetype;
+    @ColumnDefault("'ANNUAL'")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "leavetype", nullable = false)
+    private LeaveType leavetype;
 
     @Column(name = "startdate", nullable = false)
     private LocalDate startdate;

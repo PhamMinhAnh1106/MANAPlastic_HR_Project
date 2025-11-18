@@ -10,12 +10,13 @@ import java.util.List;
 
 @Repository
 public interface LeavePolicyRepository extends JpaRepository<LeavepolicyEntity, Integer> {
-    @Query("SELECT p FROM LeavepolicyEntity p " +
-            "WHERE p.leaveType = :leaveType " +
-            "AND :thamNien >= p.minYearsService " +
-            "AND (:thamNien < p.maxYearsService OR p.maxYearsService IS NULL) " +
-            "AND (p.jobType = :jobType OR p.jobType IS NULL) " +
-            "ORDER BY p.jobType DESC")// Ưu tiên chính sách có job_type cụ thể (NORMAL/DANGER) hơn chính sách chung (NULL)
+    @Query("SELECT p FROM LeavepolicyEntity p" +
+            " WHERE p.leavetype = :leaveType " +
+            "AND :thamNien >= p.minyearsservice " +
+            "AND (:thamNien < p.maxyearsservice " +
+            "OR p.maxyearsservice IS NULL) " +
+            "AND (p.jobtype = :jobType O" +
+            "R p.jobtype IS NULL) ORDER BY p.jobtype DESC")
     List<LeavepolicyEntity> findPolicyMatches(
             @Param("leaveType") LeavepolicyEntity.LeaveType leaveType,
             @Param("thamNien") int thamNien,

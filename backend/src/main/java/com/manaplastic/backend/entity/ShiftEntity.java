@@ -27,8 +27,9 @@ public class ShiftEntity {
     private LocalTime endtime;
 
     @NotNull
-    @Column(name = "duration_hours", nullable = false)
+    @Column(name = "durationhours", nullable = false)
     private Integer durationHours;
+
 
     @Transient // Đánh dấu để JPA biết không map cột này vào DB
     public LeavepolicyEntity.LeaveType getShiftnameAsEnum() { // Chuyển Shiftname (String) sang LeaveType (Enum) để so sánh
