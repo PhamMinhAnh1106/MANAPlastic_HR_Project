@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/login", "/refresh", "/logout").permitAll()
+                        .requestMatchers("/checkInApp/attendanceLog/**").permitAll() // cho phép cái app chấm công
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/**", "/index.html",
                                 "/*.js", "/*.css", "/*.ico",

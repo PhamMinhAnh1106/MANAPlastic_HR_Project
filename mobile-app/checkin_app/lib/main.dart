@@ -54,37 +54,42 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       _isProcessing = true;
     });
 
+    // URL trỏ về Spring Boot (IP máy tính chạy Server)
     const String serverUrl =
-        'http://192.168.1.57/attendance_api/upload_attendance.php';
+        'http://192.168.1.67:8080/checkInApp/attendanceLog/log'; // controller
 
     try {
       String base64Image = base64Encode(imageBytes);
+
+      // Gửi dạng JSON Body
       final response = await http
           .post(
             Uri.parse(serverUrl),
-            body: {'employee_id': employeeId, 'image_data': base64Image},
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode({
+              'userId':
+                  int.tryParse(employeeId) ?? 0, // Parse sang số vì DB dùng INT
+              'imageBase64': base64Image,
+            }),
           )
           .timeout(const Duration(seconds: 20));
 
       if (response.statusCode == 200) {
         final result = jsonDecode(response.body);
-        if (result['success']) {
-          // Hiển thị thanh bar thông báo
-          _showSuccessSnackbar('Đã chấm công cho mã: $employeeId');
-          //gọi hàm thời gian đếm ngược của alert
-          _startCooldown();
-        } else {
-          _showErrorDialog('Lỗi Server: ${result['message']}');
-        }
+        _showSuccessSnackbar('Đã chấm công cho mã: $employeeId');
+        _startCooldown();
       } else {
-        _showErrorDialog('Lỗi kết nối đến server: ${response.statusCode}');
+        // Đọc lỗi từ server trả về
+        final errorBody = jsonDecode(response.body);
+        _showErrorDialog(
+          'Lỗi Server: ${errorBody['message'] ?? response.statusCode}',
+        );
       }
     } catch (e) {
       _showErrorDialog(
-        'Không thể kết nối đến server. Vui lòng kiểm tra lại kết nối mạng.\nChi tiết: $e',
+        'Không thể kết nối đến server. Vui lòng kiểm tra IP và mạng.\nChi tiết: $e',
       );
     } finally {
-      // Dù thành công hay thất bại thì cũng kết thúc trạng thái xử lý
       if (mounted && !_isScanCooldown) {
         setState(() {
           _isProcessing = false;
@@ -119,7 +124,8 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
     if (!mounted) return;
     setState(() {
       _isScanCooldown = true;
-      _isProcessing = false; // Kết thúc quá trình xử lý để giao diện trở lại bình thường
+      _isProcessing =
+          false; // Kết thúc quá trình xử lý để giao diện trở lại bình thường
     });
     // thời gian sống của cái thanh bar - sau 2 giây
     Timer(const Duration(seconds: 2), () {

@@ -42,6 +42,16 @@ public class AttendanceEntity {
     @Column(name = "checkoutimgurl")
     private String checkoutImgUrl;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "checkInLogID")
+    private AttendancelogEntity checkInLogID;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "checkOutLogID")
+    private AttendancelogEntity checkOutLogID;
+
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'absent'")
     @Lob

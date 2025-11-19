@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th10 18, 2025 lúc 05:42 PM
+-- Thời gian đã tạo: Th10 19, 2025 lúc 11:17 AM
 -- Phiên bản máy phục vụ: 8.2.0
 -- Phiên bản PHP: 8.2.13
 
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS `attendancelogs` (
   `userID` int DEFAULT NULL,
   PRIMARY KEY (`attendanceLogID`),
   KEY `userID` (`userID`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `attendancelogs`
@@ -68,7 +68,9 @@ INSERT INTO `attendancelogs` (`attendanceLogID`, `timestamp`, `imgurl`, `userID`
 (8, '2025-11-01 08:10:00', 'https://img.url/checkin_5_1.jpg', 5),
 (9, '2025-11-01 16:45:00', 'https://img.url/checkout_5_1.jpg', 5),
 (10, '2025-11-02 05:59:00', 'https://img.url/checkin_8_3.jpg', 8),
-(11, '2025-11-02 17:05:00', 'https://img.url/checkout_9_1.jpg', 9);
+(11, '2025-11-02 17:05:00', 'https://img.url/checkout_9_1.jpg', 9),
+(16, '2025-11-19 11:00:12', '/uploads/47358d64-7cf1-4a33-8e1c-c5efbb7553d0.jpg', 20),
+(17, '2025-11-19 11:02:27', '/uploads/238acd2f-fd35-46f8-a36f-c4bfbe93b13d.jpg', 20);
 
 -- --------------------------------------------------------
 
@@ -87,26 +89,31 @@ CREATE TABLE IF NOT EXISTS `attendances` (
   `status` enum('PRESENT','ABSENT','LATE_AND_EARLY','ON_LEAVE','MISSING_OUTPUT_DATA','MISSING_INPUT_DATA') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ABSENT',
   `shiftID` int DEFAULT NULL,
   `userID` int DEFAULT NULL,
+  `checkInLogID` int DEFAULT NULL,
+  `checkOutLogID` int DEFAULT NULL,
   PRIMARY KEY (`attendanceID`),
   UNIQUE KEY `UQ_User_Date` (`userID`,`date`),
-  KEY `shiftID` (`shiftID`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `shiftID` (`shiftID`),
+  KEY `FK_Attendance_CheckInLog` (`checkInLogID`),
+  KEY `FK_Attendance_CheckOutLog` (`checkOutLogID`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `attendances`
 --
 
-INSERT INTO `attendances` (`attendanceID`, `date`, `checkin`, `checkout`, `checkinimgurl`, `checkoutimgurl`, `status`, `shiftID`, `userID`) VALUES
-(6, '2025-11-01', '2025-11-01 07:58:15', '2025-11-01 17:02:30', 'https://img.url/checkin_6_1.jpg', 'https://img.url/checkout_6_1.jpg', 'PRESENT', 1, 6),
-(7, '2025-11-01', '2025-11-01 05:55:10', '2025-11-01 14:01:00', 'https://img.url/checkin_8_1.jpg', 'https://img.url/checkout_8_1.jpg', 'PRESENT', 2, 8),
-(8, '2025-11-01', '2025-11-01 08:22:45', '2025-11-01 17:01:00', 'https://img.url/checkin_12_1.jpg', 'https://img.url/checkout_12_1.jpg', 'PRESENT', 1, 12),
-(9, '2025-11-01', '2025-11-01 08:10:00', '2025-11-01 16:45:00', 'https://img.url/checkin_5_1.jpg', 'https://img.url/checkout_5_1.jpg', 'PRESENT', 1, 5),
-(10, '2025-11-02', '2025-11-02 05:59:00', NULL, 'https://img.url/checkin_8_3.jpg', NULL, 'MISSING_OUTPUT_DATA', 2, 8),
-(11, '2025-11-02', NULL, '2025-11-02 17:05:00', NULL, 'https://img.url/checkout_9_1.jpg', 'MISSING_INPUT_DATA', 1, 9),
-(12, '2025-11-02', NULL, NULL, NULL, NULL, 'ABSENT', 1, 6),
-(13, '2025-11-02', NULL, NULL, NULL, NULL, 'ON_LEAVE', 1, 10),
-(14, '2025-11-04', '2025-11-04 08:00:00', '2025-11-04 17:00:00', NULL, NULL, 'PRESENT', 1, 6),
-(15, '2025-11-04', '2025-11-04 08:30:00', NULL, NULL, NULL, 'MISSING_OUTPUT_DATA', 2, 8);
+INSERT INTO `attendances` (`attendanceID`, `date`, `checkin`, `checkout`, `checkinimgurl`, `checkoutimgurl`, `status`, `shiftID`, `userID`, `checkInLogID`, `checkOutLogID`) VALUES
+(6, '2025-11-01', '2025-11-01 07:58:15', '2025-11-01 17:02:30', 'https://img.url/checkin_6_1.jpg', 'https://img.url/checkout_6_1.jpg', 'PRESENT', 1, 6, 1, 2),
+(7, '2025-11-01', '2025-11-01 05:55:10', '2025-11-01 14:01:00', 'https://img.url/checkin_8_1.jpg', 'https://img.url/checkout_8_1.jpg', 'PRESENT', 2, 8, 3, 5),
+(8, '2025-11-01', '2025-11-01 08:22:45', '2025-11-01 17:01:00', 'https://img.url/checkin_12_1.jpg', 'https://img.url/checkout_12_1.jpg', 'PRESENT', 1, 12, 6, 7),
+(9, '2025-11-01', '2025-11-01 08:10:00', '2025-11-01 16:45:00', 'https://img.url/checkin_5_1.jpg', 'https://img.url/checkout_5_1.jpg', 'PRESENT', 1, 5, 8, 9),
+(10, '2025-11-02', '2025-11-02 05:59:00', NULL, 'https://img.url/checkin_8_3.jpg', NULL, 'MISSING_OUTPUT_DATA', 2, 8, 10, NULL),
+(11, '2025-11-02', NULL, '2025-11-02 17:05:00', NULL, 'https://img.url/checkout_9_1.jpg', 'MISSING_INPUT_DATA', 1, 9, NULL, 11),
+(12, '2025-11-02', NULL, NULL, NULL, NULL, 'ABSENT', 1, 6, NULL, NULL),
+(13, '2025-11-02', NULL, NULL, NULL, NULL, 'ON_LEAVE', 1, 10, NULL, NULL),
+(14, '2025-11-04', '2025-11-04 08:00:00', '2025-11-04 17:00:00', NULL, NULL, 'PRESENT', 1, 6, NULL, NULL),
+(15, '2025-11-04', '2025-11-04 08:30:00', NULL, NULL, NULL, 'MISSING_OUTPUT_DATA', 2, 8, NULL, NULL),
+(20, '2025-11-19', '2025-11-19 11:00:12', '2025-11-19 11:02:27', '/uploads/47358d64-7cf1-4a33-8e1c-c5efbb7553d0.jpg', '/uploads/238acd2f-fd35-46f8-a36f-c4bfbe93b13d.jpg', 'LATE_AND_EARLY', 46, 20, 16, 17);
 
 -- --------------------------------------------------------
 
@@ -488,7 +495,14 @@ CREATE TABLE IF NOT EXISTS `employeeofficialschedule` (
   KEY `IX_schedule_month_year` (`monthyear`),
   KEY `FK_schedule_shift` (`shiftID`),
   KEY `FK_schedule_manager` (`approvedbymanagerID`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `employeeofficialschedule`
+--
+
+INSERT INTO `employeeofficialschedule` (`officialID`, `employeeID`, `date`, `shiftID`, `isdayoff`, `monthyear`, `approvedbymanagerID`, `publisheddate`) VALUES
+(7, 20, '2025-11-19', 46, 0, '2025-11', 1, '2025-11-19 17:43:29');
 
 -- --------------------------------------------------------
 
@@ -1013,7 +1027,9 @@ ALTER TABLE `attendancelogs`
 --
 ALTER TABLE `attendances`
   ADD CONSTRAINT `attendances_ibfk_1` FOREIGN KEY (`shiftID`) REFERENCES `shifts` (`shiftID`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `attendances_ibfk_2` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `attendances_ibfk_2` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_Attendance_CheckInLog` FOREIGN KEY (`checkInLogID`) REFERENCES `attendancelogs` (`attendanceLogID`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_Attendance_CheckOutLog` FOREIGN KEY (`checkOutLogID`) REFERENCES `attendancelogs` (`attendanceLogID`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `contracts`

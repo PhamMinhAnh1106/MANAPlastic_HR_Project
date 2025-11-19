@@ -25,8 +25,7 @@ public class AttendancelogEntity {
     private String imgUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "userID")
-    private com.manaplastic.backend.entity.UserEntity userID;
+    private UserEntity userID;
 
 }
