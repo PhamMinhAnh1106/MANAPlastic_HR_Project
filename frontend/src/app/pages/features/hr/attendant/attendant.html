@@ -65,11 +65,15 @@
           <td>{{ att.shiftName || 'Chưa có' }}</td>
           <td>{{ att.status || 'Chưa có' }}</td>
           <td>
-            <button class="proof-btn" (click)="showProof(att)">Xem</button>
+            <button class="proof-btn" (click)="showProof(att)"><span class="material-symbols-outlined">
+visibility
+</span></button>
           </td>
           <!-- Nút xóa chỉ cho HR -->
           <td *ngIf="role === 'hr'">
-            <button class="delete-btn" (click)="deleteAttendance(att.attendanceId)">Xóa</button>
+            <button class="delete-btn" (click)="deleteAttendance(att.attendanceId)"><span class="material-symbols-outlined">
+close
+</span></button>
           </td>
         </tr>
       </tbody>
@@ -85,7 +89,9 @@
   <div class="proof-box" *ngIf="selectedProof">
     <div class="proof-header">
       <h3>Minh chứng chấm công</h3>
-      <span class="close-icon" (click)="closeProof()">×</span>
+      <span class="close-icon" (click)="closeProof()"><span class="material-symbols-outlined">
+close
+</span></span>
     </div>
     <div class="proof-content">
       <div class="proof-image">

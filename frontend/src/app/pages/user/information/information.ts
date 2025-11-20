@@ -34,7 +34,7 @@ export class Information implements OnInit {
     userID: 0,
     username: "",
     fullname: "",
-    cccd: BigInt(0),
+    cccd: "",
     email: "",
     phonenumber: "",
     gender: false,

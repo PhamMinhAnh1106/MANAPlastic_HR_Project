@@ -81,22 +81,24 @@
         }
 
         .delete-btn {
-            background-color: #dc3545;
-            color: white;
+            color: #000;
             padding: 6px 10px;
             border-radius: 5px;
-            border: none;
+            border: 1px solid;
             cursor: pointer;
             transition: background-color 0.3s;
 
             &:hover {
+                color: #fff;
+
                 background-color: #c82333;
             }
         }
 
         .proof-btn {
-            background-color: #17a2b8;
-            color: white;
+            border: 1px solid;
+
+            color: #000;
             padding: 6px 10px;
             border-radius: 5px;
             border: none;
@@ -104,6 +106,7 @@
             transition: background-color 0.3s;
 
             &:hover {
+                color: #fff;
                 background-color: #138496;
             }
         }

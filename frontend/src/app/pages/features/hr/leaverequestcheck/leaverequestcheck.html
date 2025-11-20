@@ -52,8 +52,16 @@
 
           <!-- Nút duyệt / từ chối -->
           <td *ngIf="item.status === 'PENDING'">
-            <button class="approve-btn" (click)="approve(item.leaverequestID)">Duyệt</button>
-            <button class="reject-btn" (click)="reject(item.leaverequestID)">Từ chối</button>
+            <button class="approve-btn" (click)="approve(item.leaverequestID)">
+              <span class="material-symbols-outlined">
+check_circle
+</span>
+            </button>
+            <button class="reject-btn" (click)="reject(item.leaverequestID)">
+              <span class="material-symbols-outlined">
+              cancel
+              </span>
+            </button>
           </td>
         </tr>
       </tbody>

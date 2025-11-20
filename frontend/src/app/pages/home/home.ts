@@ -51,6 +51,7 @@ export class Home implements OnInit {
       }
     }
   }
+
   openAddAccount() {
     console.log("Cấp tài khoản");
   }
@@ -116,9 +117,9 @@ export class Home implements OnInit {
 
   toggleSubmenu(index: number) {
     if (this.activeIndex === index) {
-      this.activeIndex = null; // nếu click lại cùng icon → đóng submenu
+      this.activeIndex = null;
     } else {
-      this.activeIndex = index; // mở submenu icon khác
+      this.activeIndex = index;
     }
   }
 

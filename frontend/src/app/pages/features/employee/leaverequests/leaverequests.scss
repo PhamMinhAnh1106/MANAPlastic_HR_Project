@@ -65,11 +65,16 @@
 }
 
 .delete-btn {
-    padding: 6px 12px;
-    background: #ff4d4f;
-    color: white;
+    padding: 0.2rem 0.3rem;
+    color: #000;
     border: none;
     border-radius: 6px;
+    border: 1px solid;
+
+    span {
+        font-size: 0.8rem;
+    }
+
     cursor: pointer;
 
     &:hover {

@@ -92,9 +92,13 @@
   }}
 </td>
           <td>{{ emp.birth || 'Chưa có thông tin' }}</td>
-          <td>{{ emp.departmentID || 'Chưa có thông tin' }}</td>
+          <td>{{ emp.departmentName || 'Chưa có thông tin' }}</td>
           <td>
-            <button class="edit-btn" (click)="openEditModal(emp)">Sửa</button>
+            <button class="edit-btn" (click)="openEditModal(emp)">
+              <span class="material-symbols-outlined">
+stylus
+</span>
+            </button>
           </td>
         </tr>
       </tbody>

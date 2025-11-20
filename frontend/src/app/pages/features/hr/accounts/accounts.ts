@@ -27,6 +27,7 @@ export class Accounts implements OnInit {
     userID: '',
     username: '',
     departmentId: '',
+    departmentName: '',
     keyword: '',
     status: '',
     hireDateStart: '',

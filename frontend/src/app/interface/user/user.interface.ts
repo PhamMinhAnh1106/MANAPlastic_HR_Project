@@ -3,7 +3,7 @@ export interface information {
     username?: string,
     password?: string,
     fullname: string,
-    cccd: bigint,
+    cccd: string,
     email: string,
     phonenumber: string,
     gender: boolean,

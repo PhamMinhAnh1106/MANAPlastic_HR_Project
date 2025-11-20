@@ -14,7 +14,8 @@ export class Leaverequestcheck {
   constructor(private cdr: ChangeDetectorRef, private cookie: CookieService) { }
   role: string = "";
   filter = {
-    username: ''
+    username: '',
+
   };
   leaveRequests: any[] = [];
 

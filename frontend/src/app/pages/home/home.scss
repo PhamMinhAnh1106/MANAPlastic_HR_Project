@@ -40,6 +40,10 @@
     .user-dropdown {
         position: relative;
 
+        span {
+            font-size: 0.8rem;
+        }
+
         .add-icon,
         .avatar {
             cursor: pointer;
@@ -50,6 +54,8 @@
             color: #2c3e50;
             border-radius: 50%;
             background: #f1f1f1;
+
+
 
             &:hover {
                 background: #e0e0e0;

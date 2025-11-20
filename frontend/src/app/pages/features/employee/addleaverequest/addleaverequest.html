@@ -14,7 +14,7 @@
       <label>Loại phép <span class="required">*</span></label>
       <select [(ngModel)]="leaveRequest.leavetype">
         <option value="">Chọn loại phép</option>
-        <option *ngFor="let leave of leaveBalance" [value]="leave.leaveType">
+        <option *ngFor="let leave of leaveBalance" [value]="leave.leaveId">
           {{ leave.leaveType }}
         </option>
       </select>

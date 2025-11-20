@@ -14,9 +14,12 @@ import { Registerleaverequest } from '../../../../services/pages/features/employ
 export class ADdleaverequest {
   constructor(private router: Router) { }
   leaveBalance = [
-    { leaveType: "AL (Anually Leave)" },
-    { leaveType: "SL (Sick Leave)" },
-    { leaveType: "ML (Maternity Leave)" }
+    { leaveId: "ANNUAL", leaveType: "AL (Anually Leave)" },
+    { leaveId: "SICK", leaveType: "SL (Sick Leave)" },
+    { leaveId: "MATERNITY", leaveType: "ML (Maternity Leave)" },
+    { leaveId: "PARTENITY", leaveType: "PL (Paternity Leave)" },
+    { leaveId: "UNPAID", leaveType: "UL (Unpaid Leave)" }
+
   ];
 
   leaveRequest: leaverequestRegister = {
