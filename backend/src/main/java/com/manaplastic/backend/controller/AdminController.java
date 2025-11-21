@@ -48,13 +48,14 @@ public class AdminController {
                 .hireDate(currentUser.getHiredate())
                 .roleName(currentUser.getRoleID().getRolename())
                 .departmentID(currentUser.getDepartmentID().getId())
+                .departmentName(currentUser.getDepartmentID().getDepartmentname())
                 .build();
         return ResponseEntity.ok(userProfile);
     }
 
     //Cấp tk
     @PostMapping("/addAccount")
-    public ResponseEntity<String> addAccount (@RequestBody UserEntity newUser) {
+    public ResponseEntity<String> addAccount(@RequestBody UserEntity newUser) {
         UserEntity createdUser = adminService.createUser(newUser);
         String responseMessage = "Tài khoản đã được cấp thành công. Username: " + createdUser.getUsername();
         return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
@@ -83,25 +84,29 @@ public class AdminController {
     }
 
     // Bộ lọc user theo các tiêu chi
+//    @GetMapping("/userFilter")
+//    public ResponseEntity<List<UserProfileDTO>> filterUsers(
+//            @RequestParam(required = false) String keyword,
+//            @RequestParam(required = false) Integer departmentId,
+//            @RequestParam(required = false) Integer roleId,
+//            @RequestParam(required = false) String status,
+//            @RequestParam(required = false) Integer gender,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hireDateStart,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hireDateEnd,
+//            Pageable pageable) {
+//
+//        // Gói các tham số gọi 1 lần
+//        UserFilterCriteria criteria = new UserFilterCriteria(
+//                keyword, departmentId, roleId, status, gender, hireDateStart, hireDateEnd
+//        );
+//
+//        List<UserProfileDTO> userList = userService.filterUsersList(criteria, pageable);
+//
+//        return ResponseEntity.ok(userList);
+//    }
     @GetMapping("/userFilter")
-    public ResponseEntity<List<UserProfileDTO>> filterUsers(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Integer departmentId,
-            @RequestParam(required = false) Integer roleId,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) Integer gender,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hireDateStart,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hireDateEnd,
-            Pageable pageable) {
-
-        // Gói các tham số gọi 1 lần
-        UserFilterCriteria criteria = new UserFilterCriteria(
-                keyword, departmentId, roleId, status, gender, hireDateStart, hireDateEnd
-        );
-
-        List<UserProfileDTO> userList = userService.filterUsersList(criteria, pageable);
-
-        return ResponseEntity.ok(userList);
+    public ResponseEntity<List<UserProfileDTO>> filterUsers(@ModelAttribute UserFilterCriteria criteria, Pageable pageable) {
+        return ResponseEntity.ok(userService.filterUsersList(criteria, pageable));
     }
 
     //lấy thông tin tài khoản nhân sự muốn xem
@@ -117,7 +122,7 @@ public class AdminController {
             @PathVariable int userId,
             @RequestBody UpdateAccountDTO request,
             @AuthenticationPrincipal UserEntity currentUser) {
-              userService.updateAccount(userId, request, currentUser);
+        userService.updateAccount(userId, request, currentUser);
         return ResponseEntity.ok("Cập nhật tài khoản thành công!");
 
         //return ResponseEntity.ok(updatedUser);

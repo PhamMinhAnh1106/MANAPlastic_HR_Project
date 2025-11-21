@@ -3,6 +3,7 @@ package com.manaplastic.backend.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -44,5 +45,19 @@ public class ContractEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "userID", nullable = false)
     private com.manaplastic.backend.entity.UserEntity userID;
+
+    @ColumnDefault("0.00")
+    @Column(name = "InsuranceSalary", precision = 15, scale = 2)
+    private BigDecimal insuranceSalary;
+
+    @ColumnDefault("'NONE'")
+    @Lob
+    @Column(name = "AllowanceToxicType")
+    private String allowanceToxicType;
+
+    @ColumnDefault("'DRAFT'")
+    @Lob
+    @Column(name = "Status")
+    private String status;
 
 }

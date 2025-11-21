@@ -42,6 +42,7 @@ public class EmployeeController {
                 .hireDate(currentUser.getHiredate())
                 .roleName(currentUser.getRoleID().getRolename())
                 .departmentID(currentUser.getDepartmentID().getId())
+                .departmentName(currentUser.getDepartmentID().getDepartmentname())
                 .build();
         return ResponseEntity.ok(userProfile);
     }
@@ -69,20 +70,25 @@ public class EmployeeController {
     }
 
     //Xem và lọc dữ liueeuj chấm công theo tháng năm
+//    @GetMapping("/chamCong")
+//    public ResponseEntity<List<AttendanceDTO>> getMyAttendance(
+//            @RequestParam(required = false) Integer month,
+//            @RequestParam(required = false) Integer year,
+//            @RequestParam(required = false) String status,
+//            @AuthenticationPrincipal UserEntity currentUser) {
+//
+//        AttendanceFilterCriteria criteria = new AttendanceFilterCriteria(
+//                month, year, null, currentUser.getId(), status // userId là bắt buộc
+//        );
+//
+//        List<AttendanceDTO> list = attendanceService.getFilteredAttendance(criteria);
+//
+//        return ResponseEntity.ok(list);
+//    }
     @GetMapping("/chamCong")
-    public ResponseEntity<List<AttendanceDTO>> getMyAttendance(
-            @RequestParam(required = false) Integer month,
-            @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) String status,
-            @AuthenticationPrincipal UserEntity currentUser) {
-
-        AttendanceFilterCriteria criteria = new AttendanceFilterCriteria(
-                month, year, null, currentUser.getId(), status // userId là bắt buộc
-        );
-
-        List<AttendanceDTO> list = attendanceService.getFilteredAttendance(criteria);
-
-        return ResponseEntity.ok(list);
+    public ResponseEntity<List<AttendanceDTO>> getMyAttendance(@ModelAttribute AttendanceFilterCriteria criteria) {
+        // 1 dòng duy nhất: Gọi Service và trả về
+        return ResponseEntity.ok(attendanceService.getFilteredAttendance(criteria));
     }
 
 

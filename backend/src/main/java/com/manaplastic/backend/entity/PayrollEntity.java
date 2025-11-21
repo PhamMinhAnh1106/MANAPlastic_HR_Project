@@ -34,8 +34,8 @@ public class PayrollEntity {
     private Float hoursofwork;
 
     @ColumnDefault("0.00")
-    @Column(name = "VAT", precision = 15, scale = 2)
-    private BigDecimal vat;
+    @Column(name = "PIT", precision = 15, scale = 2)
+    private BigDecimal pit;
 
     @Column(name = "netsalary", nullable = false, precision = 15, scale = 2)
     private BigDecimal netsalary;

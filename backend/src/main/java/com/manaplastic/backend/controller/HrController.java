@@ -46,6 +46,7 @@ public class HrController {
                 .hireDate(currentUser.getHiredate())
                 .roleName(currentUser.getRoleID().getRolename())
                 .departmentID(currentUser.getDepartmentID().getId())
+                .departmentName(currentUser.getDepartmentID().getDepartmentname())
                 .build();
         return ResponseEntity.ok(userProfile);
     }
@@ -74,25 +75,29 @@ public class HrController {
     }
 
     // Bộ lọc user theo các tiêu chi
+//    @GetMapping("/userFilter")
+//    public ResponseEntity<List<UserProfileDTO>> filterUsers(
+//            @RequestParam(required = false) String keyword,
+//            @RequestParam(required = false) Integer departmentId,
+//            @RequestParam(required = false) Integer roleId,
+//            @RequestParam(required = false) String status,
+//            @RequestParam(required = false) Integer gender,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hireDateStart,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hireDateEnd,
+//            Pageable pageable) {
+//
+//        // Gói các tham số gọi 1 lần
+//        UserFilterCriteria criteria = new UserFilterCriteria(
+//                keyword, departmentId, roleId, status, gender, hireDateStart, hireDateEnd
+//        );
+//
+//        List<UserProfileDTO> userList = userService.filterUsersList(criteria, pageable);
+//
+//        return ResponseEntity.ok(userList);
+//    }
     @GetMapping("/userFilter")
-    public ResponseEntity<List<UserProfileDTO>> filterUsers(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Integer departmentId,
-            @RequestParam(required = false) Integer roleId,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) Integer gender,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hireDateStart,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hireDateEnd,
-            Pageable pageable) {
-
-        // Gói các tham số gọi 1 lần
-        UserFilterCriteria criteria = new UserFilterCriteria(
-                keyword, departmentId, roleId, status, gender, hireDateStart, hireDateEnd
-        );
-
-        List<UserProfileDTO> userList = userService.filterUsersList(criteria, pageable);
-
-        return ResponseEntity.ok(userList);
+    public ResponseEntity<List<UserProfileDTO>> filterUsers(@ModelAttribute UserFilterCriteria criteria, Pageable pageable) {
+        return ResponseEntity.ok(userService.filterUsersList(criteria, pageable));
     }
 
     //lấy thông tin tài khoản nhân sự muốn xem
@@ -114,21 +119,25 @@ public class HrController {
         //return ResponseEntity.ok(updatedUser);
     }
 
-    //Xem và lọc dữ liueeuj chấm công theo tháng năm
+    //    //Xem và lọc dữ liueeuj chấm công theo tháng năm
+//    @GetMapping("/chamCong")
+//    public ResponseEntity<List<AttendanceDTO>> getMyAttendance(
+//            @RequestParam(required = false) Integer month,
+//            @RequestParam(required = false) Integer year,
+//            @RequestParam(required = false) String status,
+//            @RequestParam(required = false) Integer departmentId) {
+//
+//        AttendanceFilterCriteria criteria = new AttendanceFilterCriteria(
+//                month, year, departmentId, null, status
+//        );
+//
+//        List<AttendanceDTO> list = attendanceService.getFilteredAttendance(criteria);
+//
+//        return ResponseEntity.ok(list);
+//    }
     @GetMapping("/chamCong")
-    public ResponseEntity<List<AttendanceDTO>> getMyAttendance(
-            @RequestParam(required = false) Integer month,
-            @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) Integer departmentId) {
-
-        AttendanceFilterCriteria criteria = new AttendanceFilterCriteria(
-                month, year, departmentId, null, status
-        );
-
-        List<AttendanceDTO> list = attendanceService.getFilteredAttendance(criteria);
-
-        return ResponseEntity.ok(list);
+    public ResponseEntity<List<AttendanceDTO>> getMyAttendance(@ModelAttribute AttendanceFilterCriteria criteria) {
+        return ResponseEntity.ok(attendanceService.getFilteredAttendance(criteria));
     }
 
     @DeleteMapping("/chamCong/{attendanceId}")

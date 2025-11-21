@@ -23,7 +23,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-//    private final UserRepository userRepository;
+    //    private final UserRepository userRepository;
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
@@ -34,6 +34,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/login", "/refresh", "/logout").permitAll()
+                        .requestMatchers("/uploads/contracts/**").hasAnyAuthority("HR", "Admin")
+                        .requestMatchers("/uploads/attendance/**").permitAll()
                         .requestMatchers("/checkInApp/attendanceLog/**").permitAll() // cho phép cái app chấm công
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/**", "/index.html",
@@ -56,7 +58,7 @@ public class SecurityConfig {
     }
 
 
-// FE config
+    // FE config
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

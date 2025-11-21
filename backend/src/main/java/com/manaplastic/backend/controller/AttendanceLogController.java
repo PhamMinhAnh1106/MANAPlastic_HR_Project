@@ -7,6 +7,7 @@ import com.manaplastic.backend.repository.UserRepository;
 import com.manaplastic.backend.service.AttendanceLogService;
 import com.manaplastic.backend.service.AttendanceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +33,10 @@ public class AttendanceLogController {
     private UserRepository userRepository;
 
     //Tên thư mục lưu ảnh
-    private static final String UPLOAD_DIR = "uploads/";
+//    private static final String UPLOAD_DIR = "uploads/"; ==> hard-code
+
+    @Value("${app.upload.attendance}")
+    private String uploadDir;
 
     @PostMapping("/log")
     public ResponseEntity<?> receiveAttendanceLog(@RequestBody AttendanceLogRequest request) {
@@ -63,7 +67,7 @@ public class AttendanceLogController {
     // Hàm phụ trợ để lưu file (Giống file_put_contents của PHP)
     private String saveImageFromBase64(String base64Str) {
         try {
-            Path uploadPath = Paths.get(UPLOAD_DIR);
+            Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
@@ -78,7 +82,7 @@ public class AttendanceLogController {
             }
 
             // Trả về đường dẫn để lưu vào DB
-            return "/uploads/" + fileName;
+            return "/uploads/attendance" + fileName;
         } catch (Exception e) {
             throw new RuntimeException("Lỗi lưu ảnh: " + e.getMessage());
         }

@@ -70,7 +70,7 @@ public class LeaverequestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-
+    //Lọc đơn
     @GetMapping("/user/leaverequest/filter")
     @PreAuthorize("hasAnyAuthority('Manager','HR')")
     public ResponseEntity<List<LeaverequestDTO>> getFilteredRequests(
