@@ -40,8 +40,8 @@ export class Home implements OnInit {
         case "hr":
           break;
         case "employee":
-          this.featureAdd = [{ name: "Đăng ký lịch làm việc", path: "/home/calender/schedule/register" }
-            , { name: "Đăng Ký Phép", path: "/home/leaverequest/add" }
+          this.featureAdd = [
+            { name: "Đăng Ký Phép", path: "/home/leaverequest/add" }
           ];
           break;
         case "manager":
@@ -94,7 +94,7 @@ export class Home implements OnInit {
         const icon_manager = [
           {
             iconName: "calendar_month", path: "/home/user/attendance", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" },
-            { name: "Lịch làm việc", path: "/home/calender/schedule" }, { name: "Quản lí phép", path: "/home/leaverequest/manage" }]
+            { name: "Lịch làm việc", path: "/home/schedule" }, { name: "Quản lí phép", path: "/home/leaverequest/manage" }]
           }
         ]
         icon.push(...icon_manager)
@@ -104,7 +104,7 @@ export class Home implements OnInit {
         const icon_employee = [
           {
             iconName: "calendar_month", path: "/home/user/attendance", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" },
-            { name: "Lịch làm việc", path: "/home/calender/schedule" },
+            { name: "Lịch làm việc", path: "/home/schedule" },
             ]
           }, { iconName: "assignment_add", path: "/home/leaverequest", task: [{ name: "Nghỉ Phép", path: "/home/leaverequest" }] }
         ]

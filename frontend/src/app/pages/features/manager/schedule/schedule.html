@@ -1,4 +1,40 @@
-<div class="schedule-wrapper">
-  <h3>Lịch làm việc nhân viên</h3>
-  <app-tablemonth></app-tablemonth>
-</div>
+<app-tablemonth
+  [dayData]="dayData"
+  (selectDay)="handleDayClick($event)"
+  (monthYearChange)="handleMonthYear($event)"
+>
+
+  <!-- Extra filter / buttons -->
+  <div extraControls>
+    <select [(ngModel)]="selectStatus">
+      <option  value="">Chọn Lịch</option>
+      <option *ngIf="role=='employee'" value="0">Lịch Nháp</option>
+      <option *ngIf="role=='employee'" value="1">Lịch chính thức</option>
+      <option *ngIf="role=='manager'" value="2">Lịch Nháp</option>
+      <option *ngIf="role=='manager'" value="3">Lịch chính thức</option>
+    </select>
+    <button (click)="chooseSchedule()">Lưu</button>
+    <button *ngIf="role=='manager'" (click)="UpOfficeSchedule()">Đăng Lịch Chính Thức</button>
+        <span *ngIf="role == 'employee'" class="material-symbols-outlined" (click)="registerShift()">
+add
+</span>
+  </div>
+
+<app-loading 
+  *ngIf="isloading"
+></app-loading>
+
+<app-comfirm
+  *ngIf="isconfirm"
+  [message]="confirmMessage"
+  (result)="onConfirmResult($event)"
+></app-comfirm>
+
+<app-alert
+  *ngIf="isalert"
+  [message]="alertmessage"
+  [notifyType]="alertType"
+   (hidden)="isalert = false"
+></app-alert>
+
+</app-tablemonth>

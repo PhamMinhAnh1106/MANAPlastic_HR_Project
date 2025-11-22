@@ -1,52 +1,58 @@
 <div class="container">
-  <div class="header">
-    <div class="controls">
-      <select [(ngModel)]="month">
-        <option *ngFor="let m of months; let i = index" [value]="i + 1">
-          {{ m }}
-        </option>
-      </select>
 
-      <select [(ngModel)]="year">
-        <option *ngFor="let y of years" [value]="y">
-          {{ y }}
-        </option>
-      </select>
-      <button (click)="setMonth()">Select</button>
-    </div>
+  <!-- FILTER / CONTROL -->
+  <div class="filter">
+    <label>Tháng:</label>
+    <select [(ngModel)]="selectedMonth" (ngModelChange)="onMonthYearChange()">
+      <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [value]="m">{{m}}</option>
+    </select>
+
+    <label>Năm:</label>
+    <input type="number" [(ngModel)]="selectedYear" min="2025" max="2027" (ngModelChange)="onMonthYearChange()" />
+
+    <ng-content select="[extraControls]"></ng-content>
+
   </div>
 
-  <table>
+  <!-- CALENDAR -->
+  <table class="calendar">
     <thead>
       <tr>
-        <th>Sun</th>
-        <th>Mon</th>
-        <th>Tue</th>
-        <th>Wed</th>
-        <th>Thu</th>
-        <th>Fri</th>
-        <th>Sat</th>
+        <th *ngFor="let d of ['Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7','Chủ nhật']">{{d}}</th>
       </tr>
     </thead>
-
     <tbody>
-      <tr *ngFor="let week of weeks">
-        <td *ngFor="let d of week"
-            [class.out]="!d.inMonth"
-            [class.active]="selectedDay?.dateObj.getTime() === d.dateObj.getTime()"
-            (click)="selectDay(d)">
-          <div class="td-content">
-            <span class="day-number">{{ d.inMonth ? d.day : '' }}</span>
-            <span *ngIf="d.inMonth" class="box-form">
-              <div *ngIf="getShiftForDay(d) as shift">
-                <div *ngFor="let s of shift">
-                  {{ s.shiftName }}
-                </div>
-              </div>
-            </span>
-          </div>
+      <tr *ngFor="let week of weeks; let rowIndex = index">
+        <td *ngFor="let day of week; let colIndex = index"
+            [class.not-in-month]="!day.inMonth"
+            [class.day-off]="day.isDayOff"
+            (click)="onDayClick(day, rowIndex, colIndex)">
+          
+          {{ day.inMonth ? day.date.getDate() : '' }}
+
+
+          <!-- hiển thị các ca -->
+<ng-container *ngFor="let shift of day.shifts">
+  <div class="shift-block" (click)="showShiftInfo(shift, $event)">
+    <!-- Manager hiển thị tên nhân viên + tên ca -->
+    <span *ngIf="role === 'manager'">
+      {{ shift.employeeFullName || '???' }} - {{ shift.shiftName || 'OFF' }}
+    </span>
+
+    <!-- Employee hiển thị tên ca -->
+    <span *ngIf="role === 'employee' && !shift.isDayOff">
+      {{ shift.shiftName }}
+    </span>
+
+    <!-- OFF -->
+    <span *ngIf="shift.isDayOff && role === 'employee'">OFF</span>
+  </div>
+</ng-container>
+
+          <ng-content select="[extraDayContent]"></ng-content>
         </td>
       </tr>
     </tbody>
   </table>
+
 </div>

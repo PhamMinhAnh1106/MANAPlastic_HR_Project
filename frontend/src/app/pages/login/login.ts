@@ -14,19 +14,20 @@ interface response_api {
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [NgIf, FormsModule,],
+  imports: [NgIf, FormsModule, Loading],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login implements OnInit {
+export class Login {
   constructor(private cdr: ChangeDetectorRef, private router: Router, private cookieService: CookieService) { }
   username: string = "";
   password: string = "";
   message: string = "";
   isSuccess: boolean = true;
-
+  isloading: boolean = false;
   async login() {
     try {
+      this.isloading = true;
       const res = await Login_service(this.username, this.password);
       if (typeof res === 'string') {
         this.message = res;
@@ -35,6 +36,7 @@ export class Login implements OnInit {
       }
       if (res.status == 200) {
         const { token, refreshToken } = res.data;
+        this.isloading = false;
         this.isSuccess = true;
         this.message = "Đăng nhập thành công";
         this.cookieService.set("access_token", token, { path: "/" });
@@ -42,9 +44,13 @@ export class Login implements OnInit {
         this.router.navigate(['/home/info']);
       }
     } catch (error) {
+      this.isloading = false;
+
       this.message = "Tài khoản mật khẩu sai";
       this.isSuccess = false;
     } finally {
+      this.isloading = false;
+
       this.cdr.detectChanges();
     }
 
@@ -58,6 +64,5 @@ export class Login implements OnInit {
 
 
   }
-  ngOnInit(): void {
-  }
+
 }

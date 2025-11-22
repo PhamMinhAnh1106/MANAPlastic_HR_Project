@@ -1,36 +1,121 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ChangeSchedule, schedule, userSchedule } from '../../../../interface/schedule.interface';
-import { GetScheduleEmployeeoffice, GetScheduleEmployeeDraft, GetScheduleManagerdraft, GetScheduleManageroffice, ChangeScheduleManager, UpSchedule } from '../../../../services/pages/features/employee/shedule.services';
-import { CookieService } from 'ngx-cookie-service';
-import { scheduleList } from '../../../../utils/listSchedule.utils';
+
 import { Tablemonth } from '../../../shared/tablemonth/tablemonth';
+import { GetScheduleEmployeeDraft, GetScheduleEmployeeoffice, GetScheduleManagerdraft, GetScheduleManageroffice, UpSchedule } from '../../../../services/pages/features/employee/shedule.services';
+import { CookieService } from 'ngx-cookie-service';
+import { Router } from '@angular/router';
+import { Loading } from '../../../shared/loading/loading';
+import { Alert } from '../../../shared/alert/alert';
+import { Comfirm } from '../../../shared/comfirm/comfirm';
 
 @Component({
   selector: 'app-schedule',
-  imports: [CommonModule, FormsModule, Tablemonth],
+  imports: [CommonModule, FormsModule, Tablemonth, NgIf, Loading, Alert, Comfirm],
   templateUrl: './schedule.html',
   styleUrl: './schedule.scss',
 })
 export class Schedule implements OnInit {
+  constructor(private cdr: ChangeDetectorRef, private cookie: CookieService,
+    private router: Router
+  ) { }
+  index = {
+    row: 0,
+    col: 0
+  };
+  year: string = "";
+  month: string = "";
+  role: string = '';
+  selectStatus = '';
+  date: string = '';
+  ////////////////////////
+  isconfirm: boolean = false;
+  isalert: boolean = false;
+  isloading: boolean = false;
+  confirmMessage = '';
+  alertmessage = '';
+  alertType: boolean = true;
+  actionType: 'approve' | 'reject' | '' = '';
 
-  @ViewChild(Tablemonth) tb!: Tablemonth; // lấy instance Tablemonth trên template
+  Onalert(message: string, type: boolean) {
+    this.isalert = true;
+    this.alertmessage = message;
+    this.alertType = type;
+  }
+  /////////////////////////
+  handleDayClick(event: any) {
+    this.date = event.date;
+    this.index = { row: event.row, col: event.col };
+    console.log(this.date);
+  }
+  dayData: any[] = [];
 
-  async ngOnInit() {
-    // chờ view init xong để tb đã render
-    setTimeout(async () => {
-      if (!this.tb) return;
-      const month = this.tb.month;
-      const year = this.tb.year;
-      const my = `${year}-${month}`;
-      const apiData = await GetScheduleEmployeeDraft(my); // API trả về mảng {date, shiftName,...}
+  handleMonthYear(event: any) {
+    this.year = event.year;
+    this.month = event.month;
+    this.cdr.detectChanges();
+  }
+  async loadData() {
+    const year_month = `${this.year}-${this.month}`;
+    let res: any[] = [];
 
-      const days = this.tb.getAllDays();
-      this.tb.mergedDays = this.tb.mergeSchedule(days, apiData);
-      console.log("MERGED DATA:");
-      console.table(this.tb.mergedDays);
-    }, 0);
+    switch (this.selectStatus) {
+      case '0':
+        res = await GetScheduleEmployeeDraft(year_month);
+        break;
+      case '1':
+        res = await GetScheduleEmployeeoffice(year_month);
+        break;
+      case '2':
+        res = await GetScheduleManagerdraft(year_month);
+        break;
+      case '3':
+        res = await GetScheduleManageroffice(year_month);
+        break;
+      default:
+        res = [];
+        break;
+    }
+
+    this.dayData = res;
+    console.log(res);   // debug
+    this.cdr.detectChanges();
+  }
+
+  chooseSchedule() {
+    this.loadData();
+    console.log(this.dayData)
+
+  }
+  registerShift() {
+    this.router.navigate(["/home/schedule/register"])
+  }
+  UpOfficeSchedule() {
+
+    this.isconfirm = true;
+    this.confirmMessage = "Bạn có chắc muốn duyệt lịch này ?";
+
+  }
+  async onConfirmResult(event: any) {
+    const year_month = `${this.year}-${this.month}`;
+    if (event == true) {
+      this.isconfirm = false;
+      const res = await UpSchedule(year_month) as { data: string, status: number };
+      if (res.status = 201) {
+        this.Onalert(res.data, true);
+        return;
+      }
+      this.Onalert(res.data, false);
+
+    } else {
+      this.isconfirm = false;
+    }
+
+
+  }
+  ngOnInit() {
+    this.role = this.cookie.get("role").toLowerCase();
   }
 }
 

@@ -1,0 +1,43 @@
+.notify-container {
+    position: fixed;
+    top: 3rem;
+    right: 20px;
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    animation: fadeInOut 5s forwards;
+    z-index: 9999;
+}
+
+.success {
+    background-color: #28a745; // Xanh thành công
+}
+
+.error {
+    background-color: #dc3545; // Đỏ thất bại
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    10% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    90% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}

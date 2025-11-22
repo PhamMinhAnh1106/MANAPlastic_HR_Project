@@ -1,50 +1,52 @@
-<div class="container">
-  <!-- Left side: Welcome -->
-  <div class="item left-banner">
-    <h1 class="welcome-title">
-      Welcome to <span>ManaPlastic</span>
-    </h1>
+
+<div class="login-container">
+
+<div class="box_response">
+    
+    <div
+      *ngIf="message"
+      class="alert"
+      [class.alert-success]="isSuccess"
+      [class.alert-error]="!isSuccess"
+    >
+      {{ message }}
+    </div>
+  </div>
+  <!-- Logo + Welcome -->
+  <div class="welcome-box">
+    <img src="assets/logo.png" alt="logo" class="logo">
+    <h1 class="welcome-title">Welcome to <span>ManaPlastic</span></h1>
   </div>
 
-  <!-- Right side: Login -->
-  <div class="item right-login">
-
-
-    <div class="form_login">
-      <div class="form_login_head">
-        <p>Login</p>
-      </div>
-
-      <div class="form_login_body">
-        <div class="form_login_text">
-          <span>Username</span>
-          <input
-            type="text"
-            [(ngModel)]="username"
-            placeholder="Enter your username"
-          />
-
-          <span>Password</span>
-          <input
-            type="password"
-            [(ngModel)]="password"
-            placeholder="Enter your password"
-          />
-
-          <button class="login_button" (click)="login()">Login</button>
-        </div>
-      </div>
+  <!-- Login Form -->
+  <div class="form_login">
+    <div class="form_login_head">
+      <p>Login</p>
     </div>
 
-    <div class="box_response">
-      <div
-        *ngIf="message"
-        class="alert"
-        [class.alert-success]="isSuccess"
-        [class.alert-error]="!isSuccess"
-      >
-        {{ message }}
+    <div class="form_login_body">
+      <div class="form_login_text">
+        <span>Username</span>
+        <input
+          type="text"
+          [(ngModel)]="username"
+          placeholder="Enter your username"
+        />
+
+        <span>Password</span>
+        <input
+          type="password"
+          [(ngModel)]="password"
+          placeholder="Enter your password"
+        />
+
+        <button class="login_button" (click)="login()">Login</button>
       </div>
     </div>
   </div>
+
+  <!-- Response -->
+  
+
 </div>
+<app-loading *ngIf="isloading"> <app-loading>

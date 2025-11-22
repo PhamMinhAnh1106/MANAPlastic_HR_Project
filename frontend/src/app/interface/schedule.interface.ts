@@ -9,8 +9,6 @@ export interface userSchedule {
     employeeId: number,
     employeeFullName: string,
     drafts: schedule[]
-
-
     selectedDraft?: {
         shiftId: number;
         shiftName: string;

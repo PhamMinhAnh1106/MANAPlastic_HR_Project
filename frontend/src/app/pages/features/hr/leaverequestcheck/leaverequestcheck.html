@@ -7,6 +7,13 @@
       [(ngModel)]="filter.username"
       placeholder="Nhập username để lọc"
     />
+    <select [(ngModel)]="filter.status">
+  <option value="">Tất cả trạng thái</option>
+  <option value="PENDING">PENDING</option>
+  <option value="APPROVED">APPROVED</option>
+  <option value="REJECTED">REJECTED</option>
+</select>
+
 
     <button (click)="filterLeave()">Lọc</button>
   </div>
@@ -72,3 +79,19 @@ check_circle
     </ng-template>
   </div>
 </div>
+<app-loading 
+  *ngIf="isloading"
+></app-loading>
+
+<app-comfirm
+  *ngIf="isconfirm"
+  [message]="confirmMessage"
+  (result)="onConfirmResult($event)"
+></app-comfirm>
+
+<app-alert
+  *ngIf="isalert"
+  [message]="alertmessage"
+  [notifyType]="alertType"
+   (hidden)="isalert = false"
+></app-alert>

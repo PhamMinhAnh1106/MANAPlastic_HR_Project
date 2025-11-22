@@ -3,7 +3,7 @@ $color-error: #F44336; // Đỏ
 $color-text-light: #fff; // Chữ trắng
 
 @mixin box_response {
-    position: relative;
+    position: fixed;
     z-index: 1000;
     top: 1rem;
     right: 1rem;

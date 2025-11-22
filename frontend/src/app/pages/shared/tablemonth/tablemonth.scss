@@ -1,105 +1,92 @@
 .container {
-    background-color: #fff;
-    padding: 2.8rem 2rem;
-    margin-left: 2.5rem;
+    padding: 3rem 5rem;
 
-}
+    .filter {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        font-size: 15px;
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
+        label {
+            font-weight: 600;
+        }
 
-.controls {
-    display: flex;
-    gap: 0.5rem;
+        select,
+        input {
+            padding: 4px 6px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            outline: none;
 
-    select {
-        padding: 5px 10px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 14px;
+            &:focus {
+                border-color: #0066ff;
+            }
+        }
+
+
     }
-}
 
-.close-btn {
-    background: #ff4d4d;
-    border: none;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    padding: 4px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.2s;
-}
+    .calendar {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
 
-.close-btn:hover {
-    background: #e63939;
-}
+        th {
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-weight: 700;
+            text-align: center;
+            background: #f2f6ff;
+        }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: sans-serif;
-}
+        td {
+            border: 1px solid #ccc;
+            height: 110px;
+            vertical-align: start;
+            padding: 6px;
+            position: relative;
+            overflow-y: auto;
 
-th {
-    padding: 10px 0;
-    background: #4e91ff;
-    color: white;
-    font-weight: 600;
-    border: none;
-}
+            /* số ngày */
+            &::first-line {
+                font-weight: 600;
+            }
+        }
 
-td {
-    width: 3rem;
-    height: 4rem;
-    text-align: center;
-    font-size: 0.7rem;
-    border: 1px solid #e5e5e5;
-    cursor: pointer;
-    transition: 0.2s;
-    border-radius: 4px;
-}
+        td.not-in-month {
+            background-color: #f5f5f5;
+        }
 
-.td-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-}
+        td.day-off {
+            background-color: #ffe6e6;
+        }
 
-.day-number {
-    font-weight: bold;
-    margin-bottom: 4px;
-}
+        /* Hiển thị từng ca */
+        .shift-block {
+            background-color: #d9eaff;
+            margin: 4px 0;
+            padding: 3px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: block;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            border-left: 4px solid #4d8cff;
 
-.box-form {
-    font-size: 12px;
-    color: #333;
-    background: #f0f8ff;
-    padding: 2px 4px;
-    border-radius: 4px;
-    width: 90%;
-    text-align: center;
-}
+            &:hover {
+                background-color: #c4dcff;
+            }
+        }
 
-td.out {
-    color: #ccc;
-    background: #f5f5f5;
-}
-
-td:not(.out):hover {
-    background: #e6f0ff;
-    border-color: #4e91ff;
-    color: #000;
-}
-
-td.active {
-    background: #4e91ff;
-    color: white !important;
-    border-color: #4e91ff;
+        /* OFF shift */
+        .shift-block.off {
+            background-color: #ffe0e0;
+            border-left-color: #ff5c5c;
+            color: #d22;
+            font-weight: 600;
+        }
+    }
 }

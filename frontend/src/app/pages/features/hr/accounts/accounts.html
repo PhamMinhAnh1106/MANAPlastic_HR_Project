@@ -1,3 +1,5 @@
+<app-loading *ngIf="isloading"></app-loading>
+
 <div class="employee-container">
    <div class="filter-section">
     <input type="text" placeholder="Mã nhân viên" [(ngModel)]="filter.userID" />
@@ -182,3 +184,13 @@ stylus
     </div>
   </div>
 </div>
+
+<app-comfirm *ngIf="isconfirm"
+  [message]="confirmMessage"
+  (result)="onConfirmResult($event)">
+</app-comfirm>
+
+<app-alert   *ngIf="isalert"
+  [message]="notifyMessage"
+  [notifyType]="notifyType"
+  (hidden)="isalert = false"></app-alert>

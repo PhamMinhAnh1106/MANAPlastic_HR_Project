@@ -1,8 +1,11 @@
-import { CommonModule, NgFor } from '@angular/common';
+import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DeleteAttendant, GetAttendants } from '../../../../services/pages/features/hr/attendant.service';
 import { CookieService } from 'ngx-cookie-service';
+import { Loading } from '../../../shared/loading/loading';
+import { Alert } from '../../../shared/alert/alert';
+import { Comfirm } from '../../../shared/comfirm/comfirm';
 
 interface attendance {
   attendanceId: number,
@@ -20,13 +23,14 @@ interface attendance {
 
 @Component({
   selector: 'app-attendant',
-  imports: [CommonModule, FormsModule, NgFor],
+  imports: [CommonModule, FormsModule, NgFor, NgIf, Loading, Alert, Comfirm],
   templateUrl: './attendant.html',
   styleUrl: './attendant.scss',
 })
 export class Attendant implements OnInit {
   constructor(private cdr: ChangeDetectorRef, private cookie: CookieService) { }
   role: string = "";
+  id: number = 0;
   filter = {
     date: '',
     month: '',
@@ -35,7 +39,20 @@ export class Attendant implements OnInit {
     status: ''
   };
   selectedProof: any = null;
+  ////////////////////////
+  isconfirm: boolean = false;
+  isalert: boolean = false;
+  isloading: boolean = false;
+  confirmMessage = '';
+  alertmessage = '';
+  alertType: boolean = true;
 
+  Onalert(message: string, type: boolean) {
+    this.isalert = true;
+    this.alertmessage = message;
+    this.alertType = type;
+  }
+  /////////////////////////
   showProof(att: any) {
     this.selectedProof = att;
   }
@@ -83,20 +100,34 @@ export class Attendant implements OnInit {
   }
 
   saveAttendance(updated: any) {
-    console.log('Saved:', updated);
     this.selectedAttendance = null;
   }
-  async deleteAttendance(id: number) {
-    if (this.role == "hr")
-      if (confirm('Bạn có chắc chắn muốn xóa chấm công này không?')) {
-        const res = await DeleteAttendant(id) as { data: string, status: number };
+
+  async onConfirmResult(event: any) {
+    if (event == true) {
+      this.isconfirm = false;
+      if (this.role == "hr") {
+        this.isloading = true;
+        const res = await DeleteAttendant(this.id) as { data: string, status: number };
         if (res.status == 200) {
+          this.isloading = false
           this.filterAttendance();
-          alert(res.data);
+          this.Onalert("Xóa thành công", true);
           return;
         }
-        alert("xoa that bai")
+        this.isloading = false
+        this.Onalert("Xóa Thất Bại", false);
       }
+
+    } else {
+      this.isconfirm = false;
+
+    }
+  }
+  deleteAttendance(id: number) {
+    this.isconfirm = true;
+    this.confirmMessage = "Bạn chắc chắn muốn xóa dữ liệu này ?"
+    this.id = id;
   }
   ngOnInit(): void {
     this.role = this.cookie.get("role").toLowerCase();

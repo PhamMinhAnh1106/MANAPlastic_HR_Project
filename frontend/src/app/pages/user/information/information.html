@@ -150,3 +150,14 @@
     </div>
 </div>
 
+<app-comfirm *ngIf="isconfirm"
+ [message]="confirmMessage"
+  (result)="onConfirmResult($event)"
+  ></app-comfirm>
+
+<app-alert *ngIf="isalert"
+[message]="notifyMessage"
+  [notifyType]="notifyType"
+  (hidden)="isalert = false"></app-alert>
+  
+<app-loading *ngIf="isloading"></app-loading>

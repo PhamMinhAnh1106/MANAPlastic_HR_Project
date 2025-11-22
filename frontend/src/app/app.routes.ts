@@ -38,12 +38,9 @@ export const routes: Routes = [
             //employee
             {
                 path: 'calender', component: Tablemonth,
-                children: [
-                    { path: 'schedule/register', component: RegisterSchedule },
-                    { path: 'schedule', component: Schedule },
-
-                ]
             },
+            { path: 'schedule/register', component: RegisterSchedule },
+            { path: 'schedule', component: Schedule },
             { path: 'leaverequest', component: Leaverequests },
             { path: 'leaverequest/add', component: ADdleaverequest },
 

@@ -75,7 +75,7 @@ export async function Approveleaverequest(idRequest: number) {
 }
 export async function Rejectleaverequest(idRequest: number) {
     try {
-        const res = await api.patch(`/user/leaverequest/approve/${idRequest}`);
+        const res = await api.patch(`/user/leaverequest/reject/${idRequest}`);
         return {
             status: res.status,
             data: res.data

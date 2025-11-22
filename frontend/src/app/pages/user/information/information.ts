@@ -5,10 +5,13 @@ import { FormsModule } from '@angular/forms';
 import { Department, department, information } from '../../../interface/user/user.interface';
 import { getdataRole } from '../../../services/pages/getPageRole.service';
 import { UpdateAccount } from '../../../services/pages/user.service';
+import { Loading } from '../../shared/loading/loading';
+import { Comfirm } from '../../shared/comfirm/comfirm';
+import { Alert } from '../../shared/alert/alert';
 
 @Component({
   selector: 'app-information',
-  imports: [NgIf, CommonModule, FormsModule],
+  imports: [NgIf, CommonModule, FormsModule, Loading, Comfirm, Alert],
   templateUrl: './information.html',
   styleUrl: './information.scss',
 })
@@ -47,11 +50,24 @@ export class Information implements OnInit {
     departmentID: 0
   }
   role: string = "";
+  /////////////////////////
+  isloading: boolean = false;
 
+  isconfirm: boolean = false;
+  confirmMessage = "";
 
+  isalert: boolean = false;
+  notifyMessage = "";
+  notifyType: boolean = true;
 
+  onalert(message: string, type: boolean) {
+    this.isalert = true;
+    this.notifyMessage = message;
+    this.notifyType = type;
+  }
 
   /////////////////////////////////
+
 
   async getInformation() {
     const res = await getdataRole(this.role);
@@ -88,22 +104,36 @@ export class Information implements OnInit {
     this.isEditing = false;
     this.formdata = {};
   }
-  async saveChanges() {
-    if (this.formdata.phonenumber != null) {
-      if (this.formdata.phonenumber.split("")[0] != 0)
-        alert("so dien thoai phai bat dau tu so 0 ");
-      if (this.formdata.phonenumber.length < 10 || this.formdata.phonenumber.length > 12) {
-        alert("so dien thoai khong hop le (phai tu 10 den 12 so ");
+  async onConfirmResult(event: any) {
+    if (event === true) {
+      this.isloading = true;
+      if (this.formdata.phonenumber != null) {
+        if (this.formdata.phonenumber.split("")[0] != 0)
+          this.onalert("so dien thoai phai bat dau tu so 0 ", false);
+        if (this.formdata.phonenumber.length < 10 || this.formdata.phonenumber.length > 12) {
+          this.onalert("so dien thoai khong hop le (phai tu 10 den 12 so ", false);
+        }
       }
-    }
-    const res = await UpdateAccount(this.formdata, this.role) as { data: any; status: number };
-    if (res.status == 200) {
-      alert("them thanh cong");
-      this.isEditing = false;
-      this.cdr.detectChanges();
+      const res = await UpdateAccount(this.formdata, this.role) as { data: any; status: number };
+      if (res.status == 200) {
+        this.onalert(res.data, true);
+        this.isloading = false;
+        this.isconfirm = false;
+        this.isEditing = false;
+        this.getInformation();
+        this.cdr.detectChanges();
+      } else {
+        this.onalert(res.data, false);
+      }
     } else {
-      alert("them that bai");
+      this.isconfirm = false;
+
+      this.isloading = false;
     }
+  }
+  saveChanges() {
+    this.isconfirm = true;
+    this.confirmMessage = "Bạn có chắc muốn sửa thông ?";
   }
   ngOnInit() {
     this.role = this.cookieService.get("role");

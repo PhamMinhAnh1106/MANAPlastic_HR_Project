@@ -5,11 +5,14 @@ import { GetAccountInfo, UpdateAccounthr } from '../../../../services/pages/feat
 import { Department, information } from '../../../../interface/user/user.interface';
 import { CookieService } from 'ngx-cookie-service';
 import { FilterUser } from '../../../../utils/filters.utils';
+import { Loading } from '../../../shared/loading/loading';
+import { Comfirm } from '../../../shared/comfirm/comfirm';
+import { Alert } from '../../../shared/alert/alert';
 
 
 @Component({
   selector: 'app-accounts',
-  imports: [CommonModule, FormsModule, NgFor],
+  imports: [CommonModule, FormsModule, NgFor, Loading, Comfirm, Alert],
   templateUrl: './accounts.html',
   styleUrl: './accounts.scss',
 })
@@ -18,11 +21,18 @@ export class Accounts implements OnInit {
   employee: any = [];
   editID: number | null = null;
   role: string = "";
-
+  // box hien thi
+  isloading: boolean = false;
+  isconfirm: boolean = false;
+  confirmMessage = "";
+  isalert: boolean = false;
+  notifyMessage = "";
+  notifyType: boolean = true;
+  ///
   selectedEmployee: any = null;
   /////////////////////
   showAdvancedFilter = false;
-
+  emp: any = {};
   filter = {
     userID: '',
     username: '',
@@ -34,6 +44,11 @@ export class Accounts implements OnInit {
     hireDateEnd: ''
   };
   department = Department;
+  showNotification(message: string, type: boolean) {
+    this.notifyMessage = message;
+    this.notifyType = type;
+    this.isalert = true;
+  }
   toggleAdvancedFilter() {
     this.showAdvancedFilter = !this.showAdvancedFilter;
   }
@@ -53,10 +68,14 @@ export class Accounts implements OnInit {
       if (this.employee.length > 0) {
         this.employee.length = [];
       }
+      this.isloading = true;
       const res = await FilterUser(query, this.role);
-      this.employee.push(res);
-      this.toggleAdvancedFilter();
-      this.cdr.detectChanges();
+      if (res.length > 0) {
+        this.isloading = false;
+        this.employee.push(res);
+        this.toggleAdvancedFilter();
+        this.cdr.detectChanges();
+      }
     }
   }
   /////////////////////
@@ -66,25 +85,43 @@ export class Accounts implements OnInit {
   }
   async filterEmployees() {
     const keyword = Number(this.filter.userID);
+    this.isloading = true;
     const res = await GetAccountInfo(keyword, this.role);
 
-    if (this.employee.length > 0)
+    if (this.employee.length > 0) {
+      this.isloading = false;
       this.employee = [];
+    }
+    this.isloading = false;
+
     this.employee.push(res);
     this.cdr.detectChanges();
   }
 
-  async saveEmployee(emp: any) {
-    const res = await UpdateAccounthr(emp, this.role) as { data: string, status: number };
-    if (res.status == 200) {
-      alert(res.data);
-      this.selectedEmployee = null;
-      this.cdr.detectChanges();
-      return;
-    }
-    alert("thêm thất bại")
+  saveEmployee(emp: any) {
+    this.isconfirm = true;
+    this.confirmMessage = "Bạn có chắc muốn sửa thông tin nhân viên này?";
+    this.emp = emp;
   }
+  async onConfirmResult(event: any) {
+    this.isloading = true;
+    this.isconfirm = false;
+    if (event === true) {
 
+      const res = await UpdateAccounthr(this.emp, this.role) as { data: string, status: number };
+      if (res.status == 200) {
+        this.isloading = false;
+        this.showNotification(res.data, true);
+        this.selectedEmployee = null;
+        this.cdr.detectChanges();
+        return;
+      }
+      this.showNotification(res.data, false);
+    } else {
+      this.isloading = false;
+    }
+
+  }
   cancelEdit() {
     this.selectedEmployee = null;
 

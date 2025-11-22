@@ -1,95 +1,155 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
+import { CookieService } from 'ngx-cookie-service';
+import { userSchedule } from '../../../interface/schedule.interface';
+interface DayObj {
+  date: Date;
+  inMonth: boolean;
+  isDayOff: boolean;
+  shiftName?: string;
+  shifts?: any[]; // optional, có thể chưa có ca
+}
 @Component({
   selector: 'app-tablemonth',
   imports: [NgFor, FormsModule, NgIf],
   templateUrl: './tablemonth.html',
   styleUrl: './tablemonth.scss',
 })
-export class Tablemonth implements OnInit {
-  selectedDay: any = null;
+export class Tablemonth implements OnInit, OnChanges {
+  selectedMonth: number = new Date().getMonth() + 1;
+  selectedYear: number = new Date().getFullYear();
 
-  months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-  years = [2025, 2026];
+  weeks: any[] = [];
 
-  public year = 2025;
-  public month = 11;
-  public weeks: any[] = [];
-  mergedDays: any[] = [];
+  @Input() dayData: any[] = []; // dữ liệu từ API (employee hoặc manager)
+  role: string = '';
+  @Output() selectDay = new EventEmitter<any>();
+  @Output() monthYearChange = new EventEmitter<{ month: number, year: number }>();
+
+  dayShiftMap: { [date: string]: any[] } = {}; // map ngày → list ca
+
+  constructor(private cdr: ChangeDetectorRef, private cookie: CookieService) { }
 
   ngOnInit() {
-    this.updateCalendar();
+    this.role = this.cookie.get("role").toLowerCase();
+    this.cdr.detectChanges()
+    this.prepareDayShiftMap();
+    this.generateCalendar();
+    this.emitMonthYear();
   }
 
-  updateCalendar() {
-    this.weeks = this.getCalendarMatrix(this.year, this.month);
+  ngOnChanges() {
+    this.prepareDayShiftMap();
+    this.generateCalendar();
   }
 
-  selectDay(day: any) {
-    if (!day.inMonth) return;
-    this.selectedDay = day;
+  formatDate(date: Date): string {
+    const y = date.getFullYear();
+    const m = ('0' + (date.getMonth() + 1)).slice(-2);
+    const d = ('0' + date.getDate()).slice(-2);
+    return `${y}-${m}-${d}`;
   }
 
-  setMonth() {
-    this.updateCalendar();
+  prepareDayShiftMap() {
+
+
+    this.dayShiftMap = {};
+
+
+
+    if (this.role === 'employee') {
+      this.dayData.forEach(d => {
+        const date = d.date;
+        this.dayShiftMap[date] = [{
+          shiftName: d.shiftName,
+          shiftId: d.shiftId,
+          isDayOff: d.isDayOff
+        }];
+      });
+
+    } else if (this.role === 'manager') {
+
+
+      this.dayData.forEach((emp: userSchedule) => {
+        if (!emp.drafts) return;
+
+        emp.drafts.forEach(shift => {
+          const date = shift.date;
+          if (!this.dayShiftMap[date]) this.dayShiftMap[date] = [];
+          this.dayShiftMap[date].push({
+            employeeId: emp.employeeId,
+            employeeFullName: emp.employeeFullName,
+            shiftName: shift.shiftName || 'OFF',
+            shiftId: shift.shiftId,
+            isDayOff: shift.isDayOff
+          });
+        });
+      });
+    }
   }
 
-  getCalendarMatrix(year: number, month: number) {
-    const firstDay = new Date(year, month - 1, 1);
-    const lastDay = new Date(year, month, 0);
-    const weeks = [];
-    let current = new Date(firstDay);
-    current.setDate(current.getDate() - current.getDay());
 
-    while (current <= lastDay || current.getDay() !== 0) {
+
+
+  generateCalendar() {
+    this.weeks = [];
+    const firstDay = new Date(this.selectedYear, this.selectedMonth - 1, 1);
+    const lastDay = new Date(this.selectedYear, this.selectedMonth, 0);
+
+    let startDate = new Date(firstDay);
+    startDate.setDate(firstDay.getDate() - ((firstDay.getDay() + 6) % 7));
+    let current = new Date(startDate);
+
+    while (current <= lastDay || current.getDay() !== 1) {
       let week = [];
       for (let i = 0; i < 7; i++) {
-        week.push({
-          day: current.getDate(),
-          inMonth: current.getMonth() === month - 1,
-          dateObj: new Date(current)
-        });
+        const dayObj: DayObj = {
+          date: new Date(current),
+          inMonth: current.getMonth() === firstDay.getMonth(),
+          isDayOff: false,
+          shifts: []
+
+        };
+
+        const currentDate = this.formatDate(dayObj.date);
+        if (this.dayShiftMap[currentDate]) {
+          dayObj['shifts'] = this.dayShiftMap[currentDate];
+        } else {
+          dayObj['shifts'] = [];
+        }
+
+        week.push(dayObj);
+
         current.setDate(current.getDate() + 1);
       }
-      weeks.push(week);
+      this.weeks.push(week);
     }
-    return weeks;
   }
 
-  formatDateLocal(d: Date) {
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  getShiftForDay(d: any) {
-    if (!this.mergedDays || this.mergedDays.length === 0) return null;
-    const dateStr = this.formatDateLocal(d.dateObj);
-    return this.mergedDays.find(x => x.date === dateStr)?.shift || null;
-  }
-
-  // helper merge schedule nếu muốn dùng trực tiếp
-  mergeSchedule(days: any[], apiData: any[]) {
-    return days.map(day => {
-      const found = apiData.find(x => x.date === day.date);
-      return { ...day, shift: found ? found : null };
+  onDayClick(day: any, rowIndex: number, colIndex: number) {
+    if (!day.inMonth) return;
+    this.selectDay.emit({
+      date: this.formatDate(day.date),
+      row: rowIndex,
+      col: colIndex,
+      shifts: day.shifts
     });
   }
 
-  getAllDays() {
-    const result: any[] = [];
-    for (let week of this.weeks) {
-      for (let d of week) {
-        result.push({
-          date: this.formatDateLocal(d.dateObj),
-          day: d.day,
-          shift: null
-        });
-      }
-    }
-    return result;
+  showShiftInfo(shift: any, event: MouseEvent) {
+    if (this.role == "employee") return;
+  }
+
+  onMonthYearChange() {
+    this.generateCalendar();
+    this.emitMonthYear();
+  }
+
+  private emitMonthYear() {
+    this.monthYearChange.emit({
+      month: this.selectedMonth,
+      year: this.selectedYear
+    });
   }
 }
