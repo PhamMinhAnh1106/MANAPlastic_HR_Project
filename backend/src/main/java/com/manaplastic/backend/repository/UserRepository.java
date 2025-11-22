@@ -27,4 +27,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer>, JpaS
 
     @Query("SELECT u FROM UserEntity u WHERE u.status = 'active'")
     List<UserEntity> findAllActiveUsers();
+
+    Optional<UserEntity> findById(Integer userId);
+
+    boolean existsById(Integer userId);
 }

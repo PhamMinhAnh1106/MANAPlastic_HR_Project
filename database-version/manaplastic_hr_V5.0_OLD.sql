@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th10 21, 2025 lúc 07:16 PM
+-- Thời gian đã tạo: Th10 19, 2025 lúc 11:17 AM
 -- Phiên bản máy phục vụ: 8.2.0
 -- Phiên bản PHP: 8.2.13
 
@@ -118,70 +118,6 @@ INSERT INTO `attendances` (`attendanceID`, `date`, `checkin`, `checkout`, `check
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `contractallowances`
---
-
-DROP TABLE IF EXISTS `contractallowances`;
-CREATE TABLE IF NOT EXISTS `contractallowances` (
-  `ContractAllowanceID` int NOT NULL AUTO_INCREMENT,
-  `ContractID` int NOT NULL,
-  `AllowanceName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Tên phụ cấp',
-  `Amount` decimal(15,2) NOT NULL DEFAULT '0.00',
-  `IsTaxable` tinyint(1) DEFAULT '1' COMMENT '1=Chịu thuế, 0=Không',
-  `IsInsuranceBase` tinyint(1) DEFAULT '0' COMMENT '1=Tính đóng BHXH, 0=Không',
-  PRIMARY KEY (`ContractAllowanceID`),
-  KEY `FK_Allowance_Contract` (`ContractID`)
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `contractallowances`
---
-
-INSERT INTO `contractallowances` (`ContractAllowanceID`, `ContractID`, `AllowanceName`, `Amount`, `IsTaxable`, `IsInsuranceBase`) VALUES
-(1, 9, 'Phụ cấp trách nhiệm', 2000000.00, 1, 1),
-(2, 9, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(3, 9, 'Phụ cấp độc hại (Tiền mặt)', 500000.00, 1, 0),
-(4, 1, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(5, 2, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(6, 3, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(7, 4, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(8, 5, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(9, 6, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(10, 7, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(11, 8, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(12, 9, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(13, 10, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(14, 11, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(15, 12, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(16, 13, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(17, 14, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(18, 15, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(19, 16, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(20, 17, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(21, 18, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(22, 19, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(23, 20, 'Hỗ trợ ăn ca', 730000.00, 0, 0),
-(35, 1, 'Phụ cấp trách nhiệm', 3000000.00, 1, 1),
-(36, 3, 'Phụ cấp trách nhiệm', 3000000.00, 1, 1),
-(37, 5, 'Phụ cấp trách nhiệm', 3000000.00, 1, 1),
-(38, 7, 'Phụ cấp trách nhiệm', 3000000.00, 1, 1),
-(39, 9, 'Phụ cấp trách nhiệm', 3000000.00, 1, 1),
-(40, 11, 'Phụ cấp trách nhiệm', 3000000.00, 1, 1),
-(42, 6, 'Phụ cấp độc hại (Tiền mặt)', 500000.00, 1, 0),
-(43, 8, 'Phụ cấp độc hại (Tiền mặt)', 500000.00, 1, 0),
-(44, 17, 'Phụ cấp độc hại (Tiền mặt)', 500000.00, 1, 0),
-(45, 18, 'Phụ cấp độc hại (Tiền mặt)', 500000.00, 1, 0),
-(49, 4, 'Hỗ trợ điện thoại & Xăng xe', 400000.00, 1, 0),
-(50, 11, 'Hỗ trợ điện thoại & Xăng xe', 400000.00, 1, 0),
-(51, 12, 'Hỗ trợ điện thoại & Xăng xe', 400000.00, 1, 0),
-(52, 13, 'Hỗ trợ điện thoại & Xăng xe', 400000.00, 1, 0),
-(53, 14, 'Hỗ trợ điện thoại & Xăng xe', 400000.00, 1, 0),
-(54, 19, 'Hỗ trợ điện thoại & Xăng xe', 400000.00, 1, 0),
-(56, 10, 'Hỗ trợ ăn ca', 730000.00, 0, 0);
-
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `contracts`
 --
 
@@ -191,45 +127,32 @@ CREATE TABLE IF NOT EXISTS `contracts` (
   `contractname` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `basesalary` decimal(15,2) NOT NULL,
-  `InsuranceSalary` decimal(15,2) DEFAULT '0.00' COMMENT 'Lương đóng BHXH',
-  `AllowanceToxicType` enum('NONE','CASH','IN_KIND') COLLATE utf8mb4_unicode_ci DEFAULT 'NONE' COMMENT 'Phụ cấp độc hại',
   `fileurl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `signdate` date NOT NULL,
   `startdate` date NOT NULL,
   `enddate` date DEFAULT NULL,
-  `Status` enum('DRAFT','ACTIVE','EXPIRING_SOON','EXPIRED','TERMINATED','HISTORY') COLLATE utf8mb4_unicode_ci DEFAULT 'DRAFT' COMMENT 'Trạng thái hợp đồng',
   `userID` int NOT NULL,
   PRIMARY KEY (`contractID`),
-  KEY `IDX_Contract_User` (`userID`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `userID` (`userID`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `contracts`
 --
 
-INSERT INTO `contracts` (`contractID`, `contractname`, `type`, `basesalary`, `InsuranceSalary`, `AllowanceToxicType`, `fileurl`, `signdate`, `startdate`, `enddate`, `Status`, `userID`) VALUES
-(1, 'HĐLĐ Admin', 'INDEFINITE', 30000000.00, 30000000.00, 'NONE', NULL, '2023-01-01', '2023-01-01', NULL, 'ACTIVE', 1),
-(2, 'HĐLĐ IT', 'FIXED_TERM', 15000000.00, 15000000.00, 'NONE', NULL, '2023-05-10', '2023-05-10', '2026-05-10', 'ACTIVE', 2),
-(3, 'HĐLĐ Trưởng phòng HR', 'INDEFINITE', 25000000.00, 25000000.00, 'NONE', NULL, '2023-02-15', '2023-02-15', NULL, 'ACTIVE', 3),
-(4, 'HĐLĐ Nhân viên HR', 'FIXED_TERM', 12000000.00, 12000000.00, 'NONE', NULL, '2023-08-01', '2023-08-01', '2026-08-01', 'ACTIVE', 4),
-(5, 'HĐLĐ Trưởng nhóm Kỹ thuật', 'FIXED_TERM', 22000000.00, 22000000.00, 'IN_KIND', NULL, '2023-03-01', '2023-03-01', '2026-03-01', 'ACTIVE', 5),
-(6, 'HĐLĐ Nhân viên Kỹ thuật', 'FIXED_TERM', 10000000.00, 10000000.00, 'CASH', NULL, '2023-09-10', '2023-09-10', '2026-09-10', 'ACTIVE', 6),
-(7, 'HĐLĐ Trưởng ca Sản xuất', 'INDEFINITE', 20000000.00, 20000000.00, 'IN_KIND', NULL, '2023-03-02', '2023-03-02', NULL, 'ACTIVE', 7),
-(8, 'HĐLĐ Công nhân Sản xuất', 'FIXED_TERM', 9000000.00, 9000000.00, 'CASH', NULL, '2023-09-15', '2023-09-15', '2026-09-15', 'ACTIVE', 8),
-(9, 'HĐLĐ Trưởng nhóm In ấn', 'FIXED_TERM', 18000000.00, 18000000.00, 'IN_KIND', NULL, '2023-04-01', '2023-04-01', '2026-04-01', 'ACTIVE', 9),
-(10, 'HĐLĐ Công nhân In ấn', 'FIXED_TERM', 9000000.00, 9000000.00, 'IN_KIND', NULL, '2023-10-01', '2023-10-01', '2026-10-01', 'ACTIVE', 10),
-(11, 'HĐLĐ Trưởng nhóm CSKH', 'FIXED_TERM', 17000000.00, 17000000.00, 'NONE', NULL, '2023-05-01', '2023-05-01', '2026-05-01', 'ACTIVE', 11),
-(12, 'HĐLĐ Nhân viên CSKH', 'FIXED_TERM', 8000000.00, 8000000.00, 'NONE', NULL, '2023-11-01', '2023-11-01', '2026-11-01', 'ACTIVE', 12),
-(13, 'HĐLĐ Nhân viên HR', 'FIXED_TERM', 14000000.00, 14000000.00, 'NONE', NULL, '2024-04-28', '2024-04-28', '2026-04-28', 'ACTIVE', 13),
-(14, 'HĐLĐ Thực tập sinh HR', 'FIXED_TERM', 5000000.00, 0.00, 'NONE', NULL, '2023-02-09', '2023-02-09', '2026-02-09', 'ACTIVE', 14),
-(15, 'HĐLĐ Nhân viên In ấn', 'FIXED_TERM', 9500000.00, 9500000.00, 'IN_KIND', NULL, '2023-02-23', '2023-02-23', '2026-02-23', 'ACTIVE', 15),
-(16, 'HĐLĐ Nhân viên In ấn', 'FIXED_TERM', 9200000.00, 9200000.00, 'IN_KIND', NULL, '2024-10-13', '2024-10-13', '2026-10-13', 'ACTIVE', 16),
-(17, 'HĐLĐ Nhân viên In ấn', 'FIXED_TERM', 8800000.00, 8800000.00, 'CASH', NULL, '2023-08-03', '2023-08-03', '2026-08-03', 'ACTIVE', 17),
-(18, 'HĐLĐ Nhân viên In ấn', 'FIXED_TERM', 9000000.00, 9000000.00, 'CASH', NULL, '2024-02-17', '2024-02-17', '2026-02-17', 'HISTORY', 18),
-(19, 'HĐLĐ Chuyên viên Tuyển dụng', 'FIXED_TERM', 12000000.00, 12000000.00, 'NONE', NULL, '2024-11-27', '2024-11-27', '2025-11-27', 'HISTORY', 19),
-(20, 'HĐLĐ Nhân viên In ấn (Thử việc)', 'PROBATION', 7500000.00, 0.00, 'IN_KIND', NULL, '2025-11-15', '2025-11-15', '2026-01-15', 'ACTIVE', 20),
-(21, 'Hợp đồng Tái ký 2026 - test add hdld', 'FIXED_TERM', 15000000.00, 15000000.00, 'NONE', '/uploads/contracts/be665f42-7761-447b-985e-fa5afc98cf90.pdf', '2025-11-21', '2025-11-28', '2026-11-28', 'ACTIVE', 19),
-(22, 'Hợp đồng Tái ký 2026 - test add hdld', 'FIXED_TERM', 15000000.00, 15000000.00, 'NONE', '/uploads/contracts/ed354bd8-4ef6-411e-a987-f461080a20c0.pdf', '2025-11-21', '2025-11-28', '2026-11-28', 'ACTIVE', 18);
+INSERT INTO `contracts` (`contractID`, `contractname`, `type`, `basesalary`, `fileurl`, `signdate`, `startdate`, `enddate`, `userID`) VALUES
+(1, 'HĐLĐ Admin', 'Full-time', 30000000.00, NULL, '2023-01-01', '2023-01-01', NULL, 1),
+(2, 'HĐLĐ IT', 'Full-time', 15000000.00, NULL, '2023-05-10', '2023-05-10', NULL, 2),
+(3, 'HĐLĐ Trưởng phòng HR', 'Full-time', 25000000.00, NULL, '2023-02-15', '2023-02-15', NULL, 3),
+(4, 'HĐLĐ Nhân viên HR', 'Full-time', 12000000.00, NULL, '2023-08-01', '2023-08-01', NULL, 4),
+(5, 'HĐLĐ Trưởng nhóm Kỹ thuật', 'Full-time', 22000000.00, NULL, '2023-03-01', '2023-03-01', NULL, 5),
+(6, 'HĐLĐ Nhân viên Kỹ thuật', 'Full-time', 10000000.00, NULL, '2023-09-10', '2023-09-10', NULL, 6),
+(7, 'HĐLĐ Trưởng ca Sản xuất', 'Full-time', 20000000.00, NULL, '2023-03-02', '2023-03-02', NULL, 7),
+(8, 'HĐLĐ Công nhân Sản xuất', 'Full-time', 9000000.00, NULL, '2023-09-15', '2023-09-15', NULL, 8),
+(9, 'HĐLĐ Trưởng nhóm In ấn', 'Full-time', 18000000.00, NULL, '2023-04-01', '2023-04-01', NULL, 9),
+(10, 'HĐLĐ Công nhân In ấn', 'Full-time', 9000000.00, NULL, '2023-10-01', '2023-10-01', NULL, 10),
+(11, 'HĐLĐ Trưởng nhóm CSKH', 'Full-time', 17000000.00, NULL, '2023-05-01', '2023-05-01', NULL, 11),
+(12, 'HĐLĐ Nhân viên CSKH', 'Full-time', 8000000.00, NULL, '2023-11-01', '2023-11-01', NULL, 12);
 
 -- --------------------------------------------------------
 
@@ -584,73 +507,6 @@ INSERT INTO `employeeofficialschedule` (`officialID`, `employeeID`, `date`, `shi
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `employeesafetyrecords`
---
-
-DROP TABLE IF EXISTS `employeesafetyrecords`;
-CREATE TABLE IF NOT EXISTS `employeesafetyrecords` (
-  `RecordID` int NOT NULL AUTO_INCREMENT,
-  `UserID` int NOT NULL,
-  `RecordType` enum('HEALTH_CHECK','PPE_ISSUANCE','SAFETY_TRAINING') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `DateCompleted` date NOT NULL,
-  `Cost` decimal(15,2) DEFAULT '0.00',
-  `Notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  PRIMARY KEY (`RecordID`),
-  KEY `FK_Safety_User` (`UserID`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `employeesafetyrecords`
---
-
-INSERT INTO `employeesafetyrecords` (`RecordID`, `UserID`, `RecordType`, `DateCompleted`, `Cost`, `Notes`) VALUES
-(1, 10, 'HEALTH_CHECK', '2025-10-15', 1500000.00, 'Sức khỏe Loại I'),
-(2, 10, 'PPE_ISSUANCE', '2025-10-01', 500000.00, 'Cấp phát bảo hộ lao động đợt 2'),
-(3, 5, 'HEALTH_CHECK', '2025-10-15', 1200000.00, 'Sức khỏe tốt (Loại 1)'),
-(4, 6, 'HEALTH_CHECK', '2025-10-15', 1200000.00, 'Sức khỏe tốt (Loại 2)'),
-(5, 7, 'HEALTH_CHECK', '2025-10-15', 1500000.00, 'Sức khỏe tốt (Loại 1)'),
-(6, 8, 'HEALTH_CHECK', '2025-10-15', 1500000.00, 'Có vấn đề nhẹ về hô hấp - Cần theo dõi'),
-(7, 9, 'HEALTH_CHECK', '2025-10-16', 1200000.00, 'Sức khỏe tốt (Loại 1)'),
-(8, 15, 'HEALTH_CHECK', '2025-10-16', 1200000.00, 'Sức khỏe trung bình (Loại 3)'),
-(9, 16, 'HEALTH_CHECK', '2025-10-16', 1200000.00, 'Sức khỏe tốt (Loại 1)'),
-(10, 17, 'HEALTH_CHECK', '2025-10-16', 1200000.00, 'Sức khỏe tốt (Loại 2)'),
-(11, 6, 'PPE_ISSUANCE', '2025-11-01', 450000.00, 'Giày bảo hộ, Găng tay cách điện'),
-(12, 8, 'PPE_ISSUANCE', '2025-11-01', 300000.00, 'Mũ bảo hộ, Khẩu trang lọc bụi'),
-(13, 15, 'PPE_ISSUANCE', '2025-11-02', 300000.00, 'Găng tay chống hóa chất, Kính bảo hộ'),
-(14, 20, 'PPE_ISSUANCE', '2025-11-15', 600000.00, 'Full bộ bảo hộ cho nhân viên mới'),
-(15, 20, 'SAFETY_TRAINING', '2025-11-16', 200000.00, 'Đào tạo nhập môn an toàn hóa chất');
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `insurancesettings`
---
-
-DROP TABLE IF EXISTS `insurancesettings`;
-CREATE TABLE IF NOT EXISTS `insurancesettings` (
-  `SettingID` int NOT NULL AUTO_INCREMENT,
-  `Type` enum('SOCIAL','HEALTH','UNEMPLOYMENT','UNION','ACCIDENT') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'BHXH, BHYT, BHTN, Công đoàn, Tai nạn LĐ & BNN',
-  `EmployeeRate` decimal(5,2) NOT NULL COMMENT 'Tỷ lệ nhân viên đóng (%)',
-  `CompanyRate` decimal(5,2) NOT NULL COMMENT 'Tỷ lệ công ty đóng (%)',
-  `EffectiveDate` date NOT NULL COMMENT 'Ngày áp dụng',
-  `IsActive` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`SettingID`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `insurancesettings`
---
-
-INSERT INTO `insurancesettings` (`SettingID`, `Type`, `EmployeeRate`, `CompanyRate`, `EffectiveDate`, `IsActive`) VALUES
-(1, 'SOCIAL', 8.00, 17.50, '2025-01-01', 1),
-(2, 'HEALTH', 1.50, 3.00, '2025-01-01', 1),
-(3, 'UNEMPLOYMENT', 1.00, 1.00, '2025-01-01', 1),
-(4, 'ACCIDENT', 0.00, 0.50, '2025-01-01', 1),
-(5, 'UNION', 0.00, 2.00, '2025-01-01', 1);
-
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `leavebalance`
 --
 
@@ -803,42 +659,6 @@ INSERT INTO `leaverequests` (`leaverequestID`, `leavetype`, `startdate`, `enddat
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `monthlypayrollconfigs`
---
-
-DROP TABLE IF EXISTS `monthlypayrollconfigs`;
-CREATE TABLE IF NOT EXISTS `monthlypayrollconfigs` (
-  `ConfigID` int NOT NULL AUTO_INCREMENT,
-  `Month` int NOT NULL,
-  `Year` int NOT NULL,
-  `CycleStartDate` date NOT NULL,
-  `CycleEndDate` date NOT NULL,
-  `StandardWorkDays` decimal(4,2) DEFAULT '26.00',
-  PRIMARY KEY (`ConfigID`),
-  UNIQUE KEY `UQ_Month_Year` (`Month`,`Year`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `monthlypayrollconfigs`
---
-
-INSERT INTO `monthlypayrollconfigs` (`ConfigID`, `Month`, `Year`, `CycleStartDate`, `CycleEndDate`, `StandardWorkDays`) VALUES
-(1, 1, 2025, '2024-12-26', '2025-01-25', 26.00),
-(2, 2, 2025, '2025-01-26', '2025-02-25', 24.00),
-(3, 3, 2025, '2025-02-26', '2025-03-25', 26.00),
-(4, 4, 2025, '2025-03-26', '2025-04-25', 26.00),
-(5, 5, 2025, '2025-04-26', '2025-05-25', 26.00),
-(6, 6, 2025, '2025-05-26', '2025-06-25', 26.00),
-(7, 7, 2025, '2025-06-26', '2025-07-25', 26.00),
-(8, 8, 2025, '2025-07-26', '2025-08-25', 26.00),
-(9, 9, 2025, '2025-08-26', '2025-09-25', 26.00),
-(10, 10, 2025, '2025-09-26', '2025-10-25', 26.00),
-(11, 11, 2025, '2025-10-26', '2025-11-25', 26.00),
-(12, 12, 2025, '2025-11-26', '2025-12-25', 26.00);
-
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `payrolldetails`
 --
 
@@ -851,7 +671,7 @@ CREATE TABLE IF NOT EXISTS `payrolldetails` (
   `payID` int DEFAULT NULL,
   PRIMARY KEY (`paydetailID`),
   KEY `payID` (`payID`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `payrolldetails`
@@ -860,12 +680,7 @@ CREATE TABLE IF NOT EXISTS `payrolldetails` (
 INSERT INTO `payrolldetails` (`paydetailID`, `description`, `type`, `amount`, `payID`) VALUES
 (1, 'Thưởng chuyên cần', 'bonus', 500000.00, 1),
 (2, 'Thưởng vượt năng suất', 'bonus', 200000.00, 2),
-(3, 'Phạt đi trễ', 'deduction', 100000.00, 2),
-(4, 'Lương cơ bản tháng 11', 'allowance', 9000000.00, 3),
-(5, 'Hỗ trợ ăn ca', 'allowance', 730000.00, 3),
-(6, 'Thưởng: Nhân viên xuất sắc tháng 11', 'bonus', 1000000.00, 3),
-(7, 'Phạt: Làm hỏng vật tư', 'deduction', 500000.00, 3),
-(8, 'Trích đóng Bảo hiểm (10.5%)', 'deduction', 945000.00, 3);
+(3, 'Phạt đi trễ', 'deduction', 100000.00, 2);
 
 -- --------------------------------------------------------
 
@@ -880,22 +695,21 @@ CREATE TABLE IF NOT EXISTS `payrolls` (
   `bonus` decimal(15,2) DEFAULT '0.00',
   `penalty` decimal(15,2) DEFAULT '0.00',
   `hoursofwork` float DEFAULT NULL,
-  `PIT` decimal(15,2) DEFAULT '0.00' COMMENT 'Thuế Thu nhập cá nhân (PIT)',
+  `VAT` decimal(15,2) DEFAULT '0.00',
   `netsalary` decimal(15,2) NOT NULL,
   `payperiod` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
   `userID` int DEFAULT NULL,
   PRIMARY KEY (`payID`),
   UNIQUE KEY `UQ_User_Period` (`userID`,`payperiod`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `payrolls`
 --
 
-INSERT INTO `payrolls` (`payID`, `basesalary`, `bonus`, `penalty`, `hoursofwork`, `PIT`, `netsalary`, `payperiod`, `userID`) VALUES
+INSERT INTO `payrolls` (`payID`, `basesalary`, `bonus`, `penalty`, `hoursofwork`, `VAT`, `netsalary`, `payperiod`, `userID`) VALUES
 (1, 10000000.00, 500000.00, 0.00, 176, 0.00, 10500000.00, '2025-09', 6),
-(2, 9000000.00, 200000.00, 100000.00, 180, 0.00, 9100000.00, '2025-09', 8),
-(3, 9000000.00, 1000000.00, 500000.00, 192, 0.00, 9285000.00, '2025-11', 10);
+(2, 9000000.00, 200000.00, 100000.00, 180, 0.00, 9100000.00, '2025-09', 8);
 
 -- --------------------------------------------------------
 
@@ -950,42 +764,6 @@ CREATE TABLE IF NOT EXISTS `requirementrules` (
 INSERT INTO `requirementrules` (`ruleID`, `requirementID`, `requiredskillGrade`, `minstaffcount`) VALUES
 (7, 2, 3, 1),
 (9, 3, 3, 1);
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `rewardpunishmentdecisions`
---
-
-DROP TABLE IF EXISTS `rewardpunishmentdecisions`;
-CREATE TABLE IF NOT EXISTS `rewardpunishmentdecisions` (
-  `DecisionID` int NOT NULL AUTO_INCREMENT,
-  `UserID` int NOT NULL,
-  `Type` enum('REWARD','PUNISHMENT') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Khen thưởng hoặc Kỷ luật',
-  `Reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Lý do',
-  `DecisionDate` date NOT NULL COMMENT 'Ngày ra quyết định',
-  `Amount` decimal(15,2) DEFAULT '0.00' COMMENT 'Số tiền',
-  `IsTaxExempt` tinyint(1) DEFAULT '0' COMMENT '1=Miễn thuế TNCN, 0=Chịu thuế',
-  `Status` enum('PENDING','APPROVED','PROCESSED','CANCELLED') COLLATE utf8mb4_unicode_ci DEFAULT 'PENDING' COMMENT 'Processed=Đã tính vào lương',
-  PRIMARY KEY (`DecisionID`),
-  KEY `FK_Decision_User` (`UserID`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `rewardpunishmentdecisions`
---
-
-INSERT INTO `rewardpunishmentdecisions` (`DecisionID`, `UserID`, `Type`, `Reason`, `DecisionDate`, `Amount`, `IsTaxExempt`, `Status`) VALUES
-(1, 10, 'PUNISHMENT', 'Vi phạm quy trình vận hành máy in làm hỏng vật tư', '2025-11-05', 500000.00, 0, 'PROCESSED'),
-(2, 10, 'REWARD', 'Đạt thành tích nhân viên xuất sắc tháng 11', '2025-11-28', 1000000.00, 1, 'PROCESSED'),
-(3, 6, 'PUNISHMENT', 'Đi muộn 3 lần trong tháng 11', '2025-11-25', 200000.00, 0, 'APPROVED'),
-(4, 16, 'PUNISHMENT', 'Làm hỏng bản in số lượng lớn (Lỗi vận hành)', '2025-11-20', 1000000.00, 0, 'APPROVED'),
-(5, 12, 'REWARD', 'Nhân viên CSKH có phản hồi tốt nhất tháng', '2025-11-30', 500000.00, 1, 'APPROVED'),
-(6, 8, 'REWARD', 'Sáng kiến cải tiến quy trình đóng gói', '2025-11-15', 2000000.00, 1, 'APPROVED'),
-(7, 5, 'REWARD', 'Hoàn thành dự án bảo trì sớm hạn', '2025-11-28', 3000000.00, 1, 'APPROVED'),
-(8, 6, 'REWARD', 'Thưởng chuyên cần tháng 09/2025', '2025-09-30', 500000.00, 1, 'PROCESSED'),
-(9, 8, 'REWARD', 'Thưởng vượt năng suất tháng 09/2025', '2025-09-30', 200000.00, 1, 'PROCESSED'),
-(10, 8, 'PUNISHMENT', 'Vi phạm quy định giờ giấc (Đi trễ)', '2025-09-15', 100000.00, 0, 'PROCESSED');
 
 -- --------------------------------------------------------
 
@@ -1049,66 +827,6 @@ INSERT INTO `rolespermissions` (`roleID`, `permissionID`) VALUES
 (2, 9),
 (3, 9),
 (4, 9);
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `salaryformulas`
---
-
-DROP TABLE IF EXISTS `salaryformulas`;
-CREATE TABLE IF NOT EXISTS `salaryformulas` (
-  `FormulaID` int NOT NULL AUTO_INCREMENT,
-  `Name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Calculation` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Type` enum('INCOME','DEDUCTION','TAX','NET') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Priority` int DEFAULT '0',
-  `IsActive` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`FormulaID`),
-  UNIQUE KEY `Code` (`Code`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `salaryformulas`
---
-
-INSERT INTO `salaryformulas` (`FormulaID`, `Name`, `Code`, `Calculation`, `Type`, `Priority`, `IsActive`) VALUES
-(1, 'Lương theo ngày công', 'WORK_SALARY', '([BASE_SALARY] / [STD_DAYS]) * [REAL_WORK_DAYS]', 'INCOME', 1, 1),
-(2, 'Khấu trừ Bảo hiểm', 'INSURANCE_DEDUCT', '[INSURANCE_SALARY] * 0.105', 'DEDUCTION', 2, 1),
-(3, 'Thu nhập chịu thuế', 'TAXABLE_INCOME', '[WORK_SALARY] + [TOTAL_ALLOWANCE] + [TOTAL_REWARD] - [INSURANCE_DEDUCT]', 'INCOME', 3, 1),
-(4, 'Thực lãnh', 'NET_SALARY', '[TAXABLE_INCOME] - [TOTAL_PENALTY] - [PIT]', 'NET', 99, 1);
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `salaryvariables`
---
-
-DROP TABLE IF EXISTS `salaryvariables`;
-CREATE TABLE IF NOT EXISTS `salaryvariables` (
-  `VariableID` int NOT NULL AUTO_INCREMENT,
-  `Name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Description` text COLLATE utf8mb4_unicode_ci,
-  `ExampleValue` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`VariableID`),
-  UNIQUE KEY `Code` (`Code`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `salaryvariables`
---
-
-INSERT INTO `salaryvariables` (`VariableID`, `Name`, `Code`, `Description`, `ExampleValue`) VALUES
-(1, 'Lương cơ bản (HĐLĐ)', 'BASE_SALARY', 'Lấy từ bảng Contracts', NULL),
-(2, 'Ngày công chuẩn tháng', 'STD_DAYS', 'Lấy từ MonthlyPayrollConfigs', NULL),
-(3, 'Ngày công đi làm thực tế', 'REAL_WORK_DAYS', 'Tổng số ngày có mặt + Nghỉ phép có lương', NULL),
-(4, 'Tổng tiền Phụ cấp', 'TOTAL_ALLOWANCE', 'Tổng bảng ContractAllowances', NULL),
-(5, 'Tổng tiền Thưởng', 'TOTAL_REWARD', 'Tổng RewardPunishmentDecisions loại REWARD', NULL),
-(6, 'Tổng tiền Phạt', 'TOTAL_PENALTY', 'Tổng RewardPunishmentDecisions loại PUNISHMENT', NULL),
-(7, 'Giờ tăng ca', 'OT_HOURS', 'Tổng số giờ làm thêm', NULL),
-(8, 'Lương đóng bảo hiểm', 'INSURANCE_SALARY', 'Lấy từ bảng Contracts', NULL);
 
 -- --------------------------------------------------------
 
@@ -1217,34 +935,6 @@ INSERT INTO `shifts` (`shiftID`, `shiftname`, `starttime`, `endtime`, `durationh
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `taxbrackets`
---
-
-DROP TABLE IF EXISTS `taxbrackets`;
-CREATE TABLE IF NOT EXISTS `taxbrackets` (
-  `BracketID` int NOT NULL AUTO_INCREMENT,
-  `Level` int NOT NULL,
-  `MinIncome` decimal(15,2) NOT NULL,
-  `MaxIncome` decimal(15,2) DEFAULT NULL,
-  `TaxRate` decimal(5,2) NOT NULL,
-  `SubtractionAmount` decimal(15,2) DEFAULT '0.00',
-  `EffectiveDate` date NOT NULL,
-  PRIMARY KEY (`BracketID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `taxbrackets`
---
-
-INSERT INTO `taxbrackets` (`BracketID`, `Level`, `MinIncome`, `MaxIncome`, `TaxRate`, `SubtractionAmount`, `EffectiveDate`) VALUES
-(1, 1, 0.00, 5000000.00, 5.00, 0.00, '2025-01-01'),
-(2, 2, 5000001.00, 10000000.00, 10.00, 250000.00, '2025-01-01'),
-(3, 3, 10000001.00, 18000000.00, 15.00, 750000.00, '2025-01-01'),
-(4, 4, 18000001.00, 32000000.00, 20.00, 1650000.00, '2025-01-01');
-
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `userpermissions`
 --
 
@@ -1342,12 +1032,6 @@ ALTER TABLE `attendances`
   ADD CONSTRAINT `FK_Attendance_CheckOutLog` FOREIGN KEY (`checkOutLogID`) REFERENCES `attendancelogs` (`attendanceLogID`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `contractallowances`
---
-ALTER TABLE `contractallowances`
-  ADD CONSTRAINT `FK_Allowance_Contract` FOREIGN KEY (`ContractID`) REFERENCES `contracts` (`contractID`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
 -- Các ràng buộc cho bảng `contracts`
 --
 ALTER TABLE `contracts`
@@ -1379,12 +1063,6 @@ ALTER TABLE `employeeofficialschedule`
   ADD CONSTRAINT `FK_schedule_manager` FOREIGN KEY (`approvedbymanagerID`) REFERENCES `users` (`userID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_schedule_shift` FOREIGN KEY (`shiftID`) REFERENCES `shifts` (`shiftID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_schedule_user` FOREIGN KEY (`employeeID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Các ràng buộc cho bảng `employeesafetyrecords`
---
-ALTER TABLE `employeesafetyrecords`
-  ADD CONSTRAINT `FK_Safety_User` FOREIGN KEY (`UserID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `leavebalance`
@@ -1423,12 +1101,6 @@ ALTER TABLE `payrolls`
 --
 ALTER TABLE `requirementrules`
   ADD CONSTRAINT `FK_rule_req` FOREIGN KEY (`requirementID`) REFERENCES `schedulerequirements` (`requirementID`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Các ràng buộc cho bảng `rewardpunishmentdecisions`
---
-ALTER TABLE `rewardpunishmentdecisions`
-  ADD CONSTRAINT `FK_Decision_User` FOREIGN KEY (`UserID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `rolespermissions`
