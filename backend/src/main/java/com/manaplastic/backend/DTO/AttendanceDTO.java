@@ -17,6 +17,7 @@ public class AttendanceDTO {
     private int attendanceId;
     private String userName;
     private String fullNameUser;
+    private String departmentName;
     private String attendanceDate;
     private LocalDateTime checkIn;
     private LocalDateTime checkOut;

@@ -3,6 +3,7 @@ package com.manaplastic.backend.repository;
 import com.manaplastic.backend.entity.ContractEntity;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ContractRepository extends JpaRepository<ContractEntity, Integer> {
+public interface ContractRepository extends JpaRepository<ContractEntity, Integer>, JpaSpecificationExecutor<ContractEntity> {
 
     // Đếm số hợp đồng "Xác định thời hạn" mà nhân viên này đã ký (trừ các bản nháp/đã hủy)
     @Query("SELECT COUNT(c) FROM ContractEntity c WHERE c.userID.id = :userId AND c.type = 'FIXED_TERM' AND c.status != 'DRAFT' AND c.status != 'TERMINATED'")

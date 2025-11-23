@@ -5,6 +5,7 @@ import com.manaplastic.backend.DTO.ContractFilterCriteria;
 import com.manaplastic.backend.DTO.ContractDTO;
 import com.manaplastic.backend.entity.ContractEntity;
 import com.manaplastic.backend.entity.UserEntity;
+import com.manaplastic.backend.exportfile.ExcelHelper;
 import com.manaplastic.backend.filters.ContractFilter;
 import com.manaplastic.backend.repository.ContractRepository;
 import com.manaplastic.backend.repository.UserRepository;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -113,7 +115,7 @@ public class ContractService {
         Specification<ContractEntity> spec = ContractFilter.filterContracts(filter);
         List<ContractEntity> entities = contractRepository.findAll(spec);
 
-        return entities.stream().map(this::mapToDTO).collect(Collectors.toList());
+        return entities.stream().map(this::mapToContractDTO).collect(Collectors.toList());
     }
 
     // Lấy ds hdld của nhân sự đó
@@ -124,11 +126,11 @@ public class ContractService {
         List<ContractEntity> entities = contractRepository.findAllByUserId(userId);
 
         return entities.stream()
-                .map(this::mapToDTO)
+                .map(this::mapToContractDTO)
                 .collect(Collectors.toList());
     }
 
-    private ContractDTO mapToDTO(ContractEntity entity) {
+    private ContractDTO mapToContractDTO(ContractEntity entity) {
         String username = (entity.getUserID() != null) ? entity.getUserID().getUsername() : null;
         return new ContractDTO(
                 entity.getId(),
@@ -144,5 +146,17 @@ public class ContractService {
                 entity.getStatus(),
                 username
         );
+    }
+
+    //Xuất file hdld
+    public ByteArrayInputStream exportContracts(ContractFilterCriteria criteria) {
+        Specification<ContractEntity> spec = ContractFilter.filterContracts(criteria);
+        List<ContractEntity> entities = contractRepository.findAll(spec);
+
+        List<ContractDTO> dtos = entities.stream()
+                .map(this::mapToContractDTO)
+                .collect(Collectors.toList());
+
+        return ExcelHelper.contractsToExcel(dtos);
     }
 }
