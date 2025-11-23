@@ -79,14 +79,11 @@ export class Schedule implements OnInit {
     }
 
     this.dayData = res;
-    console.log(res);   // debug
     this.cdr.detectChanges();
   }
 
   chooseSchedule() {
     this.loadData();
-    console.log(this.dayData)
-
   }
   registerShift() {
     this.router.navigate(["/home/schedule/register"])
@@ -98,23 +95,35 @@ export class Schedule implements OnInit {
 
   }
   async onConfirmResult(event: any) {
+    this.isloading = true;
     const year_month = `${this.year}-${this.month}`;
     if (event == true) {
       this.isconfirm = false;
       const res = await UpSchedule(year_month) as { data: string, status: number };
-      if (res.status = 201) {
+      if (res.status = 200) {
+        this.isloading = false;
+        setTimeout(() => {
+          this.cdr.detectChanges();
+        }, 2000);
         this.Onalert(res.data, true);
         return;
       }
+      this.isloading = false;
+      setTimeout(() => {
+        this.cdr.detectChanges();
+      }, 2000);
       this.Onalert(res.data, false);
 
     } else {
+      this.isloading = false;
+
       this.isconfirm = false;
     }
 
 
   }
   ngOnInit() {
+
     this.role = this.cookie.get("role").toLowerCase();
   }
 }

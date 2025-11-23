@@ -3,6 +3,11 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, O
 import { FormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
 import { userSchedule } from '../../../interface/schedule.interface';
+import { scheduleList } from '../../../utils/listSchedule.utils';
+import { Loading } from '../loading/loading';
+import { Alert } from '../alert/alert';
+import { Comfirm } from '../comfirm/comfirm';
+import { ChangeScheduleManager } from '../../../services/pages/features/employee/shedule.services';
 interface DayObj {
   date: Date;
   inMonth: boolean;
@@ -12,14 +17,28 @@ interface DayObj {
 }
 @Component({
   selector: 'app-tablemonth',
-  imports: [NgFor, FormsModule, NgIf],
+  imports: [NgFor, FormsModule, NgIf, Loading, Alert, Comfirm],
   templateUrl: './tablemonth.html',
   styleUrl: './tablemonth.scss',
 })
 export class Tablemonth implements OnInit, OnChanges {
+
   selectedMonth: number = new Date().getMonth() + 1;
   selectedYear: number = new Date().getFullYear();
+  ////////////////////////
+  isconfirm: boolean = false;
+  isalert: boolean = false;
+  isloading: boolean = false;
+  confirmMessage = '';
+  alertmessage = '';
+  alertType: boolean = true;
 
+  Onalert(message: string, type: boolean) {
+    this.isalert = true;
+    this.alertmessage = message;
+    this.alertType = type;
+  }
+  /////////////////////////
   weeks: any[] = [];
 
   @Input() dayData: any[] = []; // dữ liệu từ API (employee hoặc manager)
@@ -151,5 +170,67 @@ export class Tablemonth implements OnInit, OnChanges {
       month: this.selectedMonth,
       year: this.selectedYear
     });
+  }
+
+
+
+  selectedShiftData: any = null;   // chứa employeeId, date, shiftId
+  shiftId: number | null = null;   // dropdown chọn ca
+  list: any[] = [];                // list ca (API trả về)
+
+  // Mở popup chỉnh sửa ca
+  openEditShift(day: any, shift: any) {
+    this.selectedShiftData = {
+      employeeId: shift.employeeId,
+      employeeFullName: shift.employeeFullName,
+      date: this.formatDate(day.date),
+      oldShiftId: shift.shiftId,
+      isDayOff: shift.isDayOff
+    };
+
+    this.shiftId = shift.shiftId; // gán ca hiện tại
+  }
+  changeType(hours: number) {
+    scheduleList(hours, this.list);
+  }
+  async onConfirmResult(event: any) {
+
+    if (!this.shiftId) return this.Onalert("Bạn chưa chọn ca!", false);
+    this.isconfirm = false;
+    if (event == true) {
+      this.isloading = true;
+      const payload = {
+        employeeId: this.selectedShiftData.employeeId,
+        date: this.selectedShiftData.date,
+        shiftId: this.shiftId,
+        isDayOff: this.shiftId >= 53
+      };
+      const res = await ChangeScheduleManager(payload) as { data: string, status: number };
+      if (res.status == 200) {
+        this.isloading = false;
+        this.selectedShiftData = null;
+        setTimeout(() => {
+
+          this.cdr.detectChanges();
+        }, 2000);
+        this.Onalert(res.data, true);
+        return;
+      }
+      this.isloading = false;
+      setTimeout(() => {
+        this.cdr.detectChanges();
+      }, 2000);
+      this.Onalert(res.data, false);
+
+
+      this.selectedShiftData = null; // đóng popup
+      this.monthYearChange.emit({ month: this.selectedMonth, year: this.selectedYear });
+    }
+  }
+
+  saveShift() {
+    this.isconfirm = true;
+    this.confirmMessage = "Bạn Có chắc muốn thay đổi thông tin ca làm này ?";
+
   }
 }

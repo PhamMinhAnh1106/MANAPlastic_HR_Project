@@ -31,28 +31,90 @@
           {{ day.inMonth ? day.date.getDate() : '' }}
 
 
-          <!-- hiển thị các ca -->
+<!-- hiển thị các ca -->
 <ng-container *ngFor="let shift of day.shifts">
-  <div class="shift-block" (click)="showShiftInfo(shift, $event)">
-    <!-- Manager hiển thị tên nhân viên + tên ca -->
-    <span *ngIf="role === 'manager'">
-      {{ shift.employeeFullName || '???' }} - {{ shift.shiftName || 'OFF' }}
-    </span>
 
-    <!-- Employee hiển thị tên ca -->
-    <span *ngIf="role === 'employee' && !shift.isDayOff">
-      {{ shift.shiftName }}
-    </span>
+  <!-- Ẩn hoàn toàn shift-block khi isDayOff = true -->
+  <div class="shift-block"
+       *ngIf="!shift.isDayOff"
+       (click)="role === 'manager' && openEditShift(day, shift); $event.stopPropagation()">
 
-    <!-- OFF -->
-    <span *ngIf="shift.isDayOff && role === 'employee'">OFF</span>
+      <!-- Manager hiển thị tên nhân viên + tên ca -->
+      <span *ngIf="role === 'manager'">
+        {{ shift.employeeFullName || '???' }} - {{ shift.shiftName }}
+      </span>
+
+      <!-- Employee hiển thị tên ca -->
+      <span *ngIf="role === 'employee'">
+        {{ shift.shiftName }}
+      </span>
+
   </div>
+
 </ng-container>
+
+
+
 
           <ng-content select="[extraDayContent]"></ng-content>
         </td>
       </tr>
     </tbody>
   </table>
+<div class="edit-popup" *ngIf="selectedShiftData && role === 'manager'">
+
+  <h3>Sửa ca làm việc</h3>
+
+  <p><strong>Nhân viên:</strong> {{ selectedShiftData.employeeFullName }}</p>
+  <p><strong>Ngày:</strong> {{ selectedShiftData.date }}</p>
+
+  <label>Loại ca:</label>
+  <div class="type-group">
+    <label>
+      <input type="radio" name="type" (change)="changeType(8)" value="8" /> Ca 8 tiếng
+    </label>
+
+    <label>
+      <input type="radio" name="type" (change)="changeType(6)" value="6" /> Ca 6 tiếng
+    </label>
+  </div>
+
+  <label>Chọn ca:</label>
+  <select [(ngModel)]="shiftId" name="shiftId" required>
+    <option [ngValue]="null" disabled selected>-- Chọn ca --</option>
+
+    <option *ngFor="let s of list" [value]="s.shift_id">
+      {{ s.shift_name }} | {{ s.start_time }} → {{ s.end_time }}
+    </option>
+
+    <option value="53">AL</option>
+    <option value="54">SL</option>
+    <option value="55">PL</option>
+    <option value="56">ML</option>
+    <option value="57">UL</option>
+  </select>
+
+  <div class="btn-group">
+    <button class="save-btn" (click)="saveShift()">Lưu thay đổi</button>
+    <button class="cancel-btn" (click)="selectedShiftData = null">Hủy</button>
+  </div>
+</div>
+
 
 </div>
+<app-loading 
+  *ngIf="isloading"
+></app-loading>
+
+<app-comfirm
+  *ngIf="isconfirm"
+  [message]="confirmMessage"
+  (result)="onConfirmResult($event)"
+></app-comfirm>
+
+<app-alert
+  *ngIf="isalert"
+  [message]="alertmessage"
+  [notifyType]="alertType"
+   (hidden)="isalert = false"
+></app-alert>

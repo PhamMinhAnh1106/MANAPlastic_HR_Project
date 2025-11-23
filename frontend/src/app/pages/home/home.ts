@@ -45,7 +45,7 @@ export class Home implements OnInit {
           ];
           break;
         case "manager":
-          this.featureAdd = [{ name: "Lịch làm việc", path: "/home/calender/schedule" }]
+          this.featureAdd = [{ name: "Lịch làm việc", path: "/home/schedule" }]
 
           break;
       }
