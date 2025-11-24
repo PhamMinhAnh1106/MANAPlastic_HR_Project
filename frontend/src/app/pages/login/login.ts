@@ -64,5 +64,9 @@ export class Login {
 
 
   }
+  forgotPassword() {
+    // Ví dụ: redirect tới trang quên mật khẩu
+    this.router.navigate(['/forgotpassword']);
+  }
 
 }

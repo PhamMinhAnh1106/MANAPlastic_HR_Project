@@ -114,3 +114,19 @@
         @include app.box_response;
     }
 }
+
+.forgot-password {
+    display: block;
+    margin: 10px 0 0 0;
+    background: none;
+    border: none;
+    color: #1a73e8;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s;
+
+    &:hover {
+        color: #155ab6;
+    }
+}

@@ -1,17 +1,16 @@
-
 <div class="login-container">
 
-<div class="box_response">
-    
-    <div
-      *ngIf="message"
-      class="alert"
-      [class.alert-success]="isSuccess"
-      [class.alert-error]="!isSuccess"
-    >
-      {{ message }}
-    </div>
+  <div class="box_response">
+      <div
+        *ngIf="message"
+        class="alert"
+        [class.alert-success]="isSuccess"
+        [class.alert-error]="!isSuccess"
+      >
+        {{ message }}
+      </div>
   </div>
+
   <!-- Logo + Welcome -->
   <div class="welcome-box">
     <img src="assets/logo.png" alt="logo" class="logo">
@@ -41,12 +40,15 @@
         />
 
         <button class="login_button" (click)="login()">Login</button>
+
+        <!-- Nút quên mật khẩu -->
+        <button class="forgot-password" (click)="forgotPassword()">
+          Quên mật khẩu?
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Response -->
-  
-
 </div>
-<app-loading *ngIf="isloading"> <app-loading>
+
+<app-loading *ngIf="isloading"></app-loading>

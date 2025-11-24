@@ -14,6 +14,7 @@ import { Tablemonth } from './pages/shared/tablemonth/tablemonth';
 import { Leaverequests } from './pages/features/employee/leaverequests/leaverequests';
 import { ADdleaverequest } from './pages/features/employee/addleaverequest/addleaverequest';
 import { Leaverequestcheck } from './pages/features/hr/leaverequestcheck/leaverequestcheck';
+import { ForgetPassword } from './pages/forget-password/forget-password';
 
 
 export const routes: Routes = [
@@ -27,6 +28,7 @@ export const routes: Routes = [
                 ]
             },
             { path: 'changepassword', component: ChangePassword },
+
             //admin
             { path: 'add/account', component: AddAccount },
             //hr
@@ -49,6 +51,8 @@ export const routes: Routes = [
         ]
     },
     { path: 'login', component: Login },
+    { path: 'forgotpassword', component: ForgetPassword },
+
     //back ve home khi ko co tro toi trang nao
     { path: '', redirectTo: '/home/info', pathMatch: 'full' },
     { path: '**', redirectTo: '/home/info' },
