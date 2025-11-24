@@ -86,8 +86,10 @@ public class EmployeeController {
 //        return ResponseEntity.ok(list);
 //    }
     @GetMapping("/chamCong")
-    public ResponseEntity<List<AttendanceDTO>> getMyAttendance(@ModelAttribute AttendanceFilterCriteria criteria) {
-        // 1 dòng duy nhất: Gọi Service và trả về
+    public ResponseEntity<List<AttendanceDTO>> getMyAttendance(
+            @ModelAttribute AttendanceFilterCriteria criteria,
+            @AuthenticationPrincipal UserEntity currentUser) {
+        criteria.setUserId(currentUser.getId()); // Lấy user hiện tại để chỉ tr về đúng cảu user đó
         return ResponseEntity.ok(attendanceService.getFilteredAttendance(criteria));
     }
 

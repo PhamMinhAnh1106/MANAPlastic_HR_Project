@@ -71,38 +71,57 @@ public class LeaverequestController {
         }
     }
     //Lọc đơn
+//    @GetMapping("/user/leaverequest/filter")
+//    @PreAuthorize("hasAnyAuthority('Manager','HR')")
+//    public ResponseEntity<List<LeaverequestDTO>> getFilteredRequests(
+//            @RequestParam(required = false) Integer departmentId,
+//            @RequestParam(required = false) String username,
+//            @RequestParam(required = false) String status,
+//            @RequestParam(required = false)
+//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+//            LocalDate fromDate,
+//            @RequestParam(required = false)
+//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+//            LocalDate toDate,
+//            @AuthenticationPrincipal UserEntity currentUser) {
+//
+//        // Nếu là Manager, tự động lọc theo phòng ban của họ
+//        Integer effectiveDeptId = departmentId;
+//        if (currentUser.getAuthorities().contains("Manager")) {
+//            effectiveDeptId = currentUser.getDepartmentID().getId();
+//        }
+//
+//
+//        LeaveRequestFilterCriteria criteria = new LeaveRequestFilterCriteria(
+//                effectiveDeptId,
+//                username,
+//                status,
+//                fromDate,
+//                toDate
+//        );
+//
+//        List<LeaverequestDTO> requests = leaverequestService.getFilteredRequests(criteria);
+//        return ResponseEntity.ok(requests);
+//    }
     @GetMapping("/user/leaverequest/filter")
     @PreAuthorize("hasAnyAuthority('Manager','HR')")
     public ResponseEntity<List<LeaverequestDTO>> getFilteredRequests(
-            @RequestParam(required = false) Integer departmentId,
-            @RequestParam(required = false) String username,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate fromDate,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate toDate,
+            @ModelAttribute LeaveRequestFilterCriteria criteria,
             @AuthenticationPrincipal UserEntity currentUser) {
 
-        // Nếu là Manager, tự động lọc theo phòng ban của họ
-        Integer effectiveDeptId = departmentId;
-        if (currentUser.getAuthorities().contains("Manager")) {
-            effectiveDeptId = currentUser.getDepartmentID().getId();
+        boolean isManager = currentUser.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("Manager"));
+
+        if (isManager) {
+            if (currentUser.getDepartmentID() != null) {
+                criteria.setDepartmentId(currentUser.getDepartmentID().getId());
+            }
         }
-
-
-        LeaveRequestFilterCriteria criteria = new LeaveRequestFilterCriteria(
-                effectiveDeptId,
-                username,
-                status,
-                fromDate,
-                toDate
-        );
 
         List<LeaverequestDTO> requests = leaverequestService.getFilteredRequests(criteria);
         return ResponseEntity.ok(requests);
     }
+
 
     @PatchMapping("/user/leaverequest/approve/{id}") // Dùng Patch vì chỉ thay đổi 1 phần (Status)
     @PreAuthorize("hasAnyAuthority('Manager','HR')")

@@ -15,37 +15,37 @@ public class ContractFilter {
 
 
             // Lọc theo Username
-            if (filter.username() != null && !filter.username().isBlank()) {
-                predicates.add(cb.like(root.get("userID").get("username"), "%" + filter.username() + "%"));
+            if (filter.getUsername() != null && !filter.getUsername().isBlank()) {
+                predicates.add(cb.like(root.get("userID").get("username"), "%" + filter.getUsername() + "%"));
             }
 
 
             // Lọc theo Loại hợp đồng (Full-time, Part-time...)
-            if (filter.type() != null && !filter.type().isBlank()) {
-                predicates.add(cb.equal(root.get("type"), filter.type()));
+            if (filter.getType() != null && !filter.getType().isBlank()) {
+                predicates.add(cb.equal(root.get("type"), filter.getType()));
             }
 
             // Lọc theo Trạng thái (ACTIVE, EXPIRED...)
-            if (filter.status() != null && !filter.status().isBlank()) {
-                predicates.add(cb.equal(root.get("status"), filter.status()));
+            if (filter.getStatus() != null && !filter.getStatus().isBlank()) {
+                predicates.add(cb.equal(root.get("status"), filter.getStatus()));
             }
 
             // Lọc theo Lương cơ bản
-            if (filter.basesalary() != null) {
-                predicates.add(cb.equal(root.get("basesalary"), filter.basesalary()));
+            if (filter.getBasesalary() != null) {
+                predicates.add(cb.equal(root.get("basesalary"), filter.getBasesalary()));
             }
 
             // Lọc theo Loại độc hại
-            if (filter.allowanceToxicType() != null && !filter.allowanceToxicType().isBlank()) {
-                predicates.add(cb.equal(root.get("allowanceToxicType"), filter.allowanceToxicType()));
+            if (filter.getAllowanceToxicType() != null && !filter.getAllowanceToxicType().isBlank()) {
+                predicates.add(cb.equal(root.get("allowanceToxicType"), filter.getAllowanceToxicType()));
             }
 
 
             // Lọc các hợp đồng ĐANG HIỆU LỰC trong khoảng [validFrom - validTo]
 
-            if (filter.validFrom() != null && filter.validTo() != null) {
-                Predicate startCond = cb.lessThanOrEqualTo(root.get("startdate"), filter.validTo());
-                Predicate endCondA = cb.greaterThanOrEqualTo(root.get("enddate"), filter.validFrom());
+            if (filter.getValidFrom() != null && filter.getValidTo() != null) {
+                Predicate startCond = cb.lessThanOrEqualTo(root.get("startdate"), filter.getValidTo());
+                Predicate endCondA = cb.greaterThanOrEqualTo(root.get("enddate"), filter.getValidFrom());
                 Predicate endCondB = cb.isNull(root.get("enddate"));
                 Predicate endCond = cb.or(endCondA, endCondB);
 

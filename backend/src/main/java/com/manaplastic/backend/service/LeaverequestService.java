@@ -57,7 +57,7 @@ public class LeaverequestService {
             throw new RuntimeException("Loại phép không hợp lệ: " + dto.leavetype());
         }
 
-        // 2. Tìm ShiftEntity dựa trên Enum đã map
+        // Tìm ShiftEntity dựa trên Enum đã map
         String shiftNameInDB = getShiftNameFromEnum(reqType);
         ShiftEntity leaveTypeShift = shiftRepository.findByShiftname(shiftNameInDB)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy loại ca trong DB: " + shiftNameInDB));

@@ -12,11 +12,11 @@ public class LeaveRequestFilter {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (criteria.status() != null && !criteria.status().isBlank()) {
+            if (criteria.getStatus() != null && !criteria.getStatus().isBlank()) {
                 try {
                     // Chuyển String "PENDING" thành Enum LeaverequestStatus.PENDING
                     LeaverequestEntity.LeaverequestStatus statusEnum =
-                            LeaverequestEntity.LeaverequestStatus.valueOf(criteria.status().toUpperCase());
+                            LeaverequestEntity.LeaverequestStatus.valueOf(criteria.getStatus().toUpperCase());
 
                     predicates.add(cb.equal(root.get("status"), statusEnum));
                 } catch (IllegalArgumentException e) { // Bỏ qua nếu nhu status gửi lên không hợp lệ
@@ -24,38 +24,38 @@ public class LeaveRequestFilter {
             }
 
             // Lọc theo DepartmentID
-            if (criteria.departmentId() != null) {
+            if (criteria.getDepartmentId() != null) {
                 // JOIN: leaverequest.userID.departmentID.id
                 predicates.add(cb.equal(
                         root.get("userID").get("departmentID").get("id"),
-                        criteria.departmentId()
+                        criteria.getDepartmentId()
                 ));
             }
 
             // Lọc theo Username (tìm kiếm gần đúng, không phân biệt hoa thường)
-            if (criteria.username() != null && !criteria.username().isBlank()) {
+            if (criteria.getUsername() != null && !criteria.getUsername().isBlank()) {
                 // JOIN: leaverequest.userID.username
                 predicates.add(cb.like(
                         cb.lower(root.get("userID").get("username")),
-                        "%" + criteria.username().toLowerCase() + "%"
+                        "%" + criteria.getUsername().toLowerCase() + "%"
                 ));
             }
 
             // Lọc theo "Từ ngày" (>= fromDate)
             // Lọc các đơn có ngày bắt đầu nghỉ (startdate) >= fromDate
-            if (criteria.fromDate() != null) {
+            if (criteria.getFromDate() != null) {
                 predicates.add(cb.greaterThanOrEqualTo(
                         root.get("startdate"),
-                        criteria.fromDate()
+                        criteria.getFromDate()
                 ));
             }
 
             // Lọc theo "Đến ngày" (<= toDate)
             // Lọc các đơn có ngày bắt đầu nghỉ (startdate) <= toDate
-            if (criteria.toDate() != null) {
+            if (criteria.getToDate() != null) {
                 predicates.add(cb.lessThanOrEqualTo(
                         root.get("startdate"),
-                        criteria.toDate()
+                        criteria.getToDate()
                 ));
             }
 
