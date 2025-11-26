@@ -10,25 +10,16 @@
     align-items: center;
     text-align: center;
     color: white;
-    gap: 3rem;
 
     .welcome-box {
         margin-bottom: 20px;
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 2rem;
 
         .logo {
-            width: 4rem;
-            background: rgba(255, 255, 255, 0.6);
-            /* nền trắng mờ */
-            border-radius: 50%;
-            /* bo tròn */
-            backdrop-filter: blur(4px);
-            /* làm mờ nền đẹp hơn */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            margin-bottom: 10px;
+            width: 10rem;
+
         }
 
 

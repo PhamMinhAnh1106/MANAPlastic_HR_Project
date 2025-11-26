@@ -58,7 +58,7 @@
           </td>
 
           <!-- Nút duyệt / từ chối -->
-          <td *ngIf="item.status === 'PENDING'">
+          <td *ngIf="item.status === 'PENDING'" style="display:flex">
             <button class="approve-btn" (click)="approve(item.leaverequestID)">
               <span class="material-symbols-outlined">
 check_circle

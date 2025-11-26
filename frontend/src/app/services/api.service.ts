@@ -4,9 +4,9 @@ const url = "http://localhost:8080";
 export const api = axios.create({
     baseURL: url,
     withCredentials: true,
-    headers: {
-        "Content-Type": "application/json"
-    }
+    // headers: {
+    //     "Content-Type": "application/json"
+    // }
 })
 
 api.interceptors.request.use((config) => {

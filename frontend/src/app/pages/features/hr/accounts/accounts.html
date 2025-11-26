@@ -173,7 +173,13 @@ stylus
           <input [(ngModel)]="selectedEmployee.status" />
 
           <label>Phòng ban</label>
-          <input [(ngModel)]="selectedEmployee.departmentID" />
+                <select [(ngModel)]="selectedEmployee.departmentID" >
+        <span *ngFor="let dept of department">
+
+        
+          <option value={{dept.departmentId}}>{{dept.departmentName}}</option>
+        </span>
+      </select>
         </div>
       </div>
 

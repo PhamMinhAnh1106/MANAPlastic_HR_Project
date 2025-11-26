@@ -15,6 +15,8 @@ import { Leaverequests } from './pages/features/employee/leaverequests/leaverequ
 import { ADdleaverequest } from './pages/features/employee/addleaverequest/addleaverequest';
 import { Leaverequestcheck } from './pages/features/hr/leaverequestcheck/leaverequestcheck';
 import { ForgetPassword } from './pages/forget-password/forget-password';
+import { Contracts } from './pages/features/hr/contracts/contracts';
+import { ContractsAdd } from './pages/features/hr/contracts-add/contracts-add';
 
 
 export const routes: Routes = [
@@ -36,6 +38,13 @@ export const routes: Routes = [
             { path: 'user/attendance', component: Attendant },
             //manager 
             { path: 'leaverequest/manage', component: Leaverequestcheck },
+            {
+                path: 'contracts', component: Contracts,
+                children: []
+
+            },
+            { path: 'contracts/add', component: ContractsAdd },
+
 
             //employee
             {

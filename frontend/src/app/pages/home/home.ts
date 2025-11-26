@@ -38,6 +38,8 @@ export class Home implements OnInit {
           ];
           break;
         case "hr":
+          this.featureAdd = [{ name: "Thêm hợp đồng", path: "/home/contracts/add" }
+          ];
           break;
         case "employee":
           this.featureAdd = [
@@ -85,7 +87,7 @@ export class Home implements OnInit {
           {
             iconName: "calendar_month", path: "/home/user/attendance", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" },
             { name: "Quản lí phép", path: "/home/leaverequest/manage" }]
-          },
+          }, { iconName: "contract", path: "/home/contracts", task: [{ name: "Quản Lí hợp đồng", path: "/home/contracts" }], },
         ];
         icon.push(...icon_hr)
         this.icon_handleBar = icon;

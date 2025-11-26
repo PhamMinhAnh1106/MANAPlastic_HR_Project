@@ -1,0 +1,79 @@
+<div class="overlay" [class.show]="isOpen">
+  <div class="popup">
+    <button class="close-btn" (click)="closePopup()">&times;</button>
+
+    <div class="popup-header">
+      <h3>Đăng ký hợp đồng lao động</h3>
+    </div>
+
+    <div class="popup-content">
+      <form #f="ngForm" (ngSubmit)="submit()">
+
+        <div class="form-grid">
+
+          <!-- Cột trái -->
+          <div class="col">
+            <label>Mã nhân viên</label>
+            <input type="number" [(ngModel)]="contract.userId" name="userId" required />
+
+            <label>Tên hợp đồng</label>
+            <input type="text" [(ngModel)]="contract.contractName" name="contractName" required />
+
+              <label>Loại hợp đồng</label>
+              <select [(ngModel)]="contract.type" name="type" required>
+                <option disabled value="">-- Chọn loại hợp đồng --</option>
+                <option *ngFor="let type of contractType" [value]="type">{{ type }}</option>
+              </select>
+
+
+            <label>Lương cơ bản</label>
+            <input type="number" [(ngModel)]="contract.baseSalary" name="baseSalary" required />
+          </div>
+
+          <!-- Cột phải -->
+          <div class="col">
+            <label>Lương đóng BHXH</label>
+            <input type="number" [(ngModel)]="contract.insuranceSalary" name="insuranceSalary" required />
+
+            <label>Phụ cấp độc hại</label>
+            <select [(ngModel)]="contract.allowanceToxicType" name="allowanceToxicType" required>
+              <option disabled selected value="">-- Chọn loại độc hại --</option>
+              <option value="NONE">NONE</option>
+              <option value="CASH">CASH</option>
+              <option value="IN_KIND">IN_KIND</option>
+            </select>
+
+            <label>Ngày ký hợp đồng</label>
+            <input type="date" [(ngModel)]="contract.signDate" name="signDate" required />
+
+            <label>Ngày bắt đầu</label>
+            <input type="date" [(ngModel)]="contract.startDate" name="startDate" required />
+
+            <label>Ngày kết thúc</label>
+            <input type="date" [(ngModel)]="contract.endDate" name="endDate" required />
+
+            <label>File hợp đồng (PDF)</label>
+            <input type="file" (change)="handleFileSelect($event)" accept="application/pdf" required />
+          </div>
+
+        </div>
+
+        <div class="hidden-submit-placeholder"></div>
+      </form>
+    </div>
+
+    <div class="popup-footer">
+      <button class="btn btn-cancel" (click)="closePopup()">Hủy</button>
+      <button class="btn btn-save" (click)="f.ngSubmit.emit()" [disabled]="f.invalid">Lưu</button>
+    </div>
+  </div>
+</div>
+<app-comfirm *ngIf="isconfirm"
+  [message]="confirmMessage"
+  (result)="onConfirmResult($event)">
+</app-comfirm>
+<app-alert   *ngIf="isalert"
+  [message]="notifyMessage"
+  [notifyType]="notifyType"
+  (hidden)="isalert = false"></app-alert>
+<app-loading *ngIf="isloading"></app-loading>
