@@ -87,6 +87,7 @@ export class Information implements OnInit {
       roleName: res.roleName,
       departmentID: res.departmentID
     }
+    sessionStorage.setItem("departmentId", String(this.userInfo.departmentID));
     this.cdr.detectChanges();
   }
   getDepartment(id: number) {
@@ -137,7 +138,6 @@ export class Information implements OnInit {
   }
   ngOnInit() {
     this.role = this.cookieService.get("role");
-
     this.getInformation();
     this.cdr.detectChanges();
   }

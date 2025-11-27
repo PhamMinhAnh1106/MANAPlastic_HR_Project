@@ -37,7 +37,7 @@ export class Schedule implements OnInit {
   alertmessage = '';
   alertType: boolean = true;
   actionType: 'approve' | 'reject' | '' = '';
-
+  statusSchedule = "";
   Onalert(message: string, type: boolean) {
     this.isalert = true;
     this.alertmessage = message;
@@ -56,7 +56,10 @@ export class Schedule implements OnInit {
     this.month = event.month;
     this.cdr.detectChanges();
   }
-  async loadData() {
+  autoSchedule() {
+    this.router.navigate(["home/schedule/auto"]);
+  }
+  public async loadData() {
     const year_month = `${this.year}-${this.month}`;
     let res: any[] = [];
 
@@ -69,9 +72,17 @@ export class Schedule implements OnInit {
         break;
       case '2':
         res = await GetScheduleManagerdraft(year_month);
+        this.statusSchedule = "draft";
+        sessionStorage.setItem("statusSchedule", this.statusSchedule);
+        this.cdr.detectChanges();
         break;
       case '3':
         res = await GetScheduleManageroffice(year_month);
+        this.statusSchedule = "office";
+        sessionStorage.setItem("statusSchedule", this.statusSchedule);
+        this.cdr.detectChanges();
+        console.log(this.statusSchedule)
+
         break;
       default:
         res = [];
@@ -123,7 +134,6 @@ export class Schedule implements OnInit {
 
   }
   ngOnInit() {
-
     this.role = this.cookie.get("role").toLowerCase();
   }
 }

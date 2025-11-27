@@ -7,7 +7,8 @@ import { scheduleList } from '../../../utils/listSchedule.utils';
 import { Loading } from '../loading/loading';
 import { Alert } from '../alert/alert';
 import { Comfirm } from '../comfirm/comfirm';
-import { ChangeScheduleManager } from '../../../services/pages/features/employee/shedule.services';
+import { ChangeScheduleDraftManager, ChangeScheduleOfficeManager } from '../../../services/pages/features/employee/shedule.services';
+import { Schedule } from '../../features/manager/schedule/schedule';
 interface DayObj {
   date: Date;
   inMonth: boolean;
@@ -48,14 +49,16 @@ export class Tablemonth implements OnInit, OnChanges {
 
   dayShiftMap: { [date: string]: any[] } = {}; // map ngày → list ca
 
-  constructor(private cdr: ChangeDetectorRef, private cookie: CookieService) { }
-
+  constructor(private cdr: ChangeDetectorRef, private cookie: CookieService, private schedule: Schedule) { }
+  statusSchedule: string | null = '';
   ngOnInit() {
     this.role = this.cookie.get("role").toLowerCase();
     this.cdr.detectChanges()
     this.prepareDayShiftMap();
     this.generateCalendar();
     this.emitMonthYear();
+
+
   }
 
   ngOnChanges() {
@@ -198,6 +201,8 @@ export class Tablemonth implements OnInit, OnChanges {
     if (!this.shiftId) return this.Onalert("Bạn chưa chọn ca!", false);
     this.isconfirm = false;
     if (event == true) {
+      this.statusSchedule = sessionStorage.getItem("statusSchedule");
+
       this.isloading = true;
       const payload = {
         employeeId: this.selectedShiftData.employeeId,
@@ -205,10 +210,17 @@ export class Tablemonth implements OnInit, OnChanges {
         shiftId: this.shiftId,
         isDayOff: this.shiftId >= 53
       };
-      const res = await ChangeScheduleManager(payload) as { data: string, status: number };
+      let res: { data: string, status: number } = { data: "", status: 0 };
+      if (this.statusSchedule == "draft") {
+        res = await ChangeScheduleDraftManager(payload) as { data: string, status: number };
+      } else if (this.statusSchedule == "office") {
+        res = await ChangeScheduleOfficeManager(payload) as { data: string, status: number };
+
+      }
       if (res.status == 200) {
         this.isloading = false;
         this.selectedShiftData = null;
+        this.schedule.loadData();
         setTimeout(() => {
 
           this.cdr.detectChanges();

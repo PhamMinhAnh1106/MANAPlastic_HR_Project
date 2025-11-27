@@ -17,6 +17,7 @@ import { Leaverequestcheck } from './pages/features/hr/leaverequestcheck/leavere
 import { ForgetPassword } from './pages/forget-password/forget-password';
 import { Contracts } from './pages/features/hr/contracts/contracts';
 import { ContractsAdd } from './pages/features/hr/contracts-add/contracts-add';
+import { AutoSchedule } from './pages/features/manager/auto-schedule/auto-schedule';
 
 
 export const routes: Routes = [
@@ -51,6 +52,7 @@ export const routes: Routes = [
                 path: 'calender', component: Tablemonth,
             },
             { path: 'schedule/register', component: RegisterSchedule },
+            { path: 'schedule/auto', component: AutoSchedule },
             { path: 'schedule', component: Schedule },
             { path: 'leaverequest', component: Leaverequests },
             { path: 'leaverequest/add', component: ADdleaverequest },

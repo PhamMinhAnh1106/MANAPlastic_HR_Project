@@ -15,9 +15,8 @@
     </select>
     <button (click)="chooseSchedule()">Lưu</button>
     <button *ngIf="role=='manager'" (click)="UpOfficeSchedule()">Đăng Lịch Chính Thức</button>
-        <span *ngIf="role == 'employee'" class="material-symbols-outlined" (click)="registerShift()">
-add
-</span>
+    <button *ngIf="role=='manager'" (click)="autoSchedule()">Xếp lịch tự động</button>
+    <span *ngIf="role == 'employee'" class="material-symbols-outlined" (click)="registerShift()">add</span>
   </div>
 
 

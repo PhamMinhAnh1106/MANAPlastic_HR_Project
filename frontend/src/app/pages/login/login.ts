@@ -41,7 +41,7 @@ export class Login {
         this.message = "Đăng nhập thành công";
         this.cookieService.set("access_token", token, { path: "/" });
         this.cookieService.set("refreshToken", refreshToken, { path: "/" });
-        this.router.navigate(['/home/info']);
+        this.router.navigate(['/home/info/user']);
       }
     } catch (error) {
       this.isloading = false;

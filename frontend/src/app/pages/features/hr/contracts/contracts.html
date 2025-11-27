@@ -1,8 +1,7 @@
 <div class="page-container">
 
-  <!-- LEFT SIDEBAR -->
-  <div class="sidebar">
-
+  <!-- HEADER MENU -->
+  <div class="header">
     <div class="menu-item" [class.active]="tab === 'check'" (click)="tab = 'check'">
       Kiểm tra hợp đồng
     </div>
@@ -10,27 +9,19 @@
     <div class="menu-item" [class.active]="tab === 'search'" (click)="tab = 'search'">
       Tìm hợp đồng
     </div>
-
-    <div class="menu-item" [class.active]="tab === 'export'" (click)="tab = 'export'">
-      Xuất file
-    </div>
   </div>
 
   <!-- RIGHT CONTENT -->
   <div class="content">
     
     <!-- NÚT THÊM HỢP ĐỒNG -->
-    <button class="add-btn" (click)="addContract()">
-      +
-    </button>
+    <button class="add-btn" (click)="addContract()">+</button>
 
     <!-- ===== TAB KIỂM TRA HỢP ĐỒNG ===== -->
     <div *ngIf="tab === 'check'">
       <h2>Kiểm tra hợp đồng</h2>
-
       <label>Mã nhân viên</label>
       <input type="text" [(ngModel)]="employeeId" placeholder="Nhập ID nhân viên">
-
       <div class="btn-group">
         <button (click)="checkSignedContract()">Kiểm tra hợp đồng đã ký</button>
         <button (click)="viewEmployeeContracts()">Xem danh sách hợp đồng</button>
@@ -40,7 +31,6 @@
     <!-- ===== TAB TÌM HỢP ĐỒNG ===== -->
     <div *ngIf="tab === 'search'">
       <h2>Tìm hợp đồng</h2>
-
       <label>Tên username</label>
       <input type="text" [(ngModel)]="filters.username" placeholder="Nhập tên user">
 
@@ -78,15 +68,11 @@
     </div>
 
     <!-- ===== TAB XUẤT FILE ===== -->
-    <div *ngIf="tab === 'export'">
-      <h2>Xuất file</h2>
-
-      <button class="export-btn" (click)="exportAttendance()">Xuất Data chấm công</button>
-      <button class="export-btn" (click)="exportContract()">Xuất hợp đồng lao động</button>
-    </div>
+    
 
   </div>
 </div>
+
 
 <!-- ===== POPUP ===== -->
 <div class="overlay" *ngIf="showPopup">
@@ -139,36 +125,7 @@
       </table>
     </div>
 
-    <!-- 🔥 MODE: EXPORT -->
-    <div *ngIf="popupMode === 'export'">
-      <h3>Xuất file</h3>
 
-  
-
-      <!-- Nếu chọn EXPORT ATTENDANCE → chọn STATUS -->
-      <div *ngIf="exportType === 'exportContract'" class="export-group">
-        <label>Status</label>
-        <select [(ngModel)]="selectedstatus">
-          <option value="">-- Chọn status --</option>
-          <option *ngFor="let st of statusContract" [value]="st">
-            {{st}}
-          </option>
-        </select>
-      </div>
-
-      <!-- Nếu chọn EXPORT CONTRACT  → chọn DEPARTMENT -->
-      <div *ngIf="exportType === 'exportAttendance'" class="export-group">
-        <label>Phòng ban</label>
-        <select [(ngModel)]="selectedDepartment">
-          <option value="">-- Chọn phòng ban --</option>
-          <option *ngFor="let d of department" [value]="d.departmentId">
-            {{ d.departmentName }}
-          </option>
-        </select>
-      </div>
-
-      <button class="export-btn" (click)="confirmExport()">Xuất file</button>
-    </div>
 
   </div>
 </div>

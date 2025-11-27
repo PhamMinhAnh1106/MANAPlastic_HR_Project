@@ -1,0 +1,199 @@
+.container {
+    margin: 4rem 1rem 0 5rem;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+
+    .month_year {
+        display: flex;
+        gap: 20px; // khoảng cách giữa tháng và năm
+        align-items: center;
+        margin: 10px 0;
+
+        label {
+            display: flex;
+            flex-direction: column; // label trên, input/select dưới
+            font-weight: 500;
+            font-size: 14px;
+
+            select,
+            input[type="number"] {
+                margin-top: 5px;
+                padding: 5px 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                font-size: 14px;
+                width: 100px;
+                outline: none;
+                transition: 0.2s all;
+
+                &:focus {
+                    border-color: #4a90e2;
+                    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+                }
+            }
+        }
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin: 10px 0 5px;
+        font-weight: 500;
+    }
+
+    input[type="text"],
+    select {
+        width: 100%;
+        padding: 6px 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+
+    .type-group {
+        margin-bottom: 15px;
+        display: flex;
+
+        label {
+            margin-right: 20px;
+            font-weight: 400;
+
+            input {
+                margin-right: 5px;
+            }
+        }
+    }
+
+    button {
+        margin: 5px 5px 5px 0;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+
+        &:hover {
+            background-color: #0056b3;
+        }
+    }
+
+    /* Popup chung */
+    .popup {
+        position: fixed;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        width: 700px;
+        /* Tăng width để hiển thị table */
+        max-width: 95%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #555;
+
+            &:hover {
+                color: #000;
+            }
+        }
+    }
+
+    /* ===== TABLE STYLE CHO REQUIREMENT + RULES ===== */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+
+        th {
+            background: #1976d2;
+            color: #fff;
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #ccc;
+        }
+
+        td {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f5f5f5;
+        }
+    }
+
+    .rule-block {
+        margin-bottom: 20px;
+
+        h4 {
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 15px;
+        }
+    }
+
+    /* Status màu cho lịch nháp */
+    .compliant {
+        color: green;
+        font-weight: 500;
+    }
+
+    .non-compliant {
+        color: red;
+        font-weight: 500;
+    }
+
+    .full-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+
+        th {
+            background: #1976d2;
+            color: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        td {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        tr:nth-child(even) {
+            background: #f7f7f7;
+        }
+    }
+
+}
