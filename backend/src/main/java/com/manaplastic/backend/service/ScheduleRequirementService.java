@@ -39,7 +39,7 @@ public class ScheduleRequirementService {
 
     public ScheduleRequirementDTO createRequirement(UserEntity manager, ScheduleRequirementDTO dto) {
         Integer departmentId = getManagerDepartmentId(manager);
-        if (!dto.departmentId().equals(departmentId)) {
+        if (!dto.getDepartmentId().equals(departmentId)) {
             throw new AccessDeniedException("Manager chỉ có thể tạo quy tắc cho phòng ban của mình.");
         }
 
@@ -48,7 +48,7 @@ public class ScheduleRequirementService {
 
         SchedulerequirementEntity savedEntity = requirementRepository.save(entity);
 
-        List<RequirementrulesEntity> rules = dto.rules().stream()
+        List<RequirementrulesEntity> rules = dto.getRules().stream()
                 .map(ruleDto -> mapRuleDtoToEntity(new RequirementrulesEntity(), ruleDto, savedEntity))
                 .collect(Collectors.toList());
         ruleRepository.saveAll(rules);
@@ -69,7 +69,7 @@ public class ScheduleRequirementService {
         List<RequirementrulesEntity> existingRules = entity.getRules();
         existingRules.clear();
 
-        for (RequirementRuleDTO ruleDto : dto.rules()) {
+        for (RequirementRuleDTO ruleDto : dto.getRules()) {
             RequirementrulesEntity newChildRule = new RequirementrulesEntity();
             mapRuleDtoToEntity(newChildRule, ruleDto, entity);
             existingRules.add(newChildRule);
@@ -122,16 +122,16 @@ public class ScheduleRequirementService {
     }
 
     private void mapDtoToEntityOnCreate(SchedulerequirementEntity entity, ScheduleRequirementDTO dto) {
-        entity.setDepartmentID(departmentRepository.findById(dto.departmentId())
+        entity.setDepartmentID(departmentRepository.findById(dto.getDepartmentId())
                 .orElseThrow(() -> new RuntimeException("Phòng ban không tồn tại.")));
-        entity.setShiftID(shiftRepository.findById(dto.shiftId())
+        entity.setShiftID(shiftRepository.findById(dto.getShiftId())
                 .orElseThrow(() -> new RuntimeException("Ca làm việc không tồn tại.")));
-        entity.setTotalStaffNeeded(dto.totalStaffNeeded());
+        entity.setTotalStaffNeeded(dto.getTotalStaffNeeded());
     }
 
 
     private void mapDtoToEntityOnUpdate(SchedulerequirementEntity entity, ScheduleRequirementDTO dto) {
-        entity.setTotalStaffNeeded(dto.totalStaffNeeded());
+        entity.setTotalStaffNeeded(dto.getTotalStaffNeeded());
     }
 
 //    private void mapDtoToEntity(SchedulerequirementEntity entity, ScheduleRequirementDTO dto) {

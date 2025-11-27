@@ -45,4 +45,13 @@ public class ContractallowanceEntity {
     @Column(name = "IsInsuranceBase")
     private Boolean isInsuranceBase;
 
+    @ColumnDefault("0.00")
+    @Column(name = "TaxFreeAmount", precision = 15, scale = 2)
+    private BigDecimal taxFreeAmount;
+
+    @Size(max = 50)
+    @ColumnDefault("'OTHER'")
+    @Column(name = "AllowanceType", length = 50)
+    private String allowanceType;
+
 }

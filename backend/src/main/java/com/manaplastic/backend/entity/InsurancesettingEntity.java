@@ -40,4 +40,12 @@ public class InsurancesettingEntity {
     @Column(name = "IsActive")
     private Boolean isActive;
 
+    @Column(name = "CappedSalary", precision = 15, scale = 2)
+    private BigDecimal cappedSalary;
+
+    @ColumnDefault("'BASIC_SALARY_CAP'")
+    @Lob
+    @Column(name = "CapType")
+    private String capType;
+
 }

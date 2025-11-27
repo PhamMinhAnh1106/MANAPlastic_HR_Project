@@ -40,16 +40,21 @@ public class ContractFilter {
                 predicates.add(cb.equal(root.get("allowanceToxicType"), filter.getAllowanceToxicType()));
             }
 
+            // Lọc theo ngày bắt đầu ( sattrt date)
+            if (filter.getStartdate() != null && filter.getEnddate() == null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("startdate"), filter.getStartdate()));
+            }
 
-            // Lọc các hợp đồng ĐANG HIỆU LỰC trong khoảng [validFrom - validTo]
+            // Lọc theo ngày kết thúc (enddate)
+            if (filter.getEnddate() != null && filter.getStartdate() == null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("enddate"), filter.getEnddate()));
+            }
 
-            if (filter.getValidFrom() != null && filter.getValidTo() != null) {
-                Predicate startCond = cb.lessThanOrEqualTo(root.get("startdate"), filter.getValidTo());
-                Predicate endCondA = cb.greaterThanOrEqualTo(root.get("enddate"), filter.getValidFrom());
-                Predicate endCondB = cb.isNull(root.get("enddate"));
-                Predicate endCond = cb.or(endCondA, endCondB);
-
-                predicates.add(cb.and(startCond, endCond));
+            // Lọc các hợp đồng ĐANG HIỆU LỰC trong khoảng
+            if (filter.getStartdate() != null && filter.getEnddate() != null) {
+                Predicate startRangeCond = cb.greaterThanOrEqualTo(root.get("startdate"), filter.getStartdate());
+                Predicate endRangeCond = cb.lessThanOrEqualTo(root.get("startdate"), filter.getEnddate());
+                predicates.add(cb.and(startRangeCond, endRangeCond));
             }
 
             // Mặc định sắp xếp: Mới nhất lên đầu (theo ID giảm dần)

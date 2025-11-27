@@ -31,10 +31,10 @@ public class ContractFilterCriteria {
     private String status;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate validFrom;
+    private LocalDate startdate;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate validTo;
+    private LocalDate enddate;
 
     private String allowanceToxicType;
 }

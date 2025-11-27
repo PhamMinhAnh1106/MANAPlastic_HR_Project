@@ -27,6 +27,10 @@ public interface ContractRepository extends JpaRepository<ContractEntity, Intege
     @Query("SELECT c FROM ContractEntity c WHERE c.userID.id = :userId ORDER BY c.startdate DESC")
     List<ContractEntity> findAllByUserId(@Param("userId") Integer userId);
 
+    @Query("SELECT c FROM ContractEntity c WHERE c.userID.id = :userId AND c.status = 'ACTIVE'")
+    Optional<ContractEntity> findActiveContractByUserId(@Param("userId") Integer userId);
+
+
 
     // KIẾN THỨC LƯU Ý về Spring để tránh truy vấn db nhiều lần cho 1 tác vụ nhỏ
 //    Khi nào truyền Entity? Khi ta đã có sẵn đối tượng User đầy đủ trong tay (ví dụ lúc save contract mới).

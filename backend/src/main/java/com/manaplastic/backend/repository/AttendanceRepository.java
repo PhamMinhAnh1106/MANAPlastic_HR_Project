@@ -18,4 +18,15 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
 
     //Tuwj động lấy log dữ liệu chấm công vào bảng chấm cong ( AttendanceLogs -> Attendance)
     Optional<AttendanceEntity> findByUserIDAndDate(UserEntity user, LocalDate date);
+
+    @Query("SELECT COUNT(a) FROM AttendanceEntity a " +
+            "WHERE a.userID.id = :userId " +
+            "AND a.date BETWEEN :startDate AND :endDate " +
+            "AND a.status = 'PRESENT'")
+    Double countPresentDays(@Param("userId") int userId,
+                            @Param("startDate") LocalDate startDate,
+                            @Param("endDate") LocalDate endDate);
+
+
+
 }
