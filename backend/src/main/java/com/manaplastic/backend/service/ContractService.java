@@ -44,12 +44,13 @@ public class ContractService {
     //Tạo hdld
     @Transactional
     public ContractEntity createContract(ContractCreateDTO request) throws IOException {
-        UserEntity employee = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("Nhân viên không tồn tại với ID: " + request.getUserId()));
-
+//        UserEntity employee = userRepository.findById(request.getUserId())
+//                .orElseThrow(() -> new RuntimeException("Nhân viên không tồn tại với ID: " + request.getUserId()));
+        UserEntity employee = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new RuntimeException("Nhân viên không tồn tại với Username: " + request.getUsername()));
         // Chỉ check nếu HR đang cố tạo HĐ có thời hạn (FIXED_TERM)
         if ("FIXED_TERM".equalsIgnoreCase(request.getType())) {
-            int count = contractRepository.countFixedTermContracts(request.getUserId());
+            int count = contractRepository.countFixedTermContracts(employee.getId());
             if (count >= 2) {
                 throw new RuntimeException("Nhân viên này đã ký đủ 2 lần HĐ xác định thời hạn. Theo luật, lần này bắt buộc phải ký HĐ Vô thời hạn (INDEFINITE)!");
             }
@@ -61,7 +62,7 @@ public class ContractService {
         }
 
         // Xử lý Hợp đồng cũ (Nếu có cái đang ACTIVE thì phải đóng lại)
-        contractRepository.findByUserIdAndStatus(request.getUserId(), "ACTIVE")
+        contractRepository.findByUserIdAndStatus(employee.getId(), "ACTIVE")
                 .ifPresent(oldContract -> {
                     oldContract.setStatus("HISTORY");
                     contractRepository.save(oldContract);
