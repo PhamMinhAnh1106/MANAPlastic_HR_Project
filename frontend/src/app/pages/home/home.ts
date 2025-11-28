@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { DecodeTokenRole } from '../../utils/token.utils';
@@ -13,7 +13,22 @@ import { Loout_service } from '../../services/pages/login.service';
 })
 export class Home implements OnInit {
   constructor(private cookieService: CookieService, private router: Router, private cdr: ChangeDetectorRef) { }
+  @ViewChild('addDrop') addDrop!: ElementRef;
+  @ViewChild('userDrop') userDrop!: ElementRef;
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    const target = event.target as Node;
 
+    // --- ADD DROPDOWN ---
+    if (this.isAddOpen && this.addDrop && !this.addDrop.nativeElement.contains(target)) {
+      this.isAddOpen = false;
+    }
+
+    // --- USER DROPDOWN ---
+    if (this.isUserOpen && this.userDrop && !this.userDrop.nativeElement.contains(target)) {
+      this.isUserOpen = false;
+    }
+  }
   //cac thuoc tinh khoi tao de luu tru 
   token: string = "";
   role: string[] = [];
@@ -47,7 +62,7 @@ export class Home implements OnInit {
           ];
           break;
         case "manager":
-          this.featureAdd = [{ name: "Lịch làm việc", path: "/home/schedule" }]
+          this.featureAdd = [{ name: "Lịch làm việc", path: "/home/schedule" }, { name: "Xếp ca làm việc", path: "/home/schedule/auto" }]
 
           break;
       }

@@ -3,7 +3,8 @@ import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Loading } from '../../../shared/loading/loading';
-import { CheckContractByIdEmployee, FillterContract, FillterContractByIdEmployee } from '../../../../services/pages/features/hr/contracts.service';
+import { CheckContractByIdEmployee, ExportFileDataContracts, FillterContract, FillterContractByIdEmployee } from '../../../../services/pages/features/hr/contracts.service';
+import { buildQueryParams } from '../../../../utils/filters.utils';
 
 @Component({
   selector: 'app-contracts',
@@ -20,7 +21,7 @@ export class Contracts {
     username: '',
     type: '',
     status: '',
-    allowance: '',
+    allowanceToxicType: '',
     startdate: '',
     enddate: ''
   };
@@ -97,5 +98,12 @@ export class Contracts {
       this.showPopup = true;
       this.cdr.detectChanges();
     }
+  }
+
+  async ExportExcel() {
+    const query = buildQueryParams(this.filters);
+    console.log(query)
+
+    await ExportFileDataContracts(query);
   }
 }

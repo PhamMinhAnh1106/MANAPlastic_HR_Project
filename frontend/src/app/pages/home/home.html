@@ -4,23 +4,22 @@
 
     <div class="user-actions">
   <!-- Nút thêm tài khoản -->
-  <div class="add-dropdown" (click)="toggleAddDropdown()">
-    <span class="material-symbols-outlined add-icon">add</span>
+<div class="add-dropdown" #addDrop>
+  <span class="material-symbols-outlined add-icon" (click)="toggleAddDropdown()">add</span>
 
-    <div class="dropdown-menu" *ngIf="isAddOpen" (click)="$event.stopPropagation()">
-      <div class="feature" *ngFor="let feature of featureAdd">
-        <button class="menu-btn"  [routerLink]="feature.path">{{feature.name}}</button>
-      </div>
-      
-
+  <div class="dropdown-menu" *ngIf="isAddOpen">
+    <div class="feature" *ngFor="let feature of featureAdd">
+      <button class="menu-btn" [routerLink]="feature.path">{{ feature.name }}</button>
     </div>
   </div>
+</div>
+
 
   <!-- Avatar người dùng -->
-  <div class="user-dropdown" (click)="toggleUserDropdown()">
-    <img src="assets/avatar.png" alt="User Avatar" class="avatar" />
+  <div class="user-dropdown" #userDrop>
+    <img src="assets/avatar.png" alt="User Avatar" class="avatar" (click)="toggleUserDropdown()"/>
     
-    <div class="dropdown-menu" *ngIf="isUserOpen" (click)="$event.stopPropagation()">
+    <div class="dropdown-menu" *ngIf="isUserOpen" >
       <button class="menu-btn" (click)="changepass()">Đổi mật khẩu</button>
       <button class="logout-btn" (click)="logout()">Đăng xuất</button>
     </div>

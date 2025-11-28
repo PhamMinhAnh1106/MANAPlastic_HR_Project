@@ -87,6 +87,10 @@ export class AutoSchedule {
   }
 
   async checkDraftSchedule() {
+    if (this.saveyear == "" || this.savemonth == "") {
+      this.Onalert("Hãy chọn tháng và năm", false);
+      return;
+    }
     const month_year = `${this.saveyear}-${this.savemonth}`;
     const res = await CheckAutoAssignSchedule(month_year);
     this.draftData = res;
@@ -119,6 +123,10 @@ export class AutoSchedule {
     return found ? found.shift_name : id;
   }
   async checkRules() {
+    if (this.saveyear == "" || this.savemonth == "") {
+      this.Onalert("Hãy chọn tháng và năm", false);
+      return;
+    }
     this.requirementPopupVisible = true;
     const res = await GetRequirementsAutoSchedule();
     this.rulesData = res;

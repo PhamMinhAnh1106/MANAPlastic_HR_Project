@@ -22,16 +22,13 @@ api.interceptors.response.use(
         if (error.response) {
             if (error.response.status === 403) {
                 console.warn("Access token đã hết hạn hoặc không hợp lệ.");
-
-
-
                 // Hoặc nếu bạn có refresh token API, có thể gọi ở đây
                 const refreshtoken = getCookie('refreshToken');
                 if (refreshtoken != null) {
-
                     const res = await refreshAccessToken(refreshtoken) as { token: string, refreshToken: string };
                     document.cookie = `access_token=${res.token}; path=/;`
                     document.cookie = `refreshToken=${res.refreshToken}; path=/;`
+                    window.location.reload();
 
                 }
             }

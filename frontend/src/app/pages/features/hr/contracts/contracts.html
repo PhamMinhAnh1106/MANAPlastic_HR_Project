@@ -51,7 +51,7 @@
       </select>
 
       <label>Allowance Toxic Type</label>
-      <select [(ngModel)]="filters.allowance">
+      <select [(ngModel)]="filters.allowanceToxicType">
         <option value="">-- Chọn --</option>
         <option value="NONE">NONE</option>
         <option value="CASH">CASH</option>
@@ -89,7 +89,6 @@
     <!-- 🔥 MODE: LIST HỢP ĐỒNG -->
     <div *ngIf="popupMode === 'list'">
       <h3>Danh sách hợp đồng</h3>
-
       <table class="contract-table">
         <thead>
           <tr>
@@ -123,6 +122,10 @@
           </tr>
         </tbody>
       </table>
+        <div class="btnexport">
+      <button class="exportExcel" (click)="ExportExcel()" >Xuất File</button>
+
+        </div>
     </div>
 
 

@@ -41,36 +41,34 @@ export async function FillterContractByIdEmployee(id: number) {
         return "co loi xay ra " + error;
     }
 }
-export async function ExportFileDataContracts(status: string) {
+export async function ExportFileDataContracts(query: string) {
     try {
-        if (statusContract.includes(status as StatusContract)) {
-            const res = await api.get(`/hr/contract/exportExcel?status=${status}`, {
-                responseType: 'blob', // bắt buộc nếu API trả file
-            });
+        const res = await api.get(`/hr/contract/exportExcel?${query}`, {
+            responseType: 'blob', // bắt buộc nếu API trả file
+        });
 
-            // Tạo link download
-            const url = window.URL.createObjectURL(res.data);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `DataChamCong_${status}.xlsx`;
-            a.click();
-            window.URL.revokeObjectURL(url);
-        }
+        // Tạo link download
+        const url = window.URL.createObjectURL(res.data);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Data_contracts.xlsx`;
+        a.click();
+        window.URL.revokeObjectURL(url);
     } catch (error) {
         console.error("Có lỗi xảy ra:", error);
     }
 }
 
-export async function ExportFileDataAttendance(id: number) {
+export async function ExportFileDataAttendance(query: string) {
     try {
-        const res = await api.get(`/hr/attendace/exportExcel?departmentId=${id}`, {
+        const res = await api.get(`/hr/attendace/exportExcel?${query}`, {
             responseType: 'blob',
         });
 
         const url = window.URL.createObjectURL(res.data);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `HopDong_Department_${id}.xlsx`;
+        a.download = `Data_Attendance.xlsx`;
         a.click();
         window.URL.revokeObjectURL(url);
 

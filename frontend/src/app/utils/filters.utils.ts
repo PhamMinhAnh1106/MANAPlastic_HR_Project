@@ -8,3 +8,14 @@ export async function FilterUser(query: string, role: string) {
         return "co loi xay ra" + error;
     }
 }
+export function buildQueryParams(filter: any): string {
+    const params = [];
+
+    for (const key in filter) {
+        if (filter[key] !== "") {
+            params.push(`${key}=${encodeURIComponent(filter[key])}`);
+        }
+    }
+
+    return params.join("&");
+}

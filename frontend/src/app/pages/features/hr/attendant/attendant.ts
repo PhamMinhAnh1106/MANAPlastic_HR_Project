@@ -6,6 +6,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { Loading } from '../../../shared/loading/loading';
 import { Alert } from '../../../shared/alert/alert';
 import { Comfirm } from '../../../shared/comfirm/comfirm';
+import { ExportFileDataAttendance } from '../../../../services/pages/features/hr/contracts.service';
 
 interface attendance {
   attendanceId: number,
@@ -128,6 +129,23 @@ export class Attendant implements OnInit {
     this.isconfirm = true;
     this.confirmMessage = "Bạn chắc chắn muốn xóa dữ liệu này ?"
     this.id = id;
+  }
+
+  buildQueryParams(filter: any): string {
+    const params = [];
+
+    for (const key in filter) {
+      if (filter[key] !== "") {
+        params.push(`${key}=${encodeURIComponent(filter[key])}`);
+      }
+    }
+
+    return params.join("&");
+  }
+
+  async exportfile() {
+    const query = this.buildQueryParams(this.filter);
+    await ExportFileDataAttendance(query);
   }
   ngOnInit(): void {
     this.role = this.cookie.get("role").toLowerCase();
