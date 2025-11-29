@@ -1,7 +1,9 @@
 package com.manaplastic.backend.service;
 
 import com.manaplastic.backend.DTO.PayrollDTO;
+import com.manaplastic.backend.DTO.PayrollFilterCriteria;
 import com.manaplastic.backend.entity.*;
+import com.manaplastic.backend.filters.PayrollFilter;
 import com.manaplastic.backend.repository.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -18,14 +20,21 @@ import java.util.Map;
 @Service
 public class PayrollService {
 
-    @Autowired private UserRepository usersRepo;
-    @Autowired private MonthlyPayrollConfigsRepository configRepo;
-    @Autowired private PayrollsRepository payrollsRepo;
-    @Autowired private TaxBracketsRepository taxRepo;
-    @Autowired private SalaryVariableRepository variableRepo;
-    @Autowired private SalaryFormulaService formulaService;
+    @Autowired
+    private UserRepository usersRepo;
+    @Autowired
+    private MonthlyPayrollConfigsRepository configRepo;
+    @Autowired
+    private PayrollsRepository payrollsRepo;
+    @Autowired
+    private TaxBracketsRepository taxRepo;
+    @Autowired
+    private SalaryVariableRepository variableRepo;
+    @Autowired
+    private SalaryFormulaService formulaService;
 
-    @PersistenceContext private EntityManager entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public void calculatePayrollForMonth(int month, int year) {
         String period = String.format("%d-%02d", year, month);
@@ -47,9 +56,13 @@ public class PayrollService {
         }
     }
 
-    public List<PayrollDTO> getPayrollsByMonth(int month, int year) {
-        String period = String.format("%d-%02d", year, month);
-        return payrollsRepo.findByPayperiod(period).stream().map(this::mapToDTO).toList();
+    //    public List<PayrollDTO> getPayrollsByMonth(int month, int year) {
+//        String period = String.format("%d-%02d", year, month);
+//        return payrollsRepo.findByPayperiod(period).stream().map(this::mapToDTO).toList();
+//    }
+    public List<PayrollDTO> getPayrollsByFilter(PayrollFilterCriteria criteria) {
+        List<PayrollEntity> entities = payrollsRepo.findAll(PayrollFilter.filterBy(criteria));
+        return entities.stream().map(this::mapToDTO).toList();
     }
 
     @Transactional
@@ -128,7 +141,8 @@ public class PayrollService {
                 .orElseThrow(() -> new RuntimeException("Chưa có dữ liệu lương tháng " + period));
 
         return mapToDTO(payroll);
-        }
+    }
+
     private void savePayrollRecord(UserEntity user, String period, Map<String, BigDecimal> context) {
         PayrollEntity p = new PayrollEntity();
         p.setUserID(user);

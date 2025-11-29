@@ -1,6 +1,7 @@
 package com.manaplastic.backend.controller;
 
 import com.manaplastic.backend.DTO.PayrollDTO;
+import com.manaplastic.backend.DTO.PayrollFilterCriteria;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.service.PayrollService;
 import com.manaplastic.backend.service.PayrollServiceHC;
@@ -42,14 +43,14 @@ public class PayrollController {
 
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('HR')")
-    public ResponseEntity<?> getPayrollList(
-            @RequestParam int month,
-            @RequestParam int year) {
+    public ResponseEntity<?> getPayrollList(@ModelAttribute PayrollFilterCriteria criteria) {
         try {
-            List<PayrollDTO> payrolls = payrollService.getPayrollsByMonth(month, year);
-
+            if (criteria.getMonth() == null || criteria.getYear() == null) {
+                return ResponseEntity.badRequest().body("Vui lòng chọn Tháng và Năm kỳ lương!");
+            }
+            List<PayrollDTO> payrolls = payrollService.getPayrollsByFilter(criteria);
             if (payrolls.isEmpty()) {
-                return ResponseEntity.ok().body("Chưa có dữ liệu lương cho tháng này. Hãy chạy tính lương trước!");
+                return ResponseEntity.ok().body("Không tìm thấy dữ liệu lương phù hợp.");
             }
             return ResponseEntity.ok(payrolls);
         } catch (Exception e) {

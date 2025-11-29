@@ -25,7 +25,6 @@ public class LeaveRequestFilter {
 
             // Lọc theo DepartmentID
             if (criteria.getDepartmentId() != null) {
-                // JOIN: leaverequest.userID.departmentID.id
                 predicates.add(cb.equal(
                         root.get("userID").get("departmentID").get("id"),
                         criteria.getDepartmentId()
@@ -34,7 +33,6 @@ public class LeaveRequestFilter {
 
             // Lọc theo Username (tìm kiếm gần đúng, không phân biệt hoa thường)
             if (criteria.getUsername() != null && !criteria.getUsername().isBlank()) {
-                // JOIN: leaverequest.userID.username
                 predicates.add(cb.like(
                         cb.lower(root.get("userID").get("username")),
                         "%" + criteria.getUsername().toLowerCase() + "%"
