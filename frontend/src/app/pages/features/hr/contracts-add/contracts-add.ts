@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { contracts, statusContract } from '../../../../interface/contract.interface';
+import { contracts, statusContract, TypeContract } from '../../../../interface/contract.interface';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgFor, NgIf } from '@angular/common';
@@ -31,9 +31,10 @@ export class ContractsAdd {
 
   ////////////////////////////
   constructor(private router: Router, private cdr: ChangeDetectorRef) { }
-  contractType = statusContract;
+  contractType = TypeContract;
   contract: contracts = {
     userId: 0,
+    userName: "",
     contractName: "",
     type: "",
     baseSalary: "",
@@ -65,7 +66,7 @@ export class ContractsAdd {
         return;
       }
       const formData = new FormData();
-      formData.append("userId", this.contract.userId.toString());
+      formData.append("userName", this.contract.userName);
       formData.append("contractName", this.contract.contractName);
       formData.append("type", this.contract.type);
       formData.append("baseSalary", this.contract.baseSalary);

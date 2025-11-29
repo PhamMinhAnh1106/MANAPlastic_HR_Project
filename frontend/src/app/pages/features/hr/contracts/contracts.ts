@@ -66,6 +66,7 @@ export class Contracts {
 
     if (res.status == 200) {
       this.listContracts = res.data;
+
     } else {
       this.listContracts = [];
     }
@@ -106,4 +107,15 @@ export class Contracts {
 
     await ExportFileDataContracts(query);
   }
+
+  copyLink(url: string) {
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        alert('Đã copy link!');
+      })
+      .catch(err => {
+        console.error('Lỗi copy link:', err);
+      });
+  }
+
 }

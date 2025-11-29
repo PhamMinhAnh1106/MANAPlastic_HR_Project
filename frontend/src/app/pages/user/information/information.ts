@@ -107,7 +107,7 @@ export class Information implements OnInit {
   }
   async onConfirmResult(event: any) {
     if (event === true) {
-      this.isloading = true;
+      // this.isloading = true;
       if (this.formdata.phonenumber != null) {
         if (this.formdata.phonenumber.split("")[0] != 0)
           this.onalert("so dien thoai phai bat dau tu so 0 ", false);
@@ -115,6 +115,7 @@ export class Information implements OnInit {
           this.onalert("so dien thoai khong hop le (phai tu 10 den 12 so ", false);
         }
       }
+      console.log(this.formdata);
       const res = await UpdateAccount(this.formdata, this.role) as { data: any; status: number };
       if (res.status == 200) {
         this.onalert(res.data, true);

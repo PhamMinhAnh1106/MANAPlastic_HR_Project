@@ -14,7 +14,8 @@ export async function UpdateAccount(formdata: updateaccount, role: string) {
             gender: formdata.gender as boolean,
             birth: formdata.birth,
             bankAccount: formdata.bankAccount,
-            bankName: formdata.bankName
+            bankName: formdata.bankName,
+            address: formdata.address
         });
         return {
             data: res.data,

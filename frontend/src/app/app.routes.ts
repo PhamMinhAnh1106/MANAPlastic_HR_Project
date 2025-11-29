@@ -39,11 +39,7 @@ export const routes: Routes = [
             { path: 'user/attendance', component: Attendant },
             //manager 
             { path: 'leaverequest/manage', component: Leaverequestcheck },
-            {
-                path: 'contracts', component: Contracts,
-                children: []
-
-            },
+            { path: 'contracts', component: Contracts },
             { path: 'contracts/add', component: ContractsAdd },
 
 

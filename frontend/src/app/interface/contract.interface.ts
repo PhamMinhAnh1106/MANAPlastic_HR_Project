@@ -1,5 +1,6 @@
 export interface contracts {
     userId: number;
+    userName: string;
     contractName: string;
     type: string;
     baseSalary: string;
@@ -16,3 +17,7 @@ export const statusContract = [
 ] as const;
 
 export type StatusContract = typeof statusContract[number];
+
+export const TypeContract = [
+    'FIXED_TERM', 'PROBATION', 'INDEFINITE'
+] 

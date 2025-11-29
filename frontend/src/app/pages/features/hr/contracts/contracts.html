@@ -66,10 +66,6 @@
 
       <button class="search-btn" (click)="searchContract()">Tìm kiếm</button>
     </div>
-
-    <!-- ===== TAB XUẤT FILE ===== -->
-    
-
   </div>
 </div>
 
@@ -103,6 +99,7 @@
             <th>Ngày hết hạn</th>
             <th>Status</th>
             <th>User</th>
+            <th>fileUrl</th>
           </tr>
         </thead>
 
@@ -119,6 +116,16 @@
             <td>{{ c.enddate }}</td>
             <td>{{ c.status }}</td>
             <td>{{ c.username }}</td>
+          <td>
+  <ng-container *ngIf="c.fileurl; else noLink">
+    <button (click)="copyLink(c.fileurl)">Lấy link</button>
+  </ng-container>
+
+  <ng-template #noLink>
+    Chưa có link
+  </ng-template>
+</td>
+
           </tr>
         </tbody>
       </table>
