@@ -12,7 +12,6 @@ public class PayrollDTO {
     private Integer userId;
     private String fullName;
     private String departmentName;
-    private String jobTitle;
     private String jobType;
 
     private String payPeriod;

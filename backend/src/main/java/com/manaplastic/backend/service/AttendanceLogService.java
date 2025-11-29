@@ -4,6 +4,7 @@ import com.manaplastic.backend.entity.*;
 import com.manaplastic.backend.repository.AttendanceLogRepository;
 import com.manaplastic.backend.repository.AttendanceRepository;
 import com.manaplastic.backend.repository.EmployeeOfficialScheduleRepository;
+import com.manaplastic.backend.repository.ShiftRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,15 +22,16 @@ public class AttendanceLogService {
     private AttendanceRepository attendanceRepository;
     @Autowired
     private EmployeeOfficialScheduleRepository scheduleRepository;
+    @Autowired
+    private ShiftRepository shiftRepository;
 
     // Cấu hình TimeZone (Việt Nam) để convert từ Instant sang LocalDate
     private final ZoneId zoneId = ZoneId.of("Asia/Ho_Chi_Minh");
-
     // Cho phép đi trễ/về sớm bao nhiêu phút
     private static final int TOLERANCE_MINUTES = 5; // 5p thôii
-
     // Thời gian tối thiểu giữa 2 lần chấm công (15p =  900s)
     private static final long SPAM_COOLDOWN_SECONDS = 900;
+    private static final Integer OFFICE_SHIFT_ID = 36;
 
     @Transactional
     public AttendancelogEntity processAttendanceLog(AttendancelogEntity log) {
@@ -89,14 +91,25 @@ public class AttendanceLogService {
         return savedLog;
     }
 
-    private void assignShiftToAttendance(AttendanceEntity attendance, UserEntity user, LocalDate date) { // gán ca làm từ lịch chính thức
-        var scheduleOpt = scheduleRepository.findByEmployeeIDAndDate(user, date);
-
-        if (scheduleOpt.isPresent()) {
-            EmployeeofficialscheduleEntity schedule = scheduleOpt.get();
-
-            if (Boolean.FALSE.equals(schedule.getIsDayOff()) && schedule.getShiftID() != null) {
-                attendance.setShiftID(schedule.getShiftID());
+    private void assignShiftToAttendance(AttendanceEntity attendance, UserEntity user, LocalDate date) {
+        boolean isOfficeUser = false;
+        if (user.getDepartmentID() != null && Boolean.TRUE.equals(user.getDepartmentID().getIsoffice())) {
+            isOfficeUser = true;
+        }
+        if (isOfficeUser) {
+            Optional<ShiftEntity> officeShift = shiftRepository.findById(OFFICE_SHIFT_ID);
+            if (officeShift.isPresent()) {
+                attendance.setShiftID(officeShift.get());
+            } else {
+                System.err.println("Lỗi: Không tìm thấy Shift ID.");
+            }
+        } else {
+            var scheduleOpt = scheduleRepository.findByEmployeeIDAndDate(user, date);
+            if (scheduleOpt.isPresent()) {
+                EmployeeofficialscheduleEntity schedule = scheduleOpt.get();
+                if (Boolean.FALSE.equals(schedule.getIsDayOff()) && schedule.getShiftID() != null) {
+                    attendance.setShiftID(schedule.getShiftID());
+                }
             }
         }
     }

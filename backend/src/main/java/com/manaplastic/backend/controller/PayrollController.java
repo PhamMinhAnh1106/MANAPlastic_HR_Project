@@ -1,34 +1,37 @@
 package com.manaplastic.backend.controller;
 
 import com.manaplastic.backend.DTO.PayrollDTO;
+import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.service.PayrollService;
+import com.manaplastic.backend.service.PayrollServiceHC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/hr/payroll")
-@PreAuthorize("hasAuthority('HR')")
+@RequestMapping("/payroll")
 @CrossOrigin(origins = "*")
 public class PayrollController {
 
     @Autowired
     private PayrollService payrollService;
 
-    // /hr/payroll/calculate?month=11&year=2025
     @PostMapping("/calculate")
+    @PreAuthorize("hasAuthority('HR')")
     public ResponseEntity<?> calculatePayroll(
             @RequestParam int month,
             @RequestParam int year) {
         try {
-            // Validate đầu vào cơ bản
             if (month < 1 || month > 12) {
                 return ResponseEntity.badRequest().body("Tháng không hợp lệ!");
             }
-
             payrollService.calculatePayrollForMonth(month, year);
             return ResponseEntity.ok().body("Đã tính lương xong cho kỳ " + month + "/" + year);
         } catch (Exception e) {
@@ -37,9 +40,8 @@ public class PayrollController {
         }
     }
 
-
-    // /hr/payroll/list?month=11&year=2025
     @GetMapping("/list")
+    @PreAuthorize("hasAuthority('HR')")
     public ResponseEntity<?> getPayrollList(
             @RequestParam int month,
             @RequestParam int year) {
@@ -49,13 +51,28 @@ public class PayrollController {
             if (payrolls.isEmpty()) {
                 return ResponseEntity.ok().body("Chưa có dữ liệu lương cho tháng này. Hãy chạy tính lương trước!");
             }
-
             return ResponseEntity.ok(payrolls);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Lỗi lấy dữ liệu: " + e.getMessage());
         }
     }
 
-
+    @GetMapping("/my-payslip")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getMyPayslip(
+            @RequestParam int month,
+            @RequestParam int year,
+            @AuthenticationPrincipal UserEntity currentUser) {
+        try {
+            if (currentUser == null) {
+                return ResponseEntity.status(401).body("User chưa đăng nhập!");
+            }
+            int userId = currentUser.getId();
+            PayrollDTO myPayroll = payrollService.getPayrollDetailForUser(userId, month, year);
+            return ResponseEntity.ok(myPayroll);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Lỗi: " + e.getMessage());
+        }
+    }
 
 }

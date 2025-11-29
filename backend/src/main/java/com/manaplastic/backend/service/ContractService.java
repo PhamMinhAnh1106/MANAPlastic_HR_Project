@@ -46,8 +46,8 @@ public class ContractService {
     public ContractEntity createContract(ContractCreateDTO request) throws IOException {
 //        UserEntity employee = userRepository.findById(request.getUserId())
 //                .orElseThrow(() -> new RuntimeException("Nhân viên không tồn tại với ID: " + request.getUserId()));
-        UserEntity employee = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("Nhân viên không tồn tại với Username: " + request.getUsername()));
+        UserEntity employee = userRepository.findByUsername(request.getUserName())
+                .orElseThrow(() -> new RuntimeException("Nhân viên không tồn tại với Username: " + request.getUserName()));
         // Chỉ check nếu HR đang cố tạo HĐ có thời hạn (FIXED_TERM)
         if ("FIXED_TERM".equalsIgnoreCase(request.getType())) {
             int count = contractRepository.countFixedTermContracts(employee.getId());

@@ -30,8 +30,8 @@ public class SalaryvariableEntity {
     @Column(name = "Description")
     private String description;
 
-    @Size(max = 50)
-    @Column(name = "ExampleValue", length = 50)
-    private String exampleValue;
+    @Lob
+    @Column(name = "SQLQuery")
+    private String sQLQuery;
 
 }

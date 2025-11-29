@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Data
 public class ContractCreateDTO {
     private Integer userId;
-    private String username;
+    private String userName;
     private String contractName;
     private String type; // Loại hdld => kiểm tra 2 lần ký hdld CÓ THỜI HẠN
     private BigDecimal baseSalary;

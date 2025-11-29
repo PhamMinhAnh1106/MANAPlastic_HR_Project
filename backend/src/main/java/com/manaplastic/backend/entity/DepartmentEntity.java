@@ -3,6 +3,7 @@ package com.manaplastic.backend.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -23,5 +24,9 @@ public class DepartmentEntity {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "managerID")
     private com.manaplastic.backend.entity.UserEntity managerID;
+
+    @ColumnDefault("b'0'")
+    @Column(name = "isoffice")
+    private Boolean isoffice;
 
 }

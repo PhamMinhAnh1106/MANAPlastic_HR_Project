@@ -64,7 +64,6 @@ public class EmailService {
             message.setTo(userEmail);
             message.setSubject("[Thông báo] Đơn nghỉ phép của bạn đã bị từ chối");
 
-            // Bạn đã nói là không cần lý do, nên mail sẽ đơn giản
             String text = String.format(
                     "Xin chào %s,\n\n" +
                             "Chúng tôi rất tiếc phải thông báo Đơn nghỉ phép của bạn đã bị TỪ CHỐI.\n\n" +
@@ -104,7 +103,6 @@ public class EmailService {
         try {
             mailSender.send(message);
         } catch (Exception e) {
-            // Ghi log lỗi, không ném ra để làm sập luồng chính
             System.err.println("Lỗi khi gửi email OTP: " + e.getMessage());
         }
     }

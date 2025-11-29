@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface PayrollsRepository extends JpaRepository<PayrollEntity, Integer> {
-    Optional<PayrollEntity> findByUserIDAndPayperiod(UserEntity userID, String payperiod);
+    Optional<PayrollEntity> findByUserIDAndPayperiod(UserEntity user, String payperiod);
 
     @Transactional
     void deleteByPayperiod(String payperiod);
