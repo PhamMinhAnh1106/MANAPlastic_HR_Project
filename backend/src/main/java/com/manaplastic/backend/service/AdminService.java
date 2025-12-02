@@ -1,5 +1,6 @@
 package com.manaplastic.backend.service;
 
+import com.manaplastic.backend.DTO.AdminUserDTO;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.repository.RoleRepository;
 import com.manaplastic.backend.repository.UserRepository;
@@ -10,8 +11,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminService {
@@ -68,5 +72,19 @@ public class AdminService {
 
         return userRepository.save(newUser);
     }
+    public List<AdminUserDTO> getAllUsersForDropdown() {
+        // Lấy tất cả user đang hoạt động (active)
+        // Giả sử trong UserEntity có phương thức getStatus()
+        List<UserEntity> users = userRepository.findAll();
 
+        return users.stream()
+                // Chỉ map những trường cần thiết
+                .map(u -> new AdminUserDTO(
+                        u.getId(), // Hoặc u.getId() tùy entity của bạn
+                        u.getFullname(),
+                        u.getUsername(),
+                        u.getDepartmentID() != null ? u.getDepartmentID().getDepartmentname() : "N/A"
+                ))
+                .collect(Collectors.toList());
+    }
 }

@@ -31,10 +31,20 @@ public class PayrollFilter {
             }
 
            // Lọc userName
-            if (criteria.getUserName() != null && !criteria.getUserName().isEmpty()) {
-                String searchKey = "%" + criteria.getUserName().toLowerCase() + "%";
+            if (criteria.getUsername() != null && !criteria.getUsername().isEmpty()) {
+                String searchKey = "%" + criteria.getUsername().toLowerCase() + "%";
                 Predicate checkUsername = cb.like(cb.lower(userJoin.get("username")), searchKey);
                 predicates.add(cb.or(checkUsername));
+            }
+
+            // Lọc theo Khoảng Lương
+            // Lọc lương thực lĩnh (netsalary) >= Min
+            if (criteria.getMinSalary() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("netsalary"), criteria.getMinSalary()));
+            }
+            // Lọc lương thực lĩnh (netsalary) <= Max
+            if (criteria.getMaxSalary() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("netsalary"), criteria.getMaxSalary()));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));

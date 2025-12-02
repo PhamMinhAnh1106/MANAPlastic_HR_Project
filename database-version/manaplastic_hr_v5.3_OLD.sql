@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th12 02, 2025 lúc 07:54 PM
+-- Thời gian đã tạo: Th10 29, 2025 lúc 10:42 AM
 -- Phiên bản máy phục vụ: 8.2.0
 -- Phiên bản PHP: 8.2.13
 
@@ -159,7 +159,7 @@ CREATE TABLE IF NOT EXISTS `contractallowances` (
   PRIMARY KEY (`ContractAllowanceID`),
   KEY `FK_Allowance_Contract` (`ContractID`),
   KEY `idx_allowance_type` (`AllowanceType`)
-) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `contractallowances`
@@ -205,8 +205,7 @@ INSERT INTO `contractallowances` (`ContractAllowanceID`, `ContractID`, `Allowanc
 (52, 13, 'Hỗ trợ điện thoại & Xăng xe', 'MEAL', 400000.00, 1, 0, 0.00),
 (53, 14, 'Hỗ trợ điện thoại & Xăng xe', 'MEAL', 400000.00, 1, 0, 0.00),
 (54, 19, 'Hỗ trợ điện thoại & Xăng xe', 'MEAL', 400000.00, 1, 0, 0.00),
-(56, 10, 'Hỗ trợ ăn ca', 'MEAL', 730000.00, 0, 0, 730000.00),
-(57, 25, 'Phụ cấp xăng xe', 'OTHER', 500000.00, 1, 0, 0.00);
+(56, 10, 'Hỗ trợ ăn ca', 'MEAL', 730000.00, 0, 0, 730000.00);
 
 -- --------------------------------------------------------
 
@@ -443,7 +442,7 @@ INSERT INTO `employeedraftschedule` (`draftID`, `employeeID`, `date`, `shiftID`,
 (77, 15, '2025-12-11', NULL, 1, '2025-12', '2025-11-16 13:10:23'),
 (78, 15, '2025-12-12', 36, 0, '2025-12', '2025-11-16 13:10:23'),
 (79, 17, '2025-12-12', 36, 0, '2025-12', '2025-11-16 13:10:23'),
-(80, 18, '2025-12-12', 36, 0, '2025-12', '2025-11-29 14:26:39'),
+(80, 18, '2025-12-12', 36, 0, '2025-12', '2025-11-16 13:10:23'),
 (81, 9, '2025-12-12', 41, 0, '2025-12', '2025-11-16 13:10:23'),
 (82, 20, '2025-12-12', 41, 0, '2025-12', '2025-11-16 13:10:23'),
 (83, 10, '2025-12-12', 41, 0, '2025-12', '2025-11-16 13:10:23'),
@@ -772,6 +771,36 @@ INSERT INTO `employeeofficialschedule` (`officialID`, `employeeID`, `date`, `shi
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `insurancesettings`
+--
+
+DROP TABLE IF EXISTS `insurancesettings`;
+CREATE TABLE IF NOT EXISTS `insurancesettings` (
+  `SettingID` int NOT NULL AUTO_INCREMENT,
+  `Type` enum('SOCIAL','HEALTH','UNEMPLOYMENT','UNION','ACCIDENT') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'BHXH, BHYT, BHTN, Công đoàn, Tai nạn LĐ & BNN',
+  `EmployeeRate` decimal(5,2) NOT NULL COMMENT 'Tỷ lệ nhân viên đóng (%)',
+  `CompanyRate` decimal(5,2) NOT NULL COMMENT 'Tỷ lệ công ty đóng (%)',
+  `CapType` enum('BASIC_SALARY_CAP','REGION_MIN_SALARY_CAP','CUSTOM','NO_CAP') COLLATE utf8mb4_unicode_ci DEFAULT 'BASIC_SALARY_CAP' COMMENT 'Loại trần bảo hiểm: BASIC_SALARY_CAP (lương cơ sở), REGION_MIN_SALARY_CAP (lương tối thiểu vùng), CUSTOM (tự định), NO_CAP (không trần)',
+  `CappedSalary` decimal(15,2) DEFAULT NULL COMMENT 'Mức lương trần đóng BH. Nếu NULL thì tính theo công thức',
+  `EffectiveDate` date NOT NULL COMMENT 'Ngày áp dụng',
+  `IsActive` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`SettingID`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `insurancesettings`
+--
+
+INSERT INTO `insurancesettings` (`SettingID`, `Type`, `EmployeeRate`, `CompanyRate`, `CapType`, `CappedSalary`, `EffectiveDate`, `IsActive`) VALUES
+(1, 'SOCIAL', 8.00, 17.50, 'BASIC_SALARY_CAP', NULL, '2025-01-01', 1),
+(2, 'HEALTH', 1.50, 3.00, 'BASIC_SALARY_CAP', NULL, '2025-01-01', 1),
+(3, 'UNEMPLOYMENT', 1.00, 1.00, 'REGION_MIN_SALARY_CAP', NULL, '2025-01-01', 1),
+(4, 'ACCIDENT', 0.00, 0.50, 'NO_CAP', NULL, '2025-01-01', 1),
+(5, 'UNION', 0.00, 2.00, 'NO_CAP', NULL, '2025-01-01', 1);
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `leavebalance`
 --
 
@@ -1022,17 +1051,61 @@ INSERT INTO `overtimetypes` (`OvertimeTypeID`, `OtCode`, `OtName`, `Rate`, `Calc
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `payrolldetails`
+--
+
+DROP TABLE IF EXISTS `payrolldetails`;
+CREATE TABLE IF NOT EXISTS `payrolldetails` (
+  `paydetailID` int NOT NULL AUTO_INCREMENT,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` enum('bonus','deduction','allowance') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `amount` decimal(15,2) NOT NULL,
+  `payID` int DEFAULT NULL,
+  PRIMARY KEY (`paydetailID`),
+  KEY `payID` (`payID`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `payrolldetails`
+--
+
+INSERT INTO `payrolldetails` (`paydetailID`, `description`, `type`, `amount`, `payID`) VALUES
+(1, 'Thưởng chuyên cần', 'bonus', 500000.00, 1),
+(2, 'Thưởng vượt năng suất', 'bonus', 200000.00, 2),
+(3, 'Phạt đi trễ', 'deduction', 100000.00, 2);
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `payrolls`
 --
 
 DROP TABLE IF EXISTS `payrolls`;
 CREATE TABLE IF NOT EXISTS `payrolls` (
   `payID` int NOT NULL AUTO_INCREMENT,
+  `basesalary` decimal(15,2) NOT NULL,
+  `bonus` decimal(15,2) DEFAULT '0.00',
+  `penalty` decimal(15,2) DEFAULT '0.00',
+  `hoursofwork` float DEFAULT NULL,
+  `PIT` decimal(15,2) DEFAULT '0.00' COMMENT 'Thuế Thu nhập cá nhân (PIT)',
   `netsalary` decimal(15,2) NOT NULL,
   `payperiod` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
   `userID` int DEFAULT NULL,
   `totalincome` decimal(15,2) NOT NULL DEFAULT '0.00' COMMENT 'Tổng thu nhập (Gross)',
-  `status` enum('DRAFT','FINAL','PAID') COLLATE utf8mb4_unicode_ci DEFAULT 'DRAFT',
+  `totalinsuranceemployee` decimal(15,2) NOT NULL DEFAULT '0.00' COMMENT 'Tổng BH nhân viên đóng',
+  `assessableincome` decimal(15,2) NOT NULL DEFAULT '0.00' COMMENT 'Thu nhập chịu thuế (TNCT)',
+  `taxableincome` decimal(15,2) NOT NULL DEFAULT '0.00' COMMENT 'Thu nhập tính thuế (TNTT)',
+  `actualworkdays` double DEFAULT '0' COMMENT 'Số ngày công thực tế (WorkDays)',
+  `totalovertimepay` decimal(15,2) DEFAULT '0.00' COMMENT 'Tổng tiền tăng ca (OvertimePay)',
+  `OtTaxExempt` decimal(15,2) DEFAULT '0.00' COMMENT 'Tổng tiền OT được miễn thuế',
+  `totalallowance` decimal(15,2) DEFAULT '0.00' COMMENT 'Tổng tiền phụ cấp (Allowance)',
+  `insurancebase` decimal(15,2) DEFAULT NULL COMMENT 'Mức lương đóng bảo hiểm (cơ sở)',
+  `bhxh_emp` decimal(15,2) DEFAULT NULL COMMENT 'BHXH nhân viên đóng',
+  `bhyt_emp` decimal(15,2) DEFAULT NULL COMMENT 'BHYT nhân viên đóng',
+  `bhtn_emp` decimal(15,2) DEFAULT NULL COMMENT 'BHTN nhân viên đóng',
+  `bhxh_comp` decimal(15,2) DEFAULT NULL COMMENT 'BHXH công ty đóng',
+  `bhyt_comp` decimal(15,2) DEFAULT NULL COMMENT 'BHYT công ty đóng',
+  `bhtn_comp` decimal(15,2) DEFAULT NULL COMMENT 'BHTN công ty đóng',
   PRIMARY KEY (`payID`),
   UNIQUE KEY `UQ_User_Period` (`userID`,`payperiod`)
 ) ENGINE=InnoDB AUTO_INCREMENT=590 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1041,30 +1114,30 @@ CREATE TABLE IF NOT EXISTS `payrolls` (
 -- Đang đổ dữ liệu cho bảng `payrolls`
 --
 
-INSERT INTO `payrolls` (`payID`, `netsalary`, `payperiod`, `userID`, `totalincome`, `status`) VALUES
-(1, 10500000.00, '2025-09', 6, 0.00, 'DRAFT'),
-(2, 9100000.00, '2025-09', 8, 0.00, 'DRAFT'),
-(569, -3150000.00, '2025-11', 1, 0.00, 'DRAFT'),
-(570, -1575000.00, '2025-11', 2, 0.00, 'DRAFT'),
-(571, -2625000.00, '2025-11', 3, 0.00, 'DRAFT'),
-(572, -1260000.00, '2025-11', 4, 0.00, 'DRAFT'),
-(573, -1320384.62, '2025-11', 5, 989615.38, 'DRAFT'),
-(574, -586153.84, '2025-11', 6, 663846.16, 'DRAFT'),
-(575, -2100000.00, '2025-11', 7, 0.00, 'DRAFT'),
-(576, 1448461.54, '2025-11', 8, 2393461.54, 'DRAFT'),
-(577, -1890000.00, '2025-11', 9, 0.00, 'DRAFT'),
-(578, -1945000.00, '2025-11', 10, -500000.00, 'DRAFT'),
-(579, -1785000.00, '2025-11', 11, 0.00, 'DRAFT'),
-(580, -488846.15, '2025-11', 12, 351153.85, 'DRAFT'),
-(581, -1470000.00, '2025-11', 13, 0.00, 'DRAFT'),
-(582, 0.00, '2025-11', 14, 0.00, 'DRAFT'),
-(583, -997500.00, '2025-11', 15, 0.00, 'DRAFT'),
-(584, -2966000.00, '2025-11', 16, -1000000.00, 'DRAFT'),
-(585, -924000.00, '2025-11', 17, 0.00, 'DRAFT'),
-(586, -1575000.00, '2025-11', 18, 0.00, 'DRAFT'),
-(587, -1575000.00, '2025-11', 19, 0.00, 'DRAFT'),
-(588, 0.00, '2025-11', 20, 0.00, 'DRAFT'),
-(589, 10868269.31, '2025-11', 21, 12519230.85, 'DRAFT');
+INSERT INTO `payrolls` (`payID`, `basesalary`, `bonus`, `penalty`, `hoursofwork`, `PIT`, `netsalary`, `payperiod`, `userID`, `totalincome`, `totalinsuranceemployee`, `assessableincome`, `taxableincome`, `actualworkdays`, `totalovertimepay`, `OtTaxExempt`, `totalallowance`, `insurancebase`, `bhxh_emp`, `bhyt_emp`, `bhtn_emp`, `bhxh_comp`, `bhyt_comp`, `bhtn_comp`) VALUES
+(1, 10000000.00, 500000.00, 0.00, 176, 0.00, 10500000.00, '2025-09', 6, 0.00, 0.00, 0.00, 0.00, 0, 0.00, 0.00, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 9000000.00, 200000.00, 100000.00, 180, 0.00, 9100000.00, '2025-09', 8, 0.00, 0.00, 0.00, 0.00, 0, 0.00, 0.00, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(569, 30000000.00, 0.00, 0.00, NULL, 0.00, 580000.00, '2025-11', 1, 3730000.00, 3150000.00, 0.00, -19950000.00, 0, 0.00, 0.00, 3730000.00, 30000000.00, 2400000.00, 450000.00, 300000.00, 5250000.00, 900000.00, 300000.00),
+(570, 15000000.00, 0.00, 0.00, NULL, 0.00, -845000.00, '2025-11', 2, 730000.00, 1575000.00, 0.00, -16975000.00, 0, 0.00, 0.00, 730000.00, 15000000.00, 1200000.00, 225000.00, 150000.00, 2625000.00, 450000.00, 150000.00),
+(571, 25000000.00, 0.00, 0.00, NULL, 0.00, 1105000.00, '2025-11', 3, 3730000.00, 2625000.00, 0.00, -15025000.00, 0, 0.00, 0.00, 3730000.00, 25000000.00, 2000000.00, 375000.00, 250000.00, 4375000.00, 750000.00, 250000.00),
+(572, 12000000.00, 0.00, 0.00, NULL, 0.00, -130000.00, '2025-11', 4, 1130000.00, 1260000.00, 0.00, -16260000.00, 0, 0.00, 0.00, 1130000.00, 12000000.00, 960000.00, 180000.00, 120000.00, 2100000.00, 360000.00, 120000.00),
+(573, 22000000.00, 0.00, 0.00, NULL, 0.00, 2266153.85, '2025-11', 5, 4576153.85, 2310000.00, 0.00, -18263846.15, 1, 0.00, 0.00, 3730000.00, 22000000.00, 1760000.00, 330000.00, 220000.00, 3850000.00, 660000.00, 220000.00),
+(574, 10000000.00, 0.00, 200000.00, NULL, 0.00, 749230.77, '2025-11', 6, 1999230.77, 1050000.00, 0.00, -15680769.23, 2, 0.00, 0.00, 1230000.00, 10000000.00, 800000.00, 150000.00, 100000.00, 1750000.00, 300000.00, 100000.00),
+(575, 20000000.00, 0.00, 0.00, NULL, 0.00, 1630000.00, '2025-11', 7, 3730000.00, 2100000.00, 0.00, -14500000.00, 0, 0.00, 0.00, 3730000.00, 20000000.00, 1600000.00, 300000.00, 200000.00, 3500000.00, 600000.00, 200000.00),
+(576, 9000000.00, 2000000.00, 0.00, NULL, 0.00, 2631153.85, '2025-11', 8, 3576153.85, 945000.00, 0.00, -15998846.15, 1, 0.00, 0.00, 1230000.00, 9000000.00, 720000.00, 135000.00, 90000.00, 1575000.00, 270000.00, 90000.00),
+(577, 18000000.00, 0.00, 0.00, NULL, 0.00, 5070000.00, '2025-11', 9, 6960000.00, 1890000.00, 0.00, -16690000.00, 0, 0.00, 0.00, 6960000.00, 18000000.00, 1440000.00, 270000.00, 180000.00, 3150000.00, 540000.00, 180000.00),
+(578, 9000000.00, 0.00, 0.00, NULL, 0.00, 515000.00, '2025-11', 10, 1460000.00, 945000.00, 0.00, -16345000.00, 0, 0.00, 0.00, 1460000.00, 9000000.00, 720000.00, 135000.00, 90000.00, 1575000.00, 270000.00, 90000.00),
+(579, 17000000.00, 0.00, 0.00, NULL, 0.00, 2345000.00, '2025-11', 11, 4130000.00, 1785000.00, 0.00, -13785000.00, 0, 0.00, 0.00, 4130000.00, 17000000.00, 1360000.00, 255000.00, 170000.00, 2975000.00, 510000.00, 170000.00),
+(580, 8000000.00, 0.00, 0.00, NULL, 0.00, 597692.31, '2025-11', 12, 1437692.31, 840000.00, 0.00, -15532307.69, 1, 0.00, 0.00, 1130000.00, 8000000.00, 640000.00, 120000.00, 80000.00, 1400000.00, 240000.00, 80000.00),
+(581, 14000000.00, 0.00, 0.00, NULL, 0.00, -340000.00, '2025-11', 13, 1130000.00, 1470000.00, 0.00, -16470000.00, 0, 0.00, 0.00, 1130000.00, 14000000.00, 1120000.00, 210000.00, 140000.00, 2450000.00, 420000.00, 140000.00),
+(582, 5000000.00, 0.00, 0.00, NULL, 0.00, 1130000.00, '2025-11', 14, 1130000.00, 0.00, 0.00, -15000000.00, 0, 0.00, 0.00, 1130000.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00),
+(583, 9500000.00, 0.00, 0.00, NULL, 0.00, -267500.00, '2025-11', 15, 730000.00, 997500.00, 0.00, -16397500.00, 0, 0.00, 0.00, 730000.00, 9500000.00, 760000.00, 142500.00, 95000.00, 1662500.00, 285000.00, 95000.00),
+(584, 9200000.00, 0.00, 1000000.00, NULL, 0.00, -1236000.00, '2025-11', 16, 730000.00, 966000.00, 0.00, -16366000.00, 0, 0.00, 0.00, 730000.00, 9200000.00, 736000.00, 138000.00, 92000.00, 1610000.00, 276000.00, 92000.00),
+(585, 8800000.00, 0.00, 0.00, NULL, 0.00, 306000.00, '2025-11', 17, 1230000.00, 924000.00, 0.00, -16324000.00, 0, 0.00, 0.00, 1230000.00, 8800000.00, 704000.00, 132000.00, 88000.00, 1540000.00, 264000.00, 88000.00),
+(586, 15000000.00, 0.00, 0.00, NULL, 0.00, -1575000.00, '2025-11', 18, 0.00, 1575000.00, 0.00, -16975000.00, 0, 0.00, 0.00, 0.00, 15000000.00, 1200000.00, 225000.00, 150000.00, 2625000.00, 450000.00, 150000.00),
+(587, 15000000.00, 0.00, 0.00, NULL, 0.00, -1575000.00, '2025-11', 19, 0.00, 1575000.00, 0.00, -16975000.00, 0, 0.00, 0.00, 0.00, 15000000.00, 1200000.00, 225000.00, 150000.00, 2625000.00, 450000.00, 150000.00),
+(588, 7500000.00, 0.00, 0.00, NULL, 0.00, 730000.00, '2025-11', 20, 730000.00, 0.00, 0.00, -11000000.00, 0, 0.00, 0.00, 730000.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00),
+(589, 15000000.00, 0.00, 0.00, NULL, 0.00, 10540384.62, '2025-11', 21, 12115384.62, 1575000.00, 0.00, -459615.38, 21, 0.00, 0.00, 0.00, 15000000.00, 1200000.00, 225000.00, 150000.00, 2625000.00, 450000.00, 150000.00);
 
 -- --------------------------------------------------------
 
@@ -1227,6 +1300,45 @@ INSERT INTO `rolespermissions` (`roleID`, `permissionID`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `salaryformulas`
+--
+
+DROP TABLE IF EXISTS `salaryformulas`;
+CREATE TABLE IF NOT EXISTS `salaryformulas` (
+  `FormulaID` int NOT NULL AUTO_INCREMENT,
+  `Name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Calculation` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Type` enum('INCOME','DEDUCTION','TAX','NET') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Priority` int DEFAULT '0',
+  `IsActive` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`FormulaID`),
+  UNIQUE KEY `Code` (`Code`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `salaryformulas`
+--
+
+INSERT INTO `salaryformulas` (`FormulaID`, `Name`, `Code`, `Calculation`, `Type`, `Priority`, `IsActive`) VALUES
+(1, 'Lương ngày công', 'WORK_SALARY', '([BASE_SALARY] / [STD_DAYS]) * [REAL_WORK_DAYS]', 'INCOME', 1, 1),
+(2, 'Lương làm thêm giờ', 'OT_INCOME', '([BASE_SALARY] / [STD_DAYS] / 8) * [OT_HOURS] * 1.5', 'INCOME', 2, 1),
+(3, 'Tổng thu nhập', 'TOTAL_INCOME', '[WORK_SALARY] + [TOTAL_ALLOWANCE] + [OT_INCOME] + [TOTAL_REWARD]', 'INCOME', 3, 1),
+(4, 'Khấu trừ Bảo hiểm', 'INSURANCE_AMT', '[BHXH_EMP] + [BHYT_EMP] + [BHTN_EMP]', 'DEDUCTION', 4, 1),
+(5, 'Thu nhập tính thuế', 'TAXABLE_INCOME', '[TOTAL_INCOME] - [TAX_EXEMPT_INCOME] - [OT_TAX_EXEMPT] - [INSURANCE_AMT] - [FAMILY_DEDUCTION]', 'INCOME', 5, 1),
+(6, 'Thuế TNCN', 'PIT_TAX', '0', 'TAX', 6, 1),
+(7, 'Thực lĩnh (NET)', 'NET_SALARY', '[TOTAL_INCOME] - [INSURANCE_AMT] - [PIT_TAX] - [TOTAL_PENALTY]', 'NET', 99, 1),
+(8, 'Phần OT miễn thuế', 'OT_TAX_EXEMPT', '[OT_INCOME] - ([OT_HOURS] * ([BASE_SALARY] / [STD_DAYS] / 8))', 'INCOME', 3, 1),
+(9, 'BHXH Nhân viên (8%)', 'BHXH_EMP', 'min([INSURANCE_SALARY], [BASIC_SALARY_STATE] * [INSURANCE_CAP_MULTIPLIER]) * 0.08', 'DEDUCTION', 4, 1),
+(10, 'BHYT Nhân viên (1.5%)', 'BHYT_EMP', 'min([INSURANCE_SALARY], [BASIC_SALARY_STATE] * [INSURANCE_CAP_MULTIPLIER]) * 0.015', 'DEDUCTION', 4, 1),
+(11, 'BHTN Nhân viên (1%)', 'BHTN_EMP', 'min([INSURANCE_SALARY], [REGION_MIN_SALARY] * [INSURANCE_CAP_MULTIPLIER]) * 0.01', 'DEDUCTION', 4, 1),
+(12, 'BHXH Công ty (17.5%)', 'BHXH_COMP', 'min([INSURANCE_SALARY], [BASIC_SALARY_STATE] * [INSURANCE_CAP_MULTIPLIER]) * 0.175', 'DEDUCTION', 4, 1),
+(13, 'BHYT Công ty (3%)', 'BHYT_COMP', 'min([INSURANCE_SALARY], [BASIC_SALARY_STATE] * [INSURANCE_CAP_MULTIPLIER]) * 0.03', 'DEDUCTION', 4, 1),
+(14, 'BHTN Công ty (1%)', 'BHTN_COMP', 'min([INSURANCE_SALARY], [REGION_MIN_SALARY] * [INSURANCE_CAP_MULTIPLIER]) * 0.01', 'DEDUCTION', 4, 1);
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `salaryvariables`
 --
 
@@ -1237,346 +1349,32 @@ CREATE TABLE IF NOT EXISTS `salaryvariables` (
   `Code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `Description` text COLLATE utf8mb4_unicode_ci,
   `SQLQuery` text COLLATE utf8mb4_unicode_ci COMMENT 'Câu lệnh Native SQL để lấy giá trị',
-  `rule_id` int DEFAULT NULL,
-  `dsl_version_id` int DEFAULT NULL,
   PRIMARY KEY (`VariableID`),
-  UNIQUE KEY `Code` (`Code`),
-  KEY `fk_salaryvariables_rule_fix` (`rule_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `Code` (`Code`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `salaryvariables`
 --
 
-INSERT INTO `salaryvariables` (`VariableID`, `Name`, `Code`, `Description`, `SQLQuery`, `rule_id`, `dsl_version_id`) VALUES
-(1, 'Lương cơ bản (HĐLĐ)', 'BASE_SALARY', 'Lấy từ bảng Contracts', 'SELECT COALESCE(basesalary, 0) FROM contracts WHERE userID = :userId AND Status = \'ACTIVE\' LIMIT 1', NULL, NULL),
-(2, 'Ngày công chuẩn tháng', 'STD_DAYS', 'Lấy từ MonthlyPayrollConfigs', 'SELECT StandardWorkDays FROM monthlypayrollconfigs WHERE Month = :month AND Year = :year', NULL, NULL),
-(3, 'Ngày công đi làm thực tế', 'REAL_WORK_DAYS', 'Tổng số ngày có mặt + Nghỉ phép có lương', 'SELECT COALESCE(COUNT(*), 0) FROM attendances WHERE userID = :userId AND date BETWEEN :startDate AND :endDate AND status = \'PRESENT\'', NULL, NULL),
-(4, 'Tổng tiền Phụ cấp', 'TOTAL_ALLOWANCE', 'Tổng bảng ContractAllowances', 'SELECT COALESCE(SUM(Amount), 0) FROM contractallowances ca JOIN contracts c ON ca.ContractID = c.contractID WHERE c.userID = :userId AND c.Status = \'ACTIVE\'', NULL, NULL),
-(5, 'Tổng tiền Thưởng', 'TOTAL_REWARD', 'Tổng RewardPunishmentDecisions loại REWARD', 'SELECT COALESCE(SUM(Amount), 0) FROM rewardpunishmentdecisions WHERE UserID = :userId AND Type = \'REWARD\' AND Status = \'APPROVED\' AND DecisionDate BETWEEN :startDate AND :endDate', NULL, NULL),
-(6, 'Tổng tiền Phạt', 'TOTAL_PENALTY', 'Tổng RewardPunishmentDecisions loại PUNISHMENT', 'SELECT COALESCE(SUM(Amount), 0) FROM rewardpunishmentdecisions WHERE UserID = :userId AND Type = \'PUNISHMENT\' AND Status = \'APPROVED\' AND DecisionDate BETWEEN :startDate AND :endDate', NULL, NULL),
-(7, 'Giờ tăng ca', 'OT_HOURS', 'Tổng số giờ làm thêm', 'SELECT COALESCE(SUM(hours), 0) FROM overtime WHERE userid = :userId AND date BETWEEN :startDate AND :endDate AND status = \'APPROVED\'', NULL, NULL),
-(8, 'Lương đóng bảo hiểm', 'INSURANCE_SALARY', 'Lấy từ bảng Contracts', 'SELECT COALESCE(InsuranceSalary, 0) FROM contracts WHERE userID = :userId AND Status = \'ACTIVE\' LIMIT 1', NULL, NULL),
-(9, 'Tổng thu nhập chịu thuế', 'TAXABLE_INCOME', 'Tổng thu nhập - Các khoản miễn thuế', NULL, NULL, NULL),
-(10, 'Tổng thu nhập miễn thuế', 'TAX_EXEMPT_INCOME', 'Tổng TaxFreeAmount + Chênh lệch OT', '\nSELECT \n    (SELECT COALESCE(SUM(TaxFreeAmount), 0) FROM contractallowances ca JOIN contracts c ON ca.ContractID = c.contractID WHERE c.userID = :userId AND c.Status = \'ACTIVE\')\n    +\n    (SELECT COALESCE(SUM(Amount), 0) FROM rewardpunishmentdecisions WHERE UserID = :userId AND Type = \'REWARD\' AND Status = \'APPROVED\' AND IsTaxExempt = 1 AND DecisionDate BETWEEN :startDate AND :endDate)\n', NULL, NULL),
-(11, 'Giảm trừ gia cảnh', 'FAMILY_DEDUCTION', '11tr + (Người phụ thuộc * 4.4tr)', '\nSELECT \n    (SELECT Value FROM taxsettings WHERE SettingKey = \'PERSONAL_DEDUCTION\' ORDER BY EffectiveDate DESC LIMIT 1) \n    + \n    (\n      (SELECT COALESCE(COUNT(*), 0) FROM dependents WHERE userID = :userId AND istaxdeductible = 1) \n      * (SELECT Value FROM taxsettings WHERE SettingKey = \'DEPENDENT_DEDUCTION\' ORDER BY EffectiveDate DESC LIMIT 1)\n    )\n', NULL, NULL),
-(12, 'Thu nhập tính thuế', 'ASSESSABLE_INCOME', 'Thu nhập chịu thuế - Bảo hiểm - Giảm trừ gia cảnh', NULL, NULL, NULL),
-(13, 'Số người phụ thuộc', 'DEPENDENT_COUNT', 'Lấy từ bảng dependents', 'SELECT COALESCE(COUNT(*), 0) FROM dependents WHERE userID = :userId AND istaxdeductible = 1', NULL, NULL),
-(14, 'Lương cơ sở nhà nước', 'BASIC_SALARY_STATE', 'Lấy từ bảng TaxSettings', 'SELECT Value FROM taxsettings WHERE SettingKey = \'BASIC_SALARY_STATE\' AND EffectiveDate <= :endDate ORDER BY EffectiveDate DESC LIMIT 1', NULL, NULL),
-(15, 'Lương tối thiểu vùng', 'REGION_MIN_SALARY', 'Lấy từ bảng TaxSettings', 'SELECT Value FROM taxsettings WHERE SettingKey = \'REGION_MIN_SALARY\' AND EffectiveDate <= :endDate ORDER BY EffectiveDate DESC LIMIT 1', NULL, NULL),
-(16, 'Hệ số trần bảo hiểm', 'INSURANCE_CAP_MULTIPLIER', 'Lấy từ bảng TaxSettings (thường là 20 lần)', 'SELECT Value FROM taxsettings WHERE SettingKey = \'INSURANCE_CAP_MULTIPLIER\' AND EffectiveDate <= :endDate ORDER BY EffectiveDate DESC LIMIT 1', NULL, NULL),
-(17, 'Giới hạn ăn ca miễn thuế', 'LUNCH_ALLOWANCE_LIMIT', 'Lấy từ bảng TaxSettings', 'SELECT Value FROM taxsettings WHERE SettingKey = \'LUNCH_ALLOWANCE_LIMIT\' AND EffectiveDate <= :endDate ORDER BY EffectiveDate DESC LIMIT 1', NULL, NULL),
-(18, 'Số ngày đi trễ', 'LATE_COUNT', 'Số ngày đi trễ', 'SELECT COUNT(*) FROM attendances WHERE userID = :userId AND date BETWEEN :startDate AND :endDate AND status IN (\'LATE_AND_EARLY\')', NULL, NULL);
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `salary_rule`
---
-
-DROP TABLE IF EXISTS `salary_rule`;
-CREATE TABLE IF NOT EXISTS `salary_rule` (
-  `rule_id` int NOT NULL AUTO_INCREMENT,
-  `rule_code` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `status` enum('DRAFT','APPROVED','RETIRED') COLLATE utf8mb4_unicode_ci DEFAULT 'DRAFT',
-  `current_version_id` int DEFAULT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `priority` int DEFAULT '10',
-  PRIMARY KEY (`rule_id`),
-  UNIQUE KEY `rule_code` (`rule_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `salary_rule`
---
-
-INSERT INTO `salary_rule` (`rule_id`, `rule_code`, `name`, `description`, `status`, `current_version_id`, `created_at`, `priority`) VALUES
-(1, 'WORK_SALARY', 'Lương theo ngày công (gồm PC)', NULL, 'APPROVED', 1, '2025-12-01 01:47:36', 1),
-(2, 'INSURANCE_AMT', 'Tiền bảo hiểm (10.5%)', NULL, 'RETIRED', 2, '2025-12-01 01:47:36', 2),
-(3, 'TOTAL_INCOME', 'Tổng thu nhập thực tế (Gross)', NULL, 'APPROVED', 3, '2025-12-01 01:47:36', 3),
-(4, 'TAXABLE_INCOME', 'Thu nhập tính thuế', NULL, 'APPROVED', 16, '2025-12-01 01:47:36', 4),
-(5, 'PIT_TAX', 'Thuế TNCN', NULL, 'APPROVED', 5, '2025-12-01 01:47:36', 5),
-(6, 'NET_SALARY', 'Lương thực lĩnh (NET)', NULL, 'APPROVED', 17, '2025-12-01 01:47:36', 99),
-(19, 'ATTENDANCE_BONUS', 'Thưởng chuyên cần', NULL, 'APPROVED', 7, NULL, 10),
-(20, 'BHXH_EMP', 'BHXH Nhân viên (8%)', NULL, 'APPROVED', 8, '2025-12-02 21:00:44', 4),
-(21, 'BHYT_EMP', 'BHYT Nhân viên (1.5%)', NULL, 'APPROVED', 9, '2025-12-02 21:00:44', 4),
-(22, 'BHTN_EMP', 'BHTN Nhân viên (1%)', NULL, 'APPROVED', 10, '2025-12-02 21:00:44', 4);
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `salary_rule_version`
---
-
-DROP TABLE IF EXISTS `salary_rule_version`;
-CREATE TABLE IF NOT EXISTS `salary_rule_version` (
-  `version_id` int NOT NULL AUTO_INCREMENT,
-  `rule_id` int DEFAULT NULL,
-  `version_number` int DEFAULT NULL,
-  `dsl_json` json DEFAULT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`version_id`),
-  KEY `rule_id` (`rule_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `salary_rule_version`
---
-
-INSERT INTO `salary_rule_version` (`version_id`, `rule_id`, `version_number`, `dsl_json`, `created_at`) VALUES
-(1, 1, 1, '{\"left\": {\"left\": {\"left\": {\"name\": \"BASE_SALARY\", \"type\": \"VARIABLE\"}, \"type\": \"ADD\", \"right\": {\"name\": \"TOTAL_ALLOWANCE\", \"type\": \"VARIABLE\"}}, \"type\": \"DIV\", \"right\": {\"name\": \"STD_DAYS\", \"type\": \"VARIABLE\"}}, \"type\": \"MUL\", \"right\": {\"name\": \"REAL_WORK_DAYS\", \"type\": \"VARIABLE\"}}', '2025-12-01 01:47:36'),
-(2, 2, 1, '{\"left\": {\"name\": \"INSURANCE_SALARY\", \"type\": \"VARIABLE\"}, \"type\": \"MUL\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0.105}}', '2025-12-01 01:47:36'),
-(3, 3, 1, '{\"left\": {\"left\": {\"left\": {\"name\": \"WORK_SALARY\", \"type\": \"REFERENCE\"}, \"type\": \"ADD\", \"right\": {\"name\": \"TOTAL_REWARD\", \"type\": \"VARIABLE\"}}, \"type\": \"ADD\", \"right\": {\"name\": \"TOTAL_OT_HOURS_CONVERTED\", \"type\": \"VARIABLE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"TOTAL_PENALTY\", \"type\": \"VARIABLE\"}}', '2025-12-01 01:47:36'),
-(4, 4, 1, '{\"left\": {\"left\": {\"left\": {\"name\": \"TOTAL_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"SUB\", \"right\": {\"name\": \"TAX_EXEMPT_INCOME\", \"type\": \"VARIABLE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"INSURANCE_AMT\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"left\": {\"name\": \"PERSONAL_DEDUCTION\", \"type\": \"VARIABLE\"}, \"type\": \"ADD\", \"right\": {\"left\": {\"name\": \"DEPENDENT_COUNT\", \"type\": \"VARIABLE\"}, \"type\": \"MUL\", \"right\": {\"name\": \"DEPENDENT_DEDUCTION\", \"type\": \"VARIABLE\"}}}}', '2025-12-01 01:47:36'),
-(5, 5, 1, '{\"type\": \"IF_ELSE\", \"condition\": {\"left\": {\"name\": \"TAXABLE_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"GT\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0}}, \"true_case\": {\"type\": \"IF_ELSE\", \"condition\": {\"left\": {\"name\": \"TAXABLE_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"GT\", \"right\": {\"type\": \"CONSTANT\", \"value\": 80000000}}, \"true_case\": {\"left\": {\"left\": {\"name\": \"TAXABLE_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"MUL\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0.35}}, \"type\": \"SUB\", \"right\": {\"type\": \"CONSTANT\", \"value\": 9850000}}, \"false_case\": {\"type\": \"IF_ELSE\", \"condition\": {\"left\": {\"name\": \"TAXABLE_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"GT\", \"right\": {\"type\": \"CONSTANT\", \"value\": 52000000}}, \"true_case\": {\"left\": {\"left\": {\"name\": \"TAXABLE_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"MUL\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0.3}}, \"type\": \"SUB\", \"right\": {\"type\": \"CONSTANT\", \"value\": 5850000}}, \"false_case\": {\"type\": \"IF_ELSE\", \"condition\": {\"left\": {\"name\": \"TAXABLE_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"GT\", \"right\": {\"type\": \"CONSTANT\", \"value\": 32000000}}, \"true_case\": {\"left\": {\"left\": {\"name\": \"TAXABLE_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"MUL\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0.25}}, \"type\": \"SUB\", \"right\": {\"type\": \"CONSTANT\", \"value\": 3250000}}, \"false_case\": {\"type\": \"IF_ELSE\", \"condition\": {\"left\": {\"name\": \"TAXABLE_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"GT\", \"right\": {\"type\": \"CONSTANT\", \"value\": 18000000}}, \"true_case\": {\"left\": {\"left\": {\"name\": \"TAXABLE_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"MUL\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0.2}}, \"type\": \"SUB\", \"right\": {\"type\": \"CONSTANT\", \"value\": 1650000}}, \"false_case\": {\"type\": \"IF_ELSE\", \"condition\": {\"left\": {\"name\": \"TAXABLE_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"GT\", \"right\": {\"type\": \"CONSTANT\", \"value\": 10000000}}, \"true_case\": {\"left\": {\"left\": {\"name\": \"TAXABLE_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"MUL\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0.15}}, \"type\": \"SUB\", \"right\": {\"type\": \"CONSTANT\", \"value\": 750000}}, \"false_case\": {\"type\": \"IF_ELSE\", \"condition\": {\"left\": {\"name\": \"TAXABLE_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"GT\", \"right\": {\"type\": \"CONSTANT\", \"value\": 5000000}}, \"true_case\": {\"left\": {\"left\": {\"name\": \"TAXABLE_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"MUL\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0.1}}, \"type\": \"SUB\", \"right\": {\"type\": \"CONSTANT\", \"value\": 250000}}, \"false_case\": {\"left\": {\"name\": \"TAXABLE_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"MUL\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0.05}}}}}}}}, \"false_case\": {\"type\": \"CONSTANT\", \"value\": 0}}', '2025-12-01 01:47:36'),
-(6, 6, 1, '{\"left\": {\"left\": {\"name\": \"TOTAL_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"SUB\", \"right\": {\"name\": \"INSURANCE_AMT\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"PIT_TAX\", \"type\": \"REFERENCE\"}}', '2025-12-01 01:47:36'),
-(7, 19, 1, '{\"type\": \"IF_ELSE\", \"condition\": {\"left\": {\"name\": \"LATE_COUNT\", \"type\": \"VARIABLE\"}, \"type\": \"LTE\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0}}, \"true_case\": {\"type\": \"CONSTANT\", \"value\": 50000}, \"false_case\": {\"type\": \"CONSTANT\", \"value\": 0}}', '2025-12-02 14:36:58'),
-(8, 20, 1, '{\"left\": {\"name\": \"INSURANCE_SALARY\", \"type\": \"VARIABLE\"}, \"type\": \"MUL\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0.08}}', '2025-12-02 21:00:44'),
-(9, 21, 1, '{\"left\": {\"name\": \"INSURANCE_SALARY\", \"type\": \"VARIABLE\"}, \"type\": \"MUL\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0.015}}', '2025-12-02 21:00:44'),
-(10, 22, 1, '{\"left\": {\"name\": \"INSURANCE_SALARY\", \"type\": \"VARIABLE\"}, \"type\": \"MUL\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0.01}}', '2025-12-02 21:00:44'),
-(11, 4, 2, '{\"left\": {\"left\": {\"left\": {\"left\": {\"left\": {\"name\": \"TOTAL_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"SUB\", \"right\": {\"name\": \"TAX_EXEMPT_INCOME\", \"type\": \"VARIABLE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"BHXH_EMP\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"BHYT_EMP\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"BHTN_EMP\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"left\": {\"name\": \"PERSONAL_DEDUCTION\", \"type\": \"VARIABLE\"}, \"type\": \"ADD\", \"right\": {\"left\": {\"name\": \"DEPENDENT_COUNT\", \"type\": \"VARIABLE\"}, \"type\": \"MUL\", \"right\": {\"name\": \"DEPENDENT_DEDUCTION\", \"type\": \"VARIABLE\"}}}}', '2025-12-02 21:00:44'),
-(12, 6, 2, '{\"left\": {\"left\": {\"left\": {\"left\": {\"left\": {\"name\": \"TOTAL_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"SUB\", \"right\": {\"name\": \"BHXH_EMP\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"BHYT_EMP\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"BHTN_EMP\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"PIT_TAX\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"TOTAL_PENALTY\", \"type\": \"VARIABLE\"}}', '2025-12-02 21:00:44'),
-(13, 20, 1, '{\"left\": {\"name\": \"INSURANCE_SALARY\", \"type\": \"VARIABLE\"}, \"type\": \"MUL\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0.08}}', '2025-12-02 21:09:24'),
-(14, 21, 1, '{\"left\": {\"name\": \"INSURANCE_SALARY\", \"type\": \"VARIABLE\"}, \"type\": \"MUL\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0.015}}', '2025-12-02 21:09:24'),
-(15, 22, 1, '{\"left\": {\"name\": \"INSURANCE_SALARY\", \"type\": \"VARIABLE\"}, \"type\": \"MUL\", \"right\": {\"type\": \"CONSTANT\", \"value\": 0.01}}', '2025-12-02 21:09:24'),
-(16, 4, 3, '{\"left\": {\"left\": {\"left\": {\"left\": {\"left\": {\"name\": \"TOTAL_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"SUB\", \"right\": {\"name\": \"TAX_EXEMPT_INCOME\", \"type\": \"VARIABLE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"BHXH_EMP\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"BHYT_EMP\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"BHTN_EMP\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"left\": {\"name\": \"PERSONAL_DEDUCTION\", \"type\": \"VARIABLE\"}, \"type\": \"ADD\", \"right\": {\"left\": {\"name\": \"DEPENDENT_COUNT\", \"type\": \"VARIABLE\"}, \"type\": \"MUL\", \"right\": {\"name\": \"DEPENDENT_DEDUCTION\", \"type\": \"VARIABLE\"}}}}', '2025-12-02 21:09:24'),
-(17, 6, 3, '{\"left\": {\"left\": {\"left\": {\"left\": {\"left\": {\"name\": \"TOTAL_INCOME\", \"type\": \"REFERENCE\"}, \"type\": \"SUB\", \"right\": {\"name\": \"BHXH_EMP\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"BHYT_EMP\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"BHTN_EMP\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"PIT_TAX\", \"type\": \"REFERENCE\"}}, \"type\": \"SUB\", \"right\": {\"name\": \"TOTAL_PENALTY\", \"type\": \"VARIABLE\"}}', '2025-12-02 21:09:24');
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `salary_variable_cache`
---
-
-DROP TABLE IF EXISTS `salary_variable_cache`;
-CREATE TABLE IF NOT EXISTS `salary_variable_cache` (
-  `cache_id` int NOT NULL AUTO_INCREMENT,
-  `variable_id` int DEFAULT NULL,
-  `employee_id` int DEFAULT NULL,
-  `payperiod` varchar(7) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `value` decimal(20,2) DEFAULT NULL,
-  `evaluated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`cache_id`),
-  UNIQUE KEY `variable_id` (`variable_id`,`employee_id`,`payperiod`)
-) ENGINE=MyISAM AUTO_INCREMENT=211 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `salary_variable_cache`
---
-
-INSERT INTO `salary_variable_cache` (`cache_id`, `variable_id`, `employee_id`, `payperiod`, `value`, `evaluated_at`) VALUES
-(1, 1, 1, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(2, 2, 1, '2025-11', 3150000.00, '2025-12-02 19:41:17'),
-(3, 3, 1, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(4, 4, 1, '2025-11', -19800000.00, '2025-12-02 23:15:02'),
-(5, 5, 1, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(6, 6, 1, '2025-11', -3150000.00, '2025-12-02 23:15:02'),
-(7, 1, 2, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(8, 2, 2, '2025-11', 1575000.00, '2025-12-02 19:41:17'),
-(9, 3, 2, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(10, 4, 2, '2025-11', -15400000.00, '2025-12-02 23:15:02'),
-(11, 5, 2, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(12, 6, 2, '2025-11', -1575000.00, '2025-12-02 23:15:02'),
-(13, 1, 3, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(14, 2, 3, '2025-11', 2625000.00, '2025-12-02 19:41:17'),
-(15, 3, 3, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(16, 4, 3, '2025-11', -15400000.00, '2025-12-02 23:15:02'),
-(17, 5, 3, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(18, 6, 3, '2025-11', -2625000.00, '2025-12-02 23:15:02'),
-(19, 1, 4, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(20, 2, 4, '2025-11', 1260000.00, '2025-12-02 19:41:17'),
-(21, 3, 4, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(22, 4, 4, '2025-11', -15400000.00, '2025-12-02 23:15:02'),
-(23, 5, 4, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(24, 6, 4, '2025-11', -1260000.00, '2025-12-02 23:15:02'),
-(25, 1, 5, '2025-11', 989615.38, '2025-12-02 23:15:02'),
-(26, 2, 5, '2025-11', 2310000.00, '2025-12-02 19:41:17'),
-(27, 3, 5, '2025-11', 989615.38, '2025-12-02 23:15:02'),
-(28, 4, 5, '2025-11', -18810384.62, '2025-12-02 23:15:02'),
-(29, 5, 5, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(30, 6, 5, '2025-11', -1320384.62, '2025-12-02 23:15:02'),
-(31, 1, 6, '2025-11', 863846.16, '2025-12-02 23:15:02'),
-(32, 2, 6, '2025-11', 1050000.00, '2025-12-02 19:41:17'),
-(33, 3, 6, '2025-11', 663846.16, '2025-12-02 23:15:02'),
-(34, 4, 6, '2025-11', -14736153.84, '2025-12-02 23:15:02'),
-(35, 5, 6, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(36, 6, 6, '2025-11', -586153.84, '2025-12-02 23:15:02'),
-(37, 1, 7, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(38, 2, 7, '2025-11', 2100000.00, '2025-12-02 19:41:17'),
-(39, 3, 7, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(40, 4, 7, '2025-11', -15400000.00, '2025-12-02 23:15:02'),
-(41, 5, 7, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(42, 6, 7, '2025-11', -2100000.00, '2025-12-02 23:15:02'),
-(43, 1, 8, '2025-11', 393461.54, '2025-12-02 23:15:02'),
-(44, 2, 8, '2025-11', 945000.00, '2025-12-02 19:41:17'),
-(45, 3, 8, '2025-11', 2393461.54, '2025-12-02 23:15:02'),
-(46, 4, 8, '2025-11', -13006538.46, '2025-12-02 23:15:02'),
-(47, 5, 8, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(48, 6, 8, '2025-11', 1448461.54, '2025-12-02 23:15:02'),
-(49, 1, 9, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(50, 2, 9, '2025-11', 1890000.00, '2025-12-02 19:41:17'),
-(51, 3, 9, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(52, 4, 9, '2025-11', -19800000.00, '2025-12-02 23:15:02'),
-(53, 5, 9, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(54, 6, 9, '2025-11', -1890000.00, '2025-12-02 23:15:02'),
-(55, 1, 10, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(56, 2, 10, '2025-11', 945000.00, '2025-12-02 19:41:17'),
-(57, 3, 10, '2025-11', -500000.00, '2025-12-02 23:15:02'),
-(58, 4, 10, '2025-11', -15900000.00, '2025-12-02 23:15:02'),
-(59, 5, 10, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(60, 6, 10, '2025-11', -1945000.00, '2025-12-02 23:15:02'),
-(61, 1, 11, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(62, 2, 11, '2025-11', 1785000.00, '2025-12-02 19:41:17'),
-(63, 3, 11, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(64, 4, 11, '2025-11', -15400000.00, '2025-12-02 23:15:02'),
-(65, 5, 11, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(66, 6, 11, '2025-11', -1785000.00, '2025-12-02 23:15:02'),
-(67, 1, 12, '2025-11', 351153.85, '2025-12-02 23:15:02'),
-(68, 2, 12, '2025-11', 840000.00, '2025-12-02 19:41:17'),
-(69, 3, 12, '2025-11', 351153.85, '2025-12-02 23:15:02'),
-(70, 4, 12, '2025-11', -15048846.15, '2025-12-02 23:15:02'),
-(71, 5, 12, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(72, 6, 12, '2025-11', -488846.15, '2025-12-02 23:15:02'),
-(73, 1, 13, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(74, 2, 13, '2025-11', 1470000.00, '2025-12-02 19:41:18'),
-(75, 3, 13, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(76, 4, 13, '2025-11', -15400000.00, '2025-12-02 23:15:02'),
-(77, 5, 13, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(78, 6, 13, '2025-11', -1470000.00, '2025-12-02 23:15:02'),
-(79, 1, 14, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(80, 2, 14, '2025-11', 0.00, '2025-12-02 19:41:18'),
-(81, 3, 14, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(82, 4, 14, '2025-11', -15400000.00, '2025-12-02 23:15:02'),
-(83, 5, 14, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(84, 6, 14, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(85, 1, 15, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(86, 2, 15, '2025-11', 997500.00, '2025-12-02 19:41:18'),
-(87, 3, 15, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(88, 4, 15, '2025-11', -15400000.00, '2025-12-02 23:15:03'),
-(89, 5, 15, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(90, 6, 15, '2025-11', -997500.00, '2025-12-02 23:15:03'),
-(91, 1, 16, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(92, 2, 16, '2025-11', 966000.00, '2025-12-02 19:41:18'),
-(93, 3, 16, '2025-11', -1000000.00, '2025-12-02 23:15:03'),
-(94, 4, 16, '2025-11', -16400000.00, '2025-12-02 23:15:03'),
-(95, 5, 16, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(96, 6, 16, '2025-11', -2966000.00, '2025-12-02 23:15:03'),
-(97, 1, 17, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(98, 2, 17, '2025-11', 924000.00, '2025-12-02 19:41:18'),
-(99, 3, 17, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(100, 4, 17, '2025-11', -15400000.00, '2025-12-02 23:15:03'),
-(101, 5, 17, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(102, 6, 17, '2025-11', -924000.00, '2025-12-02 23:15:03'),
-(103, 1, 18, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(104, 2, 18, '2025-11', 1575000.00, '2025-12-02 19:41:18'),
-(105, 3, 18, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(106, 4, 18, '2025-11', -15400000.00, '2025-12-02 23:15:03'),
-(107, 5, 18, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(108, 6, 18, '2025-11', -1575000.00, '2025-12-02 23:15:03'),
-(109, 1, 19, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(110, 2, 19, '2025-11', 1575000.00, '2025-12-02 19:41:18'),
-(111, 3, 19, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(112, 4, 19, '2025-11', -15400000.00, '2025-12-02 23:15:03'),
-(113, 5, 19, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(114, 6, 19, '2025-11', -1575000.00, '2025-12-02 23:15:03'),
-(115, 1, 20, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(116, 2, 20, '2025-11', 0.00, '2025-12-02 19:41:18'),
-(117, 3, 20, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(118, 4, 20, '2025-11', -11000000.00, '2025-12-02 23:15:03'),
-(119, 5, 20, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(120, 6, 20, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(121, 1, 21, '2025-11', 12519230.85, '2025-12-02 23:15:03'),
-(122, 2, 21, '2025-11', 1575000.00, '2025-12-02 19:41:18'),
-(123, 3, 21, '2025-11', 12519230.85, '2025-12-02 23:15:03'),
-(124, 4, 21, '2025-11', 1519230.85, '2025-12-02 23:15:03'),
-(125, 5, 21, '2025-11', 75961.54, '2025-12-02 23:15:03'),
-(126, 6, 21, '2025-11', 10868269.31, '2025-12-02 23:15:03'),
-(127, 19, 1, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(128, 19, 2, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(129, 19, 3, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(130, 19, 4, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(131, 19, 5, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(132, 19, 6, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(133, 19, 7, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(134, 19, 8, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(135, 19, 9, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(136, 19, 10, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(137, 19, 11, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(138, 19, 12, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(139, 19, 13, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(140, 19, 14, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(141, 19, 15, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(142, 19, 16, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(143, 19, 17, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(144, 19, 18, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(145, 19, 19, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(146, 19, 20, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(147, 19, 21, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(148, 20, 1, '2025-11', 2400000.00, '2025-12-02 23:15:02'),
-(149, 21, 1, '2025-11', 450000.00, '2025-12-02 23:15:02'),
-(150, 22, 1, '2025-11', 300000.00, '2025-12-02 23:15:02'),
-(151, 20, 2, '2025-11', 1200000.00, '2025-12-02 23:15:02'),
-(152, 21, 2, '2025-11', 225000.00, '2025-12-02 23:15:02'),
-(153, 22, 2, '2025-11', 150000.00, '2025-12-02 23:15:02'),
-(154, 20, 3, '2025-11', 2000000.00, '2025-12-02 23:15:02'),
-(155, 21, 3, '2025-11', 375000.00, '2025-12-02 23:15:02'),
-(156, 22, 3, '2025-11', 250000.00, '2025-12-02 23:15:02'),
-(157, 20, 4, '2025-11', 960000.00, '2025-12-02 23:15:02'),
-(158, 21, 4, '2025-11', 180000.00, '2025-12-02 23:15:02'),
-(159, 22, 4, '2025-11', 120000.00, '2025-12-02 23:15:02'),
-(160, 20, 5, '2025-11', 1760000.00, '2025-12-02 23:15:02'),
-(161, 21, 5, '2025-11', 330000.00, '2025-12-02 23:15:02'),
-(162, 22, 5, '2025-11', 220000.00, '2025-12-02 23:15:02'),
-(163, 20, 6, '2025-11', 800000.00, '2025-12-02 23:15:02'),
-(164, 21, 6, '2025-11', 150000.00, '2025-12-02 23:15:02'),
-(165, 22, 6, '2025-11', 100000.00, '2025-12-02 23:15:02'),
-(166, 20, 7, '2025-11', 1600000.00, '2025-12-02 23:15:02'),
-(167, 21, 7, '2025-11', 300000.00, '2025-12-02 23:15:02'),
-(168, 22, 7, '2025-11', 200000.00, '2025-12-02 23:15:02'),
-(169, 20, 8, '2025-11', 720000.00, '2025-12-02 23:15:02'),
-(170, 21, 8, '2025-11', 135000.00, '2025-12-02 23:15:02'),
-(171, 22, 8, '2025-11', 90000.00, '2025-12-02 23:15:02'),
-(172, 20, 9, '2025-11', 1440000.00, '2025-12-02 23:15:02'),
-(173, 21, 9, '2025-11', 270000.00, '2025-12-02 23:15:02'),
-(174, 22, 9, '2025-11', 180000.00, '2025-12-02 23:15:02'),
-(175, 20, 10, '2025-11', 720000.00, '2025-12-02 23:15:02'),
-(176, 21, 10, '2025-11', 135000.00, '2025-12-02 23:15:02'),
-(177, 22, 10, '2025-11', 90000.00, '2025-12-02 23:15:02'),
-(178, 20, 11, '2025-11', 1360000.00, '2025-12-02 23:15:02'),
-(179, 21, 11, '2025-11', 255000.00, '2025-12-02 23:15:02'),
-(180, 22, 11, '2025-11', 170000.00, '2025-12-02 23:15:02'),
-(181, 20, 12, '2025-11', 640000.00, '2025-12-02 23:15:02'),
-(182, 21, 12, '2025-11', 120000.00, '2025-12-02 23:15:02'),
-(183, 22, 12, '2025-11', 80000.00, '2025-12-02 23:15:02'),
-(184, 20, 13, '2025-11', 1120000.00, '2025-12-02 23:15:02'),
-(185, 21, 13, '2025-11', 210000.00, '2025-12-02 23:15:02'),
-(186, 22, 13, '2025-11', 140000.00, '2025-12-02 23:15:02'),
-(187, 20, 14, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(188, 21, 14, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(189, 22, 14, '2025-11', 0.00, '2025-12-02 23:15:02'),
-(190, 20, 15, '2025-11', 760000.00, '2025-12-02 23:15:03'),
-(191, 21, 15, '2025-11', 142500.00, '2025-12-02 23:15:03'),
-(192, 22, 15, '2025-11', 95000.00, '2025-12-02 23:15:03'),
-(193, 20, 16, '2025-11', 736000.00, '2025-12-02 23:15:03'),
-(194, 21, 16, '2025-11', 138000.00, '2025-12-02 23:15:03'),
-(195, 22, 16, '2025-11', 92000.00, '2025-12-02 23:15:03'),
-(196, 20, 17, '2025-11', 704000.00, '2025-12-02 23:15:03'),
-(197, 21, 17, '2025-11', 132000.00, '2025-12-02 23:15:03'),
-(198, 22, 17, '2025-11', 88000.00, '2025-12-02 23:15:03'),
-(199, 20, 18, '2025-11', 1200000.00, '2025-12-02 23:15:03'),
-(200, 21, 18, '2025-11', 225000.00, '2025-12-02 23:15:03'),
-(201, 22, 18, '2025-11', 150000.00, '2025-12-02 23:15:03'),
-(202, 20, 19, '2025-11', 1200000.00, '2025-12-02 23:15:03'),
-(203, 21, 19, '2025-11', 225000.00, '2025-12-02 23:15:03'),
-(204, 22, 19, '2025-11', 150000.00, '2025-12-02 23:15:03'),
-(205, 20, 20, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(206, 21, 20, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(207, 22, 20, '2025-11', 0.00, '2025-12-02 23:15:03'),
-(208, 20, 21, '2025-11', 1200000.00, '2025-12-02 23:15:03'),
-(209, 21, 21, '2025-11', 225000.00, '2025-12-02 23:15:03'),
-(210, 22, 21, '2025-11', 150000.00, '2025-12-02 23:15:03');
+INSERT INTO `salaryvariables` (`VariableID`, `Name`, `Code`, `Description`, `SQLQuery`) VALUES
+(1, 'Lương cơ bản (HĐLĐ)', 'BASE_SALARY', 'Lấy từ bảng Contracts', 'SELECT COALESCE(basesalary, 0) FROM contracts WHERE userID = :userId AND Status = \'ACTIVE\' LIMIT 1'),
+(2, 'Ngày công chuẩn tháng', 'STD_DAYS', 'Lấy từ MonthlyPayrollConfigs', 'SELECT StandardWorkDays FROM monthlypayrollconfigs WHERE Month = :month AND Year = :year'),
+(3, 'Ngày công đi làm thực tế', 'REAL_WORK_DAYS', 'Tổng số ngày có mặt + Nghỉ phép có lương', 'SELECT COALESCE(COUNT(*), 0) FROM attendances WHERE userID = :userId AND date BETWEEN :startDate AND :endDate AND status = \'PRESENT\''),
+(4, 'Tổng tiền Phụ cấp', 'TOTAL_ALLOWANCE', 'Tổng bảng ContractAllowances', 'SELECT COALESCE(SUM(Amount), 0) FROM contractallowances ca JOIN contracts c ON ca.ContractID = c.contractID WHERE c.userID = :userId AND c.Status = \'ACTIVE\''),
+(5, 'Tổng tiền Thưởng', 'TOTAL_REWARD', 'Tổng RewardPunishmentDecisions loại REWARD', 'SELECT COALESCE(SUM(Amount), 0) FROM rewardpunishmentdecisions WHERE UserID = :userId AND Type = \'REWARD\' AND Status = \'APPROVED\' AND DecisionDate BETWEEN :startDate AND :endDate'),
+(6, 'Tổng tiền Phạt', 'TOTAL_PENALTY', 'Tổng RewardPunishmentDecisions loại PUNISHMENT', 'SELECT COALESCE(SUM(Amount), 0) FROM rewardpunishmentdecisions WHERE UserID = :userId AND Type = \'PUNISHMENT\' AND Status = \'APPROVED\' AND DecisionDate BETWEEN :startDate AND :endDate'),
+(7, 'Giờ tăng ca', 'OT_HOURS', 'Tổng số giờ làm thêm', 'SELECT COALESCE(SUM(hours), 0) FROM overtime WHERE userid = :userId AND date BETWEEN :startDate AND :endDate AND status = \'APPROVED\''),
+(8, 'Lương đóng bảo hiểm', 'INSURANCE_SALARY', 'Lấy từ bảng Contracts', 'SELECT COALESCE(InsuranceSalary, 0) FROM contracts WHERE userID = :userId AND Status = \'ACTIVE\' LIMIT 1'),
+(9, 'Tổng thu nhập chịu thuế', 'TAXABLE_INCOME', 'Tổng thu nhập - Các khoản miễn thuế', NULL),
+(10, 'Tổng thu nhập miễn thuế', 'TAX_EXEMPT_INCOME', 'Tổng TaxFreeAmount + Chênh lệch OT', '\nSELECT \n    (SELECT COALESCE(SUM(TaxFreeAmount), 0) FROM contractallowances ca JOIN contracts c ON ca.ContractID = c.contractID WHERE c.userID = :userId AND c.Status = \'ACTIVE\')\n    +\n    (SELECT COALESCE(SUM(Amount), 0) FROM rewardpunishmentdecisions WHERE UserID = :userId AND Type = \'REWARD\' AND Status = \'APPROVED\' AND IsTaxExempt = 1 AND DecisionDate BETWEEN :startDate AND :endDate)\n'),
+(11, 'Giảm trừ gia cảnh', 'FAMILY_DEDUCTION', '11tr + (Người phụ thuộc * 4.4tr)', '\nSELECT \n    (SELECT Value FROM taxsettings WHERE SettingKey = \'PERSONAL_DEDUCTION\' ORDER BY EffectiveDate DESC LIMIT 1) \n    + \n    (\n      (SELECT COALESCE(COUNT(*), 0) FROM dependents WHERE userID = :userId AND istaxdeductible = 1) \n      * (SELECT Value FROM taxsettings WHERE SettingKey = \'DEPENDENT_DEDUCTION\' ORDER BY EffectiveDate DESC LIMIT 1)\n    )\n'),
+(12, 'Thu nhập tính thuế', 'ASSESSABLE_INCOME', 'Thu nhập chịu thuế - Bảo hiểm - Giảm trừ gia cảnh', NULL),
+(13, 'Số người phụ thuộc', 'DEPENDENT_COUNT', 'Lấy từ bảng dependents', 'SELECT COALESCE(COUNT(*), 0) FROM dependents WHERE userID = :userId AND istaxdeductible = 1'),
+(14, 'Lương cơ sở nhà nước', 'BASIC_SALARY_STATE', 'Lấy từ bảng TaxSettings', 'SELECT Value FROM taxsettings WHERE SettingKey = \'BASIC_SALARY_STATE\' AND EffectiveDate <= :endDate ORDER BY EffectiveDate DESC LIMIT 1'),
+(15, 'Lương tối thiểu vùng', 'REGION_MIN_SALARY', 'Lấy từ bảng TaxSettings', 'SELECT Value FROM taxsettings WHERE SettingKey = \'REGION_MIN_SALARY\' AND EffectiveDate <= :endDate ORDER BY EffectiveDate DESC LIMIT 1'),
+(16, 'Hệ số trần bảo hiểm', 'INSURANCE_CAP_MULTIPLIER', 'Lấy từ bảng TaxSettings (thường là 20 lần)', 'SELECT Value FROM taxsettings WHERE SettingKey = \'INSURANCE_CAP_MULTIPLIER\' AND EffectiveDate <= :endDate ORDER BY EffectiveDate DESC LIMIT 1'),
+(17, 'Giới hạn ăn ca miễn thuế', 'LUNCH_ALLOWANCE_LIMIT', 'Lấy từ bảng TaxSettings', 'SELECT Value FROM taxsettings WHERE SettingKey = \'LUNCH_ALLOWANCE_LIMIT\' AND EffectiveDate <= :endDate ORDER BY EffectiveDate DESC LIMIT 1');
 
 -- --------------------------------------------------------
 
@@ -1685,6 +1483,37 @@ INSERT INTO `shifts` (`shiftID`, `shiftname`, `starttime`, `endtime`, `durationh
 (55, 'PL (Paternity Leave)', '00:00:00', '00:00:00', 0),
 (56, 'ML (Maternity Leave)', '00:00:00', '00:00:00', 0),
 (57, 'UL (Unpaid Leave)', '00:00:00', '00:00:00', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `taxbrackets`
+--
+
+DROP TABLE IF EXISTS `taxbrackets`;
+CREATE TABLE IF NOT EXISTS `taxbrackets` (
+  `BracketID` int NOT NULL AUTO_INCREMENT,
+  `Level` int NOT NULL,
+  `MinIncome` decimal(15,2) NOT NULL,
+  `MaxIncome` decimal(15,2) DEFAULT NULL,
+  `TaxRate` decimal(5,2) NOT NULL,
+  `SubtractionAmount` decimal(15,2) DEFAULT '0.00',
+  `EffectiveDate` date NOT NULL,
+  PRIMARY KEY (`BracketID`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `taxbrackets`
+--
+
+INSERT INTO `taxbrackets` (`BracketID`, `Level`, `MinIncome`, `MaxIncome`, `TaxRate`, `SubtractionAmount`, `EffectiveDate`) VALUES
+(1, 1, 0.00, 5000000.00, 5.00, 0.00, '2025-01-01'),
+(2, 2, 5000001.00, 10000000.00, 10.00, 250000.00, '2025-01-01'),
+(3, 3, 10000001.00, 18000000.00, 15.00, 750000.00, '2025-01-01'),
+(4, 4, 18000001.00, 32000000.00, 20.00, 1650000.00, '2025-01-01'),
+(5, 5, 32000001.00, 52000000.00, 25.00, 3250000.00, '2025-01-01'),
+(6, 6, 52000001.00, 80000000.00, 30.00, 5850000.00, '2025-01-01'),
+(7, 7, 80000001.00, NULL, 35.00, 9850000.00, '2025-01-01');
 
 -- --------------------------------------------------------
 
@@ -1884,6 +1713,12 @@ ALTER TABLE `overtime`
   ADD CONSTRAINT `fk_overtime_users` FOREIGN KEY (`userid`) REFERENCES `users` (`userID`);
 
 --
+-- Các ràng buộc cho bảng `payrolldetails`
+--
+ALTER TABLE `payrolldetails`
+  ADD CONSTRAINT `payrolldetails_ibfk_1` FOREIGN KEY (`payID`) REFERENCES `payrolls` (`payID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Các ràng buộc cho bảng `payrolls`
 --
 ALTER TABLE `payrolls`
@@ -1907,12 +1742,6 @@ ALTER TABLE `rewardpunishmentdecisions`
 ALTER TABLE `rolespermissions`
   ADD CONSTRAINT `rolespermissions_ibfk_1` FOREIGN KEY (`roleID`) REFERENCES `roles` (`roleID`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `rolespermissions_ibfk_2` FOREIGN KEY (`permissionID`) REFERENCES `permissions` (`permissionID`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Các ràng buộc cho bảng `salaryvariables`
---
-ALTER TABLE `salaryvariables`
-  ADD CONSTRAINT `fk_salaryvariables_rule_fix` FOREIGN KEY (`rule_id`) REFERENCES `salary_rule` (`rule_id`);
 
 --
 -- Các ràng buộc cho bảng `schedulerequirements`

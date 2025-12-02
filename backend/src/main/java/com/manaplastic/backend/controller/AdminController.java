@@ -2,7 +2,9 @@
 package com.manaplastic.backend.controller;
 
 import com.manaplastic.backend.DTO.*;
+import com.manaplastic.backend.entity.MonthlypayrollconfigEntity;
 import com.manaplastic.backend.entity.UserEntity;
+import com.manaplastic.backend.repository.MonthlyPayrollConfigsRepository;
 import com.manaplastic.backend.service.AdminService;
 import com.manaplastic.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +13,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/admin")
@@ -28,6 +36,10 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    @Autowired
+    private MonthlyPayrollConfigsRepository monthlyPayrollConfigsRepository;
 
     //Xem thông tin
     @GetMapping("/profile")
@@ -127,4 +139,6 @@ public class AdminController {
 
         //return ResponseEntity.ok(updatedUser);
     }
+
+
 }

@@ -34,4 +34,11 @@ public class SalaryvariableEntity {
     @Column(name = "SQLQuery")
     private String sQLQuery;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rule_id")
+    private SalaryRuleEntity rule;
+
+    @Column(name = "dsl_version_id")
+    private Integer dslVersionId;
+
 }
