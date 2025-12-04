@@ -7,6 +7,8 @@ import com.manaplastic.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -95,9 +97,16 @@ public class HrController {
 //
 //        return ResponseEntity.ok(userList);
 //    }
+//    @GetMapping("/userFilter")
+//    public ResponseEntity<List<UserProfileDTO>> filterUsers(@ModelAttribute UserFilterCriteria criteria, Pageable pageable) {
+//        return ResponseEntity.ok(userService.filterUsersList(criteria, pageable));
+//    }
     @GetMapping("/userFilter")
-    public ResponseEntity<List<UserProfileDTO>> filterUsers(@ModelAttribute UserFilterCriteria criteria, Pageable pageable) {
-        return ResponseEntity.ok(userService.filterUsersList(criteria, pageable));
+    public ResponseEntity<Page<UserProfileDTO>> filterUsers(
+            @ModelAttribute UserFilterCriteria criteria,
+            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<UserProfileDTO> result = userService.filterUsersList(criteria, pageable);
+        return ResponseEntity.ok(result);
     }
 
     //lấy thông tin tài khoản nhân sự muốn xem
@@ -136,8 +145,9 @@ public class HrController {
 //        return ResponseEntity.ok(list);
 //    }
     @GetMapping("/chamCong")
-    public ResponseEntity<List<AttendanceDTO>> getMyAttendance(@ModelAttribute AttendanceFilterCriteria criteria) {
-        return ResponseEntity.ok(attendanceService.getFilteredAttendance(criteria));
+    public ResponseEntity<Page<AttendanceDTO>> getMyAttendance(@ModelAttribute AttendanceFilterCriteria criteria,
+                                                               @PageableDefault(page=0,size=10, sort = "date", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(attendanceService.getFilteredAttendance(criteria,pageable));
     }
 
     @DeleteMapping("/chamCong/{attendanceId}")

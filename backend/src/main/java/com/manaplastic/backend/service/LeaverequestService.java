@@ -6,9 +6,12 @@ import com.manaplastic.backend.DTO.LeaveRequestFilterCriteria;
 import com.manaplastic.backend.DTO.LeaverequestDTO;
 import com.manaplastic.backend.entity.*;
 import com.manaplastic.backend.filters.LeaveRequestFilter;
+import com.manaplastic.backend.filters.UserFilter;
 import com.manaplastic.backend.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -148,15 +151,21 @@ public class LeaverequestService {
     }
 
     // Danh sách đã lọc
-    public List<LeaverequestDTO> getFilteredRequests(LeaveRequestFilterCriteria criteria) {
-
+//    public List<LeaverequestDTO> getFilteredRequests(LeaveRequestFilterCriteria criteria) {
+//
+//        Specification<LeaverequestEntity> spec = LeaveRequestFilter.withCriteria(criteria);
+//        List<LeaverequestEntity> requests = leaveRequestRepository.findAll(spec);
+//
+//        return requests.stream()
+//                .map(this::mapToDTO)
+//                .collect(Collectors.toList());
+//    }
+    public Page<LeaverequestDTO> getFilteredRequests(LeaveRequestFilterCriteria criteria, Pageable pageable) {
         Specification<LeaverequestEntity> spec = LeaveRequestFilter.withCriteria(criteria);
-        List<LeaverequestEntity> requests = leaveRequestRepository.findAll(spec);
-
-        return requests.stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
+        Page<LeaverequestEntity> result = leaveRequestRepository.findAll(spec, pageable);
+        return result.map(this::mapToDTO);
     }
+
 
     // Duyệt đơn
     @Transactional
@@ -264,47 +273,47 @@ public class LeaverequestService {
         emailService.sendRejectionEmail(email, fullname, savedRequest);
     }
 
-    //Tạo số dư mới cho nhân sự mới
-    @Transactional
-    public void createUser(UserEntity user) {
-        userRepository.save(user); // Lưu user trước
-
-        int currentYear = LocalDate.now().getYear();
-
-        // Lấy TẤT CẢ các loại phép có trong bảng 'shifts' (AL, SL, PL, ML...)
-        List<ShiftEntity> leaveTypes = shiftRepository.findAllLeaveTypes();
-
-        for (ShiftEntity leaveType : leaveTypes) {
-            int daysToGrant = 0;
-
-            List<LeavepolicyEntity> policies = leavePolicyRepository.findPolicyMatches(
-                    leaveType.getShiftnameAsEnum(),
-                    0,
-                    user.getJobtype()
-            );
-            Optional<LeavepolicyEntity> policyOpt = policies.stream().findFirst();
-
-            if (policyOpt.isPresent()) {
-                daysToGrant = policyOpt.get().getDays();
-            }
-
-            // Tạo bản ghi số dư
-            LeavebalanceEntityId id = new LeavebalanceEntityId();
-            id.setUserID(user.getId());
-            id.setLeavetypeid(leaveType.getId());
-            id.setYear(currentYear);
-
-            LeavebalanceEntity newBalance = new LeavebalanceEntity();
-            newBalance.setId(id);
-            newBalance.setUserID(user);
-            newBalance.setLeaveType(leaveType);
-            newBalance.setTotalGranted(daysToGrant);
-            newBalance.setCarriedOver(0);
-            newBalance.setDaysUsed(0);
-
-            leaveBalanceRepository.save(newBalance);
-        }
-    }
+//    //Tạo số dư mới cho nhân sự mới
+//    @Transactional
+//    public void createUser(UserEntity user) {
+//        userRepository.save(user); // Lưu user trước
+//
+//        int currentYear = LocalDate.now().getYear();
+//
+//        // Lấy TẤT CẢ các loại phép có trong bảng 'shifts' (AL, SL, PL, ML...)
+//        List<ShiftEntity> leaveTypes = shiftRepository.findAllLeaveTypes();
+//
+//        for (ShiftEntity leaveType : leaveTypes) {
+//            int daysToGrant = 0;
+//
+//            List<LeavepolicyEntity> policies = leavePolicyRepository.findPolicyMatches(
+//                    leaveType.getShiftnameAsEnum(),
+//                    0,
+//                    user.getJobtype()
+//            );
+//            Optional<LeavepolicyEntity> policyOpt = policies.stream().findFirst();
+//
+//            if (policyOpt.isPresent()) {
+//                daysToGrant = policyOpt.get().getDays();
+//            }
+//
+//            // Tạo bản ghi số dư
+//            LeavebalanceEntityId id = new LeavebalanceEntityId();
+//            id.setUserID(user.getId());
+//            id.setLeavetypeid(leaveType.getId());
+//            id.setYear(currentYear);
+//
+//            LeavebalanceEntity newBalance = new LeavebalanceEntity();
+//            newBalance.setId(id);
+//            newBalance.setUserID(user);
+//            newBalance.setLeaveType(leaveType);
+//            newBalance.setTotalGranted(daysToGrant);
+//            newBalance.setCarriedOver(0);
+//            newBalance.setDaysUsed(0);
+//
+//            leaveBalanceRepository.save(newBalance);
+//        }
+//    }
 
     private int calculateCarryOver(Integer userId, int previousYear) {
         Optional<ShiftEntity> alShiftOpt = shiftRepository.findByShiftname("AL (Anually Leave)");

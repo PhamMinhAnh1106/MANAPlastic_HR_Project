@@ -6,8 +6,13 @@ import com.manaplastic.backend.DTO.LeaveRequestFilterCriteria;
 import com.manaplastic.backend.DTO.LeaverequestDTO;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.service.LeaverequestService;
+import jakarta.servlet.Filter;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +31,7 @@ import java.util.Map;
 public class LeaverequestController {
     @Autowired
     private LeaverequestService leaverequestService;
+
 
     //nhân viên và quản lý dùng chung đăng ký, xem, xóa đơn nghỉ phép ( HR thì chưa )
     @PostMapping("/user/leaverequest/addRequest")
@@ -74,52 +80,39 @@ public class LeaverequestController {
 //    @GetMapping("/user/leaverequest/filter")
 //    @PreAuthorize("hasAnyAuthority('Manager','HR')")
 //    public ResponseEntity<List<LeaverequestDTO>> getFilteredRequests(
-//            @RequestParam(required = false) Integer departmentId,
-//            @RequestParam(required = false) String username,
-//            @RequestParam(required = false) String status,
-//            @RequestParam(required = false)
-//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-//            LocalDate fromDate,
-//            @RequestParam(required = false)
-//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-//            LocalDate toDate,
+//            @ModelAttribute LeaveRequestFilterCriteria criteria,
 //            @AuthenticationPrincipal UserEntity currentUser) {
 //
-//        // Nếu là Manager, tự động lọc theo phòng ban của họ
-//        Integer effectiveDeptId = departmentId;
-//        if (currentUser.getAuthorities().contains("Manager")) {
-//            effectiveDeptId = currentUser.getDepartmentID().getId();
+//        boolean isManager = currentUser.getAuthorities().stream()
+//                .anyMatch(auth -> auth.getAuthority().equals("Manager"));
+//
+//        if (isManager) {
+//            if (currentUser.getDepartmentID() != null) {
+//                criteria.setDepartmentId(currentUser.getDepartmentID().getId());
+//            }
 //        }
-//
-//
-//        LeaveRequestFilterCriteria criteria = new LeaveRequestFilterCriteria(
-//                effectiveDeptId,
-//                username,
-//                status,
-//                fromDate,
-//                toDate
-//        );
 //
 //        List<LeaverequestDTO> requests = leaverequestService.getFilteredRequests(criteria);
 //        return ResponseEntity.ok(requests);
 //    }
     @GetMapping("/user/leaverequest/filter")
     @PreAuthorize("hasAnyAuthority('Manager','HR')")
-    public ResponseEntity<List<LeaverequestDTO>> getFilteredRequests(
-            @ModelAttribute LeaveRequestFilterCriteria criteria,
-            @AuthenticationPrincipal UserEntity currentUser) {
-
+    public ResponseEntity<Page<LeaverequestDTO>> getFilteredRequests(@ModelAttribute LeaveRequestFilterCriteria criteria,
+                                                                     @AuthenticationPrincipal UserEntity currentUser,
+                                                                     @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
         boolean isManager = currentUser.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("Manager"));
 
-        if (isManager) {
+        if (!isManager) {
+           //Là HR
+        }
+        else{
             if (currentUser.getDepartmentID() != null) {
                 criteria.setDepartmentId(currentUser.getDepartmentID().getId());
             }
         }
-
-        List<LeaverequestDTO> requests = leaverequestService.getFilteredRequests(criteria);
-        return ResponseEntity.ok(requests);
+        Page<LeaverequestDTO> result = leaverequestService.getFilteredRequests(criteria, pageable);
+        return ResponseEntity.ok(result);
     }
 
 

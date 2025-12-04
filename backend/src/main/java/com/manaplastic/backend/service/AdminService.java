@@ -1,9 +1,8 @@
 package com.manaplastic.backend.service;
 
 import com.manaplastic.backend.DTO.AdminUserDTO;
-import com.manaplastic.backend.entity.UserEntity;
-import com.manaplastic.backend.repository.RoleRepository;
-import com.manaplastic.backend.repository.UserRepository;
+import com.manaplastic.backend.entity.*;
+import com.manaplastic.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collector;
@@ -21,9 +21,14 @@ import java.util.stream.Collectors;
 public class AdminService {
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ShiftRepository shiftRepository;
+    @Autowired
+    private LeavePolicyRepository leavePolicyRepository;
+    @Autowired
+    private LeaveBalanceRepository leaveBalanceRepository;
 
     public UserEntity createUser(UserEntity newUser) {
         String password = String.valueOf(newUser.getCccd()); // lấy số cccd làm pass
@@ -69,18 +74,56 @@ public class AdminService {
         // Format username 6 số
         String generatedUsername = String.format("%06d", nextId);
         newUser.setUsername(generatedUsername);
+        UserEntity savedUser = userRepository.save(newUser);
 
-        return userRepository.save(newUser);
+        createInitialLeaveBalances(savedUser);
+
+        return savedUser;
     }
-    public List<AdminUserDTO> getAllUsersForDropdown() {
-        // Lấy tất cả user đang hoạt động (active)
-        // Giả sử trong UserEntity có phương thức getStatus()
-        List<UserEntity> users = userRepository.findAll();
 
+    private void createInitialLeaveBalances(UserEntity user) {
+        int currentYear = LocalDate.now().getYear();
+
+        List<ShiftEntity> leaveTypes = shiftRepository.findAllLeaveTypes();
+
+        for (ShiftEntity leaveType : leaveTypes) {
+            int daysToGrant = 0;
+
+            List<LeavepolicyEntity> policies = leavePolicyRepository.findPolicyMatches(
+                    leaveType.getShiftnameAsEnum(),
+                    0, // Nhân viên mới tinh thì thâm niên là 0
+                    user.getJobtype()
+            );
+
+            Optional<LeavepolicyEntity> policyOpt = policies.stream().findFirst();
+
+            if (policyOpt.isPresent()) {
+                daysToGrant = policyOpt.get().getDays();
+            }
+
+            LeavebalanceEntityId id = new LeavebalanceEntityId();
+            id.setUserID(user.getId());      // Lấy ID từ user vừa save xong
+            id.setLeavetypeid(leaveType.getId());
+            id.setYear(currentYear);
+
+            // Tạo bản ghi số dư
+            LeavebalanceEntity newBalance = new LeavebalanceEntity();
+            newBalance.setId(id);
+            newBalance.setUserID(user);
+            newBalance.setLeaveType(leaveType);
+            newBalance.setTotalGranted(daysToGrant);
+            newBalance.setCarriedOver(0); // Mới vào chưa có phép tồn
+            newBalance.setDaysUsed(0);    // Mới vào chưa dùng phép
+
+            leaveBalanceRepository.save(newBalance);
+        }
+    }
+
+    public List<AdminUserDTO> getAllUsersForDropdown() {
+        List<UserEntity> users = userRepository.findAll();
         return users.stream()
-                // Chỉ map những trường cần thiết
                 .map(u -> new AdminUserDTO(
-                        u.getId(), // Hoặc u.getId() tùy entity của bạn
+                        u.getId(),
                         u.getFullname(),
                         u.getUsername(),
                         u.getDepartmentID() != null ? u.getDepartmentID().getDepartmentname() : "N/A"

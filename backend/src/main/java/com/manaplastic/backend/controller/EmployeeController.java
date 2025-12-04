@@ -5,6 +5,10 @@ import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.service.AttendanceService;
 import com.manaplastic.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -86,11 +90,13 @@ public class EmployeeController {
 //        return ResponseEntity.ok(list);
 //    }
     @GetMapping("/chamCong")
-    public ResponseEntity<List<AttendanceDTO>> getMyAttendance(
+    public ResponseEntity<Page<AttendanceDTO>> getMyAttendance(
             @ModelAttribute AttendanceFilterCriteria criteria,
-            @AuthenticationPrincipal UserEntity currentUser) {
-        criteria.setUserId(currentUser.getId()); // Lấy user hiện tại để chỉ tr về đúng cảu user đó
-        return ResponseEntity.ok(attendanceService.getFilteredAttendance(criteria));
+            @AuthenticationPrincipal UserEntity currentUser,
+            @PageableDefault(page = 0, size= 10, sort = "date", direction = Sort.Direction.DESC) Pageable pageable) {
+        criteria.setUserId(currentUser.getId());
+        Page<AttendanceDTO> result = attendanceService.getFilteredAttendance(criteria, pageable);
+        return ResponseEntity.ok(result);
     }
 
 

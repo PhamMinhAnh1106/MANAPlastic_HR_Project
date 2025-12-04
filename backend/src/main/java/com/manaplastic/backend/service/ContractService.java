@@ -12,6 +12,8 @@ import com.manaplastic.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -112,11 +114,28 @@ public class ContractService {
     }
 
     //Lọc
-    public List<ContractDTO> searchContracts(ContractFilterCriteria filter) {
+//    public List<ContractDTO> searchContracts(ContractFilterCriteria filter) {
+//        Specification<ContractEntity> spec = ContractFilter.filterContracts(filter);
+//        List<ContractEntity> entities = contractRepository.findAll(spec);
+//        return entities.stream().map(this::mapToContractDTO).collect(Collectors.toList());
+//    }
+    public Page<ContractDTO> searchContracts(ContractFilterCriteria filter, Pageable pageable) {
         Specification<ContractEntity> spec = ContractFilter.filterContracts(filter);
+        Page<ContractEntity> pageResult = contractRepository.findAll(spec, pageable);
+
+        return pageResult.map(this::mapToContractDTO);
+    }
+
+    //Xuất file hdld
+    public ByteArrayInputStream exportContracts(ContractFilterCriteria criteria) {
+        Specification<ContractEntity> spec = ContractFilter.filterContracts(criteria);
         List<ContractEntity> entities = contractRepository.findAll(spec);
 
-        return entities.stream().map(this::mapToContractDTO).collect(Collectors.toList());
+        List<ContractDTO> dtos = entities.stream()
+                .map(this::mapToContractDTO)
+                .collect(Collectors.toList());
+
+        return ExcelHelper.contractsToExcel(dtos);
     }
 
     // Lấy ds hdld của nhân sự đó
@@ -149,15 +168,4 @@ public class ContractService {
         );
     }
 
-    //Xuất file hdld
-    public ByteArrayInputStream exportContracts(ContractFilterCriteria criteria) {
-        Specification<ContractEntity> spec = ContractFilter.filterContracts(criteria);
-        List<ContractEntity> entities = contractRepository.findAll(spec);
-
-        List<ContractDTO> dtos = entities.stream()
-                .map(this::mapToContractDTO)
-                .collect(Collectors.toList());
-
-        return ExcelHelper.contractsToExcel(dtos);
-    }
 }

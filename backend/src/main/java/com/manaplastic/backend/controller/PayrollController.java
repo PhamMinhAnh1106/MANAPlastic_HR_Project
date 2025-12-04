@@ -21,18 +21,15 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class PayrollController {
 
-    // Inject Engine mới
     @Autowired
     private PayrollEngineService payrollEngineService;
-    // Cần Repository để lấy danh sách nhân viên cần tính lương
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private JdbcTemplate jdbcTemplate; // test
+    private JdbcTemplate jdbcTemplate;
 
-    // API tính lương (Thay đổi logic để dùng Engine mới)
     @PostMapping("/calculate")
-    @PreAuthorize("hasAuthority('HR')") // Hoặc quyền ADMIN
+    @PreAuthorize("hasAuthority('HR')")
     public ResponseEntity<?> calculatePayroll(
             @RequestParam int month,
             @RequestParam int year) {
@@ -41,18 +38,12 @@ public class PayrollController {
                 return ResponseEntity.badRequest().body("Tháng không hợp lệ!");
             }
 
-            // 1. Lấy danh sách nhân viên đang hoạt động (Active)
-            // Giả sử UserRepository có hàm findByStatus. Nếu không, dùng findAll() rồi filter.
-            // List<UserEntity> employees = userRepository.findByStatus("active");
-            List<UserEntity> employees = userRepository.findAll(); // Lấy tạm tất cả để test
-
+//            List<UserEntity> employees = userRepository.findAll(); // TEST
+            List<UserEntity> employees = userRepository.findAllActiveUsers();
             int successCount = 0;
             StringBuilder errors = new StringBuilder();
-
-            // 2. Chạy vòng lặp tính lương cho từng người
             for (UserEntity emp : employees) {
                 try {
-                    // Gọi Engine tính toán
                     payrollEngineService.calculateSalaryForEmployee(emp.getId(), month, year);
                     successCount++;
                 } catch (Exception e) {
@@ -64,9 +55,7 @@ public class PayrollController {
             if (errors.length() > 0) {
                 message += ". Chi tiết lỗi: " + errors.toString();
             }
-
             return ResponseEntity.ok().body(message);
-
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Lỗi hệ thống: " + e.getMessage());
@@ -74,7 +63,7 @@ public class PayrollController {
     }
 
 
-    @GetMapping("/debug-details") // TEST
+    @GetMapping("/debug-details") // TEST xem lương, công thức
     @PreAuthorize("hasAuthority('HR')")
     public ResponseEntity<?> getPayrollDebugDetails(
             @RequestParam int employeeId,
@@ -91,7 +80,6 @@ public class PayrollController {
                     svc.evaluated_at,
                     -- Lấy công thức từ Rule Version mới nhất
                     (SELECT dsl_json FROM salary_rule_version srv WHERE srv.version_id = r.current_version_id) as formula_dsl,
-                    -- Hoặc lấy mô tả từ bảng variable nếu là biến input
                     v.Description as input_desc,
                     v.SQLQuery as input_sql
                 FROM salary_variable_cache svc

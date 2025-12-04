@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +24,7 @@ public class PayslipController {
 
     @Autowired
     private PayslipService payslipService;
+
     // Lấy của toi
     @GetMapping("/my-payslip")
     @PreAuthorize("isAuthenticated()")
@@ -42,26 +44,34 @@ public class PayslipController {
         }
     }
 
-    // Lọc
+    //    // Lọc
+//    @GetMapping("/filter")
+//    @PreAuthorize("hasAnyAuthority('HR', 'ADMIN')")
+//    public ResponseEntity<?> filterPayrolls(
+//            @ModelAttribute PayrollFilterCriteria criteria,
+//            // tham số phân trang
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "10") int size,
+//            @RequestParam(defaultValue = "netsalary") String sortBy,
+//            @RequestParam(defaultValue = "desc") String sortDir
+//    ) {
+//        try {
+//            Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+//            Pageable pageable = PageRequest.of(page, size, sort);
+//            Page<PayrollDTO> result = payslipService.getPayrollList(criteria, pageable);
+//            return ResponseEntity.ok(result);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.badRequest().body("Lỗi lọc lương: " + e.getMessage());
+//        }
+//    }
     @GetMapping("/filter")
-    @PreAuthorize("hasAnyAuthority('HR', 'ADMIN')")
-    public ResponseEntity<?> filterPayrolls(
+    @PreAuthorize("hasAuthority('HR')")
+    public ResponseEntity<Page<PayrollDTO>> filterPayrolls(
             @ModelAttribute PayrollFilterCriteria criteria,
-            // tham số phân trang
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "netsalary") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDir
-    ) {
-        try {
-            Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-            Pageable pageable = PageRequest.of(page, size, sort);
-            Page<PayrollDTO> result = payslipService.getPayrollList(criteria, pageable);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("Lỗi lọc lương: " + e.getMessage());
-        }
+            @PageableDefault(page = 0, size = 10, sort = "netsalary", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<PayrollDTO> result = payslipService.getPayrollList(criteria, pageable);
+        return ResponseEntity.ok(result);
     }
 
     // Lấy của user nhân sự muốn xem

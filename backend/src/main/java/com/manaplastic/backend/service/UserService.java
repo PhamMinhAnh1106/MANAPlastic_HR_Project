@@ -102,16 +102,22 @@ public class UserService {
         userRepository.save(currentUser);
     }
 
-    public List<UserProfileDTO> filterUsersList(UserFilterCriteria criteria, Pageable pageable) {
-
+    //    public List<UserProfileDTO> filterUsersList(UserFilterCriteria criteria, Pageable pageable) {
+//
+//        Specification<UserEntity> spec = UserFilter.withCriteria(criteria);
+//        Page<UserEntity> userPage = userRepository.findAll(spec, pageable);
+//        List<UserEntity> userEntities = userPage.getContent(); // chỉ lấy key "content"
+//
+//        // Mapping List<UserEntity> sang List<UserProfileDTO>
+//        return userEntities.stream()
+//                .map(this::mapToUserProfileDTO)
+//                .collect(Collectors.toList());
+//    }
+    public Page<UserProfileDTO> filterUsersList(UserFilterCriteria criteria, Pageable pageable) {
         Specification<UserEntity> spec = UserFilter.withCriteria(criteria);
         Page<UserEntity> userPage = userRepository.findAll(spec, pageable);
-        List<UserEntity> userEntities = userPage.getContent(); // chỉ lấy key "content"
 
-        // Mapping List<UserEntity> sang List<UserProfileDTO>
-        return userEntities.stream()
-                .map(this::mapToUserProfileDTO)
-                .collect(Collectors.toList());
+        return userPage.map(this::mapToUserProfileDTO);
     }
 
     @Transactional
@@ -169,9 +175,9 @@ public class UserService {
         }
 
         if (request.getDepartmentID() != null) {
-                DepartmentEntity department = departmentRepository.findById(request.getDepartmentID())
-                        .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng ban."));
-                userToUpdate.setDepartmentID(department);
+            DepartmentEntity department = departmentRepository.findById(request.getDepartmentID())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng ban."));
+            userToUpdate.setDepartmentID(department);
 
         }
 
@@ -184,17 +190,16 @@ public class UserService {
                 RoleEntity role = roleRepository.findById(request.getRoleID())
                         .orElseThrow(() -> new RuntimeException("Không tìm thấy vai trò."));
                 userToUpdate.setRoleID(role);
-            }
-            else if (isHR) {
+            } else if (isHR) {
                 throw new AccessDeniedException("HR không có quyền sửa vai trò của người dùng.");
             }
         }
 
-        if(request.getSkillGrade()!=null && (isAdmin || isHR)){
+        if (request.getSkillGrade() != null && (isAdmin || isHR)) {
             userToUpdate.setSkillGrade(request.getSkillGrade());
         }
 
-        if(request.getJobType()!=null && (isAdmin || isHR)){
+        if (request.getJobType() != null && (isAdmin || isHR)) {
             userToUpdate.setJobtype(request.getJobType());
         }
 

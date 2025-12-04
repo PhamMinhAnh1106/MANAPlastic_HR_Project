@@ -4,12 +4,16 @@ package com.manaplastic.backend.controller;
 import com.manaplastic.backend.DTO.*;
 import com.manaplastic.backend.entity.MonthlypayrollconfigEntity;
 import com.manaplastic.backend.entity.UserEntity;
+import com.manaplastic.backend.filters.UserFilter;
 import com.manaplastic.backend.repository.MonthlyPayrollConfigsRepository;
 import com.manaplastic.backend.service.AdminService;
 import com.manaplastic.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -116,19 +120,28 @@ public class AdminController {
 //
 //        return ResponseEntity.ok(userList);
 //    }
+
+    //    @GetMapping("/userFilter")
+//    public ResponseEntity<List<UserProfileDTO>> filterUsers(@ModelAttribute UserFilterCriteria criteria, Pageable pageable) {
+//        return ResponseEntity.ok(userService.filterUsersList(criteria, pageable));
+//    }
+    //Lọc
     @GetMapping("/userFilter")
-    public ResponseEntity<List<UserProfileDTO>> filterUsers(@ModelAttribute UserFilterCriteria criteria, Pageable pageable) {
-        return ResponseEntity.ok(userService.filterUsersList(criteria, pageable));
+    public ResponseEntity<Page<UserProfileDTO>> filterUsers(
+            @ModelAttribute UserFilterCriteria criteria,
+            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<UserProfileDTO> result = userService.filterUsersList(criteria, pageable);
+        return ResponseEntity.ok(result);
     }
 
-    //lấy thông tin tài khoản nhân sự muốn xem
+    // lấy thông tin tài khoản nhân sự muốn xem
     @GetMapping("/user/{userId}")
     public ResponseEntity<UserProfileDTO> getUserDetails(@PathVariable int userId) {
         UserProfileDTO userDetails = userService.getUserDetailsById(userId);
         return ResponseEntity.ok(userDetails);
     }
 
-    //sửa thông tin tài khoản cho nhân sự
+    // Sửa thông tin tài khoản cho nhân sự
     @PutMapping("/user/{userId}")
     public ResponseEntity<String> hrUpdateUser(
             @PathVariable int userId,

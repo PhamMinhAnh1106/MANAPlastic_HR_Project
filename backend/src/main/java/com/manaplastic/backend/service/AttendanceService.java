@@ -8,6 +8,8 @@ import com.manaplastic.backend.filters.AttendanceFilter;
 import com.manaplastic.backend.repository.AttendanceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -23,17 +25,22 @@ public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
 
     // Lấy ds từ ộ loọc
-    public List<AttendanceDTO> getFilteredAttendance(AttendanceFilterCriteria criteria) {
-
+//    public List<AttendanceDTO> getFilteredAttendance(AttendanceFilterCriteria criteria) {
+//
+//        Specification<AttendanceEntity> spec = AttendanceFilter.withCriteria(criteria);
+//        List<AttendanceEntity> entities = attendanceRepository.findAll(spec);
+//
+//        //  Mapping sang DTO
+//        return entities.stream()
+//                .map(this::mapToAttendanceDTO)
+//                .collect(Collectors.toList());
+//    }
+    public Page<AttendanceDTO> getFilteredAttendance(AttendanceFilterCriteria criteria, Pageable pageable) {
         Specification<AttendanceEntity> spec = AttendanceFilter.withCriteria(criteria);
-        List<AttendanceEntity> entities = attendanceRepository.findAll(spec);
+        Page<AttendanceEntity> result = attendanceRepository.findAll(spec,pageable);
+        return result.map(this::mapToAttendanceDTO);
 
-        //  Mapping sang DTO
-        return entities.stream()
-                .map(this::mapToAttendanceDTO)
-                .collect(Collectors.toList());
     }
-
     //xóa data
     public void deleteAttendance(int attendanceId) {
         attendanceRepository.deleteById(attendanceId);
