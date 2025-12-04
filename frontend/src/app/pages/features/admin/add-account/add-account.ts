@@ -33,7 +33,7 @@ export class AddAccount {
   constructor(private router: Router, private cdr: ChangeDetectorRef) { }
   account = {
     fullname: '',
-    cccd: BigInt(0),
+    cccd: '',
     role: 0,
     department: 0
   };
@@ -46,7 +46,7 @@ export class AddAccount {
   async onConfirmResult(event: any) {
     if (event == true) {
 
-      if (this.account.fullname == '' || this.account.cccd.toString().length < 10 || this.account.role.toString() == "" || this.account.department.toString() == "")
+      if (this.account.fullname == '' || this.account.cccd.length < 10 || this.account.role.toString() == "" || this.account.department.toString() == "")
         this.showNotification("vui long dien du thong tin", false);
       this.isloading = true;
       const res = await addAccount(this.account) as { data: string, status: number };
@@ -56,7 +56,7 @@ export class AddAccount {
         this.showNotification(res.data, true);
         this.account = {
           fullname: '',
-          cccd: BigInt(0),
+          cccd: '',
           role: 0,
           department: 0
         };

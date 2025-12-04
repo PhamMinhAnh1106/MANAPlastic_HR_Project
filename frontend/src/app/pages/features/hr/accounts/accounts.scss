@@ -1,3 +1,12 @@
+.flex {
+    display: flex;
+
+    label {
+        margin-left: 0.5rem;
+
+    }
+}
+
 .employee-container {
     z-index: 1;
     top: 4rem;
@@ -9,6 +18,26 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+}
+
+/* Trong file CSS của Component này */
+.table-section th {
+    cursor: pointer;
+    /* Thay đổi con trỏ để chỉ ra rằng nó có thể nhấp được */
+    position: relative;
+}
+
+.table-section th:hover {
+    background-color: #f0f0f0;
+    /* Hiệu ứng hover nhẹ */
+}
+
+.sort-icon {
+    position: absolute;
+    right: 5px;
+    /* Đặt biểu tượng mũi tên về phía bên phải */
+    font-size: 0.8em;
+    line-height: 1;
 }
 
 .filter-section {
@@ -60,12 +89,17 @@
 
 .advanced-filter {
     background: #fff;
+    position: absolute;
+    z-index: 10;
+    width: 100%;
+    max-width: 55rem;
+    top: 2.5rem;
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
     box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
-    animation: fadeIn 0.3s ease;
+    animation: _ngcontent-ng-c2149910290_fadeIn 0.3s ease;
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -150,6 +184,9 @@
     overflow-x: auto;
     flex: 1;
 
+    // .sortable {
+    //     display: flex;
+    // }
 
     table {
         width: 100%;
@@ -167,6 +204,8 @@
             position: sticky;
             top: 0;
             z-index: 2;
+
+            span {}
         }
 
         td {

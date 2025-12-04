@@ -1,15 +1,20 @@
 <div class="page-container">
 
   <!-- HEADER MENU -->
-  <div class="header">
-    <div class="menu-item" [class.active]="tab === 'check'" (click)="tab = 'check'">
+<div class="header">
+  <div class="menu-item" 
+       [class.active]="tab === 'check'" 
+       (click)="changeTab('check')">
       Kiểm tra hợp đồng
-    </div>
-
-    <div class="menu-item" [class.active]="tab === 'search'" (click)="tab = 'search'">
-      Tìm hợp đồng
-    </div>
   </div>
+
+  <div class="menu-item" 
+       [class.active]="tab === 'search'" 
+       (click)="changeTab('search')">
+      Tìm hợp đồng
+  </div>
+</div>
+
 
   <!-- RIGHT CONTENT -->
   <div class="content">
@@ -37,26 +42,27 @@
       <label>Loại hợp đồng</label>
       <select [(ngModel)]="filters.type">
         <option value="">-- Chọn loại --</option>
-        <option value="INDEFINITE">INDEFINITE</option>
-        <option value="FIXED_TERM">FIXED_TERM</option>
-        <option value="PROBATION">PROBATION</option>
+        <option value="INDEFINITE">Không xác định thời hạn</option>
+        <option value="FIXED_TERM">Có thời hạn</option>
+        <option value="PROBATION">Thử việc</option>
+
       </select>
 
-      <label>Status</label>
+      <label>Trạng thái hợp đồng</label>
       <select [(ngModel)]="filters.status">
         <option value="">-- Chọn status --</option>
         <option *ngFor="let st of statusContract" [value]="st">
-          {{st}}
+          {{translateContractStatus(st)}}
         </option>
       </select>
 
-      <label>Allowance Toxic Type</label>
-      <select [(ngModel)]="filters.allowanceToxicType">
-        <option value="">-- Chọn --</option>
-        <option value="NONE">NONE</option>
-        <option value="CASH">CASH</option>
-        <option value="IN_KIND">IN_KIND</option>
-      </select>
+        <label>Loại Phụ cấp Độc hại</label>
+        <select [(ngModel)]="filters.allowanceToxicType">
+          <option value="">-- Chọn --</option>
+          <option value="NONE">Không áp dụng</option>
+          <option value="CASH">Chi trả bằng Tiền mặt</option>
+          <option value="IN_KIND">Chi trả bằng Hiện vật</option>
+        </select>
 
       <label>Ngày hiệu lực (start)</label>
       <input type="date" [(ngModel)]="filters.startdate">
@@ -107,14 +113,14 @@
           <tr *ngFor="let c of listContracts">
             <td>{{ c.id }}</td>
             <td>{{ c.contractname }}</td>
-            <td>{{ c.type }}</td>
+            <td>{{ getVietnameseContractType(c.type) }}</td>
             <td>{{ c.basesalary }}</td>
             <td>{{ c.insuranceSalary }}</td>
-            <td>{{ c.allowanceToxicType }}</td>
+            <td>{{ translateAllowanceType(c.allowanceToxicType) }}</td>
             <td>{{ c.signdate }}</td>
             <td>{{ c.startdate }}</td>
             <td>{{ c.enddate }}</td>
-            <td>{{ c.status }}</td>
+            <td>{{ translateContractStatus(c.status) }}</td>
             <td>{{ c.username }}</td>
           <td>
   <ng-container *ngIf="c.fileurl; else noLink">
@@ -142,3 +148,7 @@
 
 
 <app-loading *ngIf="isloading"></app-loading>
+<app-alert   *ngIf="isalert"
+  [message]="notifyMessage"
+  [notifyType]="notifyType"
+  (hidden)="isalert = false"></app-alert>

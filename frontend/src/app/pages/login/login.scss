@@ -3,80 +3,116 @@
 .login-container {
     height: 100vh;
     width: 100%;
-    background: linear-gradient(135deg, #007bff, #00c6ff);
+
+    /* --- CẤU HÌNH ẢNH NỀN --- */
+    /* Thay thế dòng background cũ của bạn bằng dòng này */
+    background: linear-gradient(rgba(177, 177, 177, 0.374), rgba(255, 252, 252, 0.045)),
+        url('/assets/logologin.jpg') no-repeat center center;
+    background-size: cover;
+    /* Đảm bảo ảnh phủ kín */
+    background-size: cover;
+    /* Giúp ảnh phủ kín toàn bộ màn hình */
+    background-attachment: fixed;
+    /* (Tùy chọn) Giữ nền cố định khi cuộn */
+
+    /* Flexbox để căn giữa Form */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    color: white;
+    color: #333;
 
-    .welcome-box {
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    /* Thêm một lớp phủ tối nhẹ (Overlay) nếu muốn form nổi bật hơn trên nền ảnh */
+    /* Có thể bỏ dòng dưới nếu ảnh của bạn đã tối sẵn */
+    position: relative;
 
-        .logo {
-            width: 10rem;
-
-        }
-
-
-        .welcome-title {
-            font-size: 2rem;
-            font-weight: 700;
-
-            span {
-                color: #ffe600;
-            }
-        }
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3); // Phủ màu đen mờ 30%
+        z-index: 0;
     }
 
-    /* Form login */
-    .form_login {
-        margin-bottom: 7rem;
-        width: 18rem;
-        padding: 30px;
-        border: none;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        background-color: white;
-        border-radius: 12px;
-        color: black;
+    /* Đảm bảo Form nằm ĐÈ LÊN lớp phủ (z-index cao hơn) */
+    .form_login,
+    .box_response {
+        z-index: 1;
+    }
 
-        &_head {
-            text-align: center;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            color: #007bff;
-            font-weight: bold;
+    .form_login {
+        margin-bottom: 0;
+        width: 20rem;
+        padding: 40px 35px;
+        border: none;
+        /* Tăng độ đậm của bóng đổ để form tách biệt rõ khỏi ảnh nền */
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        background-color: white;
+        /* Giữ nền form màu trắng */
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        /* LOGO + TÊN THƯƠNG HIỆU */
+        .welcome-box {
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+
+            .logo {
+                width: 4rem;
+                height: auto;
+                object-fit: contain;
+            }
+
+            .brand-name {
+                font-size: 1.8rem;
+                font-weight: 700;
+                color: #007bff;
+                margin: 0;
+                line-height: 1;
+            }
         }
 
         &_body {
+            width: 100%;
+
             .form_login_text {
-                display: flex;
-                flex-direction: column;
+                width: 100%;
 
                 span {
-                    text-align: justify;
-                    margin-top: 10px;
-                    margin-bottom: 5px;
+                    display: block;
+                    text-align: left;
+                    margin-top: 15px;
+                    margin-bottom: 6px;
                     font-weight: 600;
-                    color: #333;
+                    color: #555;
+                    font-size: 0.9em;
                 }
 
                 input[type="text"],
                 input[type="password"] {
-                    padding: 10px;
-                    border: 1px solid #ddd;
+                    width: 100%;
+                    padding: 10px 12px;
+                    border: 1px solid #dcdcdc;
                     border-radius: 6px;
-                    margin-bottom: 10px;
+                    margin-bottom: 0;
                     font-size: 1em;
+                    box-sizing: border-box;
 
                     &:focus {
                         outline: none;
                         border-color: #007bff;
-                        box-shadow: 0 0 4px rgba(0, 123, 255, 0.3);
+                        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
                     }
                 }
             }
@@ -89,8 +125,9 @@
             color: white;
             border: none;
             cursor: pointer;
-            margin-top: 15px;
-            font-size: 1.1em;
+            margin-top: 25px;
+            font-size: 1.05em;
+            font-weight: 600;
             border-radius: 6px;
             transition: background 0.3s ease;
 
@@ -100,24 +137,55 @@
         }
     }
 
+    .forgot-password {
+        display: block;
+        width: 100%;
+        text-align: right;
+        margin: 12px 0 0 0;
+        color: #6c757d;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: color 0.2s;
+
+        &:hover {
+            color: #007bff;
+            text-decoration: underline;
+        }
+    }
+
     .box_response {
-        margin-top: 15px;
+        margin-top: 20px;
         @include app.box_response;
     }
 }
 
-.forgot-password {
-    display: block;
-    margin: 10px 0 0 0;
-    background: none;
-    border: none;
-    color: #1a73e8;
-    font-size: 0.9rem;
-    cursor: pointer;
-    text-decoration: underline;
-    transition: color 0.2s;
+/* 📱 RESPONSIVE MOBILE */
+@media (max-width: 500px) {
+    .login-container {
+        /* Mobile vẫn dùng ảnh nền, không đè bằng gradient nữa */
+        // background: linear-gradient(...) -> XÓA DÒNG NÀY
 
-    &:hover {
-        color: #155ab6;
+        .form_login {
+            width: 90%;
+            max-width: 320px;
+            padding: 30px 20px;
+
+            .welcome-box {
+                gap: 10px;
+
+                .logo {
+                    width: 3.5rem;
+                }
+
+                .brand-name {
+                    font-size: 1.5rem;
+                }
+            }
+
+            /* Màu chữ quên mật khẩu vẫn dùng màu xám hoặc xanh vì form vẫn màu trắng */
+            .forgot-password {
+                color: #007bff;
+            }
+        }
     }
 }

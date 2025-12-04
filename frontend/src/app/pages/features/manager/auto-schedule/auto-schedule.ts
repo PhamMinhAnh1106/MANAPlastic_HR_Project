@@ -86,18 +86,18 @@ export class AutoSchedule {
     this.rulesPopupVisible = false;
   }
 
-  async checkDraftSchedule() {
-    if (this.saveyear == "" || this.savemonth == "") {
-      this.Onalert("Hãy chọn tháng và năm", false);
-      return;
-    }
-    const month_year = `${this.saveyear}-${this.savemonth}`;
-    const res = await CheckAutoAssignSchedule(month_year);
-    this.draftData = res;
-    this.draftPopupVisible = true;
-    this.cdr.detectChanges();
+  // async checkDraftSchedule() {
+  //   if (this.saveyear == "" || this.savemonth == "") {
+  //     this.Onalert("Hãy chọn tháng và năm", false);
+  //     return;
+  //   }
+  //   const month_year = `${this.saveyear}-${this.savemonth}`;
+  //   const res = await CheckAutoAssignSchedule(month_year);
+  //   this.draftData = res;
+  //   this.draftPopupVisible = true;
+  //   this.cdr.detectChanges();
 
-  }
+  // }
 
   closeDraftPopup() {
     this.draftPopupVisible = false;
@@ -107,11 +107,11 @@ export class AutoSchedule {
     window.location.href = '/home/schedule';
   }
 
-  saveSchedule() {
-    this.isconfirm = true;
-    this.confirmMessage = "Bạn Muốn thêm tiêu chí này ?"
+  // saveSchedule() {
+  //   this.isconfirm = true;
+  //   this.confirmMessage = "Bạn Muốn thêm tiêu chí này ?"
 
-  }
+  // }
 
   requirementPopupVisible: boolean = false;
   rulesData: any = [];
@@ -122,19 +122,19 @@ export class AutoSchedule {
     const found = this.shiftName.find((x: any) => x.shift_id === id);
     return found ? found.shift_name : id;
   }
-  async checkRules() {
-    if (this.saveyear == "" || this.savemonth == "") {
-      this.Onalert("Hãy chọn tháng và năm", false);
-      return;
-    }
-    this.requirementPopupVisible = true;
-    const res = await GetRequirementsAutoSchedule();
-    this.rulesData = res;
-    this.rulesDatalength = res.length;
+  // async checkRules() {
+  //   if (this.saveyear == "" || this.savemonth == "") {
+  //     this.Onalert("Hãy chọn tháng và năm", false);
+  //     return;
+  //   }
+  //   this.requirementPopupVisible = true;
+  //   const res = await GetRequirementsAutoSchedule();
+  //   this.rulesData = res;
+  //   this.rulesDatalength = res.length;
+  //   console.log(this.rulesData);
+  //   this.cdr.detectChanges();
 
-    this.cdr.detectChanges();
-
-  }
+  // }
   closeRequirementPopup() {
     this.requirementPopupVisible = false;
   }
@@ -182,5 +182,78 @@ export class AutoSchedule {
     } else {
       this.isconfirm = false
     }
+  }
+
+  // Biến tạm cho hàng input trong bảng Rule
+  tempSkill: string = '';
+  tempMinStaff: string = '';
+
+  // Hàm thêm Rule vào bảng tạm (thay cho addRule cũ)
+  addRuleToTable() {
+    if (!this.tempSkill || !this.tempMinStaff) {
+      this.Onalert("Vui lòng nhập đầy đủ Cấp độ và Số lượng!", false);
+      return;
+    }
+
+    this.formSchedule.rules.push({
+      requiredSkillGrade: this.tempSkill,
+      minStaffCount: this.tempMinStaff
+    });
+
+    // Reset input tạm
+    this.tempSkill = '';
+    this.tempMinStaff = '';
+  }
+
+  // Hàm xóa Rule khỏi bảng
+  removeRule(index: number) {
+    this.formSchedule.rules.splice(index, 1);
+  }
+
+  // Hàm Save (cập nhật để lấy shiftId đúng)
+  saveSchedule() {
+    if (!this.shiftId || !this.formSchedule.totalStaffNeeded) {
+      this.Onalert("Vui lòng chọn Ca và nhập Tổng số NV cần!", false);
+      return;
+    }
+    this.formSchedule.shiftId = this.shiftId;
+    this.formSchedule.departmentId = sessionStorage.getItem("departmentId") ?? '';
+
+    this.isconfirm = true;
+    this.confirmMessage = "Bạn có chắc muốn lưu tiêu chí này?";
+  }
+
+  // Hàm kiểm tra tháng/năm trước khi mở popup
+  validateDateSelection(): boolean {
+    if (!this.saveyear || !this.savemonth) {
+      this.Onalert("Vui lòng chọn Tháng và Năm trước!", false);
+      return false;
+    }
+    return true;
+  }
+
+  // Cập nhật các hàm mở popup để dùng validate
+  async checkRules() {
+    if (!this.validateDateSelection()) return;
+
+    this.requirementPopupVisible = true;
+    const res = await GetRequirementsAutoSchedule();
+    // Lưu ý: Cần truyền tháng/năm vào API GetRequirements nếu API hỗ trợ lọc
+    this.rulesData = res;
+    this.rulesDatalength = res.length;
+    this.cdr.detectChanges();
+  }
+
+  async checkDraftSchedule() {
+    if (!this.validateDateSelection()) return;
+
+    const month_year = `${this.saveyear}-${this.savemonth}`;
+    const res = await CheckAutoAssignSchedule(month_year);
+    this.draftData = res;
+    this.draftPopupVisible = true;
+    this.cdr.detectChanges();
+  }
+  async updateRuleData() {
+
   }
 }

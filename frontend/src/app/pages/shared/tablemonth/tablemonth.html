@@ -1,6 +1,5 @@
 <div class="container">
 
-  <!-- FILTER / CONTROL -->
   <div class="filter">
     <label>Tháng:</label>
     <select [(ngModel)]="selectedMonth" (ngModelChange)="onMonthYearChange()">
@@ -11,10 +10,8 @@
     <input type="number" [(ngModel)]="selectedYear" min="2025" max="2027" (ngModelChange)="onMonthYearChange()" />
 
     <ng-content select="[extraControls]"></ng-content>
-
   </div>
 
-  <!-- CALENDAR -->
   <table class="calendar">
     <thead>
       <tr>
@@ -28,83 +25,108 @@
             [class.day-off]="day.isDayOff"
             (click)="onDayClick(day, rowIndex, colIndex)">
           
-          {{ day.inMonth ? day.date.getDate() : '' }}
+          <div class="day-number">{{ day.inMonth ? day.date.getDate() : '' }}</div>
 
+          <div class="shifts-container">
+            <ng-container *ngFor="let shift of day.shifts; let i = index">
+              
+              <div class="shift-block"
+                   *ngIf="!shift.isDayOff && i < 3"
+                   (click)="role === 'manager' && openEditShift(day, shift); $event.stopPropagation()">
 
-<!-- hiển thị các ca -->
-<ng-container *ngFor="let shift of day.shifts">
+                  <span *ngIf="role === 'manager'">
+                    {{ shift.employeeFullName || '???' }} - {{ shift.shiftName }}
+                  </span>
 
-  <!-- Ẩn hoàn toàn shift-block khi isDayOff = true -->
-  <div class="shift-block"
-       *ngIf="!shift.isDayOff"
-       (click)="role === 'manager' && openEditShift(day, shift); $event.stopPropagation()">
+                  <span *ngIf="role === 'employee'">
+                    {{ shift.shiftName }}
+                  </span>
+              </div>
 
-      <!-- Manager hiển thị tên nhân viên + tên ca -->
-      <span *ngIf="role === 'manager'">
-        {{ shift.employeeFullName || '???' }} - {{ shift.shiftName }}
-      </span>
+            </ng-container>
+          </div>
 
-      <!-- Employee hiển thị tên ca -->
-      <span *ngIf="role === 'employee'">
-        {{ shift.shiftName }}
-      </span>
-
-  </div>
-
-</ng-container>
-
-
-
+          <div class="more-shifts" 
+               *ngIf="day.shifts && day.shifts.length > 3"
+               (click)="openDayDetailsPopup(day); $event.stopPropagation()">
+                xem thêm
+          </div>
 
           <ng-content select="[extraDayContent]"></ng-content>
         </td>
       </tr>
     </tbody>
   </table>
-<div class="edit-popup" *ngIf="selectedShiftData && role === 'manager'">
 
-  <h3>Sửa ca làm việc</h3>
+  <div class="edit-popup" *ngIf="selectedShiftData && role === 'manager'">
+    <h3>Sửa ca làm việc</h3>
+    <p><strong>Nhân viên:</strong> {{ selectedShiftData.employeeFullName }}</p>
+    <p><strong>Ngày:</strong> {{ selectedShiftData.date }}</p>
 
-  <p><strong>Nhân viên:</strong> {{ selectedShiftData.employeeFullName }}</p>
-  <p><strong>Ngày:</strong> {{ selectedShiftData.date }}</p>
+    <label>Loại ca:</label>
+    <div class="type-group">
+      <label>
+        <input type="radio" name="type" (change)="changeType(8)" value="8" /> Ca 8 tiếng
+      </label>
+      <label>
+        <input type="radio" name="type" (change)="changeType(6)" value="6" /> Ca 6 tiếng
+      </label>
+    </div>
 
-  <label>Loại ca:</label>
-  <div class="type-group">
-    <label>
-      <input type="radio" name="type" (change)="changeType(8)" value="8" /> Ca 8 tiếng
-    </label>
+    <label>Chọn ca:</label>
+    <select [(ngModel)]="shiftId" name="shiftId" required>
+      <option [ngValue]="null" disabled selected>-- Chọn ca --</option>
+      <option *ngFor="let s of list" [value]="s.shift_id">
+        {{ s.shift_name }} | {{ s.start_time }} → {{ s.end_time }}
+      </option>
+      <option value="53">AL</option>
+      <option value="54">SL</option>
+      <option value="55">PL</option>
+      <option value="56">ML</option>
+      <option value="57">UL</option>
+    </select>
 
-    <label>
-      <input type="radio" name="type" (change)="changeType(6)" value="6" /> Ca 6 tiếng
-    </label>
+    <div class="btn-group">
+      <button class="save-btn" (click)="saveShift()">Lưu thay đổi</button>
+      <button class="cancel-btn" (click)="selectedShiftData = null">Hủy</button>
+    </div>
   </div>
 
-  <label>Chọn ca:</label>
-  <select [(ngModel)]="shiftId" name="shiftId" required>
-    <option [ngValue]="null" disabled selected>-- Chọn ca --</option>
-
-    <option *ngFor="let s of list" [value]="s.shift_id">
-      {{ s.shift_name }} | {{ s.start_time }} → {{ s.end_time }}
-    </option>
-
-    <option value="53">AL</option>
-    <option value="54">SL</option>
-    <option value="55">PL</option>
-    <option value="56">ML</option>
-    <option value="57">UL</option>
-  </select>
-
-  <div class="btn-group">
-    <button class="save-btn" (click)="saveShift()">Lưu thay đổi</button>
-    <button class="cancel-btn" (click)="selectedShiftData = null">Hủy</button>
+  <div class="day-details-popup-overlay" *ngIf="showDayDetailsPopup">
+    <div class="day-details-popup">
+      <div class="popup-header">
+        <h3>Danh sách ca ngày {{ selectedDayForDetails?.dateStr }}</h3>
+        <button class="close-btn" (click)="closeDayDetailsPopup()">&times;</button>
+      </div>
+      
+      <div class="popup-content">
+        <div class="shift-list-full">
+          <ng-container *ngFor="let shift of selectedDayForDetails?.shifts">
+             <div class="shift-item-row" 
+     *ngIf="!shift.isDayOff"
+     (click)="onDetailShiftClick(shift)">
+                
+                <div class="shift-info-row">
+                    <span class="time-badge">{{ shift.shiftName }}</span>
+                    
+                    <span class="emp-name" *ngIf="role === 'manager'">
+                        {{ shift.employeeFullName }}
+                    </span>
+                </div>
+             </div>
+          </ng-container>
+          
+          <div *ngIf="!selectedDayForDetails?.shifts?.length" class="no-data-text">
+              Không có ca làm việc nào.
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-
 
 </div>
-<app-loading 
-  *ngIf="isloading"
-></app-loading>
+
+<app-loading *ngIf="isloading"></app-loading>
 
 <app-comfirm
   *ngIf="isconfirm"

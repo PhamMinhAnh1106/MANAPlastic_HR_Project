@@ -198,28 +198,121 @@ select {
     }
 }
 
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
+/* -------------------------------------
+   1. ADJUST POPUP KÍCH THƯỚC CHUNG
+------------------------------------- */
+.popup {
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    // 💡 TĂNG MAX-WIDTH để chứa 2 cột dễ dàng hơn
+    max-width: 850px;
+    width: 90%;
+    /* Dùng % để responsive tốt hơn */
+
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
 }
 
+/* -------------------------------------
+   2. NỘI DUNG FORM CHUNG (Cho phép cuộn)
+------------------------------------- */
+.popup-content {
+    flex-grow: 1;
+    padding: 20px 30px;
+    max-height: 70vh;
+    /* Giới hạn chiều cao và cho phép cuộn */
+    overflow-y: auto;
+    /* Cho phép cuộn dọc */
+    padding-right: 15px;
+    /* Giảm padding right bị thừa */
+}
+
+/* -------------------------------------
+   3. FORM GRID (2 Cột Mặc định)
+------------------------------------- */
+.form-grid {
+    // 💡 SỬA LỖI: Chia 2 cột bằng nhau (1fr 1fr)
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    /* Tăng khoảng cách giữa 2 cột */
+}
+
+.col {
+    display: contents;
+    /* 💡 OPTIMIZATION: Cho phép các phần tử con (label, input)
+                          tương tác trực tiếp với grid cha (form-grid) */
+}
+
+/* Style cơ bản cho Label và Input (Tái định nghĩa lại để áp dụng cho cả hai cột) */
 .col label {
     display: block;
     font-weight: 600;
     margin-top: 10px;
+    grid-column: span 1;
+    /* Mỗi label chiếm 1 cột */
+    font-size: 0.9rem;
+    color: #444;
 }
 
-.col input,
+.col input[type="text"],
+.col input[type="number"],
+.col input[type="date"],
+.col input[type="file"],
 .col select {
     width: 100%;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
     margin-top: 4px;
+    grid-column: span 1;
+    /* Mỗi input chiếm 1 cột */
+    font-size: 0.95rem;
+    box-sizing: border-box;
 }
 
-.popup-content {
-    max-height: 80vh;
-    padding-right: 10px;
+/* -------------------------------------
+   4. RESPONSIVE DESIGN (Chuyển sang 1 cột)
+------------------------------------- */
+@media (max-width: 768px) {
+
+    .popup {
+        max-width: 95%;
+
+    }
+
+    .popup-header {
+        h3 {
+            font-size: 1rem !important;
+
+        }
+    }
+
+    .form-grid {
+        // 💡 CHUYỂN SANG 1 CỘT DUY NHẤT
+        grid-template-columns: 1fr;
+        gap: 0;
+        /* Loại bỏ gap ngang */
+    }
+
+    /* Đảm bảo các phần tử con không bị lỗi chiếm cột */
+    .col label,
+    .col input,
+    .col select {
+        grid-column: 1 / -1;
+        /* Bắt tất cả các phần tử chiếm toàn bộ 1 cột */
+    }
+
+    /* Điều chỉnh lại khoảng cách giữa các trường khi ở chế độ 1 cột */
+    .col label {
+        margin-top: 15px;
+    }
+
+    .popup-content {
+        padding: 15px;
+    }
 }

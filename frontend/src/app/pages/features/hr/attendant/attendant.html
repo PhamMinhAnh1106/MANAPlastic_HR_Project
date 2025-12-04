@@ -61,10 +61,10 @@
           <td>{{ att.userName || 'Chưa có' }}</td>
           <td>{{ att.fullNameUser || 'Chưa có' }}</td>
           <td>{{ att.attendanceDate }}</td>
-          <td>{{ att.checkIn || 'Chưa có' }}</td>
-          <td>{{ att.checkOut || 'Chưa có' }}</td>
+          <td>{{ getTime(att.checkIn) || 'Chưa có' }}</td>
+          <td>{{ getTime(att.checkOut) || 'Chưa có' }}</td>
           <td>{{ att.shiftName || 'Chưa có' }}</td>
-          <td>{{ att.status || 'Chưa có' }}</td>
+          <td>{{ translateStatus(att.status) || 'Chưa có' }}</td>
           <td>
             <button class="proof-btn" (click)="showProof(att)"><span class="material-symbols-outlined">
 visibility

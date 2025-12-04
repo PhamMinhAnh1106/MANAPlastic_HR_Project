@@ -2,7 +2,7 @@ import { api } from "../../../api.service";
 
 interface addaccount {
     fullname: string,
-    cccd: bigint,
+    cccd: string,
     role: number,
     department: number
 }

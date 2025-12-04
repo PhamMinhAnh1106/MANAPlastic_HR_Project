@@ -1,65 +1,62 @@
+// --- 1. GLOBAL SETTINGS ---
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f5f6fa; // Màu nền nhạt cho body
+    overflow-x: hidden; // Tránh thanh cuộn ngang
+}
+
+// --- 2. HEADER (TASK BAR) ---
 .task-bar {
-    position: fixed; // Cố định thanh bar ở trên cùng
+    position: fixed;
     top: 0;
     left: 0;
-
-    width: 100%; // Chiếm toàn bộ chiều rộng
-
-    background-color: #2e3b61; // Màu nền tối
+    width: 100%;
+    height: 60px;
+    background-color: #2e3b61;
     color: white;
-
     padding: 0 20px;
-    height: 60px; // Chiều cao cố định
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // Thêm bóng đổ nhẹ
-
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
-    justify-content: flex-end; // Căn cách đều các phần
-    align-items: center; // Căn giữa theo chiều dọc
-    z-index: 10; // Đảm bảo thanh bar nằm trên các nội dung khác
+    justify-content: flex-end; // Mặc định căn phải cho Desktop
+    align-items: center;
+    z-index: 100; // Z-index cao để luôn nổi
+    box-sizing: border-box;
+
+    // Nút menu mobile (Mặc định ẩn trên Desktop)
+    .mobile-menu-btn {
+        display: none;
+        cursor: pointer;
+        margin-right: auto; // Đẩy các phần tử khác sang phải
+
+        span {
+            font-size: 28px;
+            color: white;
+        }
+    }
 }
 
-.logo {
-    font-size: 1.5em;
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: none;
-    color: white;
-}
-
-
-
-// ///////////////////////////////////////////
+// User Actions (Copy từ code cũ, chỉnh sửa nhẹ)
 .user-actions {
     display: flex;
     align-items: center;
     gap: 1rem;
-    position: relative;
-    right: 1.4rem;
 
     .add-dropdown,
     .user-dropdown {
         position: relative;
 
-        span {
-            font-size: 0.8rem;
-        }
-
-        .add-icon,
-        .avatar {
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
         .add-icon {
             color: #2c3e50;
-            border-radius: 50%;
             background: #f1f1f1;
-
-
+            padding: 5px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
 
             &:hover {
+                transform: scale(1.1);
                 background: #e0e0e0;
-                transform: scale(1.05);
             }
         }
 
@@ -67,9 +64,9 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            object-fit: cover;
+            cursor: pointer;
             border: 2px solid #fff;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            object-fit: cover;
 
             &:hover {
                 transform: scale(1.05);
@@ -78,27 +75,23 @@
 
         .dropdown-menu {
             position: absolute;
-            top: 110%;
+            top: 120%;
             right: 0;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
             min-width: 160px;
-            z-index: 10;
-            animation: fadeIn 0.25s ease;
+            overflow: hidden;
+            z-index: 101;
 
             .menu-btn,
             .logout-btn {
                 width: 100%;
                 background: none;
                 border: none;
-                color: #333;
                 text-align: left;
-                padding: 0.5rem 0.5rem;
-                font-size: 14px;
+                padding: 10px 15px;
                 cursor: pointer;
-                transition: background 0.3s ease;
 
                 &:hover {
                     background: #eae5d4;
@@ -107,139 +100,179 @@
 
             .logout-btn:hover {
                 background: red;
-                color: #fff;
+                color: white;
             }
         }
     }
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-// /////////////////////////////////////////
-
-body {
-    display: flex;
-    flex-direction: column;
-}
-
+// --- 3. SIDEBAR (LEFT HANDLE) ---
 .left_handle {
+    position: fixed;
+    top: 0; // Bắt đầu từ đỉnh
+    left: 0;
+    height: 100vh; // Full chiều cao
+    width: 4rem; // Chiều rộng mặc định Desktop
+    background-color: #1c2655;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    height: 100%;
-    width: 4rem;
-    z-index: 11;
-    position: fixed;
-    background-color: #1c2655;
-
-    .menu-item {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        width: 100%;
-    }
-
-    .menu-icon {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        color: #fff;
-        text-decoration: none;
-        padding: 0.6rem 0;
-        transition: all 0.2s ease-in-out;
-        width: 100%;
-
-        &:hover {
-            background-color: #b7b6b6;
-            color: #000;
-
-        }
-
-        .icon {
-            font-size: 1.3rem;
-            margin-left: 0.3rem;
-            margin-bottom: 0.2rem;
-        }
-    }
-
-    .submenu {
-        display: flex;
-        flex-direction: column;
-        animation: fadeIn 0.2s ease-in-out;
-        text-align: center;
-        width: 100%;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(-5px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-
-    .submenu-link {
-        font-size: 0.5rem;
-        color: #fff;
-        text-decoration: none;
-        padding: 0.2rem 0;
-        transition: color 0.2s;
-
-        &:hover {
-            color: #90ee90;
-        }
-    }
-
-    .active {
-        color: greenyellow;
-    }
-
-
-
-}
-
-.nav-links {
-    display: flex;
-    justify-content: center;
     align-items: center;
-    width: 100%;
-    height: 4rem;
-    background: transparent;
+    z-index: 100; // Cao hơn Header 1 chút để đè lên nếu cần
+    transition: all 0.3s ease-in-out; // Hiệu ứng trượt mượt mà
+    padding-top: 4rem; // Tránh đè lên logo, hoặc để 0 nếu muốn logo nằm trong sidebar
 
-    .nav-item {
+    .nav-links {
+        height: 4rem;
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: #fff; // nền trắng
-        border-radius: 50%; // bo tròn
-        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1); // đổ bóng nhẹ
-        transition: all 0.3s ease;
+        margin-bottom: 1rem;
 
-        &:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
-        }
+        // Nếu muốn logo nằm trên cùng thanh sidebar
+        position: absolute;
+        top: 0;
 
-        img {
+        .nav-item img {
             width: 3rem;
             height: 3rem;
             border-radius: 50%;
-            object-fit: cover;
+            background: #fff;
         }
+    }
+
+    .menu-item {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .menu-icon {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 0;
+            width: 100%;
+            text-align: center;
+            transition: background 0.2s;
+
+            &:hover {
+                background-color: #b7b6b6;
+                color: #000;
+            }
+
+            &.active {
+                color: greenyellow;
+            }
+
+            .icon {
+                font-size: 1.5rem;
+            }
+        }
+
+        .submenu {
+            width: 100%;
+
+            .submenu-link {
+                display: block;
+                color: #ddd;
+                text-decoration: none;
+                font-size: 0.7rem; // Chữ nhỏ cho icon mode
+                padding: 8px 0;
+                text-align: center;
+
+                &:hover {
+                    color: #90ee90;
+                }
+
+                &:focus {
+                    color: #90ee90;
+                }
+            }
+        }
+    }
+}
+
+// --- 4. MAIN CONTENT (NỘI DUNG CHÍNH) ---
+.main-content {
+    transition: margin-left 0.3s ease-in-out;
+    min-height: calc(100vh - 60px);
+}
+
+// --- 5. OVERLAY (LỚP PHỦ) ---
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100; // Thấp hơn sidebar nhưng cao hơn content
+    display: none; // Mặc định ẩn
+}
+
+
+// ==========================================
+// --- 6. RESPONSIVE (MOBILE & TABLET) ---
+// ==========================================
+@media (max-width: 768px) {
+
+    // Header: Hiện nút menu
+    .task-bar {
+        justify-content: space-between; // Tách nút menu và user
+        padding-left: 15px;
+
+        .mobile-menu-btn {
+            display: block; // Hiện nút menu
+        }
+    }
+
+    // Sidebar: Ẩn đi, chờ kích hoạt
+    .left_handle {
+        width: 250px; // Rộng hơn để dễ nhìn trên điện thoại
+        left: -250px; // Ẩn sang trái
+        align-items: flex-start; // Căn lề trái cho nội dung bên trong
+
+        // Khi mở menu
+        &.show {
+            left: 0; // Trượt ra
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-links {
+            position: relative; // Reset lại vị trí logo
+            width: 100%;
+            margin-top: -60px; // Điều chỉnh nếu cần
+            background: #151c42;
+        }
+
+        // Chỉnh lại item bên trong cho đẹp mắt kiểu danh sách
+        .menu-item {
+            .menu-icon {
+                display: flex;
+                flex-direction: row; // Icon và chữ nằm ngang (nếu bạn có thêm text cho menu cha)
+                align-items: center;
+                padding-left: 20px;
+                text-align: left;
+
+                .icon {
+                    margin-right: 10px;
+                }
+            }
+
+            .submenu .submenu-link {
+                font-size: 0.9rem; // Chữ to hơn trên mobile
+                padding-left: 20px;
+                text-align: left;
+            }
+        }
+    }
+
+    // Main Content: Full màn hình
+    .main-content {
+        margin-left: 0; // Không chừa chỗ cho sidebar nữa
+    }
+
+    // Overlay: Hiện khi menu mở
+    .overlay {
+        display: block;
     }
 }

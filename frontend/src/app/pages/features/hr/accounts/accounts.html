@@ -60,21 +60,29 @@
   </div>
   <!-- Bảng dữ liệu -->
   <div class="table-section">
-    <table *ngIf="employee && employee.length > 0; else noData">
-      <thead>
-        <tr>
-          <th>Mã NV</th>
-          <th>Username</th>
-          <th>Họ tên</th>
-          <th>CCCD</th>
-          <th>Email</th>
-          <th>SĐT</th>
-          <th>Giới tính</th>
-          <th>Ngày sinh</th>
-          <th>Phòng ban</th>
-          <th>Hành động</th>
-        </tr>
-      </thead>
+        <table *ngIf="employee && employee.length > 0; else noData">
+          <thead>
+            <tr>
+              <th class="sortable" (click)="sort('id')">
+                Mã NV<span class="material-symbols-outlined sort-indicator">arrow_drop_down</span>
+              </th>
+              <th>Username</th>
+              <th class="sortable" (click)="sort('name')">
+                Họ tên <span class="material-symbols-outlined sort-indicator">arrow_drop_down</span>
+              </th>
+              <th>CCCD</th>
+              <th>Email</th>
+              <th>SĐT</th>
+              <th class="sortable" (click)="sort('gender')">
+                Giới tính <span class="material-symbols-outlined sort-indicator">arrow_drop_down</span>
+              </th>
+              <th class="sortable" (click)="sort('born')">
+                Ngày sinh <span class="material-symbols-outlined sort-indicator">arrow_drop_down</span>
+              </th>
+              <th>Phòng ban</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
 
       <tbody>
         <tr *ngFor="let emp of employee[0]" >
@@ -169,8 +177,27 @@ stylus
   <option value="Employee">Employee</option>
 </select>
 
-          <label>Trạng thái</label>
-          <input [(ngModel)]="selectedEmployee.status" />
+<label>Trạng thái</label>
+
+<div class="flex">
+  <label>
+    <input
+      type="radio"
+      [(ngModel)]="selectedEmployee.status"
+      value="active"
+    />
+    Hoạt Động
+  </label>
+
+  <label >
+    <input
+      type="radio"
+      [(ngModel)]="selectedEmployee.status"
+      value="inactive"
+    />
+    Ngừng Hoạt Động
+  </label>
+</div>
 
           <label>Phòng ban</label>
                 <select [(ngModel)]="selectedEmployee.departmentID" >

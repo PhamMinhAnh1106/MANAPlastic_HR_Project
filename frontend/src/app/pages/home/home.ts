@@ -29,6 +29,20 @@ export class Home implements OnInit {
       this.isUserOpen = false;
     }
   }
+
+
+
+  isMenuOpen: boolean = false; // Biến trạng thái menu mobile
+
+  // Hàm bật tắt menu
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  // Hàm đóng menu (dùng khi click vào overlay hoặc link)
+  closeMenu() {
+    this.isMenuOpen = false;
+  }
   //cac thuoc tinh khoi tao de luu tru 
   token: string = "";
   role: string[] = [];
@@ -112,7 +126,7 @@ export class Home implements OnInit {
           {
             iconName: "calendar_month", path: "/home/user/attendance", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" },
             { name: "Lịch làm việc", path: "/home/schedule" }, { name: "Quản lí phép", path: "/home/leaverequest/manage" }]
-          }
+          }, { iconName: "assignment_add", path: "/home/leaverequest", task: [{ name: "Nghỉ Phép", path: "/home/leaverequest" }] }
         ]
         icon.push(...icon_manager)
         this.icon_handleBar = icon;

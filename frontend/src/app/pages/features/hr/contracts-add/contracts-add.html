@@ -22,7 +22,7 @@
               <label>Loại hợp đồng</label>
               <select [(ngModel)]="contract.type" name="type" required>
                 <option disabled value="">-- Chọn loại hợp đồng --</option>
-                <option *ngFor="let type of contractType" [value]="type">{{ type }}</option>
+                <option *ngFor="let type of contractType" [value]="type">{{ getVietnameseContractType(type) }}</option>
               </select>
 
 

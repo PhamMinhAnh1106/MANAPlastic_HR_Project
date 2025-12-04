@@ -58,6 +58,7 @@ export class Attendant implements OnInit {
     this.selectedProof = att;
   }
 
+
   closeProof() {
     this.selectedProof = null;
   }
@@ -103,7 +104,29 @@ export class Attendant implements OnInit {
   saveAttendance(updated: any) {
     this.selectedAttendance = null;
   }
+  translateStatus(status: string): string {
+    switch (status) {
+      case 'PRESENT':
+        return "Có mặt";
+      case 'ABSENT':
+        return "Vắng mặt";
+      case 'LATE_AND_EARLY':
+        return "Đi trễ / Về sớm";
+      case 'ON_LEAVE':
+        return "Nghỉ phép";
+      case 'MISSING_OUTPUT_DATA':
+        return "Thiếu dữ liệu check-out";
+      case 'MISSING_INPUT_DATA':
+        return "Thiếu dữ liệu check-in";
+      default:
+        return "Không xác định";
+    }
+  }
 
+  getTime(datetime: string): string {
+    const date = new Date(datetime);
+    return date.toTimeString().split(" ")[0]; // HH:mm:ss
+  }
   async onConfirmResult(event: any) {
     if (event == true) {
       this.isconfirm = false;

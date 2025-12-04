@@ -23,7 +23,39 @@ interface DayObj {
   styleUrl: './tablemonth.scss',
 })
 export class Tablemonth implements OnInit, OnChanges {
+  showDayDetailsPopup: boolean = false;
+  selectedDayForDetails: any = null;
+  onDetailShiftClick(shift: any) {
+    // Chỉ Manager mới được phép sửa
+    if (this.role === 'manager') {
+      // 1. Mở popup sửa (sử dụng ngày đang được chọn trong popup chi tiết)
+      this.openEditShift(this.selectedDayForDetails, shift);
 
+      // 2. Đóng popup danh sách chi tiết
+      this.closeDayDetailsPopup();
+    }
+  }
+  // Hàm mở Popup Chi tiết khi bấm "Xem thêm"
+  openDayDetailsPopup(day: any) {
+    // Format lại ngày để hiển thị đẹp trên header popup
+    const dateObj = new Date(day.date);
+    const dayStr = ('0' + dateObj.getDate()).slice(-2);
+    const monthStr = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+    const yearStr = dateObj.getFullYear();
+
+    this.selectedDayForDetails = {
+      ...day,
+      dateStr: `${dayStr}/${monthStr}/${yearStr}`
+    };
+
+    this.showDayDetailsPopup = true;
+  }
+
+  // Hàm đóng Popup Chi tiết
+  closeDayDetailsPopup() {
+    this.showDayDetailsPopup = false;
+    this.selectedDayForDetails = null;
+  }
   selectedMonth: number = new Date().getMonth() + 1;
   selectedYear: number = new Date().getFullYear();
   ////////////////////////

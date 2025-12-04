@@ -36,7 +36,9 @@ export class ForgetPassword implements OnInit {
   }
   ///////////////////////// 
 
-
+  backToLogin() {
+    this.router.navigate(["/login"])
+  }
   async sendEmail(email: string) {
     if (!email) {
       this.Onalert('Vui lòng nhập email', false);

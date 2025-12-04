@@ -17,6 +17,10 @@ import { Alert } from '../../../shared/alert/alert';
   styleUrl: './accounts.scss',
 })
 export class Accounts implements OnInit {
+  sortByIdDesc: boolean = false;
+  sortByUsernameDesc: boolean = false;
+  sortByGenderDesc: boolean = false;
+  sortByBirthdayDesc: boolean = false;
   constructor(private cdr: ChangeDetectorRef, private cookie: CookieService) { }
   employee: any = [];
   editID: number | null = null;
@@ -129,5 +133,95 @@ export class Accounts implements OnInit {
   ngOnInit(): void {
     this.role = this.cookie.get("role");
 
+  }
+  sort(x: any) {
+
+    switch (x) {
+      case 'id':
+        // Nếu hiện tại đang DESC → sort ASC
+        if (this.sortByIdDesc) {
+          const data = this.employee[0].slice().sort(
+            (a: { userID: number }, b: { userID: number }) => a.userID - b.userID
+          );
+          this.employee[0] = data;
+        }
+        // Nếu hiện tại đang ASC → sort DESC
+        else {
+          const data = this.employee[0].slice().sort(
+            (a: { userID: number }, b: { userID: number }) => b.userID - a.userID
+          );
+          this.employee[0] = data;
+        }
+
+        // Đảo lại trạng thái toggle
+        this.sortByIdDesc = !this.sortByIdDesc;
+
+        this.cdr.detectChanges();
+        break;
+      case 'name':
+        if (this.sortByUsernameDesc) {
+          // Sort tăng dần (A → Z)
+          const data = this.employee[0].slice().sort(
+            (a: any, b: any) => a.username.localeCompare(b.username)
+          );
+          this.employee[0] = data;
+        } else {
+          // Sort giảm dần (Z → A)
+          const data = this.employee[0].slice().sort(
+            (a: any, b: any) => b.username.localeCompare(a.username)
+          );
+          this.employee[0] = data;
+        }
+
+        // Toggle
+        this.sortByUsernameDesc = !this.sortByUsernameDesc;
+
+        this.cdr.detectChanges();
+        break;
+      case 'gender':
+        if (this.sortByGenderDesc) {
+          // Tăng dần: Nữ (false) → Nam (true)
+          const data = this.employee[0].slice().sort(
+            (a: any, b: any) => Number(a.gender) - Number(b.gender)
+          );
+          this.employee[0] = data;
+        } else {
+          // Giảm dần: Nam (true) → Nữ (false)
+          const data = this.employee[0].slice().sort(
+            (a: any, b: any) => Number(b.gender) - Number(a.gender)
+          );
+          this.employee[0] = data;
+        }
+
+        // Toggle
+        this.sortByGenderDesc = !this.sortByGenderDesc;
+
+        this.cdr.detectChanges();
+        break;
+      case 'born':
+        if (this.sortByBirthdayDesc) {
+          // Tăng dần: Ngày cũ (1990 → 2000)
+          const data = this.employee[0].slice().sort(
+            (a: any, b: any) =>
+              new Date(a.birth).getTime() - new Date(b.birth).getTime()
+          );
+          this.employee[0] = data;
+        } else {
+          // Giảm dần: Ngày mới (2000 → 1990)
+          const data = this.employee[0].slice().sort(
+            (a: any, b: any) =>
+              new Date(b.birth).getTime() - new Date(a.birth).getTime()
+          );
+          this.employee[0] = data;
+        }
+
+        // Toggle đảo chiều
+        this.sortByBirthdayDesc = !this.sortByBirthdayDesc;
+
+        this.cdr.detectChanges();
+        break;
+
+
+    }
   }
 }

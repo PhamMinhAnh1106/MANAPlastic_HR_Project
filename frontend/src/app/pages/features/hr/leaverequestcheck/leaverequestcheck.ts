@@ -44,7 +44,6 @@ export class Leaverequestcheck {
     if (this.filter.status == '') {
       this.leaveRequests = res;
       this.cdr.detectChanges();
-
       return;
     }
     this.leaveRequests = res.filter(item => item.status === this.filter.status)
@@ -66,6 +65,7 @@ export class Leaverequestcheck {
       this.isconfirm = false;
     }
   }
+
   async onConfirmResult(event: any) {
     if (!event) {
       this.isconfirm = false;
@@ -76,14 +76,16 @@ export class Leaverequestcheck {
 
     if (this.actionType === 'approve') {
       const res = await Approveleaverequest(this.id) as { data: string, status: number };
-      this.Onalert(res.data, res.status === 201);
+      this.Onalert(res.data, true);
       this.filterLeave();
+      return;
     }
 
     if (this.actionType === 'reject') {
       const res = await Rejectleaverequest(this.id) as { data: string, status: number };
-      this.Onalert(res.data, res.status === 201);
+      this.Onalert(res.data, true);
       this.filterLeave();
+
     }
 
     this.actionType = '';
@@ -101,6 +103,19 @@ export class Leaverequestcheck {
     this.id = id;
     this.actionType = 'reject';
   }
-
+  getVietnameseLeaveType(type: string): string {
+    switch (type) {
+      case 'ANNUAL':
+        return 'Nghỉ Phép Thường Niên';
+      case 'SICK':
+        return 'Nghỉ Ốm/Bệnh';
+      case 'MATERNITY':
+        return 'Nghỉ Thai Sản (Mẹ)';
+      case 'PATERNITY':
+        return 'Nghỉ Thai Sản (Cha)';
+      default:
+        return 'Không Xác Định';
+    }
+  }
 
 }

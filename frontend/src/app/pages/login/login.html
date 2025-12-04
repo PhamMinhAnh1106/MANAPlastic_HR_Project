@@ -11,20 +11,16 @@
       </div>
   </div>
 
-  <!-- Logo + Welcome -->
-  <div class="welcome-box">
-    <img src="assets/logo.png" alt="logo" class="logo">
-    <h1 class="welcome-title">Welcome to <span>ManaPlastic</span></h1>
-  </div>
-
-  <!-- Login Form -->
   <div class="form_login">
-    <div class="form_login_head">
-      <p>Login</p>
+    
+    <div class="welcome-box">
+      <img src="assets/logo.png" alt="logo" class="logo">
+      <h1 class="brand-name">ManaPlastic</h1>
     </div>
 
     <div class="form_login_body">
       <div class="form_login_text">
+        
         <span>Username</span>
         <input
           type="text"
@@ -41,10 +37,9 @@
 
         <button class="login_button" (click)="login()">Login</button>
 
-        <!-- Nút quên mật khẩu -->
-        <button class="forgot-password" (click)="forgotPassword()">
+        <span class="forgot-password" (click)="forgotPassword()">
           Quên mật khẩu?
-        </button>
+        </span>
       </div>
     </div>
   </div>

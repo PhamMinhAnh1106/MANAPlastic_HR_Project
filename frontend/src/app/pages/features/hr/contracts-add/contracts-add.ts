@@ -27,7 +27,18 @@ export class ContractsAdd {
     this.notifyType = type;
     this.isalert = true;
   }
-
+  getVietnameseContractType(type: string): string {
+    switch (type) {
+      case 'INDEFINITE':
+        return 'Hợp đồng Không thời hạn';
+      case 'FIXED_TERM':
+        return 'Hợp đồng có thời hạn';
+      case 'PROBATION':
+        return 'Hợp đồng Thử việc';
+      default:
+        return 'Không xác định';
+    }
+  }
 
   ////////////////////////////
   constructor(private router: Router, private cdr: ChangeDetectorRef) { }
