@@ -1,6 +1,8 @@
 package com.manaplastic.backend.controller;
 
 import com.manaplastic.backend.DTO.*;
+import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
+import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.service.AttendanceService;
 import com.manaplastic.backend.service.UserService;
@@ -29,6 +31,7 @@ public class EmployeeController {
     private AttendanceService attendanceService;
     //Xem thông tin
     @GetMapping("/profile")
+    @RequiredPermission(PermissionConst.PROFILE_VIEW)
     public ResponseEntity<UserProfileDTO> getMyInfo(@AuthenticationPrincipal UserEntity currentUser) {
 
         UserProfileDTO userProfile = UserProfileDTO.builder()
@@ -53,6 +56,7 @@ public class EmployeeController {
 
     //sửa thông tin cá nhân
     @PutMapping("/updateProfile")
+    @RequiredPermission(PermissionConst.PROFILE_UPDATE)
     public ResponseEntity<String> updateMyProfile(@AuthenticationPrincipal UserEntity currentUser, @RequestBody UpdateSelfIn4DTO updateRequest) {
         try {
             userService.updateUserProfile(currentUser.getId(), updateRequest);
@@ -89,15 +93,6 @@ public class EmployeeController {
 //
 //        return ResponseEntity.ok(list);
 //    }
-    @GetMapping("/chamCong")
-    public ResponseEntity<Page<AttendanceDTO>> getMyAttendance(
-            @ModelAttribute AttendanceFilterCriteria criteria,
-            @AuthenticationPrincipal UserEntity currentUser,
-            @PageableDefault(page = 0, size= 10, sort = "date", direction = Sort.Direction.DESC) Pageable pageable) {
-        criteria.setUserId(currentUser.getId());
-        Page<AttendanceDTO> result = attendanceService.getFilteredAttendance(criteria, pageable);
-        return ResponseEntity.ok(result);
-    }
 
 
 }

@@ -169,14 +169,38 @@ public class LeaverequestService {
 
     // Duyệt đơn
     @Transactional
-    public void approveRequest(Integer leaveRequestId) {
+    public void approveRequest(Integer leaveRequestId, UserEntity approver) {
         LeaverequestEntity request = leaveRequestRepository.findById(leaveRequestId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn nghỉ phép."));
 
         if (request.getStatus() != LeaverequestEntity.LeaverequestStatus.PENDING) {
             throw new RuntimeException("Đơn này đã được xử lý, không thể duyệt.");
         }
+        UserEntity requester = request.getUserID();
 
+        boolean isManager = approver.getRoleID() != null && "Manager".equalsIgnoreCase(approver.getRoleID().getRolename());
+
+        // Nếu là Manager
+        if (isManager) {
+            if (approver.getId().equals(requester.getId())) {
+                throw new RuntimeException("Manager không thể tự duyệt đơn nghỉ phép của chính mình.");
+            }
+
+            if (approver.getDepartmentID() == null) {
+                throw new RuntimeException("Lỗi hệ thống: Tài khoản Manager của bạn chưa được gán Phòng ban.");
+            }
+            if (requester.getDepartmentID() == null) {
+                throw new RuntimeException("Không thể duyệt: Nhân viên tạo đơn chưa thuộc phòng ban nào.");
+            }
+
+            Integer approverDeptId = approver.getDepartmentID().getId();
+            Integer requesterDeptId = requester.getDepartmentID().getId();
+
+            if (!approverDeptId.equals(requesterDeptId)) {
+                throw new RuntimeException("Truy cập bị từ chối: Bạn chỉ có quyền duyệt đơn cho nhân viên thuộc phòng ban của mình!");
+            }
+        }
+        // Là HR
         request.setStatus(LeaverequestEntity.LeaverequestStatus.APPROVED);
         LeaverequestEntity savedRequest = leaveRequestRepository.save(request);
 
@@ -186,6 +210,46 @@ public class LeaverequestService {
         String fullname = savedRequest.getUserID().getFullname();
 
         emailService.sendApprovalEmail(email, fullname, savedRequest);
+    }
+
+    // Từ chối đơn
+    @Transactional
+    public void rejectRequest(Integer leaveRequestId, UserEntity rejecter) {
+        LeaverequestEntity request = leaveRequestRepository.findById(leaveRequestId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn nghỉ phép."));
+
+        if (request.getStatus() != LeaverequestEntity.LeaverequestStatus.PENDING) { // tránh tình trạng đã duyệt rô mà đi từ chối lại
+            throw new RuntimeException("Đơn này đã được xử lý, không thể từ chối.");
+        }
+
+        UserEntity requester = request.getUserID();
+        boolean isManager = rejecter.getRoleID() != null
+                && "Manager".equalsIgnoreCase(rejecter.getRoleID().getRolename());
+
+        if (isManager) {
+            if (rejecter.getId().equals(requester.getId())) {
+                throw new RuntimeException("Manager không thể tự xử lý đơn nghỉ phép của chính mình.");
+            }
+
+            if (rejecter.getDepartmentID() == null || requester.getDepartmentID() == null) {
+                throw new RuntimeException("Lỗi dữ liệu: Nhân viên hoặc Quản lý chưa được gán phòng ban.");
+            }
+
+            Integer approverDeptId = rejecter.getDepartmentID().getId();
+            Integer requesterDeptId = requester.getDepartmentID().getId();
+
+            if (!approverDeptId.equals(requesterDeptId)) {
+                throw new RuntimeException("Truy cập bị từ chối: Bạn chỉ được xử lý đơn của nhân viên cùng phòng ban!");
+            }
+        }
+            // Là HR
+        request.setStatus(LeaverequestEntity.LeaverequestStatus.REJECTED);
+        LeaverequestEntity savedRequest = leaveRequestRepository.save(request);
+
+        String email = savedRequest.getUserID().getEmail();
+        String fullname = savedRequest.getUserID().getFullname();
+
+        emailService.sendRejectionEmail(email, fullname, savedRequest);
     }
 
     private void updateLeaveBalanceOnApproval(LeaverequestEntity approvedRequest) {
@@ -254,24 +318,7 @@ public class LeaverequestService {
     }
 
 
-    // Từ chối đơn
-    @Transactional
-    public void rejectRequest(Integer leaveRequestId) {
-        LeaverequestEntity request = leaveRequestRepository.findById(leaveRequestId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn nghỉ phép."));
 
-        if (request.getStatus() != LeaverequestEntity.LeaverequestStatus.PENDING) { // tránh tình trạng đã duyệt rô mà đi từ chối lại
-            throw new RuntimeException("Đơn này đã được xử lý, không thể từ chối.");
-        }
-
-        request.setStatus(LeaverequestEntity.LeaverequestStatus.REJECTED);
-        LeaverequestEntity savedRequest = leaveRequestRepository.save(request);
-
-        String email = savedRequest.getUserID().getEmail();
-        String fullname = savedRequest.getUserID().getFullname();
-
-        emailService.sendRejectionEmail(email, fullname, savedRequest);
-    }
 
 //    //Tạo số dư mới cho nhân sự mới
 //    @Transactional

@@ -1,6 +1,8 @@
 package com.manaplastic.backend.controller;
 
 import com.manaplastic.backend.DTO.*;
+import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
+import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.service.AttendanceService;
 import com.manaplastic.backend.service.UserService;
@@ -31,6 +33,7 @@ public class HrController {
 
     //Xem thông tin
     @GetMapping("/profile")
+    @RequiredPermission(PermissionConst.PROFILE_VIEW)
     public ResponseEntity<UserProfileDTO> getMyInfo(@AuthenticationPrincipal UserEntity currentUser) {
 
         UserProfileDTO userProfile = UserProfileDTO.builder()
@@ -55,6 +58,7 @@ public class HrController {
 
     //sửa thông tin cá nhân
     @PutMapping("/updateProfile")
+    @RequiredPermission(PermissionConst.PROFILE_UPDATE)
     public ResponseEntity<String> updateMyProfile(@AuthenticationPrincipal UserEntity currentUser, @RequestBody UpdateSelfIn4DTO updateRequest) {
         try {
             userService.updateUserProfile(currentUser.getId(), updateRequest);
@@ -102,6 +106,7 @@ public class HrController {
 //        return ResponseEntity.ok(userService.filterUsersList(criteria, pageable));
 //    }
     @GetMapping("/userFilter")
+    @RequiredPermission(PermissionConst.ACCOUNT_VIEW_LIST)
     public ResponseEntity<Page<UserProfileDTO>> filterUsers(
             @ModelAttribute UserFilterCriteria criteria,
             @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -111,6 +116,7 @@ public class HrController {
 
     //lấy thông tin tài khoản nhân sự muốn xem
     @GetMapping("/user/{userId}")
+    @RequiredPermission(PermissionConst.ACCOUNT_VIEW_DETAIL)
     public ResponseEntity<UserProfileDTO> getUserDetails(@PathVariable int userId) {
         UserProfileDTO userDetails = userService.getUserDetailsById(userId);
         return ResponseEntity.ok(userDetails);
@@ -118,6 +124,7 @@ public class HrController {
 
     //sửa thông tin tài khoản cho nhân sự
     @PutMapping("/user/{userId}")
+    @RequiredPermission(PermissionConst.ACCOUNT_UPDATE)
     public ResponseEntity<String> hrUpdateUser(
             @PathVariable int userId,
             @RequestBody UpdateAccountDTO request,
@@ -144,15 +151,17 @@ public class HrController {
 //
 //        return ResponseEntity.ok(list);
 //    }
-    @GetMapping("/chamCong")
-    public ResponseEntity<Page<AttendanceDTO>> getMyAttendance(@ModelAttribute AttendanceFilterCriteria criteria,
-                                                               @PageableDefault(page=0,size=10, sort = "date", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(attendanceService.getFilteredAttendance(criteria,pageable));
-    }
+//    @GetMapping("/chamCong")
+//    @RequiredPermission(PermissionConst.ATTENDANCE_VIEW_ALL)
+//    public ResponseEntity<Page<AttendanceDTO>> getMyAttendance(@ModelAttribute AttendanceFilterCriteria criteria,
+//                                                               @PageableDefault(page=0,size=10, sort = "date", direction = Sort.Direction.DESC) Pageable pageable) {
+//        return ResponseEntity.ok(attendanceService.getFilteredAttendance(criteria,pageable));
+//    }
 
-    @DeleteMapping("/chamCong/{attendanceId}")
-    public ResponseEntity<String> deleteAttendance(@PathVariable int attendanceId) {
-        attendanceService.deleteAttendance(attendanceId);
-        return ResponseEntity.ok("Xóa thành công!");
-    }
+//    @DeleteMapping("/chamCong/{attendanceId}")
+//    @RequiredPermission(PermissionConst.ATTENDANCE_UPDATE)
+//    public ResponseEntity<String> deleteAttendance(@PathVariable int attendanceId) {
+//        attendanceService.deleteAttendance(attendanceId);
+//        return ResponseEntity.ok("Xóa thành công!");
+//    }
 }

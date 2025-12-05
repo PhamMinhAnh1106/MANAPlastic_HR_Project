@@ -1,21 +1,18 @@
 package com.manaplastic.backend.controller;
 
 import com.manaplastic.backend.DTO.*;
+import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
+import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.service.AttendanceService;
+import com.manaplastic.backend.service.CheckPermissionService;
 import com.manaplastic.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/manager")
@@ -24,12 +21,14 @@ public class ManagerController {
 
     @Autowired
     private UserService userService;
-
     @Autowired
     private AttendanceService attendanceService;
+    @Autowired
+    private CheckPermissionService checkPermissionService;
 
     //Xem thông tin
     @GetMapping("/profile")
+    @RequiredPermission(PermissionConst.PROFILE_VIEW)
     public ResponseEntity<UserProfileDTO> getMyInfo(@AuthenticationPrincipal UserEntity currentUser) {
 
         UserProfileDTO userProfile = UserProfileDTO.builder()
@@ -54,6 +53,7 @@ public class ManagerController {
 
     //sửa thông tin cá nhân
     @PutMapping("/updateProfile")
+    @RequiredPermission(PermissionConst.PROFILE_UPDATE)
     public ResponseEntity<String> updateMyProfile(@AuthenticationPrincipal UserEntity currentUser, @RequestBody UpdateSelfIn4DTO updateRequest) {
         try {
             userService.updateUserProfile(currentUser.getId(), updateRequest);
@@ -91,13 +91,5 @@ public class ManagerController {
 //
 //        return ResponseEntity.ok(list);
 //    }
-    @GetMapping("/chamCong")
-    public ResponseEntity<Page<AttendanceDTO>> getMyAttendance(
-            @ModelAttribute AttendanceFilterCriteria criteria,
-            @AuthenticationPrincipal UserEntity currentUser,
-            @PageableDefault(page = 0, size= 10, sort = "date", direction = Sort.Direction.DESC) Pageable pageable) {
-        criteria.setUserId(currentUser.getId());
-        Page<AttendanceDTO> result = attendanceService.getFilteredAttendance(criteria, pageable);
-        return ResponseEntity.ok(result);
-    }
+
 }

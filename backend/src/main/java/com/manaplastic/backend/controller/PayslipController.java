@@ -2,6 +2,8 @@ package com.manaplastic.backend.controller;
 
 import com.manaplastic.backend.DTO.PayrollDTO;
 import com.manaplastic.backend.DTO.PayrollFilterCriteria;
+import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
+import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.payrollengine.service.PayslipService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ public class PayslipController {
     // Lấy của toi
     @GetMapping("/my-payslip")
     @PreAuthorize("isAuthenticated()")
+    @RequiredPermission(PermissionConst.PAYROLL_VIEW_SELF)
     public ResponseEntity<?> getMyPayslip(
             @RequestParam int month,
             @RequestParam int year,
@@ -67,6 +70,7 @@ public class PayslipController {
 //    }
     @GetMapping("/filter")
     @PreAuthorize("hasAuthority('HR')")
+    @RequiredPermission(PermissionConst.PAYROLL_VIEW_ALL)
     public ResponseEntity<Page<PayrollDTO>> filterPayrolls(
             @ModelAttribute PayrollFilterCriteria criteria,
             @PageableDefault(page = 0, size = 10, sort = "netsalary", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -77,6 +81,7 @@ public class PayslipController {
     // Lấy của user nhân sự muốn xem
     @GetMapping("/{userId}")
     @PreAuthorize("hasAuthority('HR')")
+    @RequiredPermission(PermissionConst.PAYROLL_VIEW_ALL)
     public ResponseEntity<?> getPayrollDetailById(
             @PathVariable Integer userId,
             @RequestParam int month,

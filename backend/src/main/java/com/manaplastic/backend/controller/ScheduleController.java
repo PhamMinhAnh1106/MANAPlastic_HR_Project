@@ -1,6 +1,8 @@
 package com.manaplastic.backend.controller;
 
 import com.manaplastic.backend.DTO.*;
+import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
+import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.service.AutoAssignScheduleService;
 import com.manaplastic.backend.service.ScheduleRequirementService;
@@ -24,6 +26,8 @@ public class ScheduleController {
     //Role Nhân viên - employee và quản lý - manager dùng chung
     // vì nhân viên hay quản lý đều có thể dăng ky lịch làm việc
     @PostMapping("/user/shiftSchedule/myDraft")
+    @PreAuthorize("hasAnyAuthority('Manager','Employee')")
+    @RequiredPermission(PermissionConst.SHIFT_REGISTER)
     public ResponseEntity<?> handleDraftScheduleRegistration(
             @RequestBody List<DraftRegistrationDTO> registrationDTOs,
             @AuthenticationPrincipal UserEntity user
@@ -34,6 +38,8 @@ public class ScheduleController {
     }
 
     @GetMapping("/user/shiftSchedule/myDraft")
+    @PreAuthorize("hasAnyAuthority('Manager','Employee')")
+    @RequiredPermission(PermissionConst.SHIFT_VIEW)
     public ResponseEntity<List<DraftRegistrationDTO>> getMyDraftSchedule(
             @AuthenticationPrincipal UserEntity user,
             @RequestParam("month_year") String monthYear
@@ -44,6 +50,8 @@ public class ScheduleController {
     }
 
     @GetMapping("/user/shiftSchedule/myOfficial")
+    @PreAuthorize("hasAnyAuthority('Manager','Employee')")
+    @RequiredPermission(PermissionConst.SHIFT_VIEW)
     public ResponseEntity<List<DraftRegistrationDTO>> getMyOfficialSchedule(
             @AuthenticationPrincipal UserEntity user,
             @RequestParam("month_year") String monthYear // Bắt buộc: ?month_year=2025-12
@@ -56,6 +64,7 @@ public class ScheduleController {
     //Role Quản Lý - manager
     @GetMapping("/manager/shiftSchedule/drafts")
     @PreAuthorize("hasAuthority('Manager')")
+    @RequiredPermission(PermissionConst.SHIFT_VIEW)
     public ResponseEntity<List<EmployeeDraftSummaryDTO>> getDepartmentDrafts(
             @AuthenticationPrincipal UserEntity manager,
             @RequestParam("month_year") String monthYear
@@ -66,6 +75,7 @@ public class ScheduleController {
 
     @PostMapping("/manager/shiftSchedule/drafts/batch")
     @PreAuthorize("hasAuthority('Manager')")
+    @RequiredPermission(PermissionConst.SHIFT_ASSIGN)
     public ResponseEntity<?> updateDepartmentDrafts(
             @AuthenticationPrincipal UserEntity manager,
             @RequestBody List<ManagerDraftUpdateDTO> dtos
@@ -76,6 +86,7 @@ public class ScheduleController {
 
     @PostMapping("/manager/shiftSchedule/finalize") // cho nút "Hoàn Tất"
     @PreAuthorize("hasAuthority('Manager')")
+    @RequiredPermission(PermissionConst.SHIFT_ASSIGN)
     public ResponseEntity<?> finalizeDepartmentSchedule(
             @AuthenticationPrincipal UserEntity manager,
             @RequestBody FinalizeScheduleDTO dto
@@ -86,6 +97,7 @@ public class ScheduleController {
 
     @GetMapping("/manager/shiftSchedule/official")
     @PreAuthorize("hasAuthority('Manager')")
+    @RequiredPermission(PermissionConst.SHIFT_VIEW)
     public ResponseEntity<List<EmployeeDraftSummaryDTO>> getDepartmentOfficialSchedules(
             @AuthenticationPrincipal UserEntity manager,
             @RequestParam("month_year") String monthYear
@@ -96,6 +108,7 @@ public class ScheduleController {
 
     @PutMapping("/manager/shiftSchedule/official/batch")
     @PreAuthorize("hasAuthority('Manager')")
+    @RequiredPermission(PermissionConst.SHIFT_ASSIGN)
     public ResponseEntity<?> updateDepartmentOfficialSchedule(
             @AuthenticationPrincipal UserEntity manager,
             @RequestBody List<ManagerOfficialUpdateDTO> dtos

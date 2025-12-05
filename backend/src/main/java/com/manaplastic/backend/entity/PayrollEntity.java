@@ -101,4 +101,9 @@ public class PayrollEntity {
     @Column(name = "OtTaxExempt", precision = 15, scale = 2)
     private BigDecimal otTaxExempt;
 
+    @ColumnDefault("'DRAFT'")
+    @Lob
+    @Column(name = "status")
+    private String status;
+
 }

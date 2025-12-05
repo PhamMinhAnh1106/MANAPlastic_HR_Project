@@ -3,6 +3,8 @@ package com.manaplastic.backend.controller;
 import com.manaplastic.backend.DTO.FinalizeScheduleDTO;
 import com.manaplastic.backend.DTO.ScheduleRequirementDTO;
 import com.manaplastic.backend.DTO.ScheduleValidationDTO;
+import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
+import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.service.AutoAssignScheduleService;
 import com.manaplastic.backend.service.ScheduleRequirementService;
@@ -26,7 +28,7 @@ public class ScheduleAutoController {
 
     // Auto xếp ca
     @PostMapping("/shiftSchedule/auto-assign")
-    @PreAuthorize("hasAuthority('Manager')")
+    @RequiredPermission(PermissionConst.SHIFT_ASSIGN)
     public ResponseEntity<?> autoAssignBlanks(
             @AuthenticationPrincipal UserEntity manager,
             @RequestBody FinalizeScheduleDTO dto // Dùng lại DTO (chỉ cần month_year)
@@ -37,7 +39,7 @@ public class ScheduleAutoController {
 
 
     @GetMapping("/shiftSchedule/drafts/validate")
-    @PreAuthorize("hasAuthority('Manager')")
+    @RequiredPermission(PermissionConst.SHIFT_ASSIGN)
     public ResponseEntity<List<ScheduleValidationDTO>> validateDepartmentDraft(
             @AuthenticationPrincipal UserEntity manager,
             @RequestParam("month_year") String monthYear
@@ -47,6 +49,7 @@ public class ScheduleAutoController {
     }
 
     @GetMapping("/requirements")
+    @RequiredPermission(PermissionConst.SHIFT_ASSIGN)
     public ResponseEntity<List<ScheduleRequirementDTO>> getRequirements(
             @AuthenticationPrincipal UserEntity manager) {
 
@@ -55,6 +58,7 @@ public class ScheduleAutoController {
     }
 
     @PostMapping("/requirements")
+    @RequiredPermission(PermissionConst.SHIFT_ASSIGN)
     public ResponseEntity<ScheduleRequirementDTO> createRequirement(
             @AuthenticationPrincipal UserEntity manager,
             @RequestBody ScheduleRequirementDTO requirementDTO) {
@@ -65,6 +69,7 @@ public class ScheduleAutoController {
 
 
     @PutMapping("/requirements/{id}")
+    @RequiredPermission(PermissionConst.SHIFT_ASSIGN)
     public ResponseEntity<ScheduleRequirementDTO> updateRequirement(
             @AuthenticationPrincipal UserEntity manager,
             @PathVariable Integer id,
@@ -75,6 +80,7 @@ public class ScheduleAutoController {
     }
 
     @DeleteMapping("/requirements/{id}")
+    @RequiredPermission(PermissionConst.SHIFT_ASSIGN)
     public ResponseEntity<Void> deleteRequirement(
             @AuthenticationPrincipal UserEntity manager,
             @PathVariable Integer id) {

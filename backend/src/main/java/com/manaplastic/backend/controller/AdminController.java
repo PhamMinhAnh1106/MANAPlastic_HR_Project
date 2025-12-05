@@ -2,6 +2,8 @@
 package com.manaplastic.backend.controller;
 
 import com.manaplastic.backend.DTO.*;
+import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
+import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.MonthlypayrollconfigEntity;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.filters.UserFilter;
@@ -37,7 +39,6 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
-
     @Autowired
     private UserService userService;
     @Autowired
@@ -47,6 +48,7 @@ public class AdminController {
 
     //Xem thông tin
     @GetMapping("/profile")
+    @RequiredPermission(PermissionConst.PROFILE_VIEW)
     public ResponseEntity<UserProfileDTO> getMyInfo(@AuthenticationPrincipal UserEntity currentUser) {
 
         UserProfileDTO userProfile = UserProfileDTO.builder()
@@ -71,6 +73,7 @@ public class AdminController {
 
     //Cấp tk
     @PostMapping("/addAccount")
+    @RequiredPermission(PermissionConst.ACCOUNT_CREATE)
     public ResponseEntity<String> addAccount(@RequestBody UserEntity newUser) {
         UserEntity createdUser = adminService.createUser(newUser);
         String responseMessage = "Tài khoản đã được cấp thành công. Username: " + createdUser.getUsername();
@@ -79,6 +82,7 @@ public class AdminController {
 
     //sửa thông tin cá nhân
     @PutMapping("/updateProfile")
+    @RequiredPermission(PermissionConst.PROFILE_UPDATE)
     public ResponseEntity<String> updateMyProfile(@AuthenticationPrincipal UserEntity currentUser, @RequestBody UpdateSelfIn4DTO updateRequest) {
         try {
             userService.updateUserProfile(currentUser.getId(), updateRequest);
@@ -127,6 +131,7 @@ public class AdminController {
 //    }
     //Lọc
     @GetMapping("/userFilter")
+    @RequiredPermission(PermissionConst.ACCOUNT_VIEW_LIST)
     public ResponseEntity<Page<UserProfileDTO>> filterUsers(
             @ModelAttribute UserFilterCriteria criteria,
             @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -136,6 +141,7 @@ public class AdminController {
 
     // lấy thông tin tài khoản nhân sự muốn xem
     @GetMapping("/user/{userId}")
+    @RequiredPermission(PermissionConst.ACCOUNT_VIEW_DETAIL)
     public ResponseEntity<UserProfileDTO> getUserDetails(@PathVariable int userId) {
         UserProfileDTO userDetails = userService.getUserDetailsById(userId);
         return ResponseEntity.ok(userDetails);
@@ -143,6 +149,7 @@ public class AdminController {
 
     // Sửa thông tin tài khoản cho nhân sự
     @PutMapping("/user/{userId}")
+    @RequiredPermission(PermissionConst.ACCOUNT_UPDATE)
     public ResponseEntity<String> hrUpdateUser(
             @PathVariable int userId,
             @RequestBody UpdateAccountDTO request,

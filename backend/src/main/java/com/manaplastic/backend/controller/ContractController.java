@@ -3,6 +3,8 @@ package com.manaplastic.backend.controller;
 import com.manaplastic.backend.DTO.ContractCreateDTO;
 import com.manaplastic.backend.DTO.ContractFilterCriteria;
 import com.manaplastic.backend.DTO.ContractDTO;
+import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
+import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.ContractEntity;
 import com.manaplastic.backend.service.ContractService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,7 @@ public class ContractController {
 
     // Kiểm tra nhân viên này đã ký bao nhiêu HĐ có thời hạn rồi
     @GetMapping("/checkRenewal/{userId}")
+    @RequiredPermission(PermissionConst.CONTRACT_VIEW)
     public ResponseEntity<?> checkRenewalStatus(@PathVariable Integer userId) {
         try {
             boolean allowFixedTerm = contractService.checkIfFixedTermAllowed(userId);
@@ -51,13 +54,14 @@ public class ContractController {
 
     // Tạo hợp đồng mới (Kèm upload file)
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequiredPermission(PermissionConst.CONTRACT_CREATE)
     public ResponseEntity<?> createContract(@ModelAttribute ContractCreateDTO contractDTO) {
         try {
             if (contractDTO.getFile() == null || contractDTO.getFile().isEmpty()) {
                 return ResponseEntity.badRequest().body("Vui lòng đính kèm file scan hợp đồng! (file PDF)");
             }
 
-            ContractEntity newContract = contractService.createContract(contractDTO);
+            contractService.createContract(contractDTO);
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Tạo hợp đồng mới thành công!");
@@ -80,6 +84,7 @@ public class ContractController {
 //    }
 
     @GetMapping("/contractFilter")
+    @RequiredPermission(PermissionConst.CONTRACT_VIEW)
     public ResponseEntity<Page<ContractDTO>> getContracts(
             @ModelAttribute ContractFilterCriteria filter,
             @PageableDefault(page = 0,size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -89,6 +94,7 @@ public class ContractController {
 
     //Lấy ds hdld của nhân sự này
     @GetMapping("/user/{userId}")
+    @RequiredPermission(PermissionConst.CONTRACT_VIEW)
     public ResponseEntity<List<ContractDTO>> getContractsByEmployee(@PathVariable Integer userId) {
         return ResponseEntity.ok(contractService.getContractsByUserId(userId));
     }

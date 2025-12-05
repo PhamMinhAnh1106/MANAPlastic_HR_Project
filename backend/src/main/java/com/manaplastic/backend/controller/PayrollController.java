@@ -2,6 +2,8 @@ package com.manaplastic.backend.controller;
 
 import com.manaplastic.backend.DTO.PayrollDTO;
 import com.manaplastic.backend.DTO.PayrollFilterCriteria;
+import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
+import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.payrollengine.service.PayrollEngineService;
 import com.manaplastic.backend.repository.UserRepository; // Giả định bạn có repo này
@@ -30,6 +32,7 @@ public class PayrollController {
 
     @PostMapping("/calculate")
     @PreAuthorize("hasAuthority('HR')")
+    @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
     public ResponseEntity<?> calculatePayroll(
             @RequestParam int month,
             @RequestParam int year) {
@@ -65,6 +68,7 @@ public class PayrollController {
 
     @GetMapping("/debug-details") // TEST xem lương, công thức
     @PreAuthorize("hasAuthority('HR')")
+    @RequiredPermission(PermissionConst.PAYROLL_VIEW_ALL)
     public ResponseEntity<?> getPayrollDebugDetails(
             @RequestParam int employeeId,
             @RequestParam int month,

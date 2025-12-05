@@ -42,4 +42,8 @@ public class SalaryRuleEntity {
     @Column(name = "created_at")
     private Instant createdAt;
 
+    @ColumnDefault("10")
+    @Column(name = "priority")
+    private Integer priority;
+
 }

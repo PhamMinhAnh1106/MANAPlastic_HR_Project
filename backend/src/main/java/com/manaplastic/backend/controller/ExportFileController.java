@@ -3,6 +3,8 @@ package com.manaplastic.backend.controller;
 import com.manaplastic.backend.DTO.AttendanceDTO;
 import com.manaplastic.backend.DTO.AttendanceFilterCriteria;
 import com.manaplastic.backend.DTO.ContractFilterCriteria;
+import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
+import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.exportfile.ExcelHelper;
 import com.manaplastic.backend.service.AttendanceService;
 import com.manaplastic.backend.service.ContractService;
@@ -27,6 +29,7 @@ public class ExportFileController {// Tạm thời chỉ cho HR xuất file báo
     private ContractService contractService;
 
     @GetMapping("/attendace/exportExcel")
+    @RequiredPermission(PermissionConst.ATTENDANCE_EXPORT)
     public ResponseEntity<InputStreamResource> exportExcel(@ModelAttribute AttendanceFilterCriteria criteria) {
 
         ByteArrayInputStream in = attendanceService.exportReport(criteria);
@@ -40,6 +43,7 @@ public class ExportFileController {// Tạm thời chỉ cho HR xuất file báo
     }
 
     @GetMapping("/contract/exportExcel")
+    @RequiredPermission(PermissionConst.CONTRACT_EXPORT)
     public ResponseEntity<InputStreamResource> exportContracts(@ModelAttribute ContractFilterCriteria criteria) {
 
         ByteArrayInputStream in = contractService.exportContracts(criteria);

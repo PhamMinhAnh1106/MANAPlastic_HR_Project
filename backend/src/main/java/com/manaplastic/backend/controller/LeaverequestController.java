@@ -4,38 +4,38 @@ import com.manaplastic.backend.DTO.AddLeaverequestDTO;
 import com.manaplastic.backend.DTO.LeaveBalanceDTO;
 import com.manaplastic.backend.DTO.LeaveRequestFilterCriteria;
 import com.manaplastic.backend.DTO.LeaverequestDTO;
+import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
+import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.service.LeaverequestService;
-import jakarta.servlet.Filter;
+import com.manaplastic.backend.service.CheckPermissionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class LeaverequestController {
     @Autowired
     private LeaverequestService leaverequestService;
+    @Autowired
+    private CheckPermissionService checkPermissionService;
 
 
-    //nhân viên và quản lý dùng chung đăng ký, xem, xóa đơn nghỉ phép ( HR thì chưa )
+    //nhân viên và quản lý, HR dùng chung đăng ký, xem, xóa đơn nghỉ phép
     @PostMapping("/user/leaverequest/addRequest")
-    @PreAuthorize("hasAnyAuthority('Employee','Manager')")
+    @RequiredPermission(PermissionConst.LEAVE_CREATE)
+//    @PreAuthorize("hasAnyAuthority('Employee','Manager','HR')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> createLeaveRequest(
             @Valid @RequestBody AddLeaverequestDTO requestDTO,
             @AuthenticationPrincipal UserEntity currentUser) {
@@ -54,7 +54,8 @@ public class LeaverequestController {
     }
 
     @GetMapping("/user/leaverequest/myRequest")
-    @PreAuthorize("hasAnyAuthority('Employee','Manager')")
+    @PreAuthorize("isAuthenticated()")
+    @RequiredPermission(PermissionConst.LEAVE_VIEW_SELF)
     public ResponseEntity<List<LeaverequestDTO>> getMyLeaveRequests(
             @AuthenticationPrincipal UserEntity currentUser) {
 
@@ -64,7 +65,8 @@ public class LeaverequestController {
 
     //chỉ được xóa đơn khi đơn đang là PENDING
     @DeleteMapping("/user/leaverequest/myRequest/{id}")
-    @PreAuthorize("hasAnyAuthority('Employee','Manager')")
+    @PreAuthorize("isAuthenticated()")
+    @RequiredPermission(PermissionConst.LEAVE_CANCEL)
     public ResponseEntity<String> deleteMyLeaveRequest(@PathVariable("id") Integer leaveRequestId,
                                                        @AuthenticationPrincipal UserEntity currentUser) {
         try {
@@ -95,22 +97,35 @@ public class LeaverequestController {
 //        List<LeaverequestDTO> requests = leaverequestService.getFilteredRequests(criteria);
 //        return ResponseEntity.ok(requests);
 //    }
+
     @GetMapping("/user/leaverequest/filter")
     @PreAuthorize("hasAnyAuthority('Manager','HR')")
     public ResponseEntity<Page<LeaverequestDTO>> getFilteredRequests(@ModelAttribute LeaveRequestFilterCriteria criteria,
                                                                      @AuthenticationPrincipal UserEntity currentUser,
                                                                      @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
-        boolean isManager = currentUser.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("Manager"));
+//        boolean isManager = currentUser.getAuthorities().stream()
+//                .anyMatch(auth -> auth.getAuthority().equals("Manager"));
+        boolean canViewAll = checkPermissionService.checkPermission(currentUser.getId(), PermissionConst.LEAVE_VIEW_ALL);
+        boolean canViewDept = checkPermissionService.checkPermission(currentUser.getId(), PermissionConst.LEAVE_VIEW_DEPT);
 
-        if (!isManager) {
-           //Là HR
+//        if (!isManager) {
+//           //Là HR
+//        }
+//        else{
+//            if (currentUser.getDepartmentID() != null) {
+//                criteria.setDepartmentId(currentUser.getDepartmentID().getId());
+//            }
+//        }
+        if (canViewAll) {
+            // Là HR
         }
-        else{
-            if (currentUser.getDepartmentID() != null) {
-                criteria.setDepartmentId(currentUser.getDepartmentID().getId());
+        else if (canViewDept) {
+            if (currentUser.getDepartmentID() == null) {
+                throw new RuntimeException("Tài khoản Manager chưa được gán phòng ban, không thể xem dữ liệu.");
             }
+            criteria.setDepartmentId(currentUser.getDepartmentID().getId());
         }
+
         Page<LeaverequestDTO> result = leaverequestService.getFilteredRequests(criteria, pageable);
         return ResponseEntity.ok(result);
     }
@@ -118,9 +133,11 @@ public class LeaverequestController {
 
     @PatchMapping("/user/leaverequest/approve/{id}") // Dùng Patch vì chỉ thay đổi 1 phần (Status)
     @PreAuthorize("hasAnyAuthority('Manager','HR')")
-    public ResponseEntity<String> approveRequest(@PathVariable("id") Integer leaveRequestId) {
+    @RequiredPermission(PermissionConst.LEAVE_APPROVE)
+    public ResponseEntity<String> approveRequest(@PathVariable("id") Integer leaveRequestId,
+                                                 @AuthenticationPrincipal UserEntity currentUser) {
         try {
-            leaverequestService.approveRequest(leaveRequestId);
+            leaverequestService.approveRequest(leaveRequestId,currentUser);
             return ResponseEntity.ok("Đã duyệt (APPROVED) đơn nghỉ phép thành công. Email thông báo đang được gửi.");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -129,9 +146,11 @@ public class LeaverequestController {
 
     @PatchMapping("/user/leaverequest/reject/{id}")
     @PreAuthorize("hasAnyAuthority('Manager','HR')")
-    public ResponseEntity<String> rejectRequest(@PathVariable("id") Integer leaveRequestId) {
+    @RequiredPermission(PermissionConst.LEAVE_APPROVE)
+    public ResponseEntity<String> rejectRequest(@PathVariable("id") Integer leaveRequestId,
+                                                @AuthenticationPrincipal UserEntity currentUser) {
         try {
-            leaverequestService.rejectRequest(leaveRequestId);
+            leaverequestService.rejectRequest(leaveRequestId,currentUser);
             return ResponseEntity.ok("Đã từ chối (REJECTED) đơn nghỉ phép. Email thông báo đang được gửi.");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -139,6 +158,7 @@ public class LeaverequestController {
     }
 
     @GetMapping("/user/leaverequest/myBalances")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<LeaveBalanceDTO>> getMyLeaveBalances(
             @AuthenticationPrincipal UserEntity currentUser
     ) {
