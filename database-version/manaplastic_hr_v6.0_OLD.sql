@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th12 05, 2025 lúc 07:41 PM
+-- Thời gian đã tạo: Th12 02, 2025 lúc 07:54 PM
 -- Phiên bản máy phục vụ: 8.2.0
 -- Phiên bản PHP: 8.2.13
 
@@ -908,7 +908,7 @@ CREATE TABLE IF NOT EXISTS `leaverequests` (
   PRIMARY KEY (`leaverequestID`),
   KEY `userID` (`userID`),
   KEY `FK_Request_Shift` (`shiftID`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `leaverequests`
@@ -921,8 +921,7 @@ INSERT INTO `leaverequests` (`leaverequestID`, `leavetype`, `startdate`, `enddat
 (5, 'SICK', '2025-12-01', '2025-12-02', 'Test API tạo đơn từ Postman', 'PENDING', '2025-11-13', 15, 54),
 (6, 'SICK', '2025-12-06', '2025-12-06', 'Test API tạo đơn từ Postman', 'REJECTED', '2025-11-13', 18, 54),
 (7, 'ANNUAL', '2025-12-02', '2025-12-02', 'đi chơi', 'APPROVED', '2025-11-24', 18, 53),
-(8, 'SICK', '2025-12-03', '2025-12-03', 'bệnh Ho ', 'APPROVED', '2025-11-24', 18, 54),
-(9, 'ANNUAL', '2025-12-25', '2025-12-26', 'Nghỉ phép test chức năng', 'PENDING', NULL, 6, NULL);
+(8, 'SICK', '2025-12-03', '2025-12-03', 'bệnh Ho ', 'APPROVED', '2025-11-24', 18, 54);
 
 -- --------------------------------------------------------
 
@@ -1078,61 +1077,24 @@ CREATE TABLE IF NOT EXISTS `permissions` (
   `permissionID` int NOT NULL AUTO_INCREMENT,
   `permissionname` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text COLLATE utf8mb4_unicode_ci,
-  `is_active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`permissionID`),
   UNIQUE KEY `permissionname` (`permissionname`)
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `permissions`
 --
 
-INSERT INTO `permissions` (`permissionID`, `permissionname`, `description`, `is_active`) VALUES
-(1, 'LOGIN', 'Đăng nhập vào hệ thống', 1),
-(2, 'CHANGE_PASS', 'Đổi mật khẩu / Quên mật khẩu', 1),
-(3, 'PROFILE_VIEW', 'Xem thông tin tài khoản cá nhân', 1),
-(4, 'PROFILE_UPDATE', 'Cập nhật thông tin cá nhân (SĐT, ĐC...)', 1),
-(5, 'ACCOUNT_VIEW_LIST', 'Xem danh sách tài khoản/nhân sự', 1),
-(6, 'ACCOUNT_VIEW_DETAIL', 'Xem chi tiết thông tin tài khoản khác', 1),
-(7, 'ACCOUNT_CREATE', 'Tạo tài khoản/Hồ sơ nhân sự mới', 1),
-(8, 'ACCOUNT_UPDATE', 'Sửa thông tin tài khoản/Hồ sơ nhân sự', 1),
-(9, 'ACCOUNT_DELETE', 'Xóa hoặc Vô hiệu hóa tài khoản', 1),
-(10, 'ACCOUNT_RESET_PASS', 'Cấp lại mật khẩu cho user', 1),
-(11, 'ACCOUNT_PERMISSION', 'Thiết lập phân quyền truy cập', 1),
-(12, 'SYS_LOG_VIEW', 'Xem lịch sử hoạt động hệ thống', 1),
-(13, 'SYS_AUDIT_VIEW', 'Theo dõi thao tác tài khoản', 1),
-(14, 'ATTENDANCE_VIEW_SELF', 'Xem dữ liệu chấm công của mình', 1),
-(15, 'ATTENDANCE_REQ_CREATE', 'Yêu cầu bổ sung dữ liệu chấm công', 1),
-(16, 'ATTENDANCE_VIEW_DEPT', 'Xem chấm công nhân viên phòng ban', 1),
-(17, 'ATTENDANCE_VIEW_ALL', 'Xem chấm công toàn công ty', 1),
-(18, 'ATTENDANCE_UPDATE', 'Sửa/Xóa dữ liệu chấm công', 1),
-(19, 'ATTENDANCE_APPROVE', 'Duyệt/Từ chối yêu cầu bổ sung công', 1),
-(20, 'ATTENDANCE_EXPORT', 'Xuất báo cáo chấm công', 1),
-(21, 'SHIFT_VIEW', 'Xem lịch/ca làm việc', 1),
-(22, 'SHIFT_ASSIGN', 'Phân ca/Sửa ca làm việc', 1),
-(23, 'SHIFT_REGISTER', 'Đăng ký ca làm việc', 1),
-(24, 'LEAVE_CREATE', 'Tạo yêu cầu nghỉ phép/Làm việc', 1),
-(25, 'LEAVE_VIEW_SELF', 'Xem lịch sử nghỉ phép cá nhân', 1),
-(26, 'LEAVE_CANCEL', 'Hủy yêu cầu nghỉ phép', 1),
-(27, 'LEAVE_VIEW_DEPT', 'Xem danh sách nghỉ phép phòng ban', 1),
-(28, 'LEAVE_VIEW_ALL', 'Xem danh sách nghỉ phép toàn công ty', 1),
-(29, 'LEAVE_APPROVE', 'Duyệt/Từ chối đơn nghỉ phép', 1),
-(30, 'PAYROLL_VIEW_SELF', 'Xem phiếu lương cá nhân', 1),
-(31, 'PAYROLL_CALCULATE', 'Tính lương hàng tháng', 1),
-(32, 'PAYROLL_VIEW_ALL', 'Xem danh sách lương toàn công ty', 1),
-(33, 'PAYROLL_REWARD_VIEW', 'Xem danh sách Thưởng/Phạt', 1),
-(34, 'PAYROLL_EXPORT', 'Xuất báo cáo lương', 1),
-(35, 'CONTRACT_VIEW', 'Xem danh sách hợp đồng', 1),
-(36, 'CONTRACT_CREATE', 'Thêm hợp đồng lao động', 1),
-(37, 'CONTRACT_UPDATE', 'Cập nhật/Gia hạn hợp đồng', 1),
-(38, 'CONTRACT_EXPORT', 'Xuất báo cáo hợp đồng', 1),
-(39, 'EVALUATE_VIEW', 'Xem đánh giá quá trình làm việc', 1),
-(40, 'EVALUATE_CREATE', 'Thực hiện đánh giá nhân viên', 1),
-(41, 'SYS_MAIL_PAYROLL', 'Gửi mail phiếu lương', 1),
-(42, 'SYS_MAIL_SCHEDULE', 'Gửi mail lịch làm việc', 1),
-(43, 'SYS_MAIL_LEAVE', 'Gửi mail thông báo đơn phép', 1),
-(44, 'SYS_MAIL_CONTRACT', 'Gửi mail cảnh báo hết hạn HĐ', 1),
-(45, 'SYS_IMPORT_QR', 'Nhận dữ liệu chấm công QR', 1);
+INSERT INTO `permissions` (`permissionID`, `permissionname`, `description`) VALUES
+(1, 'manage_all_users', 'Tạo, sửa, xóa tất cả người dùng'),
+(2, 'manage_department_users', 'Quản lý người dùng trong phòng ban của mình'),
+(3, 'manage_payroll', 'Quản lý, tính toán lương cho mọi người'),
+(4, 'view_own_payroll', 'Chỉ xem được bảng lương của bản thân'),
+(5, 'manage_leave_requests', 'Duyệt/từ chối đơn nghỉ phép của mọi người'),
+(6, 'approve_leave_requests', 'Duyệt/tối chối đơn của phòng ban mình'),
+(7, 'request_leave', 'Tạo đơn xin nghỉ phép'),
+(8, 'manage_attendance', 'Quản lý chấm công của mọi người'),
+(9, 'view_own_attendance', 'Xem chấm công của bản thân');
 
 -- --------------------------------------------------------
 
@@ -1244,69 +1206,23 @@ CREATE TABLE IF NOT EXISTS `rolespermissions` (
 INSERT INTO `rolespermissions` (`roleID`, `permissionID`) VALUES
 (1, 1),
 (2, 1),
-(3, 1),
-(4, 1),
-(1, 2),
-(2, 2),
 (3, 2),
-(4, 2),
 (1, 3),
 (2, 3),
-(3, 3),
-(4, 3),
-(1, 4),
 (2, 4),
 (3, 4),
 (4, 4),
 (1, 5),
 (2, 5),
-(3, 5),
-(1, 6),
-(2, 6),
 (3, 6),
-(1, 7),
 (2, 7),
+(3, 7),
+(4, 7),
 (1, 8),
 (2, 8),
-(1, 9),
-(1, 10),
-(1, 11),
-(1, 12),
-(1, 13),
-(4, 14),
-(3, 15),
-(3, 16),
-(2, 17),
-(2, 18),
-(2, 19),
-(3, 19),
-(2, 20),
-(3, 21),
-(4, 21),
-(3, 22),
-(4, 23),
-(3, 24),
-(4, 24),
-(3, 25),
-(4, 25),
-(4, 26),
-(3, 27),
-(2, 28),
-(2, 29),
-(3, 29),
-(2, 30),
-(3, 30),
-(4, 30),
-(2, 31),
-(2, 32),
-(2, 33),
-(2, 34),
-(2, 35),
-(2, 36),
-(2, 37),
-(2, 38),
-(3, 39),
-(3, 40);
+(2, 9),
+(3, 9),
+(4, 9);
 
 -- --------------------------------------------------------
 
@@ -1370,7 +1286,7 @@ CREATE TABLE IF NOT EXISTS `salary_rule` (
   `priority` int DEFAULT '10',
   PRIMARY KEY (`rule_id`),
   UNIQUE KEY `rule_code` (`rule_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `salary_rule`
@@ -1816,17 +1732,6 @@ CREATE TABLE IF NOT EXISTS `userpermissions` (
   KEY `permissionID` (`permissionID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Đang đổ dữ liệu cho bảng `userpermissions`
---
-
-INSERT INTO `userpermissions` (`userID`, `permissionID`, `activepermission`) VALUES
-(4, 29, 0),
-(4, 31, 0),
-(6, 5, 1),
-(6, 10, 1),
-(7, 29, 0);
-
 -- --------------------------------------------------------
 
 --
@@ -1858,14 +1763,14 @@ CREATE TABLE IF NOT EXISTS `users` (
   UNIQUE KEY `email` (`email`),
   KEY `roleID` (`roleID`),
   KEY `departmentID` (`departmentID`)
-) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `users`
 --
 
 INSERT INTO `users` (`userID`, `username`, `password`, `fullname`, `cccd`, `email`, `phonenumber`, `birth`, `gender`, `address`, `bankaccount`, `bankname`, `hiredate`, `status`, `roleID`, `departmentID`, `skillGrade`, `jobtype`) VALUES
-(1, 'admin', '$2a$10$2sQzJxjvMcMeSNOSsysqjOQZzWIpwvHKIdwdeZ.EqQDM6QKcufj0q', 'Phạm Minh Anh', '12345678987', 'admin@manaplastic.com', '0123456789', NULL, 1, '123 Cao Lỗ ', NULL, NULL, '2023-01-01', 'active', 1, 2, 3, 'NORMAL'),
+(1, 'admin', '$2a$10$2sQzJxjvMcMeSNOSsysqjOQZzWIpwvHKIdwdeZ.EqQDM6QKcufj0q', 'Phạm Minh Anh', '12345678987', 'admin@manaplastic.com', '0123456789', NULL, 1, NULL, NULL, NULL, '2023-01-01', 'active', 1, 2, 3, 'NORMAL'),
 (2, 'it_support', '$2a$10$skyfJgN4n.Z2GMTP7GLnneUFL4cSm1DWoJdSsYGvF06flQTGz1GBC', 'Lê Hỗ Trợ IT', NULL, 'it.support@manaplastic.com', NULL, NULL, 1, NULL, NULL, NULL, '2023-05-10', 'active', 1, 2, 3, 'NORMAL'),
 (3, 'hr_manager', '$2a$10$yVs4Kv0e36Kcb8wesofM3enjSu/Kicj5TFJm6YavsG5TDd2kLtsqy', 'Nguyễn Thị Nhân Sự', '012345678906', 'hr.manager@manaplastic.com', '0123456789', '2006-03-02', 0, '123 Cao Lỗ', '1028123123', 'vietcombank', '2023-02-15', 'active', 2, 1, 1, 'NORMAL'),
 (4, 'hr_staff', '$2a$10$wnTMZHPSgAkKLfwNCY3cE.ufDKVPHrdWvaJ5oL.o0dKj7kxBMJNXG', 'Phạm Văn Tuyển Dụng', NULL, 'hr.staff@manaplastic.com', NULL, NULL, 1, NULL, NULL, NULL, '2023-08-01', 'active', 2, 1, 1, 'NORMAL'),
@@ -1885,7 +1790,7 @@ INSERT INTO `users` (`userID`, `username`, `password`, `fullname`, `cccd`, `emai
 (18, '56885905', '$2a$10$4WtXYERXuVRu89Fh1KVm4uc0PuMsuHbwMg7/32dl9/qbrsFZvin3m', 'testAddAccountNVinan', '12345678900', 'pminhanh1106@gmail.com', NULL, NULL, 0, NULL, NULL, NULL, '2024-02-17', 'active', 4, 5, 2, 'NORMAL'),
 (19, '79753710', '$2a$10$vHtQqmnZ0POJYFnxD42L4O./uv5SHW5viV3DZdBCXAa8vpYdD1MQG', 'Phạm Minh Anh Test Pass', '12345678922', 'phamminhanh11623@gmail.com', '0395168006', '2003-06-11', 1, NULL, '1023765488', NULL, '2024-11-27', 'active', 2, 1, 1, 'NORMAL'),
 (20, '000020', '$2a$10$gFUhtqQKDR2Lxwp71TlleONgBBbuc7ND.rIf/lhNhksN1lfEEJrbS', 'testAddAccountNVinan logic mới', '012345678900', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-15', 'active', 4, 5, 1, 'NORMAL'),
-(21, '000021', '$2a$10$hbZy3M1bMaLduAoQQ5g0eOEpoo6CtNZp5P1zi3GofCnBbMNlJnSjO', 'Phạm Minh Anh Kỹ Thuật', '012345678900', 'darkpic1106@gmail.com', '0395168006', '2003-06-11', 1, '123 Cao Lỗ', '1028792003', 'Vietcombank', '2025-11-28', 'active', 3, 3, 1, 'NORMAL');
+(21, '000021', '$2a$10$hbZy3M1bMaLduAoQQ5g0eOEpoo6CtNZp5P1zi3GofCnBbMNlJnSjO', 'Phạm Minh Anh Kỹ Thuật', '12345678900', 'darkpic1106@gmail.com', '0395168006', '2003-06-11', 1, '123 Cao Lỗ', '1028792003', 'Vietcombank', '2025-11-28', 'active', 3, 3, 1, 'NORMAL');
 
 --
 -- Các ràng buộc cho các bảng đã đổ
