@@ -13,7 +13,7 @@ body {
     left: 0;
     width: 100%;
     height: 60px;
-    background-color: #2e3b61;
+    background-color: #1c2655;
     color: white;
     padding: 0 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -109,85 +109,178 @@ body {
 // --- 3. SIDEBAR (LEFT HANDLE) ---
 .left_handle {
     position: fixed;
-    top: 0; // Bắt đầu từ đỉnh
+    top: 0;
     left: 0;
-    height: 100vh; // Full chiều cao
-    width: 4rem; // Chiều rộng mặc định Desktop
+    height: 100vh;
+    width: 4rem; // Chiều rộng mặc định (chỉ hiện icon)
     background-color: #1c2655;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    z-index: 100; // Cao hơn Header 1 chút để đè lên nếu cần
-    transition: all 0.3s ease-in-out; // Hiệu ứng trượt mượt mà
-    padding-top: 4rem; // Tránh đè lên logo, hoặc để 0 nếu muốn logo nằm trong sidebar
+    z-index: 100;
+    padding-top: 1rem;
 
-    .nav-links {
-        height: 4rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 1rem;
+    // Hiệu ứng chuyển động mượt mà cho width
+    transition: width 0.3s ease-in-out;
+    overflow-x: hidden; // Ẩn nội dung bị thừa khi thu nhỏ
+    white-space: nowrap; // Giữ chữ luôn nằm trên 1 dòng, không xuống dòng
 
-        // Nếu muốn logo nằm trên cùng thanh sidebar
-        position: absolute;
-        top: 0;
+    // --- LOGIC HOVER: Khi hover vào sidebar ---
+    &:hover {
+        width: 10rem; // Chiều rộng khi mở ra (khoảng 256px)
 
-        .nav-item img {
-            width: 3rem;
-            height: 3rem;
-            border-radius: 50%;
-            background: #fff;
+        // Khi sidebar mở ra, hiện text lên
+        .link-text {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        // Căn lề lại cho đẹp khi mở rộng
+        .menu-item .menu-icon {
+            justify-content: flex-start; // Căn trái thay vì giữa
+        }
+
+        .namelogo {
+            display: block;
+            color: #fff;
+            padding-left: 16px;
+            transform: translateX(0);
+        }
+
+        // ========================================================
+        // [MỚI] LOGIC: Sidebar mở + Icon Active => Hiện Submenu
+        // ========================================================
+        .menu-item {
+            .menu-icon.active+.submenu {
+                display: block; // Hiện lên khi sidebar đang mở
+                animation: fadeIn 0.3s ease; // Thêm chút hiệu ứng nếu thích
+            }
         }
     }
 
+    .namelogo {
+        display: none;
+    }
+
+    // --- NAV LINKS (LOGO) ---
+    .nav-links {
+        height: 4rem;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 1rem;
+        padding-left: 0.7rem; // Căn chỉnh logo
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+
+            img {
+                width: 2.5rem; // Chỉnh lại size logo chút cho cân đối
+                height: 2.5rem;
+                border-radius: 50%;
+                background: #fff;
+                min-width: 2.5rem; // Giữ icon không bị bóp méo
+                object-fit: cover;
+            }
+
+            .logo-text {
+                font-weight: bold;
+                font-size: 1.2rem;
+                color: #fff;
+                margin-left: 1rem;
+            }
+        }
+    }
+
+    // --- MENU ITEMS ---
     .menu-item {
         width: 100%;
         display: flex;
         flex-direction: column;
-        align-items: center;
 
         .menu-icon {
             color: #fff;
             text-decoration: none;
-            padding: 10px 0;
+            padding: 12px 0;
             width: 100%;
-            text-align: center;
-            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center; // Mặc định căn giữa (khi đóng)
+            transition: all 0.3s ease;
+            cursor: pointer; // Thêm con trỏ chuột
 
             &:hover {
-                background-color: #b7b6b6;
-                color: #000;
+                background-color: rgba(255, 255, 255, 0.1);
+                color: #fff;
             }
 
             &.active {
                 color: greenyellow;
+                background-color: rgba(255, 255, 255, 0.05);
+                border-left: 4px solid greenyellow;
             }
 
             .icon {
-                font-size: 1.5rem;
+                font-size: 1.2rem;
+                min-width: 4rem; // Đảm bảo icon luôn nằm giữa cột 4rem đầu tiên
+                text-align: center;
             }
         }
 
+        // --- SUBMENU ---
         .submenu {
             width: 100%;
+            // [QUAN TRỌNG] Mặc định ẩn đi (kể cả khi active mà chưa hover sidebar)
+            display: none;
+            padding-left: 0.5rem; // Thêm chút padding nếu cần
 
             .submenu-link {
-                display: block;
-                color: #ddd;
+                display: flex;
+                color: #b0b0b0;
                 text-decoration: none;
-                font-size: 0.7rem; // Chữ nhỏ cho icon mode
-                padding: 8px 0;
-                text-align: center;
+                font-size: 0.8rem; // Tăng size lên một chút cho dễ đọc (0.6 hơi bé)
+                transition: 0.2s;
+                margin: 0.5rem 0;
+                padding-left: 1rem; // Thụt đầu dòng cho đẹp
 
-                &:hover {
-                    color: #90ee90;
+                // Icon chấm nhỏ (nếu dùng)
+                .sub-icon {
+                    font-size: 0.5rem;
+                    min-width: 0.4rem; // Giảm xuống chút cho cân đối với submenu
+                    text-align: center;
+                    margin-right: 0;
                 }
 
-                &:focus {
+                &:hover,
+                &.active {
                     color: #90ee90;
                 }
             }
         }
+    }
+
+    // --- CLASS CHUNG CHO TEXT ---
+    // Mặc định ẩn text đi
+    .link-text {
+        opacity: 0;
+        visibility: hidden;
+        margin-left: 10px;
+        transition: opacity 0.3s ease 0.1s; // Delay 0.1s để sidebar mở ra chút rồi mới hiện chữ
+    }
+}
+
+// Keyframes cho hiệu ứng hiện submenu (Tùy chọn)
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 

@@ -1,318 +1,329 @@
+// --- VARIABLES ---
+$primary: #4f46e5; // Indigo
+$primary-hover: #4338ca;
+$text-main: #1e293b;
+$text-light: #64748b;
+$border: #e2e8f0;
+$bg-input: #f8fafc;
+$red: #ef4444;
+
+// --- OVERLAY ---
 .overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(15, 23, 42, 0.6); // Màu tối đậm hơn
+    backdrop-filter: blur(4px); // Làm mờ nền phía sau
     display: flex;
     justify-content: center;
     align-items: center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
+    transition: all 0.3s ease;
     z-index: 1000;
+
+    &.show {
+        opacity: 1;
+        visibility: visible;
+    }
 }
 
-.overlay.show {
-    opacity: 1;
-    visibility: visible;
-}
-
+// --- POPUP CONTAINER ---
 .popup {
-    background-color: white;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    width: 100%;
-    margin: 1rem;
-    /* Tăng chiều rộng để giống ảnh */
-    min-height: 400px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 95%;
+    max-width: 800px; // Rộng hơn chút
+    max-height: 90vh;
     display: flex;
     flex-direction: column;
-    position: relative;
-    /* Cho nút đóng */
-    overflow: hidden;
-    /* Cắt góc tròn */
+    animation: zoomIn 0.3s ease;
 }
 
-/* -------------------------------------
-   2. HEADER VÀ NÚT ĐÓNG
-------------------------------------- */
+// --- HEADER ---
 .popup-header {
-    background-color: #f7f7f7;
-    /* Màu nền xám nhạt */
-    padding: 1rem 20px;
-    border-bottom: 1px solid #eee;
-
-    h3 {
-        font-size: 1.2rem;
-        color: #333;
-        font-weight: 700;
-        margin: 0;
-        text-align: left;
-    }
-}
-
-.close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: #555;
-    cursor: pointer;
-    line-height: 1;
-    transition: color 0.2s;
-
-    &:hover {
-        color: #000;
-    }
-}
-
-/* -------------------------------------
-   3. NỘI DUNG FORM
-------------------------------------- */
-.popup-content {
-    flex-grow: 1;
-    padding: 20px 30px;
-
-    // Bắt chước phần Chi Tiết Tài Khoản
-    h4 {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 20px;
-    }
-}
-
-form {
+    padding: 20px 24px;
+    border-bottom: 1px solid $border;
     display: flex;
-    flex-direction: column;
-}
+    justify-content: space-between;
+    align-items: flex-start;
+    background: #ffffff;
+    border-radius: 16px 16px 0 0;
 
-label {
-    font-size: 0.95rem;
-    color: #333;
-    font-weight: 500;
-    margin-top: 0.8rem;
-    margin-bottom: 0.3rem;
-    display: block;
-    text-align: left;
-}
+    .header-content {
+        h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: $primary;
+        }
 
-input[type="date"],
-select {
-    width: 100%;
-    padding: 0.6rem 0.8rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    /* Góc bo tròn nhẹ hơn */
-    font-size: 0.95rem;
-    box-sizing: border-box;
-
-    &:focus {
-        outline: none;
-        border-color: #007bff;
-        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+        p {
+            margin: 4px 0 0;
+            font-size: 0.9rem;
+            color: $text-light;
+        }
     }
-}
 
-/* Ẩn placeholder của nút submit cũ */
-.hidden-submit-placeholder {
-    display: none;
-}
-
-/* -------------------------------------
-   4. RADIO BUTTON GROUP (Giữ nguyên style cơ bản)
-------------------------------------- */
-.type-group {
-    display: flex;
-    gap: 1.5rem;
-    margin-top: 0.5rem;
-
-    &>label {
+    .close-btn {
+        background: transparent;
+        border: none;
+        color: $text-light;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
-        font-weight: 400;
-        margin-top: 0;
-        cursor: pointer;
-        color: #555;
+        justify-content: center;
+        transition: all 0.2s;
 
-        input[type="radio"] {
-            margin-right: 8px;
-            accent-color: #007bff;
+        &:hover {
+            background-color: #f1f5f9;
+            color: $red;
+        }
+
+        span {
+            font-size: 24px;
         }
     }
 }
 
-/* -------------------------------------
-   5. POPUP FOOTER VÀ NÚT HÀNH ĐỘNG
-------------------------------------- */
+// --- CONTENT & FORM ---
+.popup-content {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto; // Scroll nội dung
+
+    // Custom Scrollbar
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 10px;
+    }
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); // 2 Cột đều nhau
+    gap: 20px;
+}
+
+// Tiêu đề từng phần (Section)
+.form-section {
+    grid-column: span 2;
+    border-bottom: 1px solid $border;
+    padding-bottom: 8px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+
+    .section-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: $text-light;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+// --- FORM GROUPS ---
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: $text-main;
+
+        .required {
+            color: $red;
+            margin-left: 2px;
+        }
+    }
+
+    input,
+    select {
+        padding: 10px 12px;
+        border: 1px solid $border;
+        border-radius: 8px;
+        background-color: $bg-input;
+        font-size: 0.95rem;
+        color: $text-main;
+        outline: none;
+        transition: all 0.2s;
+        width: 100%;
+        box-sizing: border-box;
+
+        &::placeholder {
+            color: #94a3b8;
+        }
+
+        &:focus {
+            border-color: $primary;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba($primary, 0.1);
+        }
+
+        &:hover:not(:focus) {
+            border-color: #cbd5e1;
+        }
+    }
+}
+
+// --- FILE UPLOAD STYLE ---
+.file-upload-wrapper {
+    position: relative;
+    width: 100%;
+    height: 80px;
+    border: 2px dashed $border;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    transition: all 0.2s;
+    cursor: pointer;
+
+    &:hover {
+        border-color: $primary;
+        background-color: #eef2ff;
+    }
+
+    input[type="file"] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    .file-trigger {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+        pointer-events: none;
+        gap: 5px;
+
+        .icon {
+            font-size: 28px;
+            color: $text-light;
+        }
+
+        .text {
+            font-size: 0.9rem;
+            color: $text-light;
+        }
+
+        .text.highlight {
+            color: $primary;
+            font-weight: 600;
+        }
+    }
+}
+
+// --- FOOTER ---
 .popup-footer {
-    padding: 1rem 20px;
-    background-color: #f7f7f7;
-    /* Màu nền footer giống header */
-    border-top: 1px solid #eee;
+    padding: 16px 24px;
+    background-color: #f8fafc;
+    border-top: 1px solid $border;
+    border-radius: 0 0 16px 16px;
     display: flex;
     justify-content: flex-end;
-    /* Nút nằm bên phải */
-    gap: 10px;
-    position: sticky;
-    /* Giữ footer cố định */
-    bottom: 0;
+    gap: 12px;
 }
 
 .btn {
-    padding: 0.6rem 1.2rem;
-    border: none;
-    border-radius: 4px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
-    font-weight: 500;
-    transition: 0.2s;
-}
-
-.btn-save {
-    background-color: #007bff;
-    /* Màu Xanh dương (giống nút Lưu trong ảnh) */
-    color: white;
-
-    &:hover {
-        background-color: #0056b3;
-    }
-
-    &:disabled {
-        background-color: #a0c3e8;
-        cursor: not-allowed;
-    }
-}
-
-.btn-cancel {
-    background-color: #ccc;
-    /* Màu xám (giống nút Hủy trong ảnh) */
-    color: #333;
-
-    &:hover {
-        background-color: #bbb;
-    }
-}
-
-/* -------------------------------------
-   1. ADJUST POPUP KÍCH THƯỚC CHUNG
-------------------------------------- */
-.popup {
-    background-color: white;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-    // 💡 TĂNG MAX-WIDTH để chứa 2 cột dễ dàng hơn
-    max-width: 850px;
-    width: 90%;
-    /* Dùng % để responsive tốt hơn */
-
+    border: none;
     display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow: hidden;
-}
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
 
-/* -------------------------------------
-   2. NỘI DUNG FORM CHUNG (Cho phép cuộn)
-------------------------------------- */
-.popup-content {
-    flex-grow: 1;
-    padding: 20px 30px;
-    max-height: 70vh;
-    /* Giới hạn chiều cao và cho phép cuộn */
-    overflow-y: auto;
-    /* Cho phép cuộn dọc */
-    padding-right: 15px;
-    /* Giảm padding right bị thừa */
-}
+    &.btn-primary {
+        background-color: $primary;
+        color: white;
 
-/* -------------------------------------
-   3. FORM GRID (2 Cột Mặc định)
-------------------------------------- */
-.form-grid {
-    // 💡 SỬA LỖI: Chia 2 cột bằng nhau (1fr 1fr)
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 25px;
-    /* Tăng khoảng cách giữa 2 cột */
-}
+        &:hover {
+            background-color: $primary-hover;
+            transform: translateY(-1px);
+        }
 
-.col {
-    display: contents;
-    /* 💡 OPTIMIZATION: Cho phép các phần tử con (label, input)
-                          tương tác trực tiếp với grid cha (form-grid) */
-}
-
-/* Style cơ bản cho Label và Input (Tái định nghĩa lại để áp dụng cho cả hai cột) */
-.col label {
-    display: block;
-    font-weight: 600;
-    margin-top: 10px;
-    grid-column: span 1;
-    /* Mỗi label chiếm 1 cột */
-    font-size: 0.9rem;
-    color: #444;
-}
-
-.col input[type="text"],
-.col input[type="number"],
-.col input[type="date"],
-.col input[type="file"],
-.col select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-top: 4px;
-    grid-column: span 1;
-    /* Mỗi input chiếm 1 cột */
-    font-size: 0.95rem;
-    box-sizing: border-box;
-}
-
-/* -------------------------------------
-   4. RESPONSIVE DESIGN (Chuyển sang 1 cột)
-------------------------------------- */
-@media (max-width: 768px) {
-
-    .popup {
-        max-width: 95%;
-
-    }
-
-    .popup-header {
-        h3 {
-            font-size: 1rem !important;
-
+        &:disabled {
+            background-color: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
         }
     }
 
+    &.btn-text {
+        background-color: transparent;
+        color: $text-light;
+
+        &:hover {
+            background-color: #e2e8f0;
+            color: $text-main;
+        }
+    }
+}
+
+// --- RESPONSIVE ---
+@media (max-width: 768px) {
+    .popup {
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+        border-radius: 0;
+    }
+
+    .popup-header {
+        border-radius: 0;
+    }
+
     .form-grid {
-        // 💡 CHUYỂN SANG 1 CỘT DUY NHẤT
         grid-template-columns: 1fr;
-        gap: 0;
-        /* Loại bỏ gap ngang */
     }
 
-    /* Đảm bảo các phần tử con không bị lỗi chiếm cột */
-    .col label,
-    .col input,
-    .col select {
-        grid-column: 1 / -1;
-        /* Bắt tất cả các phần tử chiếm toàn bộ 1 cột */
+    // Chuyển về 1 cột trên mobile
+    .form-section,
+    .full-width {
+        grid-column: span 1;
     }
 
-    /* Điều chỉnh lại khoảng cách giữa các trường khi ở chế độ 1 cột */
-    .col label {
-        margin-top: 15px;
+    .empty-desktop {
+        display: none;
+    }
+}
+
+// --- ANIMATION ---
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
     }
 
-    .popup-content {
-        padding: 15px;
+    to {
+        opacity: 1;
+        transform: scale(1);
     }
 }

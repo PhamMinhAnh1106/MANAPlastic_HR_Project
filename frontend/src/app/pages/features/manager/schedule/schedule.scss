@@ -1,72 +1,16 @@
-[extraControls] {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    /* cần để đẩy icon ra mép phải */
+.schedule-container {
+    padding: 20px;
+    background-color: #fff;
+    min-height: 100vh;
+    box-sizing: border-box;
 
-    /* Icon + (luôn nằm bên phải) */
-    .material-symbols-outlined {
-        margin-left: auto;
-        /* ĐẨY RA PHẢI */
-        cursor: pointer;
-        font-size: 26px;
-        padding: 6px;
-        border-radius: 50%;
-        transition: 0.2s;
-        user-select: none;
-
-        &:hover {
-            background: #eaeaea;
-        }
-
-        &:active {
-            transform: scale(0.9);
-        }
-    }
-
-    select {
-        padding: 6px 10px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        background: #fff;
-        font-size: 14px;
-        min-width: 140px;
-        cursor: pointer;
-
-        &:focus {
-            outline: none;
-            border-color: #4d8cff;
-            box-shadow: 0 0 4px rgba(77, 140, 255, 0.4);
-        }
-    }
-
-    button {
-        padding: 6px 14px;
-        font-size: 14px;
-        border-radius: 6px;
-        border: none;
-        cursor: pointer;
-        background: #4d8cff;
-        color: white;
-        font-weight: 600;
-        transition: 0.2s;
-
-        &:hover {
-            background: #2f6de0;
-        }
-
-        &:active {
-            transform: scale(0.97);
-        }
-    }
-
-    /* Manager button: Đăng lịch */
-    button:nth-child(3) {
-        background: #28a745 !important;
-
-        &:hover {
-            background: #1e8b38 !important;
-        }
+    /* --- COMPACT MODE (Chế độ thu gọn) --- */
+    &.compact-view {
+        padding: 5px; // Giảm padding tối đa
+        min-height: auto; // Bỏ chiều cao tối thiểu bắt buộc
+        height: 100vh; // Cố định chiều cao bằng màn hình
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; // Ẩn scroll của container ngoài
     }
 }

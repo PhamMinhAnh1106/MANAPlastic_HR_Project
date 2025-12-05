@@ -1,175 +1,289 @@
 <div class="container">
-  <h2>Xếp Ca Tự Động</h2>
+    
+    <!-- CARD DUY NHẤT: CHỨA TOÀN BỘ CẤU HÌNH -->
+    <div class="card">
+        <h2>Thiết Lập Xếp Ca Tự Động</h2>
+        
+        <!-- Phần 1: Chọn Thời Gian -->
+        <div class="month_year">
+            <label>
+                Tháng
+                <select [(ngModel)]="savemonth" name="month">
+                    <option value="" disabled selected>-- Chọn --</option>
+                    <option *ngFor="let m of month" [value]="m">Tháng {{m}}</option>
+                </select>
+            </label>
+            <label>
+                Năm
+                <select [(ngModel)]="saveyear" name="year">
+                    <option value="" disabled selected>-- Chọn --</option>
+                    <option *ngFor="let y of year" [value]="y">{{y}}</option>
+                </select>
+            </label>
+        </div>
 
-  <div class="month_year">
-    <label>
-      Tháng:
-      <select [(ngModel)]="savemonth" name="month">
-        <option value="" disabled selected>-- Chọn tháng --</option>
-        <option *ngFor="let m of month" [value]="m">{{m}}</option>
-      </select>
-    </label>
+        <hr>
 
-    <label>
-      Năm:
-      <select [(ngModel)]="saveyear" name="year">
-        <option value="" disabled selected>-- Chọn năm --</option>
-        <option *ngFor="let y of year" [value]="y">{{y}}</option>
-      </select>
-    </label>
-  </div>
+        <!-- Phần 2: Cấu hình Tiêu chí -->
+        <h3><span class="material-symbols-outlined" style="vertical-align: bottom;">tune</span> Thiết lập Tiêu chí</h3>
+        
+        <div class="config-grid">
+            <!-- Loại ca: Segmented Control -->
+            <div class="input-group">
+                <label>Loại ca làm việc</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="type" (change)="changeType(8)" value="8" />
+                        <span>8 Tiếng</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="type" (change)="changeType(6)" value="6" />
+                        <span>6 Tiếng</span>
+                    </label>
+                </div>
+            </div>
 
-  <hr>
+            <!-- Chọn ca -->
+            <div class="input-group">
+                <label>Chọn ca cụ thể</label>
+                <select [(ngModel)]="shiftId" name="shiftId" class="form-control">
+                    <option [ngValue]="''" disabled selected>-- Chọn ca --</option>
+                    <option *ngFor="let s of list" [value]="s.shift_id">
+                        {{ s.shift_name }} ({{ s.start_time }} - {{ s.end_time }})
+                    </option>
+                    <optgroup label="Nghỉ phép">
+                        <option value="53">AL (Annually Leave)</option>
+                        <option value="54">SL (Sick Leave)</option>
+                    </optgroup>
+                </select>
+            </div>
 
-  <h3>Thiết lập Tiêu chí Xếp ca</h3>
-  
-  <div class="input-row">
-    <div class="input-group">
-        <label>Loại ca:</label>
-        <div class="radio-group">
-            <label><input type="radio" name="type" (change)="changeType(8)" value="8" /> 8 tiếng</label>
-            <label><input type="radio" name="type" (change)="changeType(6)" value="6" /> 6 tiếng</label>
+            <!-- Tổng NV -->
+            <div class="input-group">
+                <label>Tổng nhân sự cần</label>
+                <input type="number" [(ngModel)]="formSchedule.totalStaffNeeded" class="form-control" placeholder="Nhập số lượng...">
+            </div>
+        </div>
+
+        <!-- Phần 3: Bảng Rules -->
+        <div class="rule-input-table">
+            <h4>Chi tiết yêu cầu kỹ năng (Skill Rules)</h4>
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">STT</th>
+                        <th>Cấp độ nhân viên (Skill Grade)</th>
+                        <th>Số lượng tối thiểu (Min Staff)</th>
+                        <th style="width: 100px; text-align: center;">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Danh sách Rule đã thêm -->
+                    <tr *ngFor="let rule of formSchedule.rules; let i = index">
+                        <td>{{ i + 1 }}</td>
+                        <td><strong>{{ rule.requiredSkillGrade }}</strong></td>
+                        <td>{{ rule.minStaffCount }}</td>
+                        <td style="text-align: center;">
+                            <button class="delete-btn" (click)="removeRule(i)">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    <!-- Dòng Input Thêm mới -->
+                    <tr class="input-tr">
+                        <td>#</td>
+                        <td><input type="text" [(ngModel)]="tempSkill" placeholder="VD: Senior, Junior, 1, 2..."></td>
+                        <td><input type="number" [(ngModel)]="tempMinStaff" placeholder="VD: 5"></td>
+                        <td>
+                            <button class="add-btn" (click)="addRuleToTable()">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">add</span> Thêm
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Nút Lưu -->
+        <div style="margin-top: 25px; text-align: right; border-top: 1px dashed #e2e8f0; padding-top: 15px;">
+            <button class="btn-primary" [disabled]="!hasRules" (click)="saveSchedule()">
+                <span class="material-symbols-outlined">save</span> Lưu Tiêu Chí Này
+            </button>
         </div>
     </div>
 
-    <div class="input-group">
-        <label>Chọn ca:</label>
-        <select [(ngModel)]="shiftId" name="shiftId" class="form-control">
-            <option [ngValue]="''" disabled selected>-- Chọn ca làm việc --</option>
-            <option *ngFor="let s of list" [value]="s.shift_id">
-                {{ s.shift_name }} ({{ s.start_time }} - {{ s.end_time }})
-            </option>
-            <option value="53">AL (Annually Leave)</option>
-            <option value="54">SL (Sick Leave)</option>
-            <option value="55">PL (Paternity Leave)</option>
-            <option value="56">ML (Maternity Leave)</option>
-            <option value="57">UL (Unpaid Leave)</option>
-        </select>
+    <!-- CARD 2: CHỨC NĂNG CHÍNH -->
+    <div class="function-buttons">
+        <button class="btn-success" (click)="checkRules()"> 
+            <span class="material-symbols-outlined">list_alt</span> Xem DS Tiêu chí
+        </button>
+        <button class="btn-primary" style="background-color: #0ea5e9;" (click)="checkDraftSchedule()"> 
+            <span class="material-symbols-outlined">fact_check</span> Kiểm tra Lịch Nháp
+        </button>
+        <button class="btn-warning" style="background-color: #d97706;" (click)="viewSchedule()"> 
+            <span class="material-symbols-outlined">calendar_month</span> Xem Lịch Chi tiết
+        </button>
     </div>
 
-    <div class="input-group">
-        <label>Tổng NV cần:</label>
-        <input type="number" [(ngModel)]="formSchedule.totalStaffNeeded" class="form-control small-input" placeholder="0">
+    <!-- POPUP 1: DANH SÁCH TIÊU CHÍ -->
+    <div class="popup-overlay" *ngIf="requirementPopupVisible">
+        <div class="popup large-popup">
+            <div class="popup-header">
+                <h3>Danh sách Tiêu chí Tháng {{ savemonth }}/{{ saveyear }}</h3>
+                <button class="close-btn" (click)="closeRequirementPopup()">&times;</button>
+            </div>
+            
+            <div class="popup-content">
+                <div *ngIf="rulesDatalength > 0; else noReqData">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Ca làm việc</th>
+                                <th>Tổng cần</th>
+                                <th>Rule ID</th>
+                                <th>Skill Grade</th>
+                                <th>Min Staff</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngFor="let req of rulesData">
+                                <tr *ngFor="let r of req.rules; let i = index">
+                                    <td *ngIf="i === 0" [attr.rowspan]="req.rules.length" style="background: #fff; vertical-align: top; font-weight: bold;">
+                                        {{ getShiftName(req.shiftId) }}
+                                    </td>
+                                    <td *ngIf="i === 0" [attr.rowspan]="req.rules.length" style="background: #fff; vertical-align: top;">
+                                        {{ req.totalStaffNeeded }}
+                                    </td>
+                                    
+                                    <td>{{ r.ruleId }}</td>
+                                    <td>{{ r.requiredSkillGrade }}</td>
+                                    <td>{{ r.minStaffCount }}</td>
+                                    <td>
+                                        <!-- Nút Sửa gọi hàm mở modal sửa -->
+                                        <button class="edit-btn" style="background: #fef08a; color: #854d0e; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;" (click)="openEditModal(req)">
+                                            Sửa
+                                        </button>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                    <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                        <button class="btn-primary" (click)="autoassign()">
+                            <span class="material-symbols-outlined">autoplay</span> Xếp Ca Tự Động (Tạo Nháp)
+                        </button>
+                    </div>
+                </div>
+
+                <ng-template #noReqData>
+                    <div class="no-data">
+                        <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1;">folder_off</span>
+                        <p>Chưa có tiêu chí nào được thiết lập.</p>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div class="rule-input-table">
-      <h4>Chi tiết yêu cầu kỹ năng (Rules)</h4>
-      <table>
-          <thead>
-              <tr>
-                  <th>STT</th>
-                  <th>Cấp độ nhân viên (Skill Grade)</th>
-                  <th>Số lượng tối thiểu (Min Staff)</th>
-                  <th>Hành động</th>
-              </tr>
-          </thead>
-          <tbody>
-              <tr *ngFor="let rule of formSchedule.rules; let i = index">
-                  <td>{{ i + 1 }}</td>
-                  <td>{{ rule.requiredSkillGrade }}</td>
-                  <td>{{ rule.minStaffCount }}</td>
-                  <td><button class="delete-btn" (click)="removeRule(i)">Xóa</button></td>
-              </tr>
-              <tr class="input-tr">
-                  <td>#</td>
-                  <td><input type="text" [(ngModel)]="tempSkill" placeholder="VD: 1, 2..."></td>
-                  <td><input type="number" [(ngModel)]="tempMinStaff" placeholder="VD: 5"></td>
-                  <td><button class="add-btn" (click)="addRuleToTable()">+ Thêm Rule</button></td>
-              </tr>
-          </tbody>
-      </table>
-  </div>
-
-  <div class="action-buttons center">
-      <button class="save-btn" [disabled]="!hasRules" (click)="saveSchedule()">Lưu Tiêu Chí Này</button>
-  </div>
-
-  <hr>
-
-  <div class="function-buttons">
-    <button (click)="checkRules()" style="background-color: #28a745;"> Xem Danh sách Tiêu chí Đã Lưu</button>
-    <button (click)="checkDraftSchedule()" style="background-color: #28a3a7ff;"> Kiểm tra Lịch Nháp</button>
-    <button (click)="viewSchedule()" style="background-color: #a5a728ff;"> Xem Lịch Chi tiết</button>
-  </div>
-
-  <div class="popup-overlay" *ngIf="requirementPopupVisible">
-    <div class="popup large-popup">
-      <div class="popup-header">
-          <h3>Danh sách Tiêu chí Xếp ca ({{ savemonth }}/{{ saveyear }})</h3>
-          <button class="close-btn" (click)="closeRequirementPopup()">&times;</button>
-      </div>
-      
-      <div class="popup-content">
-          <table class="data-table" *ngIf="rulesDatalength > 0; else noReqData">
-            <thead>
-              <tr>
-                <th>Requirement ID</th>
-                <th>Ca làm việc</th>
-                <th>Tổng NV cần</th>
-                <th>Rule ID</th>
-                <th>Skill Grade</th>
-                <th>Min Staff</th>
-                <th>Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              <ng-container *ngFor="let req of rulesData">
-                <tr *ngFor="let r of req.rules; let i = index">
-                  <td *ngIf="i === 0" [attr.rowspan]="req.rules.length">{{ req.requirementId }}</td>
-                  <td *ngIf="i === 0" [attr.rowspan]="req.rules.length">{{ getShiftName(req.shiftId) }}</td>
-                  <td *ngIf="i === 0" [attr.rowspan]="req.rules.length">{{ req.totalStaffNeeded }}</td>
-                  
-                  <td>{{ r.ruleId }}</td>
-                  <td>{{ r.requiredSkillGrade }}</td>
-                  <td>{{ r.minStaffCount }}</td>
-                  <td><button class="edit-btn" (click)="updateRuleData()">Sửa</button></td>
-                </tr>
-              </ng-container>
-            </tbody>
-              <button class="btn_up" (click)="autoassign()"> Xếp Ca Tự Động (Tạo Nháp)</button>
-
-          </table>
-          <ng-template #noReqData>
-              <p class="no-data">Chưa có tiêu chí nào được thiết lập cho tháng {{ savemonth }}/{{ saveyear }}.</p>
-          </ng-template>
-      </div>
+    <!-- POPUP 2: KẾT QUẢ KIỂM TRA -->
+    <div class="popup-overlay" *ngIf="draftPopupVisible">
+        <div class="popup">
+            <div class="popup-header">
+                <h3>Kết quả Kiểm tra Lịch Nháp</h3>
+                <button class="close-btn" (click)="closeDraftPopup()">&times;</button>
+            </div>
+            <div class="popup-content">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Ngày</th>
+                            <th>Ca làm việc</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let d of draftData">
+                            <td>{{ d.date }}</td>
+                            <td>{{ d.shiftName }}</td>
+                            <td>
+                                <span class="status-badge" [ngClass]="{'ok': d.isCompliant, 'err': !d.isCompliant}">
+                                    {{ d.message }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div class="popup-overlay" *ngIf="draftPopupVisible">
-    <div class="popup">
-      <div class="popup-header">
-          <h3>Kết quả Kiểm tra Lịch Nháp</h3>
-          <button class="close-btn" (click)="closeDraftPopup()">&times;</button>
-      </div>
-      <div class="popup-content">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Ngày</th>
-                <th>Ca làm việc</th>
-                <th>Trạng thái</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let d of draftData">
-                <td>{{ d.date }}</td>
-                <td>{{ d.shiftName }}</td>
-                <td>
-                  <span [ngClass]="{'status-ok': d.isCompliant, 'status-err': !d.isCompliant}">
-                    {{ d.message }}
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-      </div>
+    <!-- POPUP 3: SỬA TIÊU CHÍ (EDIT MODAL) -->
+    <div class="popup-overlay" *ngIf="isEditing">
+        <div class="popup large-popup" style="z-index: 10001;">
+            <div class="popup-header">
+                <h3>Cập nhật Tiêu chí #{{ editingData.requirementId }}</h3>
+                <button class="close-btn" (click)="closeEditModal()">&times;</button>
+            </div>
+
+            <div class="popup-content">
+                <div class="config-grid">
+                    <div class="input-group">
+                        <label>Ca làm việc:</label>
+                        <input type="text" [value]="getShiftName(editingData.shiftId)" disabled class="form-control" style="background: #e9ecef;">
+                    </div>
+                    <div class="input-group">
+                        <label>Tổng nhân sự cần:</label>
+                        <input type="number" [(ngModel)]="editingData.totalStaffNeeded" class="form-control">
+                    </div>
+                </div>
+
+                <div class="rule-input-table" style="margin-top: 20px;">
+                    <h4>Danh sách yêu cầu kỹ năng</h4>
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Skill Grade</th>
+                                <th>Min Staff</th>
+                                <th class="text-center">Xóa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let rule of editingData.rules; let i = index">
+                                <td>
+                                    <input type="text" [(ngModel)]="rule.requiredSkillGrade" placeholder="VD: 1, 2...">
+                                </td>
+                                <td>
+                                    <input type="number" [(ngModel)]="rule.minStaffCount">
+                                </td>
+                                <td class="text-center">
+                                    <button class="delete-btn" (click)="removeRuleInEdit(i)">
+                                        <span class="material-symbols-outlined">delete</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <button class="add-btn" style="margin-top: 10px;" (click)="addRuleInEdit()">
+                        <span class="material-symbols-outlined">add</span> Thêm dòng
+                    </button>
+                </div>
+
+                <div style="margin-top: 20px; text-align: right; border-top: 1px solid #eee; padding-top: 15px;">
+                    <button class="btn-secondary" style="margin-right: 10px; border: 1px solid #ccc; background: white;" (click)="closeEditModal()">Hủy</button>
+                    <button class="btn-primary" (click)="saveEditRule()">
+                        <span class="material-symbols-outlined">save</span> Lưu Thay Đổi
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
 </div>
 
+<!-- COMPONENT PHỤ -->
 <app-loading *ngIf="isloading"></app-loading>
 <app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
 <app-alert *ngIf="isalert" [message]="alertmessage" [notifyType]="alertType" (hidden)="isalert = false"></app-alert>

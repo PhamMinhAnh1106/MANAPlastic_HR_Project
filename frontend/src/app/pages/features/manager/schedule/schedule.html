@@ -1,40 +1,30 @@
-<app-tablemonth
-  [dayData]="dayData"
-  (selectDay)="handleDayClick($event)"
-  (monthYearChange)="handleMonthYear($event)"
->
+<div class="schedule-container compact-view">
+  <app-tablemonth 
+    [dayData]="dayData" 
+    (selectDay)="handleDayClick($event)" 
+    (monthYearChange)="handleMonthYear($event)"
+    
+    (statusChange)="selectStatus = $event; chooseSchedule()"
+    (upOffice)="UpOfficeSchedule()"
+    (autoSchedule)="autoSchedule()"
+    (register)="registerShift()"
+    >
+    <!-- Nội dung trong này đã được chuyển vào bên trong Tablemonth -->
+  </app-tablemonth>
+</div>
 
-  <!-- Extra filter / buttons -->
-  <div extraControls>
-    <select [(ngModel)]="selectStatus">
-      <option  value="">Chọn Lịch</option>
-      <option *ngIf="role=='employee'" value="0">Lịch Nháp</option>
-      <option *ngIf="role=='employee'" value="1">Lịch chính thức</option>
-      <option *ngIf="role=='manager'" value="2">Lịch Nháp</option>
-      <option *ngIf="role=='manager'" value="3">Lịch chính thức</option>
-    </select>
-    <button (click)="chooseSchedule()">Lưu</button>
-    <button *ngIf="role=='manager'" (click)="UpOfficeSchedule()">Đăng Lịch Chính Thức</button>
-    <button *ngIf="role=='manager'" (click)="autoSchedule()">Xếp lịch tự động</button>
-    <span *ngIf="role == 'employee'" class="material-symbols-outlined" (click)="registerShift()">add</span>
-  </div>
+<!-- Global Components -->
+<app-loading *ngIf="isloading"></app-loading>
 
+<app-comfirm 
+  *ngIf="isconfirm" 
+  [message]="confirmMessage" 
+  (result)="onConfirmResult($event)">
+</app-comfirm>
 
-</app-tablemonth>
-
-<app-loading 
-  *ngIf="isloading"
-></app-loading>
-
-<app-comfirm
-  *ngIf="isconfirm"
-  [message]="confirmMessage"
-  (result)="onConfirmResult($event)"
-></app-comfirm>
-
-<app-alert
-  *ngIf="isalert"
-  [message]="alertmessage"
-  [notifyType]="alertType"
-   (hidden)="isalert = false"
-></app-alert>
+<app-alert 
+  *ngIf="isalert" 
+  [message]="alertmessage" 
+  [notifyType]="alertType" 
+  (hidden)="isalert = false">
+</app-alert>

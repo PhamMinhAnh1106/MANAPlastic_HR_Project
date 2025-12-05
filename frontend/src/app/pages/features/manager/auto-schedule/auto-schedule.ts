@@ -5,8 +5,19 @@ import { getAllSchedules, scheduleList } from '../../../../utils/listSchedule.ut
 import { Loading } from '../../../shared/loading/loading';
 import { Alert } from '../../../shared/alert/alert';
 import { Comfirm } from '../../../shared/comfirm/comfirm';
-import { AutoAssignSchedule, CheckAutoAssignSchedule, GetRequirementsAutoSchedule, RequirementsAutoSchedule } from '../../../../services/pages/features/manager/autoSchedule.service';
+import { AutoAssignSchedule, CheckAutoAssignSchedule, GetRequirementsAutoSchedule, RequirementsAutoSchedule, updateRuleData } from '../../../../services/pages/features/manager/autoSchedule.service';
 import { reqAutoSchedule } from '../../../../interface/autoSchedule';
+
+// Define Form Interface cho Edit
+interface formRule {
+  requirementId: number;
+  totalStaffNeeded: number;
+  rules: {
+    ruleId?: number;
+    requiredSkillGrade: string;
+    minStaffCount: number;
+  }[];
+}
 
 @Component({
   selector: 'app-auto-schedule',
@@ -17,7 +28,8 @@ import { reqAutoSchedule } from '../../../../interface/autoSchedule';
 })
 export class AutoSchedule {
   constructor(private cdr: ChangeDetectorRef) { }
-  ////////////////////////
+
+  // Alert Props
   isconfirm: boolean = false;
   isalert: boolean = false;
   isloading: boolean = false;
@@ -31,11 +43,10 @@ export class AutoSchedule {
     this.alertmessage = message;
     this.alertType = type;
   }
-  /////////////////////////
-  //form api schedule auto add rule
+
+  // --- FORM ADD NEW ---
   departmentId = "";
   totalStaffNeeded = "";
-  //
   formSchedule = {
     departmentId: '',
     shiftId: '',
@@ -44,16 +55,50 @@ export class AutoSchedule {
     requiredSkillGrade: '',  // input tạm
     minStaffCount: ''        // input tạm
   };
-  list: any[] = [];       // danh sách ca
+  list: any[] = [];
   shiftId: any = '';
+
   changeType(hours: number) {
     scheduleList(hours, this.list);
   }
+
+  // --- POPUPS & DATA LISTS ---
   rulesPopupVisible = false;
   draftPopupVisible = false;
+  requirementPopupVisible = false;
   draftData: any[] = [];
+  rulesData: any = [];
+  rulesDatalength = 0;
+  shiftName = getAllSchedules();
 
-  // Thêm rule nhưng KHÔNG reset input
+  month: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  year: number[] = [2024, 2025, 2026, 2027];
+  savemonth = '';
+  saveyear = '';
+
+  // --- EDIT MODAL PROPS ---
+  isEditing: boolean = false;
+  editingData: any = {
+    requirementId: 0,
+    shiftId: 0,
+    totalStaffNeeded: 0,
+    rules: []
+  };
+
+  // --- METHODS ---
+
+  getShiftName(id: number) {
+    const found = this.shiftName.find((x: any) => x.shift_id === id);
+    return found ? found.shift_name : id;
+  }
+
+  closeRequirementPopup() { this.requirementPopupVisible = false; }
+  closeDraftPopup() { this.draftPopupVisible = false; }
+  closeRulesPopup() { this.rulesPopupVisible = false; }
+  showRules() { this.rulesPopupVisible = true; }
+  viewSchedule() { window.location.href = '/home/schedule'; }
+
+  // --- ADD LOGIC ---
   addRule() {
     if (this.shiftId == "" || this.formSchedule.totalStaffNeeded == "")
       this.Onalert("Hãy Điền Đủ Thông Tin", false);
@@ -67,150 +112,32 @@ export class AutoSchedule {
         requiredSkillGrade: this.formSchedule.requiredSkillGrade,
         minStaffCount: this.formSchedule.minStaffCount
       });
-      // không reset input
       this.formSchedule.requiredSkillGrade = '';
       this.formSchedule.minStaffCount = '';
     }
   }
 
-  // Kiểm tra nút Save hiển thị
-  get hasRules() {
-    return this.formSchedule.rules.length > 0;
-  }
-
-  showRules() {
-    this.rulesPopupVisible = true;
-  }
-
-  closeRulesPopup() {
-    this.rulesPopupVisible = false;
-  }
-
-  // async checkDraftSchedule() {
-  //   if (this.saveyear == "" || this.savemonth == "") {
-  //     this.Onalert("Hãy chọn tháng và năm", false);
-  //     return;
-  //   }
-  //   const month_year = `${this.saveyear}-${this.savemonth}`;
-  //   const res = await CheckAutoAssignSchedule(month_year);
-  //   this.draftData = res;
-  //   this.draftPopupVisible = true;
-  //   this.cdr.detectChanges();
-
-  // }
-
-  closeDraftPopup() {
-    this.draftPopupVisible = false;
-  }
-
-  viewSchedule() {
-    window.location.href = '/home/schedule';
-  }
-
-  // saveSchedule() {
-  //   this.isconfirm = true;
-  //   this.confirmMessage = "Bạn Muốn thêm tiêu chí này ?"
-
-  // }
-
-  requirementPopupVisible: boolean = false;
-  rulesData: any = [];
-  rulesDatalength = 0;
-  shiftName = getAllSchedules();
-
-  getShiftName(id: number) {
-    const found = this.shiftName.find((x: any) => x.shift_id === id);
-    return found ? found.shift_name : id;
-  }
-  // async checkRules() {
-  //   if (this.saveyear == "" || this.savemonth == "") {
-  //     this.Onalert("Hãy chọn tháng và năm", false);
-  //     return;
-  //   }
-  //   this.requirementPopupVisible = true;
-  //   const res = await GetRequirementsAutoSchedule();
-  //   this.rulesData = res;
-  //   this.rulesDatalength = res.length;
-  //   console.log(this.rulesData);
-  //   this.cdr.detectChanges();
-
-  // }
-  closeRequirementPopup() {
-    this.requirementPopupVisible = false;
-  }
-
-  month: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-  year: number[] = [2024, 2025, 2026, 2027];
-  savemonth = '';
-  saveyear = '';
-  async autoassign() {
-    const month_year = `${this.saveyear}-${this.savemonth}`;
-    this.isloading = true;
-    const res = await AutoAssignSchedule(month_year) as { data: string, status: number };
-    if (res.status == 200) {
-      this.isloading = false;
-      this.Onalert(res.data, true);
-      setTimeout(() => this.cdr.detectChanges(), 1000);
-      return;
-    }
-    this.isloading = false;
-    this.Onalert(res.data, false);
-    setTimeout(() => this.cdr.detectChanges(), 1000);
-  }
-  async onConfirmResult(event: any) {
-    const form: reqAutoSchedule = {
-      departmentId: this.formSchedule.departmentId,
-      shiftId: this.formSchedule.shiftId,
-      totalStaffNeeded: this.formSchedule.totalStaffNeeded,
-      rules: this.formSchedule.rules as { requiredSkillGrade: string; minStaffCount: string }[]
-    };
-    if (event == true) {
-      this.isconfirm = false;
-      this.isloading = true;
-      const res = await RequirementsAutoSchedule(form);
-      if (res == 201) {
-        this.isloading = false;
-        this.Onalert("Thêm thành công", true);
-        this.rulesPopupVisible = false;
-        setTimeout(() => this.cdr.detectChanges(), 1000);
-        return;
-      }
-      this.isloading = false;
-      this.Onalert("Thêm thất bại", false);
-      setTimeout(() => this.cdr.detectChanges(), 1000);
-
-    } else {
-      this.isconfirm = false
-    }
-  }
-
-  // Biến tạm cho hàng input trong bảng Rule
-  tempSkill: string = '';
-  tempMinStaff: string = '';
-
-  // Hàm thêm Rule vào bảng tạm (thay cho addRule cũ)
   addRuleToTable() {
     if (!this.tempSkill || !this.tempMinStaff) {
       this.Onalert("Vui lòng nhập đầy đủ Cấp độ và Số lượng!", false);
       return;
     }
-
     this.formSchedule.rules.push({
       requiredSkillGrade: this.tempSkill,
       minStaffCount: this.tempMinStaff
     });
-
-    // Reset input tạm
     this.tempSkill = '';
     this.tempMinStaff = '';
   }
 
-  // Hàm xóa Rule khỏi bảng
   removeRule(index: number) {
     this.formSchedule.rules.splice(index, 1);
   }
 
-  // Hàm Save (cập nhật để lấy shiftId đúng)
+  get hasRules() { return this.formSchedule.rules.length > 0; }
+  tempSkill: string = '';
+  tempMinStaff: string = '';
+
   saveSchedule() {
     if (!this.shiftId || !this.formSchedule.totalStaffNeeded) {
       this.Onalert("Vui lòng chọn Ca và nhập Tổng số NV cần!", false);
@@ -218,12 +145,49 @@ export class AutoSchedule {
     }
     this.formSchedule.shiftId = this.shiftId;
     this.formSchedule.departmentId = sessionStorage.getItem("departmentId") ?? '';
-
     this.isconfirm = true;
     this.confirmMessage = "Bạn có chắc muốn lưu tiêu chí này?";
   }
 
-  // Hàm kiểm tra tháng/năm trước khi mở popup
+  // --- API CALLS ---
+  async autoassign() {
+    const month_year = `${this.saveyear}-${this.savemonth}`;
+    this.isloading = true;
+    const res = await AutoAssignSchedule(month_year) as { data: string, status: number };
+    this.isloading = false;
+    if (res.status == 200) {
+      this.Onalert(res.data, true);
+    } else {
+      this.Onalert(res.data, false);
+    }
+    setTimeout(() => this.cdr.detectChanges(), 1000);
+  }
+
+  async onConfirmResult(event: any) {
+    if (event == true) {
+      this.isconfirm = false;
+      const form: reqAutoSchedule = {
+        departmentId: this.formSchedule.departmentId,
+        shiftId: this.formSchedule.shiftId,
+        totalStaffNeeded: this.formSchedule.totalStaffNeeded,
+        rules: this.formSchedule.rules as { requiredSkillGrade: string; minStaffCount: string }[]
+      };
+      this.isloading = true;
+      const res = await RequirementsAutoSchedule(form);
+      this.isloading = false;
+      if (res == 201) {
+        this.Onalert("Thêm thành công", true);
+        this.rulesPopupVisible = false;
+      } else {
+        this.Onalert("Thêm thất bại", false);
+      }
+      setTimeout(() => this.cdr.detectChanges(), 1000);
+    } else {
+      this.isconfirm = false
+    }
+  }
+
+  // --- CHECK / VIEW ---
   validateDateSelection(): boolean {
     if (!this.saveyear || !this.savemonth) {
       this.Onalert("Vui lòng chọn Tháng và Năm trước!", false);
@@ -232,13 +196,10 @@ export class AutoSchedule {
     return true;
   }
 
-  // Cập nhật các hàm mở popup để dùng validate
   async checkRules() {
     if (!this.validateDateSelection()) return;
-
     this.requirementPopupVisible = true;
     const res = await GetRequirementsAutoSchedule();
-    // Lưu ý: Cần truyền tháng/năm vào API GetRequirements nếu API hỗ trợ lọc
     this.rulesData = res;
     this.rulesDatalength = res.length;
     this.cdr.detectChanges();
@@ -246,14 +207,66 @@ export class AutoSchedule {
 
   async checkDraftSchedule() {
     if (!this.validateDateSelection()) return;
-
     const month_year = `${this.saveyear}-${this.savemonth}`;
     const res = await CheckAutoAssignSchedule(month_year);
     this.draftData = res;
     this.draftPopupVisible = true;
     this.cdr.detectChanges();
   }
-  async updateRuleData() {
 
+  // --- EDIT FUNCTIONS ---
+  openEditModal(req: any) {
+    // Deep clone để không ảnh hưởng dữ liệu hiển thị
+    this.editingData = JSON.parse(JSON.stringify(req));
+    this.isEditing = true;
+  }
+
+  closeEditModal() {
+    this.isEditing = false;
+    this.editingData = { requirementId: 0, shiftId: 0, totalStaffNeeded: 0, rules: [] };
+  }
+
+  addRuleInEdit() {
+    this.editingData.rules.push({
+      requiredSkillGrade: '',
+      minStaffCount: 0
+    });
+  }
+
+  removeRuleInEdit(index: number) {
+    this.editingData.rules.splice(index, 1);
+  }
+
+  async saveEditRule() {
+    if (!this.editingData.totalStaffNeeded || this.editingData.rules.length === 0) {
+      this.Onalert("Vui lòng nhập đủ thông tin", false);
+      return;
+    }
+
+    this.isloading = true;
+
+    // Map dữ liệu sang formRule interface
+    const form: any = {
+      requirementId: this.editingData.requirementId,
+      totalStaffNeeded: this.editingData.totalStaffNeeded,
+      rules: this.editingData.rules.map((r: any) => ({
+        ruleId: r.ruleId, // Giữ lại ID nếu có để backend biết là update
+        requiredSkillGrade: r.requiredSkillGrade,
+        minStaffCount: r.minStaffCount
+      }))
+    };
+
+    const res = await updateRuleData(form);
+    this.isloading = false;
+
+    // Kiểm tra kết quả trả về từ service
+    if (res && typeof res === 'string' && res.includes("co loi xay ra")) {
+      this.Onalert(res, false);
+    } else {
+      this.Onalert("Cập nhật thành công!", true);
+      this.closeEditModal();
+      this.checkRules(); // Load lại danh sách mới nhất
+    }
+    this.cdr.detectChanges();
   }
 }

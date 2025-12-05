@@ -1,154 +1,225 @@
 <div class="page-container">
-
-  <!-- HEADER MENU -->
-<div class="header">
-  <div class="menu-item" 
-       [class.active]="tab === 'check'" 
-       (click)="changeTab('check')">
-      Kiểm tra hợp đồng
+  
+  <!-- PAGE HEADER: Title + Add Button -->
+  <div class="page-header">
+    <div class="header-title">
+      <h2>Quản lý Hợp đồng</h2>
+      <p>Tra cứu, kiểm tra và quản lý hồ sơ hợp đồng nhân viên</p>
+    </div>
+    <button class="btn-primary add-contract-btn" (click)="addContract()">
+      <span class="material-symbols-outlined">add</span> Thêm mới
+    </button>
   </div>
 
-  <div class="menu-item" 
-       [class.active]="tab === 'search'" 
-       (click)="changeTab('search')">
-      Tìm hợp đồng
+  <!-- TABS NAVIGATION -->
+  <div class="tabs-container">
+    <div class="tab-item" [class.active]="tab === 'check'" (click)="changeTab('check')">
+      <span class="material-symbols-outlined">fact_check</span> Kiểm tra nhanh
+    </div>
+    <div class="tab-item" [class.active]="tab === 'search'" (click)="changeTab('search')">
+      <span class="material-symbols-outlined">search</span> Tra cứu nâng cao
+    </div>
   </div>
-</div>
 
-
-  <!-- RIGHT CONTENT -->
-  <div class="content">
+  <!-- CONTENT AREA -->
+  <div class="content-card">
     
-    <!-- NÚT THÊM HỢP ĐỒNG -->
-    <button class="add-btn" (click)="addContract()">+</button>
-
-    <!-- ===== TAB KIỂM TRA HỢP ĐỒNG ===== -->
-    <div *ngIf="tab === 'check'">
-      <h2>Kiểm tra hợp đồng</h2>
-      <label>Mã nhân viên</label>
-      <input type="text" [(ngModel)]="employeeId" placeholder="Nhập ID nhân viên">
-      <div class="btn-group">
-        <button (click)="checkSignedContract()">Kiểm tra hợp đồng đã ký</button>
-        <button (click)="viewEmployeeContracts()">Xem danh sách hợp đồng</button>
+    <!-- ===== TAB 1: KIỂM TRA HỢP ĐỒNG ===== -->
+    <div *ngIf="tab === 'check'" class="tab-content fadeIn">
+      <div class="check-panel">
+        <div class="input-group-large">
+          <label>Nhập Mã Nhân Viên (ID)</label>
+          <div class="input-wrapper">
+            <span class="material-symbols-outlined icon">badge</span>
+            <input type="text" [(ngModel)]="employeeId" placeholder="VD: 1024..." (keyup.enter)="checkSignedContract()">
+          </div>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn-primary" (click)="checkSignedContract()">
+            <span class="material-symbols-outlined">verified</span> Kiểm tra trạng thái
+          </button>
+          <button class="btn-secondary" (click)="viewEmployeeContracts()">
+            <span class="material-symbols-outlined">history_edu</span> Xem lịch sử hợp đồng
+          </button>
+        </div>
+      </div>
+      
+      <!-- Minh họa hoặc hướng dẫn -->
+      <div class="illustration">
+        <span class="material-symbols-outlined large-icon">contract</span>
+        <p>Nhập mã nhân viên để kiểm tra hợp đồng đang hiệu lực hoặc xem toàn bộ hồ sơ.</p>
       </div>
     </div>
 
-    <!-- ===== TAB TÌM HỢP ĐỒNG ===== -->
-    <div *ngIf="tab === 'search'">
-      <h2>Tìm hợp đồng</h2>
-      <label>Tên username</label>
-      <input type="text" [(ngModel)]="filters.username" placeholder="Nhập tên user">
-
-      <label>Loại hợp đồng</label>
-      <select [(ngModel)]="filters.type">
-        <option value="">-- Chọn loại --</option>
-        <option value="INDEFINITE">Không xác định thời hạn</option>
-        <option value="FIXED_TERM">Có thời hạn</option>
-        <option value="PROBATION">Thử việc</option>
-
-      </select>
-
-      <label>Trạng thái hợp đồng</label>
-      <select [(ngModel)]="filters.status">
-        <option value="">-- Chọn status --</option>
-        <option *ngFor="let st of statusContract" [value]="st">
-          {{translateContractStatus(st)}}
-        </option>
-      </select>
-
-        <label>Loại Phụ cấp Độc hại</label>
-        <select [(ngModel)]="filters.allowanceToxicType">
-          <option value="">-- Chọn --</option>
-          <option value="NONE">Không áp dụng</option>
-          <option value="CASH">Chi trả bằng Tiền mặt</option>
-          <option value="IN_KIND">Chi trả bằng Hiện vật</option>
-        </select>
-
-      <label>Ngày hiệu lực (start)</label>
-      <input type="date" [(ngModel)]="filters.startdate">
-
-      <label>Ngày kết thúc (end)</label>
-      <input type="date" [(ngModel)]="filters.enddate">
-
-      <button class="search-btn" (click)="searchContract()">Tìm kiếm</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- ===== POPUP ===== -->
-<div class="overlay" *ngIf="showPopup">
-  <div class="popup-box">
-
-    <button class="close-btn" (click)="closePopup()">×</button>
-
-    <!-- 🔥 MODE: MESSAGE -->
-    <div *ngIf="popupMode === 'message'">
-      <h3 class="mess">Thông báo</h3>
-      <p>{{ messageCheckContract }}</p>
-    </div>
-
-    <!-- 🔥 MODE: LIST HỢP ĐỒNG -->
-    <div *ngIf="popupMode === 'list'">
-      <h3>Danh sách hợp đồng</h3>
-      <table class="contract-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Tên hợp đồng</th>
-            <th>Loại</th>
-            <th>Lương cơ bản</th>
-            <th>Lương BHXH</th>
-            <th>Phụ cấp độc hại</th>
-            <th>Ngày ký</th>
-            <th>Ngày hiệu lực</th>
-            <th>Ngày hết hạn</th>
-            <th>Status</th>
-            <th>User</th>
-            <th>fileUrl</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr *ngFor="let c of listContracts">
-            <td>{{ c.id }}</td>
-            <td>{{ c.contractname }}</td>
-            <td>{{ getVietnameseContractType(c.type) }}</td>
-            <td>{{ c.basesalary }}</td>
-            <td>{{ c.insuranceSalary }}</td>
-            <td>{{ translateAllowanceType(c.allowanceToxicType) }}</td>
-            <td>{{ c.signdate }}</td>
-            <td>{{ c.startdate }}</td>
-            <td>{{ c.enddate }}</td>
-            <td>{{ translateContractStatus(c.status) }}</td>
-            <td>{{ c.username }}</td>
-          <td>
-  <ng-container *ngIf="c.fileurl; else noLink">
-    <button (click)="copyLink(c.fileurl)">Lấy link</button>
-  </ng-container>
-
-  <ng-template #noLink>
-    Chưa có link
-  </ng-template>
-</td>
-
-          </tr>
-        </tbody>
-      </table>
-        <div class="btnexport">
-      <button class="exportExcel" (click)="ExportExcel()" >Xuất File</button>
-
+    <!-- ===== TAB 2: TÌM KIẾM HỢP ĐỒNG ===== -->
+    <div *ngIf="tab === 'search'" class="tab-content fadeIn">
+      <div class="search-grid">
+        <div class="form-group">
+          <label>Tên nhân viên / Username</label>
+          <input type="text" [(ngModel)]="filters.username" placeholder="Nhập tên user...">
         </div>
+
+        <div class="form-group">
+          <label>Loại hợp đồng</label>
+          <select [(ngModel)]="filters.type">
+            <option value="">-- Tất cả --</option>
+            <option value="INDEFINITE">Không xác định thời hạn</option>
+            <option value="FIXED_TERM">Có thời hạn</option>
+            <option value="PROBATION">Thử việc</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Trạng thái</label>
+          <select [(ngModel)]="filters.status">
+            <option value="">-- Tất cả --</option>
+            <option *ngFor="let st of statusContract" [value]="st">
+              {{translateContractStatus(st)}}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Phụ cấp độc hại</label>
+          <select [(ngModel)]="filters.allowanceToxicType">
+            <option value="">-- Tất cả --</option>
+            <option value="NONE">Không áp dụng</option>
+            <option value="CASH">Tiền mặt</option>
+            <option value="IN_KIND">Hiện vật</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Từ ngày (Start Date)</label>
+          <input type="date" [(ngModel)]="filters.startdate">
+        </div>
+
+        <div class="form-group">
+          <label>Đến ngày (End Date)</label>
+          <input type="date" [(ngModel)]="filters.enddate">
+        </div>
+      </div>
+
+      <div class="search-actions">
+        <button class="btn-primary" (click)="searchContract()">
+          <span class="material-symbols-outlined">search</span> Tìm kiếm
+        </button>
+      </div>
     </div>
-
-
-
   </div>
 </div>
 
+<!-- ===== MODAL POPUP ===== -->
+<div class="overlay" *ngIf="showPopup">
+  <div class="modal-box" [ngClass]="{'modal-large': popupMode === 'list'}">
+    
+    <div class="modal-header">
+      <h3>{{ popupMode === 'message' ? 'Thông báo' : 'Danh sách Hợp đồng' }}</h3>
+      <button class="close-btn" (click)="closePopup()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
 
+    <div class="modal-body">
+      <!-- MODE: MESSAGE -->
+      <div *ngIf="popupMode === 'message'" class="message-content">
+        <span class="material-symbols-outlined icon-info">info</span>
+        <p>{{ messageCheckContract }}</p>
+      </div>
+
+      <!-- MODE: LIST -->
+      <div *ngIf="popupMode === 'list'" class="list-content">
+        <div class="table-responsive">
+          <table class="modern-table" *ngIf="listContracts.length > 0; else noData">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tên hợp đồng</th>
+                <th>Người sở hữu</th>
+                <th>Loại</th>
+                <th>Lương cơ bản</th>
+                <th>Hiệu lực</th>
+                <th>Trạng thái</th>
+                <th class="text-center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of listContracts">
+                <td><strong>#{{ c.id }}</strong></td>
+                <td>
+                    <div class="contract-name" title="{{ c.contractname }}">{{ c.contractname }}</div>
+                    <small class="text-muted">Ký ngày: {{ c.signdate | date:'dd/MM/yyyy' }}</small>
+                </td>
+                <td><strong>{{ c.username }}</strong></td>
+                <td>{{ getVietnameseContractType(c.type) }}</td>
+                <td class="text-right">{{ c.basesalary | number }} VNĐ</td>
+                <td>
+                  <div class="date-range">
+                    <span>{{ c.startdate | date:'dd/MM/yyyy' }}</span>
+                    <span *ngIf="c.enddate">➝ {{ c.enddate | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="status-badge" [ngClass]="c.status">
+                    {{ translateContractStatus(c.status) }}
+                  </span>
+                </td>
+                <td class="text-center">
+                    <button *ngIf="c.fileurl" class="btn-icon" (click)="copyLink(c.fileurl)" title="Copy Link File">
+                        <span class="material-symbols-outlined">link</span>
+                    </button>
+                    <span *ngIf="!c.fileurl" class="text-muted">-</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <ng-template #noData>
+             <div class="empty-state">
+                <span class="material-symbols-outlined icon">folder_open</span>
+                <p>Không có dữ liệu hợp đồng nào.</p>
+             </div>
+          </ng-template>
+        </div>
+
+        <!-- PAGINATION FOOTER (Only show in search/list mode) -->
+        <div class="pagination-footer" *ngIf="listContracts.length > 0">
+          <div class="page-size-selector">
+            <span>Hiển thị</span>
+            <select [(ngModel)]="size" (change)="onPageSizeChange()">
+              <option *ngFor="let s of pageSizeOptions" [value]="s">{{ s }}</option>
+            </select>
+            <span>dòng</span>
+          </div>
+          
+          <div class="page-info">
+            {{ page * size + 1 }} - {{ (page + 1) * size > totalElements ? totalElements : (page + 1) * size }} 
+            trong tổng số <strong>{{ totalElements }}</strong>
+          </div>
+
+          <div class="page-controls">
+            <button class="btn-page" [disabled]="page === 0" (click)="onPageChange(page - 1)">
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <span class="current-page">Trang {{ page + 1 }} / {{ totalPages }}</span>
+            <button class="btn-page" [disabled]="page >= totalPages - 1" (click)="onPageChange(page + 1)">
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="modal-footer" *ngIf="popupMode === 'list' && listContracts.length > 0">
+      <button class="btn-success" (click)="ExportExcel()">
+        <span class="material-symbols-outlined">download</span> Xuất Excel
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Shared Components -->
 <app-loading *ngIf="isloading"></app-loading>
-<app-alert   *ngIf="isalert"
-  [message]="notifyMessage"
-  [notifyType]="notifyType"
-  (hidden)="isalert = false"></app-alert>
+<app-alert *ngIf="isalert" [message]="notifyMessage" [notifyType]="notifyType" (hidden)="isalert = false"></app-alert>

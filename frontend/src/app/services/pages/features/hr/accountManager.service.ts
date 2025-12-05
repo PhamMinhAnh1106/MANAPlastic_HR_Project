@@ -2,9 +2,9 @@ import { information } from "../../../../interface/user/user.interface";
 import { api } from "../../../api.service";
 
 
-export async function GetAccountInfo(id: number, role: string) {
+export async function GetAccountInfo(id: number, role: string, page: number, size: number) {
     try {
-        const res = await api.get(`/${role.toLowerCase()}/userFilter?keyword=${id}`, {});
+        const res = await api.get(`/${role.toLowerCase()}/userFilter?page=${page}&size=${size}keyword=${id}`, {});
         return res.data;
     } catch (error) {
         return "co loi xay ra " + error;

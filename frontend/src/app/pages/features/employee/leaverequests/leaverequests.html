@@ -1,63 +1,111 @@
-<div class="table-container">
-        Ngày phép còn lại
-
-    <div class="remain_leave" >
-        <span *ngFor="let rm of leaverequestBl">
-            <p>{{rm.leaveType}} : {{rm.remaining}}</p>
-        </span>
-       
-                <span (click)="add()" class="material-symbols-outlined add_btn">
-                      add
-                </span>
-        
+<div class="dashboard-wrapper">
+  <!-- 1. HEADER SECTION -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Quản lý ngày phép</h1>
+      <p class="page-subtitle">Xem và quản lý các yêu cầu nghỉ phép của nhân viên</p>
     </div>
-  <table class="leave-table">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Loại phép</th>
-        <th>Họ tên</th>
-        <th>Ngày bắt đầu</th>
-        <th>Ngày kết thúc</th>
-        <th>Lý do</th>
-        <th>Ngày tạo</th>
-        <th>Trạng thái</th>
-        <th></th>
-      </tr>
-    </thead>
 
-    <tbody>
-      <tr *ngFor="let item of leaverequest">
-        <td>{{ item.leaverequestID }}</td>
-        <td>{{ item.leavetype }}</td>
-        <td>{{ item.fullname }}</td>
-        <td>{{ item.startdate }}</td>
-        <td>{{ item.enddate }}</td>
-        <td>{{ item.reason }}</td>
-        <td>{{ item.requestdate }}</td>
+    <!-- NÚT ADD MỚI VỚI TOOLTIP -->
+    <div class="action-wrapper">
+      <!-- Tooltip text (hiện ra khi hover button) -->
+      <span class="tooltip-box">Thêm mới</span>
+      
+      <!-- Nút tròn -->
+      <button class="btn-circle-add" (click)="add()">
+        <span class="material-symbols-outlined">add</span>
+      </button>
+    </div>
+  </div>
 
-        <td>
-          <span class="status" [ngClass]="item.status.toLowerCase()">
-            {{ item.status }}
-          </span>
-        </td>
+  <!-- 2. STATS CARDS -->
+  <div class="stats-grid">
+    <div class="stat-card" *ngFor="let rm of leaverequestBl" [ngClass]="rm.colorClass">
+      <div class="stat-icon">
+        <span class="material-symbols-outlined">{{rm.icon}}</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">{{rm.leaveType}}</span>
+        <span class="stat-value">{{rm.remaining}} <small>ngày</small></span>
+      </div>
+    </div>
+  </div>
 
-        <td>
-          <button class="delete-btn" (click)="deleteRequest(item.leaverequestID)">
-            <span class="material-symbols-outlined">
-close
-</span>
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- 3. MAIN TABLE -->
+  <div class="table-container">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nhân viên</th>
+          <th>Loại phép</th>
+          <th>Thời gian</th>
+          <th>Lý do</th>
+          <th>Ngày tạo</th>
+          <th>Trạng thái</th>
+          <th class="text-right">Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of leaverequest">
+          <td><span class="id-badge">#{{ item.leaverequestID }}</span></td>
+          
+          <td>
+            <div class="user-cell">
+              <div class="avatar">{{ item.fullname.charAt(0) }}</div>
+              <span class="username">{{ item.fullname }}</span>
+            </div>
+          </td>
+
+          <td>{{ item.leavetype }}</td>
+          
+          <td>
+            <div class="date-range">
+              <span>{{ item.startdate }}</span>
+              <span class="material-symbols-outlined arrow">arrow_right_alt</span>
+              <span>{{ item.enddate }}</span>
+            </div>
+          </td>
+
+          <td class="reason-cell" title="{{ item.reason }}">{{ item.reason }}</td>
+          <td class="meta-date">{{ item.requestdate }}</td>
+
+          <td>
+            <span class="status-badge" [ngClass]="item.status.toLowerCase()">
+              <span class="dot"></span> {{ item.status }}
+            </span>
+          </td>
+
+          <td class="text-right">
+            <button class="btn-icon delete" (click)="deleteRequest(item.leaverequestID)" title="Hủy yêu cầu">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="leaverequest.length === 0">
+      <span class="material-symbols-outlined">inbox</span>
+      <p>Chưa có yêu cầu nghỉ phép nào</p>
+    </div>
+  </div>
 </div>
+<!-- Confirm Modal -->
 <app-comfirm *ngIf="isconfirm"
   [message]="confirmMessage"
   (result)="onConfirmResult($event)">
 </app-comfirm>
-<app-alert   *ngIf="isalert"
+
+<!-- Alert Notification -->
+<app-alert *ngIf="isalert"
   [message]="notifyMessage"
   [notifyType]="notifyType"
-  (hidden)="isalert = false"></app-alert>
+  (hidden)="isalert = false">
+</app-alert>
+
+<!-- Loading Overlay (Tùy chọn nếu bạn muốn hiện khi đang tải) -->
+<div class="loading-overlay" *ngIf="isloading">
+    <div class="spinner">Loading...</div>
+</div>

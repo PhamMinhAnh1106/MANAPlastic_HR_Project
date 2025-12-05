@@ -39,3 +39,23 @@ export async function CheckAutoAssignSchedule(month_year: string) {
         return "co loi xay ra " + error;
     }
 }
+
+interface formRule {
+    requirementId: number,
+    totalStaffNeeded: number,
+    rules:
+    {
+        requiredSkillGrade: number,
+        minStaffCount: number
+    }[]
+
+}
+
+export async function updateRuleData(form: formRule) {
+    try {
+        const res = await api.put(`/manager/requirements/${form.requirementId}`, form);
+        return res.data;
+    } catch (error) {
+        return "co loi xay ra " + error;
+    }
+}

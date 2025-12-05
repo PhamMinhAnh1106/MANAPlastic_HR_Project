@@ -29,39 +29,36 @@
 </header>
 <body>
     <div class="left_handle">
-          <nav class="nav-links">
-        <a  [routerLink]="['/home', 'info']" 
-            routerLinkActive="active" 
-            class="nav-item">
-            <img src="assets/logo.png" alt="">
-        </a>
-    </nav>
-  <div
-    *ngFor="let item of icon_handleBar; let i = index"
-    class="menu-item"
-  >
-    <!-- Icon chính -->
-    <a
-      href="javascript:void(0)"
-      class="menu-icon"
-      (click)="toggleSubmenu(i)"
-      [class.active]="activeIndex === i"
-    >
+  <!-- Logo section -->
+  <nav class="nav-links">
+    <a [routerLink]="['/home', 'info']" routerLinkActive="active" class="nav-item">
+      <img src="assets/logo.png" alt="Logo">
+      <!-- Thêm tên App hoặc Logo text nếu muốn hiện khi hover -->
+       <span class="namelogo">ManaPlastic</span>
+    </a>
+  </nav>
+
+  <!-- Menu Loop -->
+  <div *ngFor="let item of icon_handleBar; let i = index" class="menu-item">
+    
+    <!-- Icon chính + Text -->
+    <a href="javascript:void(0)" class="menu-icon" (click)="toggleSubmenu(i)" [class.active]="activeIndex === i">
+      <!-- Icon -->
       <span class="material-symbols-outlined icon">
         {{ item.iconName }}
       </span>
+      <!-- Text (Mới thêm: sẽ ẩn khi sidebar thu nhỏ) -->
+      <span class="link-text">{{ item.label }}</span> 
+      <!-- Lưu ý: Bạn cần chắc chắn object item có thuộc tính label hoặc name -->
     </a>
 
     <!-- Danh sách task con -->
     <div class="submenu" *ngIf="activeIndex === i">
-      <a
-        *ngFor="let taskname of item.task"
-        [routerLink]="taskname.path"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="submenu-link"
-      >
-        {{ taskname.name }}
+      <a *ngFor="let taskname of item.task" [routerLink]="taskname.path" routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }" class="submenu-link">
+        <span class="link-text">
+        <span class="material-symbols-outlined sub-icon">circle</span> <!-- Icon nhỏ cho submenu (tuỳ chọn) -->
+          {{ taskname.name }}</span>
       </a>
     </div>
   </div>

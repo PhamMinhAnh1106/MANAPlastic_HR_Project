@@ -1,11 +1,25 @@
-<div class="confirm-overlay">
-  <div class="confirm-box">
+<div class="confirm-overlay" (click)="onCancel()">
+  <!-- stopPropagation để click vào box không bị đóng popup -->
+  <div class="confirm-box" (click)="$event.stopPropagation()">
+    
+    <!-- Icon minh họa -->
+    <div class="icon-header">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-circle">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    </div>
 
+    <h3 class="title">{{ title }}</h3>
     <p class="message">{{ message }}</p>
 
     <div class="actions">
-      <button class="btn confirm" (click)="onConfirm()">Xác nhận</button>
-      <button class="btn cancel" (click)="onCancel()">Hủy</button>
+      <!-- Nút Hủy (Secondary) -->
+      <button class="btn cancel" (click)="onCancel()">Hủy bỏ</button>
+      
+      <!-- Nút Xác nhận (Primary) -->
+      <button class="btn confirm" (click)="onConfirm()">Đồng ý</button>
     </div>
 
   </div>

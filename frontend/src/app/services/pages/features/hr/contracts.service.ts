@@ -19,9 +19,9 @@ export async function CheckContractByIdEmployee(id: number) {
     }
 }
 
-export async function FillterContract(query: string) {
+export async function FillterContract(query: string, page: number, size: number) {
     try {
-        const res = await api.get(`/hr/contracts/contractFilter?${query}`);
+        const res = await api.get(`/hr/contracts/contractFilter?page=${page}&size=${size}&${query}`);
         return {
             data: res.data,
             status: res.status

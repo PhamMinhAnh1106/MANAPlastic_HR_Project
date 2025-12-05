@@ -1,49 +1,132 @@
+// --- Biến màu sắc ---
+$primary-color: #3b82f6; // Màu xanh dương hiện đại
+$primary-hover: #2563eb;
+$danger-color: #ef4444; // Dùng nếu muốn nút xóa màu đỏ
+$text-main: #1f2937;
+$text-secondary: #6b7280;
+$bg-overlay: rgba(0, 0, 0, 0.4);
+
 .confirm-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
+    inset: 0; // Thay cho top/left/right/bottom: 0
+    background: $bg-overlay;
+    backdrop-filter: blur(4px); // Làm mờ nền phía sau (Glassmorphism)
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
+
+    // Animation hiện overlay
+    animation: fadeIn 0.3s ease-out forwards;
 }
 
 .confirm-box {
-    width: 300px;
-    padding: 20px;
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 400px; // Giới hạn chiều rộng
+    padding: 24px;
+    border-radius: 16px; // Bo góc lớn hơn
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     text-align: center;
+
+    // Animation nảy lên của box
+    animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.icon-header {
+    margin-bottom: 16px;
+    color: #f59e0b; // Màu vàng cam cảnh báo
+    background: #fffbeb;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+
+    svg {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+.title {
+    margin: 0 0 8px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-main;
 }
 
 .message {
-    font-size: 1.1rem;
-    margin-bottom: 20px;
+    font-size: 0.95rem;
+    color: $text-secondary;
+    margin: 0 0 24px;
+    line-height: 1.5;
 }
 
 .actions {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr 1fr; // Chia đều 2 cột
+    gap: 12px;
 
     .btn {
-        padding: 8px 14px;
+        padding: 10px 16px;
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
         cursor: pointer;
-        font-size: 1rem;
-    }
+        transition: all 0.2s ease;
 
-    .confirm {
-        background: #28a745;
-        color: white;
+        &:active {
+            transform: scale(0.98); // Hiệu ứng nhấn xuống
+        }
     }
 
     .cancel {
-        background: #dc3545;
+        background: white;
+        color: $text-main;
+        border: 1px solid #e5e7eb;
+
+        &:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+    }
+
+    .confirm {
+        background: $primary-color;
         color: white;
+        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5); // Bóng màu xanh
+
+        &:hover {
+            background: $primary-hover;
+            box-shadow: 0 6px 8px -1px rgba(59, 130, 246, 0.6);
+        }
+    }
+}
+
+// --- Keyframes Animation ---
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleUp {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
     }
 }

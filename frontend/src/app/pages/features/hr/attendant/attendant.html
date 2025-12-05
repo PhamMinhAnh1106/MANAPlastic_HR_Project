@@ -1,127 +1,224 @@
 <div class="attendance-container">
-  <!-- Bộ lọc -->
-  <div class="filter-section">
-    <!-- Chọn tháng -->
-    <select [(ngModel)]="filter.month">
-      <option value="">Chọn tháng</option>
-      <option *ngFor="let m of months" [value]="m">{{ m }}</option>
-    </select>
-
-    <!-- Chọn năm -->
-    <select [(ngModel)]="filter.year">
-      <option value="">Chọn năm</option>
-      <option *ngFor="let y of years" [value]="y">{{ y }}</option>
-    </select>
-
-    <!-- Chỉ hiển thị với HR -->
-    <ng-container *ngIf="role === 'hr'">
-      <select [(ngModel)]="filter.departmentId">
-        <option value="">Chọn phòng ban</option>
-        <option *ngFor="let dep of departments" [value]="dep.id">
-          {{ dep.name }}
-        </option>
-      </select>
-
-      <select [(ngModel)]="filter.status">
-        <option value="">Chọn trạng thái</option>
-        <option value="PRESENT">PRESENT</option>
-        <option value="MISSING_OUTPUT_DATA">MISSING_OUTPUT_DATA</option>
-        <option value="MISSING_INPUT_DATA">MISSING_INPUT_DATA</option>
-        <option value="ABSENT">ABSENT</option>
-        <option value="ON_LEAVE">ON_LEAVE</option>
-      </select>
-    </ng-container>
-
-    <button (click)="filterAttendance()">Lọc</button>
-      <button (click)="exportfile()" *ngIf="role=='hr'">xuất file excel</button>
+  <div class="page-header">
+    <div class="header-title">
+      <h2>Quản Lý Chấm Công</h2>
+      <p class="subtitle">Xem và quản lý dữ liệu ra vào của nhân viên</p>
+    </div>
   </div>
 
-  <!-- Bảng dữ liệu -->
-  <div class="table-section">
-    <table *ngIf="attendance && attendance.length > 0; else noData">
-      <thead>
-        <tr>
-          <th>Mã chấm công</th>
-          <th>Tên đăng nhập</th>
-          <th>Họ tên</th>
-          <th>Ngày</th>
-          <th>Giờ vào</th>
-          <th>Giờ ra</th>
-          <th>Ca làm</th>
-          <th>Trạng thái</th>
-          <th>Minh chứng</th>
-          <!-- Cột Xóa chỉ cho HR -->
-          <th *ngIf="role === 'hr'"></th>
-        </tr>
-      </thead>
+  <div class="card">
+    <div class="filter-grid">
+      <div class="form-group">
+        <label>Tháng</label>
+        <select [(ngModel)]="filter.month">
+          <option value="">-- Tất cả --</option>
+          <option *ngFor="let m of months" [value]="m">Tháng {{ m }}</option>
+        </select>
+      </div>
 
-      <tbody>
-        <tr *ngFor="let att of attendance">
-          <td>{{ att.attendanceId }}</td>
-          <td>{{ att.userName || 'Chưa có' }}</td>
-          <td>{{ att.fullNameUser || 'Chưa có' }}</td>
-          <td>{{ att.attendanceDate }}</td>
-          <td>{{ getTime(att.checkIn) || 'Chưa có' }}</td>
-          <td>{{ getTime(att.checkOut) || 'Chưa có' }}</td>
-          <td>{{ att.shiftName || 'Chưa có' }}</td>
-          <td>{{ translateStatus(att.status) || 'Chưa có' }}</td>
-          <td>
-            <button class="proof-btn" (click)="showProof(att)"><span class="material-symbols-outlined">
-visibility
-</span></button>
-          </td>
-          <!-- Nút xóa chỉ cho HR -->
-          <td *ngIf="role === 'hr'">
-            <button class="delete-btn" (click)="deleteAttendance(att.attendanceId)"><span class="material-symbols-outlined">
-close
-</span></button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <div class="form-group">
+        <label>Năm</label>
+        <select [(ngModel)]="filter.year">
+          <option value="">-- Tất cả --</option>
+          <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+        </select>
+      </div>
+
+      <ng-container *ngIf="role === 'hr'">
+        <div class="form-group">
+          <label>Phòng ban</label>
+          <select [(ngModel)]="filter.departmentId">
+            <option value="">-- Tất cả phòng ban --</option>
+            <option *ngFor="let dep of departments" [value]="dep.id">
+              {{ dep.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Trạng thái</label>
+          <select [(ngModel)]="filter.status">
+            <option value="">-- Tất cả trạng thái --</option>
+            <option value="PRESENT">Có mặt</option>
+            <option value="MISSING_OUTPUT_DATA">Thiếu Checkout</option>
+            <option value="MISSING_INPUT_DATA">Thiếu Checkin</option>
+            <option value="ABSENT">Vắng mặt</option>
+            <option value="ON_LEAVE">Nghỉ phép</option>
+          </select>
+        </div>
+      </ng-container>
+
+      <div class="button-group">
+        <!-- Đổi click thành onSearch để reset về trang 0 -->
+        <button class="btn-filter" (click)="onSearch()">
+          <span class="material-symbols-outlined">filter_list</span>
+          Lọc
+        </button>
+        <button class="btn-export" (click)="exportfile()" *ngIf="role === 'hr'">
+          <span class="material-symbols-outlined">download</span>
+          Xuất Excel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table *ngIf="attendance && attendance.length > 0; else noData">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nhân viên</th>
+            <th>Ngày</th>
+            <th>Ca làm</th>
+            <th>Giờ vào</th>
+            <th>Giờ ra</th>
+            <th class="text-center">Trạng thái</th>
+            <th class="text-center">Minh chứng</th>
+            <th *ngIf="role === 'hr'" class="text-center">Thao tác</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let att of attendance">
+            <td><span class="id-badge">#{{ att.attendanceId }}</span></td>
+            
+            <td>
+              <div class="user-info">
+                <span class="user-name">{{ att.fullNameUser || 'N/A' }}</span>
+                <span class="user-username">{{ att.userName }}</span>
+              </div>
+            </td>
+
+            <td>{{ att.attendanceDate | date: 'dd/MM/yyyy' }}</td>
+            
+            <td>{{ att.shiftName || '-' }}</td>
+
+            <td>
+              <div class="time-info" *ngIf="att.checkIn">
+                <span><span class="dot green"></span>{{ getTime(att.checkIn) }}</span>
+              </div>
+              <span *ngIf="!att.checkIn" class="text-light">-</span>
+            </td>
+
+            <td>
+              <div class="time-info" *ngIf="att.checkOut">
+                <span><span class="dot red"></span>{{ getTime(att.checkOut) }}</span>
+              </div>
+              <span *ngIf="!att.checkOut" class="text-light">-</span>
+            </td>
+
+            <td class="text-center">
+              <span class="status-badge" [ngClass]="att.status.toLowerCase()">
+                {{ translateStatus(att.status) }}
+              </span>
+            </td>
+
+            <td class="text-center">
+              <button class="action-btn" (click)="showProof(att)" title="Xem ảnh">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+            </td>
+
+            <td class="text-center" *ngIf="role === 'hr'">
+              <button class="action-btn delete-btn" (click)="deleteAttendance(att.attendanceId)" title="Xóa dữ liệu">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PHẦN PHÂN TRANG MỚI THÊM VÀO -->
+    <div class="pagination-footer" *ngIf="attendance && attendance.length > 0">
+      <div class="page-size-selector">
+        <span>Hiển thị</span>
+        <select [(ngModel)]="size" (change)="onPageSizeChange()">
+          <option *ngFor="let s of pageSizeOptions" [value]="s">{{ s }}</option>
+        </select>
+        <span>dòng</span>
+      </div>
+      
+      <div class="page-info">
+        {{ page * size + 1 }} - {{ (page + 1) * size > totalElements ? totalElements : (page + 1) * size }} 
+        trong tổng số <strong>{{ totalElements }}</strong>
+      </div>
+
+      <div class="page-controls">
+        <button class="btn-page" [disabled]="page === 0" (click)="onPageChange(page - 1)">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <span class="current-page">Trang {{ page + 1 }} / {{ totalPages }}</span>
+        <button class="btn-page" [disabled]="page >= totalPages - 1" (click)="onPageChange(page + 1)">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    </div>
 
     <ng-template #noData>
-      <div class="no-data">Không có dữ liệu chấm công</div>
+      <div class="empty-state">
+        <img src="https://cdn-icons-png.flaticon.com/512/7486/7486754.png" alt="No Data" width="64">
+        <p>Không tìm thấy dữ liệu chấm công nào.</p>
+      </div>
     </ng-template>
   </div>
 
-  <!-- Popup hiển thị minh chứng -->
-  <div class="proof-overlay" *ngIf="selectedProof" (click)="closeProof()"></div>
-  <div class="proof-box" *ngIf="selectedProof">
-    <div class="proof-header">
-      <h3>Minh chứng chấm công</h3>
-      <span class="close-icon" (click)="closeProof()"><span class="material-symbols-outlined">
-close
-</span></span>
-    </div>
-    <div class="proof-content">
-      <div class="proof-image">
-        <h4>Ảnh vào</h4>
-        <img
-          *ngIf="selectedProof.checkInImg; else noInImg"
-          [src]="selectedProof.checkInImg"
-          alt="Check-in"
-        />
-        <ng-template #noInImg><p>Không có ảnh</p></ng-template>
+  <div class="proof-overlay" *ngIf="selectedProof" (click)="closeProof()">
+    <div class="proof-modal" (click)="$event.stopPropagation()">
+      <div class="proof-header">
+        <h3>Minh chứng chấm công #{{ selectedProof.attendanceId }}</h3>
+        <button class="close-btn" (click)="closeProof()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
 
-      <div class="proof-image">
-        <h4>Ảnh ra</h4>
-        <img
-          *ngIf="selectedProof.checkOutImg; else noOutImg"
-          [src]="selectedProof.checkOutImg"
-          alt="Check-out"
-        />
-        <ng-template #noOutImg><p>Không có ảnh</p></ng-template>
+      <div class="proof-body">
+        <div class="proof-item">
+          <span class="img-label">Check-In</span>
+          <div class="img-wrapper">
+            <img 
+              *ngIf="selectedProof.checkInImg; else noInImg" 
+              [src]="selectedProof.checkInImg" 
+              alt="Check-in Proof" 
+            />
+            <ng-template #noInImg>
+              <div class="no-img-placeholder">
+                <span class="material-symbols-outlined">image_not_supported</span>
+                <p>Không có ảnh</p>
+              </div>
+            </ng-template>
+          </div>
+          <div class="time-info" *ngIf="selectedProof.checkIn">
+            <span class="dot green"></span> {{ getTime(selectedProof.checkIn) }}
+          </div>
+        </div>
+
+        <div class="proof-item">
+          <span class="img-label">Check-Out</span>
+          <div class="img-wrapper">
+            <img 
+              *ngIf="selectedProof.checkOutImg; else noOutImg" 
+              [src]="selectedProof.checkOutImg" 
+              alt="Check-out Proof" 
+            />
+            <ng-template #noOutImg>
+              <div class="no-img-placeholder">
+                <span class="material-symbols-outlined">image_not_supported</span>
+                <p>Không có ảnh</p>
+              </div>
+            </ng-template>
+          </div>
+           <div class="time-info" *ngIf="selectedProof.checkOut">
+            <span class="dot red"></span> {{ getTime(selectedProof.checkOut) }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-
-<app-loading 
-  *ngIf="isloading"
-></app-loading>
+<app-loading *ngIf="isloading"></app-loading>
 
 <app-comfirm
   *ngIf="isconfirm"
@@ -133,5 +230,5 @@ close
   *ngIf="isalert"
   [message]="alertmessage"
   [notifyType]="alertType"
-   (hidden)="isalert = false"
+  (hidden)="isalert = false"
 ></app-alert>

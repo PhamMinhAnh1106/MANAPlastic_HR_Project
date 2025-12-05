@@ -1,164 +1,198 @@
-/* Overlay nền mờ */
+// --- Variables (Biến màu) ---
+$primary-color: #007bff;
+$primary-hover: #0056b3;
+$text-main: #333;
+$text-light: #666;
+$border-color: #e2e8f0;
+$bg-header: #fff;
+$radius: 8px; // Giảm bo góc xuống px nhỏ cho gọn
+$shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+/* Overlay */
 .overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 99;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px); // Giảm độ mờ để nhẹ máy hơn
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px; // PX: padding tối thiểu
 }
 
-/* Hộp modal chính */
+/* Modal Box */
 .modal-box {
-    position: fixed;
-    top: 54%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 95%;
-    height: 90%;
+    width: 100%;
+    max-width: 800px; // Tăng width lên để chứa font to
+    max-height: 98vh; // Đảm bảo không vượt quá màn hình
     background: #fff;
-    border-radius: 10px;
+    border-radius: $radius;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    z-index: 100;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: $shadow;
+    position: relative;
+
+    // Animation
+    &.modal-animate {
+        animation: slideUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
 }
 
-/* Header của modal */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header - Thu gọn chiều cao */
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #f5f6f8;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #ddd;
+    background: $bg-header;
+    padding: 15px 25px; // Tăng padding một chút
+    border-bottom: 1px solid $border-color;
+    border-radius: $radius $radius 0 0;
 
     h3 {
         margin: 0;
+        font-size: 26px; // Tăng thêm 10px (16px -> 26px)
         font-weight: 600;
+        color: $text-main;
     }
 
     .close-icon {
         cursor: pointer;
-        font-size: 24px;
-        color: #666;
-        transition: color 0.2s ease;
+        font-size: 30px; // Tăng thêm 10px (20px -> 30px)
+        color: #94a3b8;
+        padding: 4px;
+        border-radius: 50%;
+        transition: all 0.2s;
 
         &:hover {
-            color: #000;
+            background: #f1f5f9;
+            color: $text-main;
         }
     }
 }
 
-/* Phần nội dung form */
+/* Body - Tối ưu khoảng cách để không bị cuộn */
 .modal-body {
     flex: 1;
-    padding: 1.5rem;
-    overflow-y: auto;
-
-    h4 {
-        margin-bottom: 1.5rem;
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #444;
-    }
+    padding: 20px 25px; // Tăng padding
+    overflow-y: auto; // Chỉ hiện scroll nếu màn hình quá bé
 
     .form-group {
         display: flex;
-        align-items: center;
-        margin-bottom: 1rem;
-        gap: 1rem;
+        flex-direction: column;
+        margin-bottom: 15px; // Tăng khoảng cách dòng
 
         label {
-            flex: 0 0 180px;
-            font-weight: 500;
-            color: #333;
-        }
-
-        input,
-        select {
-            flex: 1;
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            outline: none;
-            transition: border-color 0.2s ease;
-
-            &:focus {
-                border-color: #007bff;
-            }
-        }
-
-        .btn-add {
-            background: #007bff;
-            color: #fff;
-            border: none;
-            padding: 0.4rem;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s ease;
-
-            &:hover {
-                background: #0069d9;
-            }
-
-            .material-symbols-outlined {
-                font-size: 20px;
-            }
+            font-weight: 600;
+            color: $text-main;
+            margin-bottom: 6px;
+            font-size: 23px; // Tăng thêm 10px (13px -> 23px)
         }
 
         .required {
-            color: red;
+            color: #ef4444;
             margin-left: 3px;
         }
+
+        input,
+        select,
+        textarea {
+            padding: 8px 12px;
+            font-size: 23px; // Tăng thêm 10px (13px -> 23px)
+            border: 1px solid $border-color;
+            border-radius: 4px; // Bo góc nhẹ
+            background-color: #fff;
+            transition: all 0.2s ease;
+            outline: none;
+            color: $text-main;
+            height: 50px; // Tăng chiều cao input để chứa chữ 23px
+
+            &:hover {
+                border-color: #cbd5e1;
+            }
+
+            &:focus {
+                border-color: $primary-color;
+                box-shadow: 0 0 0 2px rgba($primary-color, 0.15); // PX: Shadow nhỏ hơn
+            }
+
+            &::placeholder {
+                color: #9ca3af;
+            }
+        }
+
+        // Riêng text area không set height cố định
+        textarea {
+            height: auto;
+            resize: none; // Khóa kéo giãn để không vỡ layout
+            min-height: 100px; // Tăng chiều cao tối thiểu
+            font-family: inherit;
+        }
+    }
+
+    .row-group {
+        display: block;
     }
 }
 
-/* Footer cố định ở cuối modal */
+/* Footer - Gọn gàng */
 .modal-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    padding: 1rem 1.5rem;
-    border-top: 1px solid #ddd;
-    background: #f9fafb;
+    gap: 15px;
+    padding: 15px 25px;
+    border-top: 1px solid $border-color;
+    background: #f8fafc;
+    border-radius: 0 0 $radius $radius;
 
     .btn {
-        padding: 0.6rem 1.2rem;
+        min-width: 100px;
+        padding: 10px 20px;
         border-radius: 6px;
         border: none;
         cursor: pointer;
         font-weight: 500;
-        transition: background 0.2s ease;
+        font-size: 23px; // Tăng thêm 10px (13px -> 23px)
+        transition: all 0.2s;
 
-        &.btn-primary {
-            background: #007bff;
-            color: #fff;
-
-            &:hover {
-                background: #0069d9;
-            }
+        &:active {
+            transform: scale(0.98);
         }
 
-        &.btn-secondary {
-            background: #17a2b8;
+        &.btn-primary {
+            background: $primary-color;
             color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
             &:hover {
-                background: #138496;
+                background: $primary-hover;
             }
         }
 
         &.btn-cancel {
-            background: #e0e0e0;
+            background: #fff;
+            border: 1px solid $border-color;
+            color: $text-light;
 
             &:hover {
-                background: #ccc;
+                background: #f1f5f9;
+                color: $text-main;
+                border-color: #cbd5e1;
             }
         }
     }

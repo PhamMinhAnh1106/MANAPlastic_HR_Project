@@ -21,7 +21,7 @@ export class Information implements OnInit {
   isEditing = false;
   formdata: any = {
     fullname: "",
-    cccd: BigInt(0),
+    cccd: '',
     email: "",
     phonenumber: "",
     gender: false,
@@ -141,5 +141,6 @@ export class Information implements OnInit {
     this.role = this.cookieService.get("role");
     this.getInformation();
     this.cdr.detectChanges();
+
   }
 }

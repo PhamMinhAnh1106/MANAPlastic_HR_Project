@@ -1,5 +1,5 @@
-import { DecimalPipe, NgFor, NgIf } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { DecimalPipe, DatePipe, NgFor, NgIf, NgClass } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit, Injectable } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Loading } from '../../../shared/loading/loading';
@@ -9,24 +9,25 @@ import { Alert } from '../../../shared/alert/alert';
 
 @Component({
   selector: 'app-contracts',
-  imports: [FormsModule, NgIf, Loading, NgFor, Alert],
+  standalone: true,
+  imports: [FormsModule, NgIf, NgFor, NgClass, Loading, Alert, DecimalPipe, DatePipe],
   templateUrl: './contracts.html',
-  styleUrls: ['./contracts.scss'], // sửa từ styleUrl -> styleUrls
+  styleUrls: ['./contracts.scss'],
 })
 export class Contracts implements OnInit {
   tab: string = 'check';
   isloading: boolean = false;
   employeeId: string = '';
-  messageCheckContract = "";
+
+  // Alert Props
   isalert: boolean = false;
   notifyMessage = "";
   notifyType: boolean = true;
-  showNotification(message: string, type: boolean) {
-    this.notifyMessage = message;
-    this.notifyType = type;
-    this.isalert = true;
-  }
 
+  // Check Props
+  messageCheckContract = "";
+
+  // Search Props
   filters = {
     username: '',
     type: '',
@@ -35,9 +36,19 @@ export class Contracts implements OnInit {
     startdate: '',
     enddate: ''
   };
-  showPopup = false;          // bật tắt popup
+
+  // Popup Props
+  showPopup = false;
   popupMode: 'message' | 'list' = 'message';
-  listContracts: any[] = [];  // hiển thị list
+  listContracts: any[] = [];
+
+  // --- PAGINATION PROPS ---
+  page: number = 0;
+  size: number = 5;
+  totalPages: number = 0;
+  totalElements: number = 0;
+  pageSizeOptions: number[] = [5, 10, 20, 50];
+
   statusContract = [
     'DRAFT',
     'ACTIVE',
@@ -46,26 +57,26 @@ export class Contracts implements OnInit {
     'TERMINATED',
     'HISTORY'
   ];
-  translateContractStatus(status: string): string {
-    switch (status) {
-      case 'DRAFT':
-        return 'Bản nháp';
-      case 'ACTIVE':
-        return 'Đang hoạt động';
-      case 'EXPIRING_SOON':
-        return 'Sắp hết hạn';
-      case 'EXPIRED':
-        return 'Đã hết hạn';
-      case 'TERMINATED':
-        return 'Đã chấm dứt';
-      case 'HISTORY':
-        return 'Lịch sử';
-      default:
-        return 'Không xác định';
+
+  constructor(private router: Router, private cdr: ChangeDetectorRef) { }
+
+  ngOnInit(): void {
+    const savedTab = sessionStorage.getItem('activeTab');
+    if (savedTab) {
+      this.tab = savedTab;
     }
   }
 
-  constructor(private router: Router, private cdr: ChangeDetectorRef) { }
+  changeTab(tabName: string) {
+    this.tab = tabName;
+    sessionStorage.setItem('activeTab', tabName);
+  }
+
+  showNotification(message: string, type: boolean) {
+    this.notifyMessage = message;
+    this.notifyType = type;
+    this.isalert = true;
+  }
 
   closePopup() {
     this.showPopup = false;
@@ -75,54 +86,121 @@ export class Contracts implements OnInit {
     this.router.navigate(["/home/contracts/add"]);
   }
 
+  // --- LOGIC CHECK (Giữ nguyên) ---
   async checkSignedContract() {
     if (this.employeeId == '') {
-      this.showNotification("Chưa Điền Mã Nhân Viên", false);
+      this.showNotification("Vui lòng nhập Mã Nhân Viên", false);
       return;
     }
     this.isloading = true;
-    const id = Number(this.employeeId);
-    const res = await CheckContractByIdEmployee(id) as { data: string, status: number };
-    this.isloading = false;
-    this.messageCheckContract = res.data;
-    this.popupMode = 'message';
-    this.showPopup = true;
-    setTimeout(() => this.cdr.detectChanges(), 1000);
-  }
-  getVietnameseContractType(type: string): string {
-    switch (type) {
-      case 'INDEFINITE':
-        return 'Hợp đồng Không thời hạn';
-      case 'FIXED_TERM':
-        return 'Hợp đồng có thời hạn';
-      case 'PROBATION':
-        return 'Hợp đồng Thử việc';
-      default:
-        return 'Không xác định';
+    try {
+      const id = Number(this.employeeId);
+      const res = await CheckContractByIdEmployee(id) as { data: string, status: number };
+      this.messageCheckContract = res.data;
+      this.popupMode = 'message';
+      this.showPopup = true;
+    } catch (e) {
+      this.showNotification("Có lỗi xảy ra", false);
+    } finally {
+      this.isloading = false;
+      this.cdr.detectChanges();
     }
   }
+
   async viewEmployeeContracts() {
     if (this.employeeId == '') {
-      this.showNotification("Chưa Điền Mã Nhân Viên", false);
+      this.showNotification("Vui lòng nhập Mã Nhân Viên", false);
       return;
     }
     this.isloading = true;
-    const id = Number(this.employeeId);
-    const res = await FillterContractByIdEmployee(id) as { data: any, status: number };
-    this.isloading = false;
+    try {
+      const id = Number(this.employeeId);
+      // API này chưa có phân trang theo yêu cầu cũ, hiển thị list tĩnh
+      const res = await FillterContractByIdEmployee(id) as { data: any, status: number };
 
-    if (res.status == 200) {
-      this.listContracts = res.data;
+      if (res.status == 200) {
+        this.listContracts = res.data;
+      } else {
+        this.listContracts = [];
+      }
+      this.popupMode = "list";
+      // Reset phân trang UI để ẩn thanh phân trang hoặc hiển thị full
+      this.totalElements = this.listContracts.length;
+      this.totalPages = 1;
 
-    } else {
-      this.listContracts = [];
+      this.showPopup = true;
+    } catch (e) {
+      this.showNotification("Có lỗi xảy ra", false);
+    } finally {
+      this.isloading = false;
+      this.cdr.detectChanges();
     }
-
-    this.popupMode = "list";
-    this.showPopup = true;
-    setTimeout(() => this.cdr.detectChanges(), 1000);
   }
 
+  // --- LOGIC SEARCH (CẬP NHẬT PHÂN TRANG) ---
+
+  // 1. Hàm tìm kiếm khi nhấn nút "Tìm kiếm" (Reset về trang 0)
+  async searchContract() {
+    this.page = 0;
+    await this.fetchContracts();
+  }
+
+  // 2. Hàm gọi API thực tế
+  async fetchContracts() {
+    const query = this.buildQuery(this.filters);
+    this.isloading = true;
+    try {
+      // Gọi API FillterContract với page và size
+      const res = await FillterContract(query, this.page, this.size) as { data: any, status: number };
+
+      if (res.status == 200 && res.data) {
+        // Xử lý dữ liệu trả về. 
+        // Giả định res.data có cấu trúc Page (content, totalPages, totalElements)
+        // Nếu API trả về mảng trực tiếp, cần điều chỉnh lại backend hoặc frontend
+
+        if (Array.isArray(res.data)) {
+          // Fallback nếu API vẫn trả về Array thay vì Page Object
+          this.listContracts = res.data;
+          this.totalElements = res.data.length;
+          this.totalPages = 1;
+        } else {
+          // Cấu trúc chuẩn phân trang
+          this.listContracts = res.data.content || [];
+          this.totalPages = res.data.totalPages || 0;
+          this.totalElements = res.data.totalElements || 0;
+        }
+
+        this.popupMode = "list";
+        this.showPopup = true;
+      } else {
+        this.listContracts = [];
+        this.totalElements = 0;
+        this.showNotification("Không tìm thấy kết quả", false);
+      }
+    } catch (e) {
+      this.showNotification("Có lỗi xảy ra", false);
+      this.listContracts = [];
+    } finally {
+      this.isloading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // 3. Sự kiện chuyển trang
+  onPageChange(newPage: number) {
+    if (newPage >= 0 && newPage < this.totalPages) {
+      this.page = newPage;
+      this.fetchContracts();
+    }
+  }
+
+  // 4. Sự kiện đổi số dòng/trang
+  onPageSizeChange() {
+    this.page = 0;
+    this.fetchContracts();
+  }
+
+  // --- UTILS ---
   buildQuery(filters: any): string {
     const params = new URLSearchParams();
     Object.keys(filters).forEach(key => {
@@ -133,55 +211,50 @@ export class Contracts implements OnInit {
     });
     return params.toString();
   }
-  translateAllowanceType(type: string): string {
-    switch (type) {
-      case 'NONE':
-        return 'Không áp dụng';
-      case 'CASH':
-        return 'Chi trả bằng Tiền mặt';
-      case 'IN_KIND':
-        return 'Chi trả bằng Hiện vật';
-      default:
-        return 'Không xác định';
-    }
-  }
-  async searchContract() {
-    const query = this.buildQuery(this.filters);
-    this.isloading = true;
-    const res = await FillterContract(query) as { data: any, status: number };
-    this.isloading = false;
-    if (res.status == 200) {
-      this.listContracts = res.data.sort((a: { id: number; }, b: { id: number; }) => a.id - b.id);
-      this.popupMode = "list";
-      this.showPopup = true;
-      this.cdr.detectChanges();
-    }
-  }
 
   async ExportExcel() {
     const query = buildQueryParams(this.filters);
-    console.log(query)
-
     await ExportFileDataContracts(query);
   }
 
   copyLink(url: string) {
     navigator.clipboard.writeText(url)
       .then(() => {
-        alert('Đã copy link!');
+        this.showNotification('Đã sao chép liên kết!', true);
       })
       .catch(err => {
         console.error('Lỗi copy link:', err);
       });
   }
-  changeTab(tabName: string) {
-    this.tab = tabName;
-    sessionStorage.setItem('activeTab', tabName);
+
+  // Translate Functions
+  translateContractStatus(status: string): string {
+    switch (status) {
+      case 'DRAFT': return 'Bản nháp';
+      case 'ACTIVE': return 'Đang hiệu lực';
+      case 'EXPIRING_SOON': return 'Sắp hết hạn';
+      case 'EXPIRED': return 'Đã hết hạn';
+      case 'TERMINATED': return 'Đã chấm dứt';
+      case 'HISTORY': return 'Lịch sử';
+      default: return status;
+    }
   }
-  ngOnInit(): void {
-    const savedTab = sessionStorage.getItem('activeTab');
-    if (savedTab) {
-      this.tab = savedTab;
+
+  getVietnameseContractType(type: string): string {
+    switch (type) {
+      case 'INDEFINITE': return 'Không thời hạn';
+      case 'FIXED_TERM': return 'Có thời hạn';
+      case 'PROBATION': return 'Thử việc';
+      default: return type;
+    }
+  }
+
+  translateAllowanceType(type: string): string {
+    switch (type) {
+      case 'NONE': return 'Không';
+      case 'CASH': return 'Tiền mặt';
+      case 'IN_KIND': return 'Hiện vật';
+      default: return type;
     }
   }
 }

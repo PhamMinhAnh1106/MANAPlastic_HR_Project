@@ -1,120 +1,528 @@
-/* --- HEADER --- */
-.profile-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #e9ecef;
-    padding-bottom: 10px;
-    margin-bottom: 25px;
+// --- VARIABLES ---
+$primary-color: #0088cc;
+$bg-color: #f5f7fb;
+$card-bg: #ffffff;
+$text-main: #333;
+$text-light: #6c757d;
+$border-color: #e9ecef;
+$input-bg: #f8f9fa;
+$breakpoint-mobile: 992px;
+
+/* Import Material Symbols Font */
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+
+:host {
+    display: block;
+    background-color: $bg-color;
+    min-height: 100vh;
+    padding: 2.8rem 1rem;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-.profile-title {
-    color: #007bff;
-    font-size: 1.3rem;
-    font-weight: 600;
+.profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    color: $text-main;
 }
 
-.edit-btn {
-    background-color: #007bff;
-    border: none;
-    color: white;
-    font-weight: 500;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+// --- 1. HEADER & BANNER ---
+.profile-header-card {
+    background: $card-bg;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    position: relative;
 
-    &:hover {
-        background-color: #0056b3;
+    .banner-bg {
+        height: 140px;
+
+        // --- CẬP NHẬT: Dùng ảnh background ---
+        background-image: url('/assets/background_home.jpg');
+        background-size: cover; // Ảnh phủ kín khung
+        background-position: center; // Căn giữa ảnh
+        background-repeat: no-repeat;
+
+        position: relative;
+
+        // Lớp phủ tối mờ để chữ trắng dễ đọc hơn (tùy chọn)
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3); // Màu đen mờ 30%
+        }
+
+
+    }
+
+    .profile-summary {
+        display: flex;
+        align-items: flex-end;
+        padding: 0 2rem 1.5rem 2rem;
+        position: relative;
+        margin-top: -4.5rem;
+        flex-wrap: wrap;
+        z-index: 1; // Đảm bảo nội dung nổi lên trên lớp phủ banner
+
+        .avatar-container {
+            position: relative;
+            margin-right: 1.5rem;
+
+            .avatar {
+                width: 110px;
+                height: 110px;
+                background: #2c3e50;
+                border-radius: 50%;
+                border: 4px solid #fff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #fff;
+                font-size: 2.8rem;
+                font-weight: bold;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        .profile-text {
+            flex: 1;
+            padding-bottom: 0.8rem;
+            min-width: 200px;
+            margin-bottom: 5px;
+
+            // CHỮ MÀU TRẮNG
+            color: #ffffff !important;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); // Tăng shadow để nổi bật trên ảnh nền
+
+            .name {
+                font-size: 1.8rem;
+                font-weight: 700;
+                margin: 0 0 5px 0;
+                color: inherit;
+            }
+
+            .sub-text {
+                font-size: 1rem;
+                color: rgba(255, 255, 255, 0.95);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-weight: 500;
+
+                .role {
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                }
+            }
+        }
+
+        .header-actions {
+            padding-bottom: 1rem;
+
+            .btn-primary {
+                background: #fff;
+                color: $primary-color;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 6px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                transition: all 0.2s;
+
+                &:hover {
+                    background: #f0f8ff;
+                    transform: translateY(-2px);
+                }
+            }
+        }
+    }
+
+    .profile-tabs {
+        display: flex;
+        padding: 0 2rem;
+        border-top: 1px solid $border-color;
+
+        .tab-item {
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            color: $text-light;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+
+            &.active {
+                color: $primary-color;
+                border-bottom-color: $primary-color;
+            }
+        }
     }
 }
 
-/* --- THÔNG TIN NGƯỜI DÙNG --- */
-.info-details {
+// --- 2. GRID & CARDS ---
+.content-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    margin-right: 0.4rem;
-    gap: 1.5rem 2rem;
-    /* khoảng cách hàng và cột */
+    grid-template-columns: 350px 1fr;
+    gap: 1.5rem;
+
+    @media (max-width: $breakpoint-mobile) {
+        grid-template-columns: 1fr;
+
+        .col-left {
+            order: 2;
+        }
+
+        .col-right {
+            order: 1;
+        }
+    }
 }
 
-.info-group {
+.info-card {
+    background: $card-bg;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 1.2rem;
+        color: $text-main;
+        border-left: 4px solid $primary-color;
+        padding-left: 10px;
+    }
+
+    .sub-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #495057;
+    }
+}
+
+// --- 3. CONTACT LIST ---
+.contact-list {
+    .contact-item {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 1.2rem;
+        align-items: flex-start;
+
+        .icon-box {
+            width: 36px;
+            height: 36px;
+            background: #e7f5ff;
+            color: $primary-color;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .contact-detail-stacked {
+            display: flex;
+            flex-direction: column;
+
+            label {
+                font-size: 0.75rem;
+                color: $text-light;
+                text-transform: uppercase;
+                margin-bottom: 2px;
+            }
+
+            span {
+                font-weight: 500;
+                font-size: 0.95rem;
+            }
+        }
+
+        &.single-line {
+            align-items: center;
+
+            .contact-detail {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 5px;
+                overflow: hidden;
+                width: 100%;
+
+                .detail-label {
+                    font-size: 0.9rem;
+                    color: $text-light;
+                    white-space: nowrap;
+                    font-weight: normal;
+                }
+
+                .detail-value {
+                    font-weight: 600;
+                    font-size: 0.95rem;
+                    color: $primary-color;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+}
+
+// --- 4. JOB INFO ---
+.job-info-list {
+    .job-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f3f5;
+        font-size: 0.9rem;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        .job-label {
+            color: $text-light;
+        }
+
+        .job-value {
+            font-weight: 500;
+        }
+
+        .highlight {
+            color: $primary-color;
+            font-weight: 600;
+        }
+    }
+}
+
+.mt-3 {
+    margin-top: 1.5rem;
+}
+
+// --- 5. FORM GRID ---
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+
+    @media(max-width: 600px) {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #adb5bd;
+            text-transform: uppercase;
+        }
+
+        .static-field {
+            background: $input-bg;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            color: $text-main;
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+        }
+    }
+}
+
+// --- 6. NOTE CARD ---
+.note-card {
+    margin-top: 1.5rem;
+    background: #e3fcf7;
+    border: 1px solid #c3fae8;
+    border-radius: 8px;
+    padding: 1.2rem;
+    display: flex;
+    gap: 1rem;
+
+    .note-icon {
+        color: #0ca678;
+    }
+
+    .note-content h4 {
+        margin: 0 0 5px 0;
+        color: #0ca678;
+        font-size: 1rem;
+    }
+
+    .note-content p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #087f5b;
+    }
+}
+
+// --- 7. MODAL POPUP STYLES ---
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    background: #fff;
+    width: 90%;
+    max-width: 700px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
-    gap: 4px;
-}
+    max-height: 90vh;
+    overflow: hidden;
 
-.info-label {
-    font-weight: 600;
-    color: #495057;
-    font-size: 0.95rem;
-}
+    &.animate-pop {
+        animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
 
-.info-value {
-    color: #343a40;
-    font-size: 0.95rem;
-    padding: 8px 10px;
-    border-radius: 6px;
-}
+    .modal-header {
+        padding: 1.2rem 1.5rem;
+        border-bottom: 1px solid $border-color;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8f9fa;
 
-/* Input và Select khi chỉnh sửa */
-input,
-select {
-    width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    outline: none;
-    font-size: 0.95rem;
-    transition: border-color 0.2s;
+        h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: $text-main;
+        }
 
-    &:focus {
-        border-color: #007bff;
+        .close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: $text-light;
+
+            &:hover {
+                color: red;
+            }
+        }
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+    }
+
+    .form-grid-modal {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+
+        @media(max-width: 600px) {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            &.full-width {
+                grid-column: 1 / -1;
+            }
+
+            label {
+                font-weight: 500;
+                font-size: 0.9rem;
+                color: $text-main;
+            }
+
+            .form-control {
+                padding: 10px;
+                border: 1px solid #ced4da;
+                border-radius: 6px;
+                outline: none;
+                transition: border-color 0.2s;
+                font-size: 0.95rem;
+
+                &:focus {
+                    border-color: $primary-color;
+                    box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.1);
+                }
+            }
+        }
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid $border-color;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        background: #f8f9fa;
+
+        button {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            &.btn-outline {
+                background: transparent;
+                border: 1px solid #ced4da;
+                color: $text-light;
+
+                &:hover {
+                    background: #e9ecef;
+                }
+            }
+
+            &.btn-primary {
+                background: $primary-color;
+                color: white;
+
+                &:hover {
+                    background: darken($primary-color, 10%);
+                }
+            }
+        }
     }
 }
 
-/* --- Nút Lưu / Hủy --- */
-.action-buttons {
-    display: flex;
-    gap: 12px;
-    height: 1.6rem;
-    padding-top: 1rem;
-}
-
-.save-btn,
-.cancel-btn {
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s;
-}
-
-.save-btn {
-    background-color: #28a745;
-    color: #fff;
-
-    &:hover {
-        background-color: #218838;
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
     }
-}
 
-.cancel-btn {
-    background-color: #dc3545;
-    color: #fff;
-
-    &:hover {
-        background-color: #c82333;
+    to {
+        opacity: 1;
+        transform: scale(1);
     }
-}
-
-/* --- Vai trò (role tag) --- */
-.role-tag {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-weight: bold;
-    background-color: #ffc107;
-    color: #343a40;
 }

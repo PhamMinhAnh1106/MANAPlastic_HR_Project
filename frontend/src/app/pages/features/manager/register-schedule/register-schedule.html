@@ -1,89 +1,122 @@
 <div class="overlay" [class.show]="isOpen">
-  <div class="popup">
-    <button class="close-btn" (click)="closePopup()">&times;</button>
-    
+  <div class="popup zoom-in">
+    <!-- Header -->
     <div class="popup-header">
-      <h3>Đăng ký ca làm</h3>
+      <h3>Đăng ký ca làm việc</h3>
+      <button class="close-btn" (click)="closePopup()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
     </div>
     
+    <!-- Body -->
     <div class="popup-content">
       <form #f="ngForm" (ngSubmit)="submit()">
 
-        <label>Chọn ngày:</label>
-        <input 
-          type="date"
-          [(ngModel)]="date"
-          name="date"
-          required
-        />
-
-        <label>Loại ca:</label>
-        <div class="type-group">
-          <label>
+        <!-- Date Picker -->
+        <div class="form-group">
+            <label>Chọn ngày</label>
             <input 
-              type="radio"
-              name="type"
-              (change)="changeType(8)"
-              value="8"
+              type="date"
+              [(ngModel)]="date"
+              name="date"
+              required
+              class="form-control"
             />
-            Ca 8 tiếng
-          </label>
-
-          <label>
-            <input 
-              type="radio"
-              name="type"
-              (change)="changeType(6)"
-              value="6"
-            />
-            Ca 6 tiếng
-          </label>
         </div>
 
-        <label>Chọn ca:</label>
-        <select 
-          [(ngModel)]="shiftId" 
-          name="shiftId"
-          required
-        >
-          <option [ngValue]="null" disabled selected>-- Chọn ca làm việc --</option>
+        <!-- Shift Type (Radio Cards) -->
+        <div class="form-group">
+            <label>Loại ca</label>
+            <div class="type-group">
+              <!-- Ca 8 Tiếng -->
+              <!-- Sử dụng biến #r8 để kiểm tra trạng thái checked cho CSS -->
+              <label class="radio-card" [class.active]="r8.checked">
+                <input 
+                  #r8
+                  type="radio"
+                  name="type"
+                  (change)="changeType(8)"
+                  value="8"
+                  required
+                />
+                <div class="card-content">
+                    <span class="card-title">Ca 8 Tiếng</span>
+                    <span class="card-desc">Tiêu chuẩn</span>
+                </div>
+              </label>
+    
+              <!-- Ca 6 Tiếng -->
+              <label class="radio-card" [class.active]="r6.checked">
+                <input 
+                  #r6
+                  type="radio"
+                  name="type"
+                  (change)="changeType(6)"
+                  value="6"
+                  required
+                />
+                <div class="card-content">
+                    <span class="card-title">Ca 6 Tiếng</span>
+                    <span class="card-desc">Bán thời gian</span>
+                </div>
+              </label>
+            </div>
+        </div>
 
-          <option *ngFor="let s of list" [value]="s.shift_id">
-            {{ s.shift_name }} | {{ s.start_time }} → {{ s.end_time }}
-          </option>
-          <option value="53">AL (Anually Leave)</option>
-          <option value="54">SL (Sick Leave)</option>
-          <option value="55">PL (Paternity Leave)</option>
-          <option value="56">ML (Maternity Leave)</option>
-          <option value="57">UL (Unpaid Leave)</option>
-
-        </select>
+        <!-- Shift Select -->
+        <div class="form-group">
+            <label>Chọn ca cụ thể</label>
+            <div class="select-wrapper">
+                <select 
+                  [(ngModel)]="shiftId" 
+                  name="shiftId"
+                  required
+                  class="form-control"
+                >
+                  <option value="" disabled selected>-- Vui lòng chọn ca --</option>
         
-        <div class="hidden-submit-placeholder"></div>
+                  <option *ngFor="let s of list" [value]="s.shift_id">
+                    {{ s.shift_name }} ({{ s.start_time }} - {{ s.end_time }})
+                  </option>
+                  
+                  <optgroup label="Nghỉ phép">
+                      <option value="53">AL (Phép năm)</option>
+                      <option value="54">SL (Nghỉ ốm)</option>
+                      <option value="55">PL (Việc riêng)</option>
+                      <option value="56">ML (Thai sản)</option>
+                      <option value="57">UL (Không lương)</option>
+                  </optgroup>
+                </select>
+            </div>
+        </div>
+        
       </form>
     </div>
     
+    <!-- Footer -->
     <div class="popup-footer">
       <button class="btn btn-cancel" (click)="closePopup()">Hủy</button>
-      <button class="btn btn-save" (click)="f.ngSubmit.emit()" [disabled]="f.invalid">Lưu</button>
+      <!-- Disabled nút Lưu nếu form chưa hợp lệ -->
+      <button class="btn btn-save" (click)="f.ngSubmit.emit()" [disabled]="f.invalid">
+        <span *ngIf="!isloading">Đăng ký ngay</span>
+        <span *ngIf="isloading">Đang xử lý...</span>
+      </button>
     </div>
   </div>
 </div>
 
+<!-- Global Components -->
+<app-loading *ngIf="isloading"></app-loading>
 
-<app-loading 
-  *ngIf="isloading"
-></app-loading>
+<app-comfirm 
+  *ngIf="isconfirm" 
+  [message]="confirmMessage" 
+  (result)="onConfirmResult($event)">
+</app-comfirm>
 
-<app-comfirm
-  *ngIf="isconfirm"
-  [message]="confirmMessage"
-  (result)="onConfirmResult($event)"
-></app-comfirm>
-
-<app-alert
-  *ngIf="isalert"
-  [message]="alertmessage"
-  [notifyType]="alertType"
-   (hidden)="isalert = false"
-></app-alert>
+<app-alert 
+  *ngIf="isalert" 
+  [message]="alertmessage" 
+  [notifyType]="alertType" 
+  (hidden)="isalert = false">
+</app-alert>

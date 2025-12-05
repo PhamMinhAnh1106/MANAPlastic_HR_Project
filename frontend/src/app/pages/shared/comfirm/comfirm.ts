@@ -7,7 +7,9 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   styleUrl: './comfirm.scss',
 })
 export class Comfirm {
-  @Input() message: string = "Bạn có chắc muốn thực hiện?";
+  @Input() title: string = "Xác nhận"; // Thêm tiêu đề
+  @Input() message: string = "Bạn có chắc muốn thực hiện hành động này?";
+
   @Output() result = new EventEmitter<boolean>();
 
   onConfirm() {

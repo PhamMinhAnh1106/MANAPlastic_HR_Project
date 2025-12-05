@@ -1,79 +1,118 @@
 <div class="overlay" [class.show]="isOpen">
   <div class="popup">
-    <button class="close-btn" (click)="closePopup()">&times;</button>
-
+    <!-- Header -->
     <div class="popup-header">
-      <h3>Đăng ký hợp đồng lao động</h3>
+      <div class="header-content">
+        <h3>Đăng ký Hợp đồng Lao động</h3>
+        <p>Nhập thông tin chi tiết để tạo mới hợp đồng</p>
+      </div>
+      <button class="close-btn" (click)="closePopup()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
     </div>
 
+    <!-- Content -->
     <div class="popup-content">
       <form #f="ngForm" (ngSubmit)="submit()">
-
+        
         <div class="form-grid">
-
-          <!-- Cột trái -->
-          <div class="col">
-            <label>Mã nhân viên</label>
-            <input type="text" [(ngModel)]="contract.userName" name="userId" required />
-
-            <label>Tên hợp đồng</label>
-            <input type="text" [(ngModel)]="contract.contractName" name="contractName" required />
-
-              <label>Loại hợp đồng</label>
-              <select [(ngModel)]="contract.type" name="type" required>
-                <option disabled value="">-- Chọn loại hợp đồng --</option>
-                <option *ngFor="let type of contractType" [value]="type">{{ getVietnameseContractType(type) }}</option>
-              </select>
-
-
-            <label>Lương cơ bản</label>
-            <input type="number" [(ngModel)]="contract.baseSalary" name="baseSalary" required />
+          <!-- SECTION 1: THÔNG TIN CƠ BẢN -->
+          <div class="form-section full-width">
+            <span class="section-title">Thông tin chung</span>
           </div>
 
-          <!-- Cột phải -->
-          <div class="col">
-            <label>Lương đóng BHXH</label>
-            <input type="number" [(ngModel)]="contract.insuranceSalary" name="insuranceSalary" required />
+          <div class="form-group">
+            <label>Mã nhân viên <span class="required">*</span></label>
+            <input type="text" [(ngModel)]="contract.userName" name="userId" placeholder="Nhập mã nhân viên..." required />
+          </div>
 
-            <label>Phụ cấp độc hại</label>
-            <select [(ngModel)]="contract.allowanceToxicType" name="allowanceToxicType" required>
-              <option disabled selected value="">-- Chọn loại độc hại --</option>
-              <option value="NONE">NONE</option>
-              <option value="CASH">CASH</option>
-              <option value="IN_KIND">IN_KIND</option>
+          <div class="form-group">
+            <label>Tên hợp đồng <span class="required">*</span></label>
+            <input type="text" [(ngModel)]="contract.contractName" name="contractName" placeholder="VD: HĐLĐ 2024..." required />
+          </div>
+
+          <div class="form-group">
+            <label>Loại hợp đồng <span class="required">*</span></label>
+            <select [(ngModel)]="contract.type" name="type" required>
+              <option disabled value="">-- Chọn loại hợp đồng --</option>
+              <option *ngFor="let type of contractType" [value]="type">{{ getVietnameseContractType(type) }}</option>
             </select>
+          </div>
 
-            <label>Ngày ký hợp đồng</label>
-            <input type="date" [(ngModel)]="contract.signDate" name="signDate" required />
+          <div class="form-group">
+             <label>Ngày ký hợp đồng <span class="required">*</span></label>
+             <input type="date" [(ngModel)]="contract.signDate" name="signDate" required />
+          </div>
 
-            <label>Ngày bắt đầu</label>
+          <!-- SECTION 2: LƯƠNG & PHÚC LỢI -->
+          <div class="form-section full-width">
+            <span class="section-title">Lương & Thời hạn</span>
+          </div>
+
+          <div class="form-group">
+            <label>Lương cơ bản (VNĐ) <span class="required">*</span></label>
+            <input type="number" [(ngModel)]="contract.baseSalary" name="baseSalary" placeholder="0" required />
+          </div>
+
+          <div class="form-group">
+            <label>Lương đóng BHXH (VNĐ) <span class="required">*</span></label>
+            <input type="number" [(ngModel)]="contract.insuranceSalary" name="insuranceSalary" placeholder="0" required />
+          </div>
+
+          <div class="form-group">
+            <label>Phụ cấp độc hại <span class="required">*</span></label>
+            <select [(ngModel)]="contract.allowanceToxicType" name="allowanceToxicType" required>
+              <option disabled selected value="">-- Chọn loại phụ cấp --</option>
+              <option value="NONE">Không áp dụng</option>
+              <option value="CASH">Tiền mặt</option>
+              <option value="IN_KIND">Hiện vật</option>
+            </select>
+          </div>
+
+           <!-- Empty div to balance grid if needed, or remove -->
+           <div class="form-group empty-desktop"></div>
+
+          <div class="form-group">
+            <label>Ngày bắt đầu <span class="required">*</span></label>
             <input type="date" [(ngModel)]="contract.startDate" name="startDate" required />
+          </div>
 
-            <label>Ngày kết thúc</label>
+          <div class="form-group">
+            <label>Ngày kết thúc <span class="required">*</span></label>
             <input type="date" [(ngModel)]="contract.endDate" name="endDate" required />
+          </div>
 
-            <label>File hợp đồng (PDF)</label>
-            <input type="file" (change)="handleFileSelect($event)" accept="application/pdf" required />
+          <!-- SECTION 3: TỆP ĐÍNH KÈM -->
+          <div class="form-section full-width">
+            <span class="section-title">Tệp đính kèm</span>
+          </div>
+
+          <div class="form-group full-width file-upload-group">
+            <label>File hợp đồng (PDF) <span class="required">*</span></label>
+            <div class="file-upload-wrapper">
+                <input type="file" id="fileInput" (change)="handleFileSelect($event)" accept="application/pdf" required />
+                <div class="file-trigger">
+                    <span class="material-symbols-outlined icon">cloud_upload</span>
+                    <span class="text" *ngIf="!selectedFile">Nhấn để tải lên file PDF</span>
+                    <span class="text highlight" *ngIf="selectedFile">{{ selectedFile.name }}</span>
+                </div>
+            </div>
           </div>
 
         </div>
-
-        <div class="hidden-submit-placeholder"></div>
       </form>
     </div>
 
+    <!-- Footer -->
     <div class="popup-footer">
-      <button class="btn btn-cancel" (click)="closePopup()">Hủy</button>
-      <button class="btn btn-save" (click)="f.ngSubmit.emit()" [disabled]="f.invalid">Lưu</button>
+      <button class="btn btn-text" (click)="closePopup()">Hủy bỏ</button>
+      <button class="btn btn-primary" (click)="f.ngSubmit.emit()" [disabled]="f.invalid">
+        <span class="material-symbols-outlined">save</span> Lưu hợp đồng
+      </button>
     </div>
   </div>
 </div>
-<app-comfirm *ngIf="isconfirm"
-  [message]="confirmMessage"
-  (result)="onConfirmResult($event)">
-</app-comfirm>
-<app-alert   *ngIf="isalert"
-  [message]="notifyMessage"
-  [notifyType]="notifyType"
-  (hidden)="isalert = false"></app-alert>
+
+<app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
+<app-alert *ngIf="isalert" [message]="notifyMessage" [notifyType]="notifyType" (hidden)="isalert = false"></app-alert>
 <app-loading *ngIf="isloading"></app-loading>

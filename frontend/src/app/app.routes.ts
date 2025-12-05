@@ -7,7 +7,6 @@ import { ChangePassword } from './pages/user/change-password/change-password';
 import { AddAccount } from './pages/features/admin/add-account/add-account';
 import { Accounts } from './pages/features/hr/accounts/accounts';
 import { Attendant } from './pages/features/hr/attendant/attendant';
-import { InfoBase } from './pages/user/info-base/info-base';
 import { Schedule } from './pages/features/manager/schedule/schedule';
 import { RegisterSchedule } from './pages/features/manager/register-schedule/register-schedule';
 import { Tablemonth } from './pages/shared/tablemonth/tablemonth';
@@ -25,7 +24,7 @@ export const routes: Routes = [
         path: 'home', component: Home,
         children: [
             {
-                path: 'info', component: InfoBase,
+                path: 'info', component: Information,
                 children: [
                     { path: 'user', component: Information },
                 ]

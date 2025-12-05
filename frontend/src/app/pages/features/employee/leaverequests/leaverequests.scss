@@ -1,86 +1,409 @@
-.table-container {
-    padding: 1rem 0.5rem 1rem 1rem;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    margin: 5rem 1.3rem 0 5.3rem;
+/* --- VARIABLES --- */
+$primary-color: #3b82f6;
+$primary-hover: #2563eb;
+$danger-color: #ef4444;
+$danger-bg: #fee2e2;
+$success-color: #10b981;
+$success-bg: #d1fae5;
+$warning-color: #f59e0b;
+$warning-bg: #fef3c7;
+$text-main: #1f2937;
+$text-secondary: #6b7280;
+$bg-surface: #ffffff;
+$bg-background: #f3f4f6;
+$border-color: #e5e7eb;
+
+:host {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    display: block;
+    background-color: $bg-background;
+    min-height: 100vh;
+    padding: 5rem 0.5rem 0 5rem;
+    /* Giảm padding ngoài cùng */
 }
 
-.remain_leave {
+.dashboard-wrapper {
+    max-width: 100%;
+    /* FULL WIDTH: Không giới hạn 1200px nữa */
+    margin: 0;
+    /* Bỏ margin auto để sát lề hơn nếu muốn */
+}
+
+/* --- HEADER & ADD BUTTON STYLE --- */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    .page-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: $text-main;
+        margin: 0;
+    }
+
+    .page-subtitle {
+        color: $text-secondary;
+        margin: 0.25rem 0 0 0;
+        font-size: 0.85rem;
+    }
+}
+
+/* Wrapper để căn chỉnh nút và tooltip */
+.action-wrapper {
+    position: relative;
     display: flex;
     align-items: center;
 
-    span {
-        margin: 0.5rem 1rem 0.5rem 0;
-    }
-
-    .add_btn {
-        margin-left: auto;
-        background-color: #0d6efd;
-        color: #fff;
-        padding: 0.2rem;
-        border-radius: 3rem;
+    .btn-circle-add {
+        background-color: $primary-color;
+        color: white;
+        border: none;
+        width: 36px;
+        /* Nhỏ lại chút nữa */
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
+        box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 2;
+
+        span {
+            font-size: 20px;
+            font-weight: bold;
+        }
 
         &:hover {
-            opacity: 0.8;
-            /* giảm độ mờ khi hover */
+            background-color: $primary-hover;
+            transform: rotate(90deg);
+            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4);
+        }
+    }
+
+    .tooltip-box {
+        position: absolute;
+        right: 45px;
+        background-color: #1f2937;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(10px);
+        transition: all 0.3s ease;
+        pointer-events: none;
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -4px;
+            transform: translateY(-50%);
+            border-width: 5px 0 5px 5px;
+            border-style: solid;
+            border-color: transparent transparent transparent #1f2937;
+        }
+    }
+
+    .btn-circle-add:hover~.tooltip-box,
+    .tooltip-box:hover {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-8px);
+        right: 45px;
+    }
+}
+
+/* --- STATS CARDS --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    /* Card gọn hơn */
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: $bg-surface;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid $border-color;
+    transition: transform 0.2s;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    &.blue-card .stat-icon {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    &.orange-card .stat-icon {
+        background: #ffedd5;
+        color: #9a3412;
+    }
+
+    &.purple-card .stat-icon {
+        background: #f3e8ff;
+        color: #6b21a8;
+    }
+}
+
+.stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .material-symbols-outlined {
+        font-size: 20px;
+    }
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+
+    .stat-label {
+        font-size: 0.7rem;
+        color: $text-secondary;
+        font-weight: 500;
+    }
+
+    .stat-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: $text-main;
+
+        small {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: $text-secondary;
+            margin-left: 2px;
         }
     }
 }
 
-.leave-table {
+/* --- TABLE (FULL WIDTH & COMPACT) --- */
+.table-container {
+    background: $bg-surface;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    overflow-x: auto;
+    border: 1px solid $border-color;
+    width: 100%;
+    /* Đảm bảo container full */
+}
+
+.modern-table {
     width: 100%;
     border-collapse: collapse;
-    font-family: 'Segoe UI', sans-serif;
+    text-align: left;
+    white-space: nowrap;
 
     th {
-        background: #0d6efd;
-        color: white;
-        padding: 10px;
-        text-align: left;
+        background: #f9fafb;
+        color: $text-secondary;
+        font-weight: 600;
+        font-size: 0.7rem;
+        /* FONT NHỎ HƠN (11.2px) */
+        text-transform: uppercase;
+        padding: 0.6rem 0.75rem;
+        /* Padding gọn hơn */
+        border-bottom: 1px solid $border-color;
     }
 
     td {
-        padding: 12px;
-        border-bottom: 1px solid #ddd;
+        padding: 0.6rem 0.75rem;
+        /* Padding gọn hơn */
+        border-bottom: 1px solid $border-color;
+        color: $text-main;
+        font-size: 0.75rem;
+        /* FONT NHỎ HƠN (12px) */
+        vertical-align: middle;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
     }
 
     tr:hover {
-        background: #f5f5f5;
+        background: #f9fafb;
     }
 }
 
-.status {
+/* UI Elements trong bảng */
+.id-badge {
+    font-family: monospace;
+    background: #f3f4f6;
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: $text-secondary;
+    font-size: 0.7rem;
+}
+
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .avatar {
+        width: 24px;
+        height: 24px;
+        background: #e0e7ff;
+        color: #4338ca;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.7rem;
+    }
+
+    .username {
+        font-weight: 500;
+        font-size: 0.75rem;
+    }
+}
+
+.date-range {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: $text-secondary;
+    font-size: 0.75rem;
+
+    .arrow {
+        font-size: 0.85rem;
+    }
+}
+
+.reason-cell {
+    max-width: 250px;
+    /* Cho phép dài hơn chút vì full width */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: $text-secondary;
+    font-size: 0.75rem;
+}
+
+.meta-date {
+    font-size: 0.75rem;
+    color: $text-secondary;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px;
+    border-radius: 99px;
+    font-size: 0.7rem;
     font-weight: 600;
 
+    .dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+    }
+
     &.approved {
-        color: green;
+        background: $success-bg;
+        color: $success-color;
+
+        .dot {
+            background: $success-color;
+        }
     }
 
     &.pending {
-        color: orange;
+        background: $warning-bg;
+        color: $warning-color;
+
+        .dot {
+            background: $warning-color;
+        }
     }
 
     &.rejected {
-        color: red;
+        background: $danger-bg;
+        color: $danger-color;
+
+        .dot {
+            background: $danger-color;
+        }
     }
 }
 
-.delete-btn {
-    padding: 0.2rem 0.3rem;
-    color: #000;
-    border: none;
-    border-radius: 6px;
-    border: 1px solid;
+.text-right {
+    text-align: right;
+}
 
-    span {
-        font-size: 0.8rem;
+.btn-icon {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: $text-secondary;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+
+    .material-symbols-outlined {
+        font-size: 1.1rem;
     }
 
-    cursor: pointer;
-
     &:hover {
-        background: #d9363e;
+        background: $bg-background;
+        color: $text-main;
+    }
+
+    &.delete:hover {
+        background: $danger-bg;
+        color: $danger-color;
+    }
+}
+
+.empty-state {
+    padding: 2rem;
+    text-align: center;
+    color: $text-secondary;
+
+    .material-symbols-outlined {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.5;
+    }
+
+    p {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 768px) {
+    :host {
+        padding: 0.5rem;
+        /* Padding nhỏ hơn trên mobile */
+    }
+
+    .modern-table {
+        display: block;
+        overflow-x: auto;
     }
 }

@@ -1,347 +1,537 @@
-.container {
-    padding: 3rem 1rem 5rem 5rem;
+// --- Variables ---
+$primary-color: #3b82f6;
+$primary-hover: #2563eb;
+$bg-color: #f8fafc;
+$border-color: #e2e8f0;
+$text-main: #1e293b;
+$text-secondary: #64748b;
+$danger: #ef4444;
+$success: #22c55e;
 
-    /* --- FILTER SECTION --- */
-    .filter {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 16px;
-        font-size: 15px;
+// Không set height cố định nữa, dùng flex để tự chia
+$cell-min-height: 0;
 
-        label {
-            font-weight: 600;
-        }
+.calendar-wrapper {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    // Padding nhỏ lại
+    padding: 3.5rem 1rem 0.5rem 5rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
-        select,
-        input {
-            padding: 4px 6px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            outline: none;
-
-            &:focus {
-                border-color: #0066ff;
-            }
-        }
-    }
-
-    /* --- CALENDAR TABLE --- */
-    .calendar {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-
-        th {
-            border: 1px solid #ccc;
-            padding: 10px;
-            font-weight: 700;
-            text-align: center;
-            background: #f2f6ff;
-        }
-
-        td {
-            border: 1px solid #ccc;
-            height: 120px;
-            /* Tăng chiều cao xíu để chứa nút xem thêm */
-            vertical-align: start;
-            padding: 6px;
-            position: relative;
-            /* overflow-y: auto; -> Bỏ scroll ở td vì đã có nút xem thêm */
-
-            .day-number {
-                font-weight: 600;
-                margin-bottom: 4px;
-                display: block;
-            }
-        }
-
-        td.not-in-month {
-            background-color: #f5f5f5;
-            color: #999;
-        }
-
-        td.day-off {
-            background-color: #ffe6e6;
-        }
-
-        /* --- SHIFT BLOCK (CA LÀM VIỆC) --- */
-        .shift-block {
-            background-color: #d9eaff;
-            margin: 2px 0;
-            padding: 2px 6px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            display: block;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            border-left: 3px solid #4d8cff;
-
-            &:hover {
-                background-color: #c4dcff;
-            }
-        }
-
-        /* --- NÚT XEM THÊM (+3 xem thêm) --- */
-        .more-shifts {
-            font-size: 11px;
-            color: #0056b3;
-            cursor: pointer;
-            padding: 3px 0;
-            margin-top: 4px;
-            font-weight: 600;
-            text-align: center;
-            border-radius: 4px;
-            background-color: rgba(0, 86, 179, 0.08);
-            transition: 0.2s;
-
-            &:hover {
-                background-color: #0056b3;
-                color: #fff;
-            }
-        }
-    }
+    // Quan trọng: Set chiều cao bằng màn hình trừ đi một chút khoảng hở
+    height: calc(100vh - 20px);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden; // Chặn scroll của trang
 }
 
-/* --- POPUP SỬA CA (EDIT) --- */
-.edit-popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.95);
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(10px);
-    padding: 28px 32px;
-    border-radius: 16px;
-    width: 460px;
-    max-width: 95%;
-    z-index: 9999;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-    animation: popupFadeIn 0.2s ease-out forwards;
-    border: 1px solid #eee;
+// --- Header ---
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    // Giảm margin bottom để dành chỗ cho lịch
+    margin-bottom: 0.5rem;
+    flex-shrink: 0; // Header không được co lại
 
-    h3 {
-        text-align: center;
-        margin-bottom: 18px;
-        font-size: 22px;
-        color: #111;
-        font-weight: 700;
-    }
-
-    p {
-        font-size: 16px;
-        margin-bottom: 8px;
-        color: #333;
-
-        strong {
-            font-weight: 600;
-        }
-    }
-
-    label {
-        display: block;
-        font-size: 14px;
-        margin-top: 15px;
-        margin-bottom: 6px;
-        font-weight: 600;
-        color: #444;
-    }
-
-    .type-group {
+    .filter-group {
         display: flex;
-        gap: 20px;
-        margin-bottom: 12px;
+        gap: 0.8rem;
+        align-items: center;
 
-        label {
-            margin-top: 0;
-            font-weight: 500;
-            cursor: pointer;
+        .control-item {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 0.4rem;
+
+            label {
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: $text-secondary;
+                text-transform: uppercase;
+                white-space: nowrap;
+            }
+
+            select,
+            input {
+                padding: 0.3rem 0.5rem;
+                border: 1px solid $border-color;
+                border-radius: 4px;
+                font-size: 0.8rem;
+                outline: none;
+                min-width: 80px;
+                background-color: #fff;
+
+                &:focus {
+                    border-color: $primary-color;
+                    box-shadow: 0 0 0 2px rgba($primary-color, 0.1);
+                }
+            }
         }
     }
 
-    select {
-        width: 100%;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        font-size: 15px;
-        outline: none;
-
-        &:focus {
-            border-color: #4aa4ff;
-        }
-    }
-
-    .btn-group {
+    // Controls mới thêm vào (Extra)
+    .extra-controls-group {
         display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        margin-top: 25px;
+        align-items: center;
+        gap: 8px;
+        margin-left: 10px;
+
+        .status-select {
+            padding: 0.3rem 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 0.8rem;
+            min-width: 110px;
+            cursor: pointer;
+            outline: none;
+        }
 
         button {
-            flex: 1;
-            padding: 10px 0;
-            border-radius: 8px;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.75rem;
+            border-radius: 4px;
             border: none;
-            font-size: 15px;
             cursor: pointer;
             font-weight: 600;
             color: white;
-            transition: 0.2s;
+            white-space: nowrap;
 
-            &.save-btn {
-                background: #28a745;
+            &.btn-primary {
+                background: $primary-color;
 
                 &:hover {
-                    background: #218838;
+                    background: $primary-hover;
                 }
             }
 
-            &.cancel-btn {
-                background: #dc3545;
+            &.btn-success {
+                background: $success;
 
                 &:hover {
-                    background: #c82333;
+                    background: darken($success, 5%);
                 }
+            }
+        }
+
+        .add-icon {
+            font-size: 20px;
+            padding: 4px;
+            cursor: pointer;
+            border-radius: 50%;
+
+            &:hover {
+                background: #f1f5f9;
+                color: $text-main;
+            }
+        }
+    }
+
+    .legend {
+        display: flex;
+        gap: 6px;
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+
+            &.draft {
+                background: #fef08a;
+                color: #854d0e;
+            }
+
+            &.official {
+                background: #bbf7d0;
+                color: #166534;
             }
         }
     }
 }
 
-/* --- POPUP DANH SÁCH CA CHI TIẾT (MỚI) --- */
-.day-details-popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    /* Nền tối */
-    z-index: 10000;
-    /* Cao hơn tất cả */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.day-details-popup {
-    background: white;
-    width: 450px;
-    max-width: 90%;
-    max-height: 85vh;
-    /* Giới hạn chiều cao */
-    border-radius: 12px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+// --- Grid Layout (Phần quan trọng nhất) ---
+.calendar-container {
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    overflow: hidden;
+    // Flex: 1 để chiếm toàn bộ chiều cao còn lại của màn hình
+    flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    animation: popupFadeIn 0.2s ease-out;
+}
 
-    .popup-header {
-        padding: 15px 20px;
-        background: #f8f9fa;
-        border-bottom: 1px solid #eee;
+.week-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background-color: #f1f5f9;
+    border-bottom: 1px solid $border-color;
+    flex-shrink: 0; // Header tuần không được co
+
+    .day-name {
+        padding: 0.5rem;
+        text-align: center;
+        font-weight: 600;
+        color: $text-secondary;
+        font-size: 0.75rem;
+    }
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    // Tự động chia đều chiều cao các dòng
+    grid-auto-rows: 1fr;
+    background-color: $border-color;
+    gap: 1px;
+    // Fill chiều cao container
+    flex: 1;
+    height: 100%;
+}
+
+// --- Day Cell ---
+.day-cell {
+    background-color: white;
+    // Cho phép cell co nhỏ hơn nội dung nếu cần thiết
+    min-height: 0;
+    padding: 2px;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: background 0.2s;
+    overflow: hidden; // Ẩn nội dung tràn
+
+    &:hover {
+        background-color: #f8fafc;
+    }
+
+    &.outside-month {
+        background-color: #fcfcfc;
+
+        .date-number {
+            color: #cbd5e1;
+        }
+    }
+
+    &.day-off {
+        background-color: #fff1f2;
+    }
+
+    .day-header {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 2px;
+
+        .date-number {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: $text-main;
+            padding: 1px 5px;
+            border-radius: 50%;
+
+            &.today {
+                background-color: $primary-color;
+                color: white;
+            }
+        }
+    }
+
+    // --- Shifts inside cell ---
+    .shifts-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1px; // Khoảng cách giữa các ca cực nhỏ
+        flex: 1;
+        overflow-y: auto; // Cho phép scroll nhẹ nếu quá nhiều ca
+
+        // Ẩn thanh scrollbar đi để nhìn đẹp hơn
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    .shift-chip {
+        background-color: #e0f2fe;
+        color: #0369a1;
+        border-radius: 2px;
+        padding: 1px 4px;
+        font-size: 0.65rem; // Font chữ ca làm việc nhỏ
+        font-weight: 500;
+        border-left: 2px solid $primary-color;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &:hover {
+            background-color: #bae6fd;
+        }
+
+        &.manager-view {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .shift-time {
+            font-size: 0.4rem;
+            opacity: 0.8;
+        }
+    }
+
+    .more-indicator {
+        margin-top: auto; // Đẩy xuống đáy
+        text-align: center;
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: $text-secondary;
+        padding: 1px;
+        background: rgba(0, 0, 0, 0.02);
+
+        &:hover {
+            background-color: #e2e8f0;
+            color: $text-main;
+        }
+    }
+}
+
+// --- Modal / Popups (Giữ nguyên hoặc thu nhỏ nhẹ) ---
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    width: 100%;
+    max-width: 420px; // Popup nhỏ gọn hơn
+    max-height: 90vh;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    animation: modalSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 0.85rem;
+
+    &.day-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-header {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid $border-color;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        background-color: #f8fafc;
 
         h3 {
             margin: 0;
-            font-size: 18px;
-            color: #333;
+            font-size: 1rem;
             font-weight: 700;
+            color: $text-main;
         }
 
-        .close-btn {
+        .close-icon {
             background: none;
             border: none;
-            font-size: 28px;
+            font-size: 1.5rem;
+            color: $text-secondary;
             cursor: pointer;
-            color: #888;
+            padding: 0;
             line-height: 1;
-            padding: 0 5px;
 
             &:hover {
-                color: #d22;
+                color: $danger;
             }
         }
     }
 
-    .popup-content {
-        padding: 0;
-        overflow-y: auto;
-        /* Cuộn dọc nếu danh sách dài */
-        background: #fff;
+    .modal-body {
+        padding: 1rem;
+
+        &.scrollable {
+            overflow-y: auto;
+        }
     }
 
-    /* Style cho từng dòng ca trong danh sách */
-    .shift-list-full {
-        .shift-item-row {
-            padding: 12px 20px;
-            border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
+    .modal-footer {
+        padding: 0.75rem 1rem;
+        background-color: #f8fafc;
+        border-top: 1px solid $border-color;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+    }
+}
 
-            &:hover {
-                background-color: #f0f8ff;
-                /* Highlight khi hover */
-            }
+// Form elements trong popup
+.info-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
 
-            &:last-child {
-                border-bottom: none;
-            }
+    .info-item {
+        display: flex;
+        flex-direction: column;
 
-            .shift-info-row {
-                display: flex;
-                align-items: center;
-                gap: 15px;
-                width: 100%;
-
-                /* Badge hiển thị giờ/tên ca */
-                .time-badge {
-                    font-size: 13px;
-                    color: #fff;
-                    background-color: #4d8cff;
-                    padding: 4px 10px;
-                    border-radius: 20px;
-                    font-weight: 600;
-                    min-width: 80px;
-                    text-align: center;
-                }
-
-                /* Tên nhân viên */
-                .emp-name {
-                    font-size: 15px;
-                    color: #333;
-                    font-weight: 500;
-                }
-            }
+        label {
+            font-size: 0.7rem;
+            color: $text-secondary;
+            margin-bottom: 0.2rem;
         }
 
-        .no-data-text {
-            padding: 30px;
-            text-align: center;
-            color: #999;
-            font-style: italic;
+        span {
+            font-weight: 600;
         }
     }
 }
 
-@keyframes popupFadeIn {
+.form-group {
+    margin-bottom: 1rem;
+
+    label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+        font-size: 0.8rem;
+    }
+}
+
+.radio-group {
+    display: flex;
+    gap: 1rem;
+
+    .radio-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        cursor: pointer;
+        font-size: 0.85rem;
+    }
+}
+
+.custom-select {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid $border-color;
+    font-size: 0.85rem;
+
+    &:focus {
+        border-color: $primary-color;
+    }
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &.btn-secondary {
+        background: white;
+        border: 1px solid $border-color;
+        color: $text-main;
+
+        &:hover {
+            background: #f1f5f9;
+        }
+    }
+
+    &.btn-primary {
+        background: $primary-color;
+        color: white;
+
+        &:hover {
+            background: darken($primary-color, 5%);
+        }
+    }
+}
+
+// Detail List
+.details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        cursor: pointer;
+
+        &:hover {
+            border-color: $primary-color;
+            background: #f0f9ff;
+        }
+
+        .shift-badge {
+            background: $primary-color;
+            color: white;
+            padding: 0.1rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .emp-name {
+            margin-left: 0.8rem;
+            font-weight: 500;
+            flex: 1;
+        }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 1rem;
+        color: $text-secondary;
+        font-style: italic;
+    }
+}
+
+// Animation
+@keyframes modalSlideIn {
     from {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.9);
+        transform: scale(0.95) translateY(10px);
     }
 
     to {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
+        transform: scale(1) translateY(0);
     }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.2s ease-out;
 }

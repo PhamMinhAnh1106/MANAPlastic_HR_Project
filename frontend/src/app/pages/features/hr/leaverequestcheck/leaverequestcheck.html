@@ -1,97 +1,151 @@
 <div class="attendance-container">
 
-  <!-- Bộ lọc theo username -->
-  <div class="filter-section">
-    <input
-      type="text"
-      [(ngModel)]="filter.username"
-      placeholder="Nhập username để lọc"
-    />
-    <select [(ngModel)]="filter.status">
-  <option value="">Tất cả trạng thái</option>
-  <option value="PENDING">PENDING</option>
-  <option value="APPROVED">APPROVED</option>
-  <option value="REJECTED">REJECTED</option>
-</select>
+  <!-- Header Section: Tiêu đề + Bộ lọc -->
+  <div class="page-header">
+    <div class="title-section">
+      <h2>Quản lý Đơn Nghỉ Phép</h2>
+      <p class="subtitle">Xem và duyệt các yêu cầu nghỉ phép từ nhân viên</p>
+    </div>
 
+    <!-- Bộ lọc -->
+    <div class="filter-card">
+      <div class="input-group">
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input 
+          type="text" 
+          [(ngModel)]="filter.username" 
+          (keyup.enter)="onSearch()"
+          placeholder="Tìm username..." 
+        />
+      </div>
 
-    <button (click)="filterLeave()">Lọc</button>
+      <div class="select-wrapper">
+        <select [(ngModel)]="filter.status" (change)="onSearch()">
+          <option value="">Tất cả trạng thái</option>
+          <option value="PENDING">Đang chờ (Pending)</option>
+          <option value="APPROVED">Đã duyệt (Approved)</option>
+          <option value="REJECTED">Từ chối (Rejected)</option>
+        </select>
+        <span class="material-symbols-outlined arrow-icon">expand_more</span>
+      </div>
+
+      <button class="btn-filter" (click)="onSearch()">
+        <span class="material-symbols-outlined">filter_list</span>
+        Lọc
+      </button>
+    </div>
   </div>
 
-  <!-- Bảng dữ liệu nghỉ phép -->
-  <div class="table-section">
-    <table *ngIf="leaveRequests && leaveRequests.length > 0; else noData">
-      <thead>
-        <tr>
-          <th>Mã đơn</th>
-          <th>Username</th>
-          <th>Họ tên</th>
-          <th>Loại nghỉ</th>
-          <th>Bắt đầu</th>
-          <th>Kết thúc</th>
-          <th>Lý do</th>
-          <th>Ngày yêu cầu</th>
-          <th>Trạng thái</th>
-          <th *ngIf="role === 'hr'"></th>
-        </tr>
-      </thead>
+  <!-- Bảng dữ liệu -->
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="modern-table" *ngIf="leaveRequests && leaveRequests.length > 0; else noData">
+        <thead>
+          <tr>
+            <th class="text-center" style="width: 60px;">ID</th>
+            <th>Nhân viên</th>
+            <th>Loại nghỉ</th>
+            <th>Thời gian</th>
+            <th>Lý do</th>
+            <th>Ngày gửi</th>
+            <th class="text-center">Trạng thái</th>
+            <th class="text-center" style="width: 100px;" *ngIf="role !== 'hr'">Hành động</th>
+          </tr>
+        </thead>
 
-      <tbody>
-        <tr *ngFor="let item of leaveRequests">
-          <td>{{ item.leaverequestID }}</td>
-          <td>{{ item.username }}</td>
-          <td>{{ item.fullname }}</td>
-          <td>{{ getVietnameseLeaveType(item.leavetype) }}</td>
-          <td>{{ item.startdate }}</td>
-          <td>{{ item.enddate }}</td>
-          <td>{{ item.reason }}</td>
-          <td>{{ item.requestdate }}</td>
+        <tbody>
+          <tr *ngFor="let item of leaveRequests">
+            <td class="text-center"><span class="username">{{ item.username }}</span>
+</td>
+            
+            <!-- Cột nhân viên -->
+            <td>
+              <div class="user-info">
+                <div class="details">
+                  <span class="fullname">{{ item.fullname }}</span>
+                </div>
+              </div>
+            </td>
 
-          <td>
-            <span [ngClass]="{
-              'status-approved': item.status === 'APPROVED',
-              'status-rejected': item.status === 'REJECTED',
-              'status-pending': item.status === 'PENDING'
-            }">
-              {{ item.status }}
-            </span>
-          </td>
+            <td>
+              <span class="leave-type">{{ getVietnameseLeaveType(item.leavetype) }}</span>
+            </td>
 
-          <!-- Nút duyệt / từ chối -->
-          <td *ngIf="item.status === 'PENDING'" style="display:flex">
-            <button class="approve-btn" (click)="approve(item.leaverequestID)">
-              <span class="material-symbols-outlined">
-check_circle
-</span>
-            </button>
-            <button class="reject-btn" (click)="reject(item.leaverequestID)">
-              <span class="material-symbols-outlined">
-              cancel
+            <td>
+              <div class="date-range">
+                <span>{{ item.startdate }}</span>
+                <span class="arrow">➝</span>
+                <span>{{ item.enddate }}</span>
+              </div>
+            </td>
+
+            <td class="reason-col" [title]="item.reason">{{ item.reason }}</td>
+            <td class="request-date">{{ item.requestdate }}</td>
+
+            <td class="text-center">
+              <span class="status-badge" [ngClass]="{
+                  'approved': item.status === 'APPROVED',
+                  'rejected': item.status === 'REJECTED',
+                  'pending': item.status === 'PENDING'
+                }">
+                {{ item.status }}
               </span>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+
+            <!-- Nút hành động -->
+            <td class="text-center" *ngIf="role !== 'hr'">
+              <div class="action-buttons" *ngIf="item.status === 'PENDING'">
+                <button class="btn-icon approve" (click)="approve(item.leaverequestID)" title="Duyệt đơn">
+                  <span class="material-symbols-outlined">check</span>
+                </button>
+                <button class="btn-icon reject" (click)="reject(item.leaverequestID)" title="Từ chối">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+              <span *ngIf="item.status !== 'PENDING'" class="text-muted">-</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PHẦN PHÂN TRANG -->
+    <div class="pagination-footer" *ngIf="leaveRequests && leaveRequests.length > 0">
+      <div class="page-size-selector">
+        <span>Hiển thị</span>
+        <select [(ngModel)]="size" (change)="onPageSizeChange()">
+          <option *ngFor="let s of pageSizeOptions" [value]="s">{{ s }}</option>
+        </select>
+        <span>dòng</span>
+      </div>
+      
+      <div class="page-info">
+        {{ page * size + 1 }} - {{ (page + 1) * size > totalElements ? totalElements : (page + 1) * size }} 
+        trong tổng số <strong>{{ totalElements }}</strong>
+      </div>
+
+      <div class="page-controls">
+        <button class="btn-page" [disabled]="page === 0" (click)="onPageChange(page - 1)">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <span class="current-page">Trang {{ page + 1 }} / {{ totalPages }}</span>
+        <button class="btn-page" [disabled]="page >= totalPages - 1" (click)="onPageChange(page + 1)">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    </div>
 
     <ng-template #noData>
-      <div class="no-data">Không có dữ liệu nghỉ phép</div>
+      <div class="empty-state">
+        <span class="material-symbols-outlined icon">inbox</span>
+        <h3>Không có dữ liệu</h3>
+        <p>Không tìm thấy đơn nghỉ phép nào phù hợp.</p>
+      </div>
     </ng-template>
   </div>
 </div>
-<app-loading 
-  *ngIf="isloading"
-></app-loading>
 
-<app-comfirm
-  *ngIf="isconfirm"
-  [message]="confirmMessage"
-  (result)="onConfirmResult($event)"
-></app-comfirm>
-
-<app-alert
-  *ngIf="isalert"
-  [message]="alertmessage"
-  [notifyType]="alertType"
-   (hidden)="isalert = false"
-></app-alert>
+<!-- Components phụ -->
+<app-loading *ngIf="isloading"></app-loading>
+<app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
+<app-alert *ngIf="isalert" [message]="alertmessage" [notifyType]="alertType" (hidden)="isalert = false"></app-alert>

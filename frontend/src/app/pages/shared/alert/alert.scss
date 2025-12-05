@@ -1,42 +1,103 @@
+// Biến màu sắc
+$success-color: #2ecc71;
+$success-bg: #eafaf1;
+$success-text: #27ae60;
+
+$error-color: #e74c3c;
+$error-bg: #fdeaea;
+$error-text: #c0392b;
+
 .notify-container {
     position: fixed;
-    top: 3rem;
+    top: 2rem;
     right: 20px;
-    padding: 0.5rem;
+    min-width: 300px;
+    max-width: 400px;
+
+    // Layout
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+
+    // Style
+    background: white;
+    border-left: 5px solid transparent; // Viền màu bên trái
     border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    animation: fadeInOut 5s forwards;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); // Đổ bóng hiện đại
     z-index: 9999;
+
+    // Animation
+    animation: slideInRight 0.5s ease-out forwards, fadeOut 0.5s ease-in 4.5s forwards;
+
+    // Typography
+    font-family: 'Segoe UI', sans-serif;
+
+    // Các trạng thái
+    &.success {
+        border-left-color: $success-color;
+        background-color: white; // Hoặc $success-bg nếu thích nền màu
+
+        .icon {
+            color: $success-color;
+        }
+    }
+
+    &.error {
+        border-left-color: $error-color;
+        background-color: white;
+
+        .icon {
+            color: $error-color;
+        }
+    }
+
+    p {
+        margin: 0;
+        flex: 1; // Để text chiếm hết khoảng trống
+        font-size: 0.95rem;
+        color: #333;
+        font-weight: 500;
+    }
+
+    // Nút đóng
+    .close-btn {
+        cursor: pointer;
+        opacity: 0.5;
+        font-size: 0.8rem;
+        line-height: 1;
+        transition: opacity 0.2s;
+        background: none;
+        border: none;
+        padding: 0;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
 }
 
-.success {
-    background-color: #28a745; // Xanh thành công
-}
-
-.error {
-    background-color: #dc3545; // Đỏ thất bại
-}
-
-@keyframes fadeInOut {
-    0% {
+// Animation trượt từ phải vào
+@keyframes slideInRight {
+    from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateX(100%);
     }
 
-    10% {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+// Animation mờ dần lúc tắt
+@keyframes fadeOut {
+    from {
         opacity: 1;
         transform: translateY(0);
     }
 
-    90% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    100% {
+    to {
         opacity: 0;
         transform: translateY(-10px);
     }

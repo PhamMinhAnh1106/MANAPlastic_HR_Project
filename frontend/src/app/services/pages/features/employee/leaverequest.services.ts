@@ -53,9 +53,9 @@ export async function Deleteleaverequest(idRequest: number) {
 }
 
 ///////////////////////// hr , manager
-export async function getleaverequestManage(username: string) {
+export async function getleaverequestManage(username: string, page: number, size: number) {
     try {
-        const res = await api.get(`/user/leaverequest/filter?username=${username}`);
+        const res = await api.get(`/user/leaverequest/filter?page=${page}&size=${size}&username=${username}`);
         return res.data;
 
     } catch (error) {

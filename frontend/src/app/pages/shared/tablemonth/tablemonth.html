@@ -1,142 +1,166 @@
-<div class="container">
+<div class="calendar-wrapper">
+  
+  <!-- HEADER / FILTER SECTION -->
+  <div class="calendar-header">
+    <div class="filter-group">
+      <!-- Month/Year Select -->
+      <div class="control-item">
+        <label>Tháng</label>
+        <select [(ngModel)]="selectedMonth" (ngModelChange)="onMonthYearChange()">
+          <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [value]="m">Tháng {{m}}</option>
+        </select>
+      </div>
 
-  <div class="filter">
-    <label>Tháng:</label>
-    <select [(ngModel)]="selectedMonth" (ngModelChange)="onMonthYearChange()">
-      <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [value]="m">{{m}}</option>
-    </select>
+      <div class="control-item">
+        <label>Năm</label>
+        <input type="number" [(ngModel)]="selectedYear" min="2025" max="2030" (ngModelChange)="onMonthYearChange()" />
+      </div>
 
-    <label>Năm:</label>
-    <input type="number" [(ngModel)]="selectedYear" min="2025" max="2027" (ngModelChange)="onMonthYearChange()" />
-
-    <ng-content select="[extraControls]"></ng-content>
+      <!-- --- NEW CONTROLS (Đã chuyển vào trong) --- -->
+      <div class="extra-controls-group">
+        <select [(ngModel)]="selectStatus" class="status-select">
+            <option value="">Chọn Lịch</option>
+            <option *ngIf="role=='employee'" value="0">Lịch Nháp</option>
+            <option *ngIf="role=='employee'" value="1">Lịch chính thức</option>
+            <option *ngIf="role=='manager'" value="2">Lịch Nháp</option>
+            <option *ngIf="role=='manager'" value="3">Lịch chính thức</option>
+        </select>
+  
+        <button class="btn-primary" (click)="emitChooseSchedule()">Lưu</button>
+  
+        <button *ngIf="role=='manager'" class="btn-success" (click)="emitUpOffice()">
+            Đăng Lịch Chính Thức
+        </button>
+  
+        <button *ngIf="role=='manager'" class="btn-primary" (click)="emitAutoSchedule()">
+            Xếp lịch tự động
+        </button>
+  
+        <span *ngIf="role == 'employee'" class="material-symbols-outlined add-icon" (click)="emitRegister()">
+            add
+        </span>
+      </div>
+    </div>
+    
+    <!-- Legend -->
+    <div class="legend" *ngIf="role === 'manager'">
+       <span class="badge draft" *ngIf="statusSchedule === 'draft'">Draft</span>
+       <span class="badge official" *ngIf="statusSchedule === 'office'">Office</span>
+    </div>
   </div>
 
-  <table class="calendar">
-    <thead>
-      <tr>
-        <th *ngFor="let d of ['Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7','Chủ nhật']">{{d}}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let week of weeks; let rowIndex = index">
-        <td *ngFor="let day of week; let colIndex = index"
-            [class.not-in-month]="!day.inMonth"
-            [class.day-off]="day.isDayOff"
-            (click)="onDayClick(day, rowIndex, colIndex)">
-          
-          <div class="day-number">{{ day.inMonth ? day.date.getDate() : '' }}</div>
+  <!-- CALENDAR GRID -->
+  <div class="calendar-container">
+    <div class="week-header">
+      <div class="day-name" *ngFor="let d of ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN']">{{d}}</div>
+    </div>
 
-          <div class="shifts-container">
+    <div class="days-grid">
+      <ng-container *ngFor="let week of weeks; let rowIndex = index">
+        <div class="day-cell" 
+             *ngFor="let day of week; let colIndex = index"
+             [class.outside-month]="!day.inMonth"
+             [class.day-off]="day.isDayOff"
+             (click)="onDayClick(day, rowIndex, colIndex)">
+
+          <div class="day-header">
+            <span class="date-number" [class.today]="isToday(day.date)">{{ day.inMonth ? day.date.getDate() : '' }}</span>
+          </div>
+
+          <div class="shifts-list custom-scroll">
             <ng-container *ngFor="let shift of day.shifts; let i = index">
-              
-              <div class="shift-block"
+              <div class="shift-chip"
                    *ngIf="!shift.isDayOff && i < 3"
-                   (click)="role === 'manager' && openEditShift(day, shift); $event.stopPropagation()">
-
-                  <span *ngIf="role === 'manager'">
-                    {{ shift.employeeFullName || '???' }} - {{ shift.shiftName }}
-                  </span>
-
-                  <span *ngIf="role === 'employee'">
-                    {{ shift.shiftName }}
-                  </span>
+                   [class.manager-view]="role === 'manager'"
+                   (click)="role === 'manager' && openEditShift(day, shift); role === 'manager' && $event.stopPropagation()">
+                
+                <ng-container *ngIf="role === 'manager'; else empView">
+                  <strong>{{ shift.employeeFullName }}</strong>
+                  <span class="shift-time"> - {{ shift.shiftName }}</span>
+                </ng-container>
+                
+                <ng-template #empView>
+                  <span class="shift-time">{{ shift.shiftName }}</span>
+                </ng-template>
               </div>
-
             </ng-container>
           </div>
 
-          <div class="more-shifts" 
+          <div class="more-indicator" 
                *ngIf="day.shifts && day.shifts.length > 3"
                (click)="openDayDetailsPopup(day); $event.stopPropagation()">
-                xem thêm
+             +{{ day.shifts.length - 3 }} xem thêm
           </div>
-
-          <ng-content select="[extraDayContent]"></ng-content>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <div class="edit-popup" *ngIf="selectedShiftData && role === 'manager'">
-    <h3>Sửa ca làm việc</h3>
-    <p><strong>Nhân viên:</strong> {{ selectedShiftData.employeeFullName }}</p>
-    <p><strong>Ngày:</strong> {{ selectedShiftData.date }}</p>
-
-    <label>Loại ca:</label>
-    <div class="type-group">
-      <label>
-        <input type="radio" name="type" (change)="changeType(8)" value="8" /> Ca 8 tiếng
-      </label>
-      <label>
-        <input type="radio" name="type" (change)="changeType(6)" value="6" /> Ca 6 tiếng
-      </label>
-    </div>
-
-    <label>Chọn ca:</label>
-    <select [(ngModel)]="shiftId" name="shiftId" required>
-      <option [ngValue]="null" disabled selected>-- Chọn ca --</option>
-      <option *ngFor="let s of list" [value]="s.shift_id">
-        {{ s.shift_name }} | {{ s.start_time }} → {{ s.end_time }}
-      </option>
-      <option value="53">AL</option>
-      <option value="54">SL</option>
-      <option value="55">PL</option>
-      <option value="56">ML</option>
-      <option value="57">UL</option>
-    </select>
-
-    <div class="btn-group">
-      <button class="save-btn" (click)="saveShift()">Lưu thay đổi</button>
-      <button class="cancel-btn" (click)="selectedShiftData = null">Hủy</button>
+        </div>
+      </ng-container>
     </div>
   </div>
 
-  <div class="day-details-popup-overlay" *ngIf="showDayDetailsPopup">
-    <div class="day-details-popup">
-      <div class="popup-header">
-        <h3>Danh sách ca ngày {{ selectedDayForDetails?.dateStr }}</h3>
-        <button class="close-btn" (click)="closeDayDetailsPopup()">&times;</button>
-      </div>
-      
-      <div class="popup-content">
-        <div class="shift-list-full">
-          <ng-container *ngFor="let shift of selectedDayForDetails?.shifts">
-             <div class="shift-item-row" 
-     *ngIf="!shift.isDayOff"
-     (click)="onDetailShiftClick(shift)">
-                
-                <div class="shift-info-row">
-                    <span class="time-badge">{{ shift.shiftName }}</span>
-                    
-                    <span class="emp-name" *ngIf="role === 'manager'">
-                        {{ shift.employeeFullName }}
-                    </span>
-                </div>
-             </div>
-          </ng-container>
-          
-          <div *ngIf="!selectedDayForDetails?.shifts?.length" class="no-data-text">
-              Không có ca làm việc nào.
-          </div>
+  <!-- POPUPS (Edit & Details) giữ nguyên -->
+  <div class="modal-backdrop" *ngIf="selectedShiftData && role === 'manager'">
+    <div class="modal-content fade-in">
+        <div class="modal-header">
+            <h3>Điều chỉnh ca làm việc</h3>
+            <button class="close-icon" (click)="selectedShiftData = null">&times;</button>
         </div>
-      </div>
+        <div class="modal-body">
+            <div class="info-row">
+                <div class="info-item"><label>Nhân viên</label><span>{{ selectedShiftData.employeeFullName }}</span></div>
+                <div class="info-item"><label>Ngày</label><span>{{ selectedShiftData.date }}</span></div>
+            </div>
+            <div class="form-group">
+                <label>Loại ca</label>
+                <div class="radio-group">
+                    <label class="radio-btn"><input type="radio" name="type" (change)="changeType(8)" value="8" /><span>Ca 8H</span></label>
+                    <label class="radio-btn"><input type="radio" name="type" (change)="changeType(6)" value="6" /><span>Ca 6H</span></label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Chọn ca mới</label>
+                <select [(ngModel)]="shiftId" class="custom-select">
+                    <option [ngValue]="null" disabled selected>-- Chọn ca --</option>
+                    <option *ngFor="let s of list" [value]="s.shift_id">{{ s.shift_name }} ({{ s.start_time }} - {{ s.end_time }})</option>
+                    <optgroup label="Nghỉ phép">
+                        <option value="53">AL (Annual Leave)</option>
+                        <option value="54">SL (Sick Leave)</option>
+                        <option value="55">PL (Personal Leave)</option>
+                        <option value="56">ML (Marriage Leave)</option>
+                        <option value="57">UL (Unpaid Leave)</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="selectedShiftData = null">Hủy bỏ</button>
+            <button class="btn btn-primary" (click)="saveShift()">Lưu thay đổi</button>
+        </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="showDayDetailsPopup">
+    <div class="modal-content day-details fade-in">
+        <div class="modal-header">
+            <h3>Chi tiết ngày {{ selectedDayForDetails?.dateStr }}</h3>
+            <button class="close-icon" (click)="closeDayDetailsPopup()">&times;</button>
+        </div>
+        <div class="modal-body scrollable">
+            <div class="details-list">
+                <ng-container *ngFor="let shift of selectedDayForDetails?.shifts">
+                    <div class="detail-item" *ngIf="!shift.isDayOff" (click)="onDetailShiftClick(shift)">
+                        <div class="shift-badge">{{ shift.shiftName }}</div>
+                        <div class="emp-name" *ngIf="role === 'manager'">{{ shift.employeeFullName }}</div>
+                        <div class="action-icon" *ngIf="role === 'manager'">✎</div>
+                    </div>
+                </ng-container>
+                <div *ngIf="!selectedDayForDetails?.shifts?.length" class="empty-state">Không có ca làm việc nào.</div>
+            </div>
+        </div>
     </div>
   </div>
 
 </div>
 
+<!-- Global Components -->
 <app-loading *ngIf="isloading"></app-loading>
-
-<app-comfirm
-  *ngIf="isconfirm"
-  [message]="confirmMessage"
-  (result)="onConfirmResult($event)"
-></app-comfirm>
-
-<app-alert
-  *ngIf="isalert"
-  [message]="alertmessage"
-  [notifyType]="alertType"
-   (hidden)="isalert = false"
-></app-alert>
+<app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
+<app-alert *ngIf="isalert" [message]="alertmessage" [notifyType]="alertType" (hidden)="isalert = false"></app-alert>
