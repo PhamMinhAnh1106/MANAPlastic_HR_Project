@@ -36,6 +36,39 @@
     </div>
   </div>
 
+  <!-- THỐNG KÊ TRẠNG THÁI (MỚI THÊM) -->
+  <div class="stats-overview">
+    <div class="stat-card pending" (click)="quickFilter('PENDING')">
+      <div class="stat-icon">
+        <span class="material-symbols-outlined">pending_actions</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Đang chờ</span>
+        <span class="stat-value">{{ stats.pending }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card approved" (click)="quickFilter('APPROVED')">
+      <div class="stat-icon">
+        <span class="material-symbols-outlined">check_circle</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Đã duyệt</span>
+        <span class="stat-value">{{ stats.approved }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card rejected" (click)="quickFilter('REJECTED')">
+      <div class="stat-icon">
+        <span class="material-symbols-outlined">cancel</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Từ chối</span>
+        <span class="stat-value">{{ stats.rejected }}</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Bảng dữ liệu -->
   <div class="table-card">
     <div class="table-responsive">
@@ -55,14 +88,14 @@
 
         <tbody>
           <tr *ngFor="let item of leaveRequests">
-            <td class="text-center"><span class="username">{{ item.username }}</span>
-</td>
+            <td class="text-center"><span class="username">{{ item.leaverequestID }}</span></td>
             
             <!-- Cột nhân viên -->
             <td>
               <div class="user-info">
                 <div class="details">
                   <span class="fullname">{{ item.fullname }}</span>
+                  <span class="username">@{{ item.username }}</span>
                 </div>
               </div>
             </td>

@@ -26,6 +26,13 @@ export class Leaverequestcheck implements OnInit {
   };
   leaveRequests: leaverequests[] = [];
 
+  // Biến chứa thống kê
+  stats = {
+    pending: 0,
+    approved: 0,
+    rejected: 0
+  };
+
   id: number = 0;
 
   // --- PAGINATION STATES ---
@@ -54,18 +61,12 @@ export class Leaverequestcheck implements OnInit {
   async filterLeave() {
     this.isloading = true;
     try {
-      // Gọi API với username, page, size
       const res: any = await getleaverequestManage(this.filter.username, this.page, this.size);
 
       if (res) {
-        // Gán dữ liệu phân trang từ API
-        // Lưu ý: Nếu API chưa hỗ trợ lọc status ở Backend, việc lọc ở Frontend trên trang hiện tại 
-        // có thể dẫn đến trang bị trống dù còn dữ liệu ở trang khác. 
-        // Tốt nhất API nên hỗ trợ param &status=...
-
         let content = res.content || [];
 
-        // Logic lọc client-side (giữ nguyên logic cũ của bạn áp dụng lên page hiện tại)
+        // Logic lọc client-side (nếu cần thiết)
         if (this.filter.status !== '') {
           content = content.filter((item: { status: string; }) => item.status === this.filter.status);
         }
@@ -73,29 +74,57 @@ export class Leaverequestcheck implements OnInit {
         this.leaveRequests = content;
         this.totalPages = res.totalPages || 0;
         this.totalElements = res.totalElements || 0;
+
+        // Tính toán thống kê sau khi lấy dữ liệu
+        // Lưu ý: Nếu API phân trang, đây chỉ đếm trên trang hiện tại hoặc danh sách trả về.
+        // Để chính xác tuyệt đối, backend nên trả về object stats riêng hoặc ta phải fetch all.
+        // Ở đây mình đếm dựa trên dữ liệu content hiện có.
+        this.calculateStats(this.leaveRequests);
+
       } else {
         this.leaveRequests = [];
         this.totalElements = 0;
+        this.resetStats();
       }
 
     } catch (error) {
       this.Onalert("Lỗi tải dữ liệu", false);
       this.leaveRequests = [];
+      this.resetStats();
     } finally {
       this.isloading = false;
       this.cdr.detectChanges();
     }
   }
 
-  // --- PAGINATION HANDLERS ---
+  // Hàm tính toán thống kê
+  calculateStats(data: leaverequests[]) {
+    this.stats.pending = data.filter(item => item.status === 'PENDING').length;
+    this.stats.approved = data.filter(item => item.status === 'APPROVED').length;
+    this.stats.rejected = data.filter(item => item.status === 'REJECTED').length;
+  }
 
-  // Khi bấm nút Lọc hoặc Enter -> Reset về trang 0
+  resetStats() {
+    this.stats = { pending: 0, approved: 0, rejected: 0 };
+  }
+
+  // Hàm hỗ trợ click vào thẻ thống kê để lọc nhanh
+  quickFilter(status: string) {
+    // Nếu đang chọn status đó rồi thì bỏ chọn (về tất cả)
+    if (this.filter.status === status) {
+      this.filter.status = '';
+    } else {
+      this.filter.status = status;
+    }
+    this.onSearch();
+  }
+
+  // --- PAGINATION HANDLERS ---
   onSearch() {
     this.page = 0;
     this.filterLeave();
   }
 
-  // Chuyển trang
   onPageChange(newPage: number) {
     if (newPage >= 0 && newPage < this.totalPages) {
       this.page = newPage;
@@ -103,9 +132,8 @@ export class Leaverequestcheck implements OnInit {
     }
   }
 
-  // Đổi số lượng dòng hiển thị
   onPageSizeChange() {
-    this.page = 0; // Reset về trang đầu
+    this.page = 0;
     this.filterLeave();
   }
 
@@ -135,24 +163,21 @@ export class Leaverequestcheck implements OnInit {
     this.isloading = true;
 
     try {
+      let res: { data: string, status: number };
+
       if (this.actionType === 'approve') {
-        const res = await Approveleaverequest(this.id) as { data: string, status: number };
-        if (res.status === 200 || res.status === 201) {
-          this.Onalert(res.data, true);
-          await this.filterLeave(); // Load lại data
-        } else {
-          this.Onalert(res.data || "Có lỗi xảy ra", false);
-        }
+        res = await Approveleaverequest(this.id) as { data: string, status: number };
+      } else {
+        res = await Rejectleaverequest(this.id) as { data: string, status: number };
       }
-      else if (this.actionType === 'reject') {
-        const res = await Rejectleaverequest(this.id) as { data: string, status: number };
-        if (res.status === 200 || res.status === 201) {
-          this.Onalert(res.data, true);
-          await this.filterLeave();
-        } else {
-          this.Onalert(res.data || "Có lỗi xảy ra", false);
-        }
+
+      if (res.status === 200 || res.status === 201) {
+        this.Onalert(res.data, true);
+        await this.filterLeave(); // Load lại data và cập nhật stats
+      } else {
+        this.Onalert(res.data || "Có lỗi xảy ra", false);
       }
+
     } catch (error) {
       this.Onalert("Lỗi kết nối máy chủ", false);
     } finally {
@@ -178,6 +203,7 @@ export class Leaverequestcheck implements OnInit {
     if (this.cookie.get('role')) {
       this.role = this.cookie.get('role');
     }
-
+    // Gọi load data ban đầu
+    this.filterLeave();
   }
 }

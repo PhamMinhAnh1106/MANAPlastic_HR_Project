@@ -17,6 +17,9 @@ import { ForgetPassword } from './pages/forget-password/forget-password';
 import { Contracts } from './pages/features/hr/contracts/contracts';
 import { ContractsAdd } from './pages/features/hr/contracts-add/contracts-add';
 import { AutoSchedule } from './pages/features/manager/auto-schedule/auto-schedule';
+import { Payrollmain } from './pages/features/hr/payroll/payrollmain/payrollmain';
+import { Payrollrules } from './pages/features/hr/payroll/payrollrules/payrollrules';
+import { Payrollpayslip } from './pages/features/hr/payroll/payrollpayslip/payrollpayslip';
 
 
 export const routes: Routes = [
@@ -36,6 +39,10 @@ export const routes: Routes = [
             //hr
             { path: 'user/account', component: Accounts },
             { path: 'user/attendance', component: Attendant },
+            { path: 'payroll', component: Payrollmain },
+            { path: 'payroll/rules', component: Payrollrules },
+            { path: 'payroll/payslip', component: Payrollpayslip },
+
             //manager 
             { path: 'leaverequest/manage', component: Leaverequestcheck },
             { path: 'contracts', component: Contracts },

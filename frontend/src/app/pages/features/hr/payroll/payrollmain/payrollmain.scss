@@ -1,0 +1,539 @@
+/* --- COLORS PALETTE --- */
+$bg-body: #f3f4f6;
+$bg-white: #ffffff;
+$primary-blue: #4f46e5; // Button Blue
+$primary-hover: #4338ca;
+$btn-green: #10b981; // Button Green
+$text-dark: #1f2937;
+$text-gray: #6b7280;
+$border-light: #e5e7eb;
+
+$badge-rule-bg: #f3e8ff; // Purple/Pink tint
+$badge-rule-text: #9333ea;
+$badge-input-bg: #f3f4f6;
+$badge-input-text: #6b7280;
+
+$row-danger-bg: #fef2f2; // Light Red for Tax
+$row-hover: #f9fafb;
+
+/* --- GLOBAL LAYOUT --- */
+:host {
+    display: block;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: $bg-body;
+    min-height: 100vh;
+    padding: 3rem 0.5rem 0.5rem 5rem;
+
+    color: $text-dark;
+}
+
+.payroll-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* --- HEADER --- */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: $bg-white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    margin-bottom: 24px;
+    border: 1px solid $border-light;
+
+    .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        .logo-box {
+            background: $primary-blue;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .title-group {
+            h1 {
+                margin: 0;
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: #111827;
+            }
+
+            p {
+                margin: 0;
+                font-size: 0.8rem;
+                color: $text-gray;
+            }
+        }
+    }
+
+    .user-section {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        .user-info {
+            text-align: right;
+
+            .role {
+                display: block;
+                font-size: 0.7rem;
+                color: #9ca3af;
+            }
+
+            .id {
+                display: block;
+                font-weight: 700;
+                color: $primary-blue;
+                font-size: 1rem;
+            }
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            font-size: 1.2rem;
+            cursor: pointer;
+
+            &:hover {
+                color: #ef4444;
+            }
+        }
+    }
+}
+
+/* --- LAYOUT GRID --- */
+.layout-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    /* Sidebar fixed width, Content fluid */
+    gap: 24px;
+    align-items: start;
+}
+
+/* --- CARDS & SIDEBAR --- */
+.card {
+    background: $bg-white;
+    border-radius: 16px;
+    border: 1px solid $border-light;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    margin-bottom: 24px;
+
+    .card-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+}
+
+/* Param Card */
+.param-card {
+    .form-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .form-group {
+        flex: 1;
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: $text-gray;
+            margin-bottom: 6px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid $border-light;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            background: #f9fafb;
+
+            &:focus {
+                outline: none;
+                border-color: $primary-blue;
+                background: #fff;
+            }
+        }
+    }
+
+    .btn-run-batch {
+        width: 100%;
+        background: $primary-blue;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+
+        &:hover {
+            background: $primary-hover;
+            transform: translateY(-1px);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+}
+
+/* Search Card */
+.search-card {
+    .search-input-group {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid $border-light;
+            border-radius: 8px;
+            background: #f9fafb;
+
+            &:focus {
+                outline: none;
+                border-color: $btn-green;
+                background: #fff;
+            }
+        }
+
+        .btn-search {
+            background: $btn-green;
+            color: white;
+            border: none;
+            width: 42px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+
+            &:hover {
+                background: darken($btn-green, 5%);
+            }
+        }
+    }
+
+    .helper-text {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        line-height: 1.4;
+        margin: 0;
+    }
+}
+
+/* --- MAIN CONTENT: RESULT TABLE --- */
+.result-card {
+    padding: 0;
+    /* Remove padding for edge-to-edge table */
+    overflow: hidden;
+
+    .card-header-row {
+        padding: 16px 24px;
+        border-bottom: 1px solid $border-light;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            h2 {
+                margin: 0;
+                font-size: 1rem;
+                font-weight: 700;
+                color: #374151;
+            }
+
+            i.text-green {
+                color: $btn-green;
+            }
+        }
+
+        .badge-count {
+            font-size: 0.75rem;
+            color: #6b7280;
+            border: 1px solid $border-light;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: #f9fafb;
+        }
+    }
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead th {
+        background: #ffffff;
+        padding: 14px 24px;
+        text-align: left;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #9ca3af;
+        text-transform: uppercase;
+        border-bottom: 1px solid $border-light;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid $border-light;
+        background: white;
+        transition: background 0.1s;
+
+        &:hover {
+            background-color: $row-hover;
+        }
+
+        /* Special row colors from TS logic */
+        &.row-highlight-success {
+            background-color: #f0fdf4;
+        }
+
+        /* Green tint */
+        &.row-highlight-danger {
+            background-color: $row-danger-bg;
+        }
+
+        /* Red tint (Like PIT_TAX) */
+    }
+
+    td {
+        padding: 16px 24px;
+        vertical-align: top;
+    }
+}
+
+/* --- COLUMN STYLES --- */
+.col-variable {
+    .var-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .var-code {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: $primary-blue;
+        /* Default blue for vars */
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Override colors based on TS logic classes */
+    .code-salary {
+        color: #059669;
+    }
+
+    .code-tax {
+        color: #dc2626;
+    }
+
+    .code-income {
+        color: #2563eb;
+    }
+
+    .var-desc {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        margin-top: 4px;
+    }
+}
+
+.col-value {
+    text-align: right;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #111827;
+
+    .currency-unit {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        text-decoration: underline;
+    }
+}
+
+/* --- DYNAMIC HTML CONTENT (DSL) STYLES --- */
+::ng-deep {
+
+    /* Badges */
+    .badge {
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .badge-rule {
+        background: $badge-rule-bg;
+        color: $badge-rule-text;
+    }
+
+    .badge-input {
+        background: $badge-input-bg;
+        color: $badge-input-text;
+        border: 1px solid #e5e7eb;
+    }
+
+    /* DSL Container */
+    .dsl-container {
+        font-size: 0.85rem;
+        line-height: 1.8;
+    }
+
+    /* Variables inside formula */
+    .dsl-container span[style*="background"] {
+        /* Style for VARIABLE nodes in DSL */
+        background-color: #eff6ff !important;
+        color: #2563eb !important;
+        border: 1px solid #dbeafe !important;
+        padding: 2px 6px !important;
+        border-radius: 12px !important;
+        font-weight: 600 !important;
+        font-family: 'Segoe UI', sans-serif !important;
+        font-size: 0.75rem !important;
+    }
+
+    /* Constant values inside formula */
+    .dsl-container span[style*="color:#059669"] {
+        color: #059669 !important;
+        font-weight: bold;
+    }
+
+    /* Math Operators */
+    .math-op {
+        font-weight: 900;
+        margin: 0 4px;
+    }
+
+    .op-add {
+        color: #10b981;
+    }
+
+    /* Green + */
+    .op-sub {
+        color: #ef4444;
+    }
+
+    /* Red - */
+    .op-mul {
+        color: #3b82f6;
+    }
+
+    /* Blue x */
+
+    /* --- LOGIC TREE (IF/ELSE) --- */
+    .logic-tree {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-family: 'Roboto Mono', monospace;
+        font-size: 0.8rem;
+        margin-top: 4px;
+
+        .logic-branch {
+            position: relative;
+            padding: 4px 0;
+        }
+
+        /* Indentation Lines */
+        .logic-branch[style*="padding-left:16px"] {
+            padding-left: 20px !important;
+            /* Increase indent */
+
+            /* Green Line for THEN */
+            &[style*="border-left:1px solid #86efac"] {
+                border-left: 2px solid #86efac !important;
+            }
+
+            /* Red Line for ELSE */
+            &[style*="border-left:1px solid #fca5a5"] {
+                border-left: 2px solid #fca5a5 !important;
+            }
+        }
+    }
+
+    /* Logic Labels (IF, THEN, ELSE) */
+    .logic-label {
+        display: inline-block;
+        width: 36px;
+        text-align: center;
+        font-size: 0.65rem;
+        font-weight: 800;
+        padding: 2px 0;
+        border-radius: 4px;
+        margin-right: 8px;
+    }
+
+    .label-if {
+        background: #fff7ed;
+        color: #ea580c;
+    }
+
+    /* Orange */
+    .label-then {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+
+    /* Green */
+    .label-else {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    /* Red */
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 1024px) {
+    .layout-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .sidebar {
+        display: flex;
+        gap: 16px;
+
+        .card {
+            flex: 1;
+            margin-bottom: 0;
+        }
+    }
+}

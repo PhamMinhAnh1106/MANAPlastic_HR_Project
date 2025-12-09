@@ -106,7 +106,11 @@ export class Home implements OnInit {
       this.cookieService.set("role", this.role[0], { path: "/" });
     switch (this.role[0]) {
       case "Admin":
-        const icon_admin = [{ iconName: "group", path: "/home/user/account", task: [{ name: "Quản Lí Nhân sự", path: "/home/user/account" }] }];
+        const icon_admin = [
+          { iconName: "group", path: "/home/user/account", task: [{ name: "Quản Lí Nhân sự", path: "/home/user/account" }] },
+          { iconName: "receipt", path: "/home/payroll/rules", task: [{ name: "Quản Lí lương", path: "/home/payroll/rules" }], },
+
+        ];
         icon.push(...icon_admin)
         this.icon_handleBar = icon;
         break;
@@ -116,7 +120,10 @@ export class Home implements OnInit {
           {
             iconName: "calendar_month", path: "/home/user/attendance", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" },
             { name: "Quản lí phép", path: "/home/leaverequest/manage" }]
-          }, { iconName: "contract", path: "/home/contracts", task: [{ name: "Quản Lí hợp đồng", path: "/home/contracts" }], },
+          },
+          { iconName: "contract", path: "/home/contracts", task: [{ name: "Quản Lí hợp đồng", path: "/home/contracts" }], },
+          { iconName: "receipt", path: "/home/payroll", task: [{ name: "Quản Lí lương", path: "/home/payroll" }], },
+
         ];
         icon.push(...icon_hr)
         this.icon_handleBar = icon;

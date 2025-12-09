@@ -10,10 +10,15 @@ $radius: 12px;
 // Status Colors
 $green-bg: #d1fae5;
 $green-text: #065f46;
+$green-border: #a7f3d0;
+
 $red-bg: #fee2e2;
 $red-text: #991b1b;
+$red-border: #fecaca;
+
 $yellow-bg: #fef3c7;
 $yellow-text: #92400e;
+$yellow-border: #fde68a;
 
 :host {
     display: block;
@@ -23,7 +28,7 @@ $yellow-text: #92400e;
 }
 
 .attendance-container {
-    padding: 3.5rem 0.8rem 0.5rem 4.3rem;
+    padding: 3rem 0.5rem 0.5rem 5rem;
     box-sizing: border-box;
 }
 
@@ -48,6 +53,91 @@ $yellow-text: #92400e;
             color: $text-gray;
             margin: 2px 0 0 0;
             font-size: 0.85rem;
+        }
+    }
+}
+
+// --- NEW: STATS OVERVIEW ---
+.stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+
+    .stat-card {
+        background: $bg-white;
+        border-radius: $radius;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            span {
+                font-size: 24px;
+            }
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+
+            .stat-label {
+                font-size: 0.85rem;
+                font-weight: 500;
+                color: $text-gray;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: $text-dark;
+                line-height: 1.2;
+            }
+        }
+
+        // Color Variants
+        &.pending {
+            border-color: $yellow-border;
+
+            .stat-icon {
+                background-color: $yellow-bg;
+                color: $yellow-text;
+            }
+        }
+
+        &.approved {
+            border-color: $green-border;
+
+            .stat-icon {
+                background-color: $green-bg;
+                color: $green-text;
+            }
+        }
+
+        &.rejected {
+            border-color: $red-border;
+
+            .stat-icon {
+                background-color: $red-bg;
+                color: $red-text;
+            }
         }
     }
 }
@@ -203,7 +293,7 @@ $yellow-text: #92400e;
     }
 }
 
-// --- NEW PAGINATION FOOTER STYLE ---
+// --- PAGINATION FOOTER STYLE ---
 .pagination-footer {
     display: flex;
     justify-content: space-between;
@@ -289,27 +379,13 @@ $yellow-text: #92400e;
     }
 }
 
-// --- 4. TABLE CONTENT ELEMENTS ---
+// --- TABLE CONTENT ELEMENTS ---
 
 // User Info 
 .user-info {
     display: flex;
     align-items: center;
     gap: 8px;
-
-    .avatar-placeholder {
-        width: 28px;
-        height: 28px;
-        background: #e0e7ff;
-        color: $primary;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 12px;
-        flex-shrink: 0;
-    }
 
     .details {
         display: flex;
@@ -353,7 +429,7 @@ $yellow-text: #92400e;
     font-size: 0.85rem;
 }
 
-// Reason Column (Truncate text)
+// Reason Column
 .reason-col {
     max-width: 200px;
     white-space: nowrap;
@@ -450,7 +526,7 @@ $yellow-text: #92400e;
     color: #9ca3af;
 }
 
-// --- 5. EMPTY STATE ---
+// --- EMPTY STATE ---
 .empty-state {
     padding: 2rem 1rem;
     text-align: center;

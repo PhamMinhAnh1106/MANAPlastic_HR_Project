@@ -1,4 +1,4 @@
-// --- VARIABLES ---
+/* --- VARIABLES --- */
 $primary-color: #0088cc;
 $bg-color: #f5f7fb;
 $card-bg: #ffffff;
@@ -15,7 +15,8 @@ $breakpoint-mobile: 992px;
     display: block;
     background-color: $bg-color;
     min-height: 100vh;
-    padding: 2.8rem 1rem;
+    /* Nếu bạn dùng layout của app cha thì có thể bỏ padding này đi */
+    padding: 3rem 0.5rem 0.5rem 5rem;
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -36,16 +37,14 @@ $breakpoint-mobile: 992px;
 
     .banner-bg {
         height: 140px;
-
-        // --- CẬP NHẬT: Dùng ảnh background ---
         background-image: url('/assets/background_home.jpg');
-        background-size: cover; // Ảnh phủ kín khung
-        background-position: center; // Căn giữa ảnh
+        /* Đảm bảo đường dẫn ảnh đúng */
+        background-size: cover;
+        background-position: center;
         background-repeat: no-repeat;
-
         position: relative;
 
-        // Lớp phủ tối mờ để chữ trắng dễ đọc hơn (tùy chọn)
+        /* Lớp phủ mờ */
         &::before {
             content: '';
             position: absolute;
@@ -53,10 +52,8 @@ $breakpoint-mobile: 992px;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.3); // Màu đen mờ 30%
+            background: rgba(0, 0, 0, 0.3);
         }
-
-
     }
 
     .profile-summary {
@@ -66,7 +63,7 @@ $breakpoint-mobile: 992px;
         position: relative;
         margin-top: -4.5rem;
         flex-wrap: wrap;
-        z-index: 1; // Đảm bảo nội dung nổi lên trên lớp phủ banner
+        z-index: 1;
 
         .avatar-container {
             position: relative;
@@ -93,10 +90,8 @@ $breakpoint-mobile: 992px;
             padding-bottom: 0.8rem;
             min-width: 200px;
             margin-bottom: 5px;
-
-            // CHỮ MÀU TRẮNG
             color: #ffffff !important;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); // Tăng shadow để nổi bật trên ảnh nền
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 
             .name {
                 font-size: 1.8rem;
@@ -171,6 +166,8 @@ $breakpoint-mobile: 992px;
     display: grid;
     grid-template-columns: 350px 1fr;
     gap: 1.5rem;
+    align-items: start;
+    /* QUAN TRỌNG: Để card không bị kéo dãn chiều cao */
 
     @media (max-width: $breakpoint-mobile) {
         grid-template-columns: 1fr;
@@ -191,6 +188,15 @@ $breakpoint-mobile: 992px;
     padding: 1.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
+    /* --- FIX: FIT CONTENT --- */
+    height: fit-content;
+    min-width: 300px;
+    max-width: 100%;
+
+    &.mt-3 {
+        margin-top: 1.5rem;
+    }
+
     .card-title {
         font-size: 1.1rem;
         font-weight: 700;
@@ -198,6 +204,7 @@ $breakpoint-mobile: 992px;
         color: $text-main;
         border-left: 4px solid $primary-color;
         padding-left: 10px;
+        white-space: nowrap;
     }
 
     .sub-title {
@@ -253,14 +260,8 @@ $breakpoint-mobile: 992px;
             align-items: center;
 
             .contact-detail {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 5px;
-                overflow: hidden;
-                width: 100%;
-
                 .detail-label {
+                    display: block;
                     font-size: 0.9rem;
                     color: $text-light;
                     white-space: nowrap;
@@ -269,11 +270,9 @@ $breakpoint-mobile: 992px;
 
                 .detail-value {
                     font-weight: 600;
-                    font-size: 0.95rem;
+                    font-size: 0.8rem;
                     color: $primary-color;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
+                    margin-right: 5px;
                 }
             }
         }
@@ -288,6 +287,8 @@ $breakpoint-mobile: 992px;
         padding: 12px 0;
         border-bottom: 1px solid #f1f3f5;
         font-size: 0.9rem;
+        gap: 20px;
+        /* Thêm khoảng cách nếu fit-content làm chữ dính nhau */
 
         &:last-child {
             border-bottom: none;
@@ -295,10 +296,12 @@ $breakpoint-mobile: 992px;
 
         .job-label {
             color: $text-light;
+            white-space: nowrap;
         }
 
         .job-value {
             font-weight: 500;
+            text-align: right;
         }
 
         .highlight {
@@ -306,10 +309,6 @@ $breakpoint-mobile: 992px;
             font-weight: 600;
         }
     }
-}
-
-.mt-3 {
-    margin-top: 1.5rem;
 }
 
 // --- 5. FORM GRID ---
@@ -343,6 +342,7 @@ $breakpoint-mobile: 992px;
             min-height: 42px;
             display: flex;
             align-items: center;
+            white-space: nowrap;
         }
     }
 }
@@ -356,6 +356,8 @@ $breakpoint-mobile: 992px;
     padding: 1.2rem;
     display: flex;
     gap: 1rem;
+    width: fit-content;
+    max-width: 100%;
 
     .note-icon {
         color: #0ca678;
@@ -401,7 +403,7 @@ $breakpoint-mobile: 992px;
     overflow: hidden;
 
     &.animate-pop {
-        animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        animation: popIn 0.3s ease-out;
     }
 
     .modal-header {
@@ -508,7 +510,7 @@ $breakpoint-mobile: 992px;
                 color: white;
 
                 &:hover {
-                    background: darken($primary-color, 10%);
+                    background: #006699;
                 }
             }
         }

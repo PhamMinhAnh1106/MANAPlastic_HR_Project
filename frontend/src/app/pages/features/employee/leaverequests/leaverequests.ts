@@ -54,7 +54,7 @@ export class Leaverequests implements OnInit {
       this.leaverequest = requests;
       // Map data balance thô sang data có giao diện (icon, màu)
       this.leaverequestBl = this.mapBalanceData(balances);
-
+      console.log(this.leaverequestBl)
     } catch (error) {
       console.error("Lỗi tải dữ liệu:", error);
       this.showNotification("Không thể tải dữ liệu", false);

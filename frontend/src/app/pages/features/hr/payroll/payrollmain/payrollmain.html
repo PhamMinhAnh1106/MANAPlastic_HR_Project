@@ -1,0 +1,148 @@
+<div class="payroll-container">
+  
+  <!-- TOP HEADER -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="logo-box">
+        <span class="material-symbols-outlined">
+memory
+</span>
+      </div>
+      <div class="title-group">
+        <h1>Payroll Engine Debugger</h1>
+        <p>Phiên bản Developer: Soi chi tiết công thức</p>
+      </div>
+    </div>
+    
+   
+  </header>
+
+  <!-- MAIN LAYOUT GRID -->
+  <div class="layout-grid">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+      
+      <!-- Card 1: Run Parameters -->
+      <div class="card param-card">
+        <div class="card-title">
+         <span class="material-symbols-outlined">
+tune
+</span>THAM SỐ CHẠY
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tháng</label>
+            <input type="number" [(ngModel)]="month" class="form-control" placeholder="11">
+          </div>
+          <div class="form-group">
+            <label>Năm</label>
+            <input type="number" [(ngModel)]="year" class="form-control" placeholder="2025">
+          </div>
+        </div>
+
+        <button class="btn btn-run-batch" (click)="runCalculation()">
+          <span class="material-symbols-outlined">
+play_arrow
+</span>Tính Lương (Batch)
+        </button>
+      </div>
+
+      <!-- Card 2: Cache Inspect -->
+      <div class="card search-card">
+        <div class="card-title">
+          <span class="material-symbols-outlined">
+search
+</span> SOI KẾT QUẢ (CACHE)
+        </div>
+
+        <div class="search-input-group">
+          <input type="number" [(ngModel)]="empId" class="form-control" placeholder="1">
+          <button class="btn btn-search" (click)="fetchDetails()">
+            <span class="material-symbols-outlined">
+search
+</span>
+          </button>
+        </div>
+        
+        <p class="helper-text">
+          Nhập ID nhân viên để xem toàn bộ biến số đã tính và công thức tương ứng.
+        </p>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT CONTENT: RESULT TABLE -->
+    <main class="main-content">
+      
+      <div class="card result-card">
+        <!-- Card Header -->
+        <div class="card-header-row">
+          <div class="header-left">
+            <i class="fa-solid fa-list-check text-green"></i>
+            <h2>Kết Quả Chi Tiết (Execution Trace)</h2>
+          </div>
+          <div class="header-right">
+            <span class="badge-count">{{ debugData.length }} biến số</span>
+          </div>
+        </div>
+
+        <!-- Scrollable Table Area -->
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 25%">BIẾN SỐ (VARIABLE)</th>
+                <th style="width: 20%; text-align: right;">GIÁ TRỊ (VNĐ)</th>
+                <th style="width: 55%">NGUỒN GỐC & CÔNG THỨC (EXPLANATION)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Loop Data -->
+              <tr *ngFor="let row of debugData" [ngClass]="row.cssClass">
+                
+                <!-- Col 1: Variable Name -->
+                <td class="col-variable">
+                  <div class="var-group">
+                    <span class="var-code" [ngClass]="row.codeStyle">{{ row.code }}</span>
+                    <!-- Badge: Rule / Input -->
+                    <span class="badge-type" [innerHTML]="row.typeBadge"></span>
+                  </div>
+                  <div class="var-desc" *ngIf="row.name">{{ row.name }}</div>
+                </td>
+
+                <!-- Col 2: Value -->
+                <td class="col-value" style="font-size: 0.9rem;">
+                  {{ row.value | number:'1.0-0' }} <span class="currency-unit">₫</span>
+                </td>
+
+                <!-- Col 3: Formula DSL -->
+                <td class="col-formula">
+                   <div class="dsl-container" [innerHTML]="row.safeHtmlDisplay"></div>
+                </td>
+              </tr>
+
+              <!-- Empty State -->
+              <tr *ngIf="debugData.length === 0 && !isloading">
+                <td colspan="3" class="text-center py-5 text-gray-400">
+                  Chưa có dữ liệu. Vui lòng bấm "Tính Lương" hoặc tìm kiếm.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Loading Overlay -->
+  <app-loading *ngIf="isloading"></app-loading>
+
+  <!-- Alerts/Confirms -->
+  <app-alert *ngIf="isalert" [message]="alertmessage" [notifyType]="alertType" (hidden)="isalert = false"></app-alert>
+  <app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
+
+</div>

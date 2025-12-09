@@ -1,265 +1,258 @@
 <div class="profile-container" *ngIf="userInfo; else loadingTpl">
-  
-    <!-- 1. HEADER BANNER SECTION -->
-    <div class="profile-header-card">
-      <div class="banner-bg"></div>
-      <div class="profile-summary">
-        <div class="avatar-container">
-          <div class="avatar">
-            <!-- Lấy chữ cái đầu -->
-            <span>{{ userInfo.fullname ? userInfo.fullname.charAt(0).toUpperCase() : 'U' }}</span>
-          </div>
+    
+  <!-- 1. HEADER BANNER SECTION -->
+  <div class="profile-header-card">
+    <div class="banner-bg"></div>
+    <div class="profile-summary">
+      <div class="avatar-container">
+        <div class="avatar">
+          <!-- Lấy chữ cái đầu -->
+          <span>{{ userInfo.fullname ? userInfo.fullname.charAt(0).toUpperCase() : 'U' }}</span>
         </div>
-        
-        <div class="profile-text">
-          <h2 class="name">{{ userInfo.fullname || 'Chưa cập nhật tên' }}</h2>
-          <div class="sub-text">
-            <span class="role">
-              <span class="material-symbols-outlined" style="font-size: 1rem;">work</span> 
-              {{ userInfo.roleName || 'Nhân viên' }}
-            </span>
-            <span class="separator">•</span>
-            <span class="dept">{{ getDepartment(userInfo.departmentID) }}</span>
-          </div>
-        </div>
-  
-        <div class="header-actions">
-          <!-- Click nút này sẽ set isEditing = true -> Mở Modal -->
-          <button class="btn-primary" (click)="startEdit()">
-            <span class="material-symbols-outlined">edit</span>
-            Chỉnh sửa
-          </button>
-        </div>
-      </div>
-  
-      <!-- TABS -->
-      <div class="profile-tabs">
-        <div class="tab-item active">Thông tin cá nhân</div>
-      </div>
-    </div>
-  
-    <!-- 2. MAIN CONTENT GRID (CHẾ ĐỘ XEM - READ ONLY) -->
-    <div class="content-grid">
-      
-      <!-- LEFT COLUMN -->
-      <div class="col-left">
-        <!-- Card: Liên hệ nhanh -->
-        <div class="info-card">
-          <h3 class="card-title">Liên hệ nhanh</h3>
-          <div class="contact-list">
-            
-            <!-- Email (Hiển thị 1 dòng) -->
-            <div class="contact-item single-line">
-              <span class="icon-box"><span class="material-symbols-outlined">mail</span></span>
-              <div class="contact-detail">
-                <span class="detail-label">Email:</span>
-                <span class="detail-value" title="{{ userInfo.email }}">{{ userInfo.email || 'Chưa có' }}</span>
-              </div>
-            </div>
-            
-            <!-- Phone -->
-            <div class="contact-item">
-              <span class="icon-box"><span class="material-symbols-outlined">call</span></span>
-              <div class="contact-detail-stacked">
-                <label>Số điện thoại</label>
-                <span>{{ userInfo.phonenumber || 'Chưa có' }}</span>
-              </div>
-            </div>
-  
-            <!-- Address -->
-            <div class="contact-item">
-              <span class="icon-box"><span class="material-symbols-outlined">location_on</span></span>
-              <div class="contact-detail-stacked">
-                <label>Địa chỉ</label>
-                <span>{{ userInfo.address || 'Chưa có' }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-  
-        <!-- Card: Thông tin công việc -->
-        <div class="info-card mt-3">
-          <h3 class="card-title">Thông tin công việc</h3>
-          <div class="job-info-list">
-            <div class="job-row">
-              <span class="job-label">Mã nhân viên</span>
-              <span class="job-value">NV-{{ userInfo.userID }}</span>
-            </div>
-            <div class="job-row">
-              <span class="job-label">Ngày vào làm</span>
-              <span class="job-value">{{ userInfo.hireDate || '---' }}</span>
-            </div>
-            <div class="job-row">
-              <span class="job-label">Phòng ban</span>
-              <span class="job-value highlight">{{ getDepartment(userInfo.departmentID) }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-  
-      <!-- RIGHT COLUMN -->
-      <div class="col-right">
-        
-        <!-- Card: Thông tin chi tiết -->
-        <div class="info-card">
-          <h3 class="card-title">Thông tin Chi Tiết</h3>
-          
-          <div class="form-grid">
-            <!-- Họ và tên -->
-            <div class="form-group">
-              <label>HỌ VÀ TÊN</label>
-              <div class="static-field">{{ userInfo.fullname }}</div>
-            </div>
-  
-            <!-- CCCD -->
-            <div class="form-group">
-              <label>CCCD/CMND</label>
-              <div class="static-field">{{ userInfo.cccd }}</div>
-            </div>
-  
-            <!-- Giới tính -->
-            <div class="form-group">
-              <label>GIỚI TÍNH</label>
-              <div class="static-field">{{ userInfo.gender ? 'Nam' : 'Nữ' }}</div>
-            </div>
-  
-            <!-- Ngày sinh -->
-            <div class="form-group">
-              <label>NGÀY SINH</label>
-              <div class="static-field">{{ userInfo.birth || '---' }}</div>
-            </div>
-          </div>
-  
-          <!-- Section con: Ngân hàng -->
-          <h4 class="sub-title"><span class="material-symbols-outlined">credit_card</span> Thông tin ngân hàng</h4>
-          <div class="form-grid">
-            <div class="form-group">
-              <label>SỐ TÀI KHOẢN</label>
-              <div class="static-field">{{ userInfo.bankAccount || '---' }}</div>
-            </div>
-            <div class="form-group">
-              <label>NGÂN HÀNG</label>
-              <div class="static-field">{{ userInfo.bankName || '---' }}</div>
-            </div>
-          </div>
-        </div>
-  
-        <!-- Card: Ghi chú -->
-        <div class="note-card">
-          <div class="note-icon">
-             <span class="material-symbols-outlined">description</span>
-          </div>
-          <div class="note-content">
-            <h4>Ghi chú nhân sự</h4>
-            <p>Thông tin cá nhân được bảo mật. Vui lòng cập nhật chính xác để đảm bảo quyền lợi bảo hiểm và lương thưởng.</p>
-          </div>
-        </div>
-  
-      </div>
-    </div>
-  
-  </div>
-  
-  <!-- LOADING TEMPLATE -->
-  <ng-template #loadingTpl>
-    <div class="loading-container">
-      <p style="text-align: center; color: #666;">Đang tải dữ liệu...</p>
-    </div>
-  </ng-template>
-  
-  <!-- POPUP (MODAL) CHỈNH SỬA -->
-  <!-- Sử dụng biến isEditing từ TS của bạn để hiển thị Modal -->
-  <div class="modal-backdrop" *ngIf="isEditing">
-    <div class="modal-content animate-pop">
-      <div class="modal-header">
-        <h3>Chỉnh sửa thông tin</h3>
-        <button class="close-btn" (click)="cancelEdit()">
-          <span class="material-symbols-outlined">close</span>
-        </button>
       </div>
       
-      <div class="modal-body">
-        <div class="form-grid-modal">
-          <!-- Fullname -->
-          <div class="form-group">
-            <label>Họ và tên</label>
-            <input type="text" [(ngModel)]="formdata.fullname" class="form-control">
-          </div>
-           <!-- Email -->
-           <div class="form-group">
-            <label>Email</label>
-            <input type="email" [(ngModel)]="formdata.email" class="form-control">
-          </div>
-          <!-- Phone -->
-          <div class="form-group">
-            <label>Số điện thoại</label>
-            <input type="text" [(ngModel)]="formdata.phonenumber" class="form-control" maxlength="12">
-          </div>
-          <!-- Address -->
-          <div class="form-group full-width">
-            <label>Địa chỉ</label>
-            <input type="text" [(ngModel)]="formdata.address" class="form-control">
-          </div>
-          
-          <!-- CCCD -->
-          <div class="form-group">
-            <label>CCCD/CMND</label>
-            <input type="text" [(ngModel)]="formdata.cccd" class="form-control">
-          </div>
-          
-           <!-- Gender -->
-           <div class="form-group">
-            <label>Giới tính</label>
-            <select [(ngModel)]="formdata.gender" class="form-control">
-                <option [ngValue]="true">Nam</option>
-                <option [ngValue]="false">Nữ</option>
-            </select>
-          </div>
-          
-          <!-- Birth -->
-          <div class="form-group">
-            <label>Ngày sinh</label>
-            <input type="date" [(ngModel)]="formdata.birth" class="form-control">
-          </div>
-  
-          <!-- Bank Info -->
-          <div class="form-group">
-             <label>Ngân hàng</label>
-             <input type="text" [(ngModel)]="formdata.bankName" class="form-control">
-          </div>
-          <div class="form-group">
-             <label>Số tài khoản</label>
-             <input type="text" [(ngModel)]="formdata.bankAccount" class="form-control">
-          </div>
-  
+      <div class="profile-text">
+        <h2 class="name">{{ userInfo.fullname || 'Chưa cập nhật tên' }}</h2>
+        <div class="sub-text">
+          <span class="role">
+            <span class="material-symbols-outlined" style="font-size: 1rem;">work</span> 
+            {{ userInfo.roleName || 'Nhân viên' }}
+          </span>
+          <span class="separator">•</span>
+          <span class="dept">{{ getDepartment(userInfo.departmentID) }}</span>
         </div>
       </div>
-  
-      <div class="modal-footer">
-        <!-- Nút hủy gọi hàm cancelEdit() -->
-        <button class="btn-outline" (click)="cancelEdit()">Hủy bỏ</button>
-        <!-- Nút lưu gọi hàm saveChanges() -> hàm này sẽ bật popup confirm -->
-        <button class="btn-primary" (click)="saveChanges()">
-          <span class="material-symbols-outlined">save</span> Lưu thay đổi
+
+      <div class="header-actions">
+        <!-- Click nút này sẽ set isEditing = true -> Mở Modal -->
+        <button class="btn-primary" (click)="startEdit()">
+          <span class="material-symbols-outlined">edit</span>
+          Chỉnh sửa
         </button>
       </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="profile-tabs">
+      <div class="tab-item active">Thông tin cá nhân</div>
     </div>
   </div>
 
-  <!-- CÁC COMPONENT PHỤ TRỢ (DỰA TRÊN TS CỦA BẠN) -->
-  
-  <!-- Loading -->
-  <app-loading *ngIf="isloading"></app-loading>
-  
-  <!-- Confirm Dialog -->
-  <app-comfirm *ngIf="isconfirm" 
-    [message]="confirmMessage" 
-    (result)="onConfirmResult($event)">
-  </app-comfirm>
-  
-  <!-- Alert Notification -->
-  <app-alert *ngIf="isalert" 
-    [message]="notifyMessage" 
-    [notifyType]="notifyType" 
-    (hidden)="isalert = false">
-  </app-alert>
+  <!-- 2. MAIN CONTENT GRID (CHẾ ĐỘ XEM - READ ONLY) -->
+  <div class="content-grid">
+    
+    <!-- LEFT COLUMN -->
+    <div class="col-left">
+      <!-- Card: Liên hệ nhanh -->
+      <div class="info-card">
+        <h3 class="card-title">Liên hệ nhanh</h3>
+        <div class="contact-list">
+          
+          <!-- Email (Hiển thị 1 dòng) -->
+          <div class="contact-item single-line">
+            <span class="icon-box"><span class="material-symbols-outlined">mail</span></span>
+            <div class="contact-detail">
+              <span class="detail-label">Email:</span>
+              <span class="detail-value" title="{{ userInfo.email }}">{{ userInfo.email || 'Chưa có' }}</span>
+            </div>
+          </div>
+          
+          <!-- Phone -->
+          <div class="contact-item">
+            <span class="icon-box"><span class="material-symbols-outlined">call</span></span>
+            <div class="contact-detail-stacked">
+              <label>Số điện thoại</label>
+              <span>{{ userInfo.phonenumber || 'Chưa có' }}</span>
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="contact-item">
+            <span class="icon-box"><span class="material-symbols-outlined">location_on</span></span>
+            <div class="contact-detail-stacked">
+              <label>Địa chỉ</label>
+              <span>{{ userInfo.address || 'Chưa có' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Thông tin công việc -->
+      <div class="info-card mt-3">
+        <h3 class="card-title">Thông tin công việc</h3>
+        <div class="job-info-list">
+          <div class="job-row">
+            <span class="job-label">Mã nhân viên</span>
+            <span class="job-value">NV-{{ userInfo.userID }}</span>
+          </div>
+          <div class="job-row">
+            <span class="job-label">Ngày vào làm</span>
+            <span class="job-value">{{ userInfo.hireDate || '---' }}</span>
+          </div>
+          <div class="job-row">
+            <span class="job-label">Phòng ban</span>
+            <span class="job-value highlight">{{ getDepartment(userInfo.departmentID) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="col-right">
+      
+      <!-- Card: Thông tin chi tiết -->
+      <div class="info-card">
+        <h3 class="card-title">Thông tin Chi Tiết</h3>
+        
+        <div class="form-grid">
+          <!-- Họ và tên -->
+          <div class="form-group">
+            <label>HỌ VÀ TÊN</label>
+            <div class="static-field">{{ userInfo.fullname }}</div>
+          </div>
+
+          <!-- CCCD -->
+          <div class="form-group">
+            <label>CCCD/CMND</label>
+            <div class="static-field">{{ userInfo.cccd }}</div>
+          </div>
+
+          <!-- Giới tính -->
+          <div class="form-group">
+            <label>GIỚI TÍNH</label>
+            <div class="static-field">{{ userInfo.gender ? 'Nam' : 'Nữ' }}</div>
+          </div>
+
+          <!-- Ngày sinh -->
+          <div class="form-group">
+            <label>NGÀY SINH</label>
+            <div class="static-field">{{ userInfo.birth || '---' }}</div>
+          </div>
+        </div>
+
+        <!-- Section con: Ngân hàng -->
+        <h4 class="sub-title"><span class="material-symbols-outlined">credit_card</span> Thông tin ngân hàng</h4>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>SỐ TÀI KHOẢN</label>
+            <div class="static-field">{{ userInfo.bankAccount || '---' }}</div>
+          </div>
+          <div class="form-group">
+            <label>NGÂN HÀNG</label>
+            <div class="static-field">{{ userInfo.bankName || '---' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Ghi chú -->
+      <div class="note-card">
+        <div class="note-icon">
+            <span class="material-symbols-outlined">description</span>
+        </div>
+        <div class="note-content">
+          <h4>Ghi chú nhân sự</h4>
+          <p>Thông tin cá nhân được bảo mật. Vui lòng cập nhật chính xác để đảm bảo quyền lợi bảo hiểm và lương thưởng.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- LOADING TEMPLATE -->
+<ng-template #loadingTpl>
+  <div class="loading-container">
+    <p style="text-align: center; color: #666;">Đang tải dữ liệu...</p>
+  </div>
+</ng-template>
+
+<!-- POPUP (MODAL) CHỈNH SỬA -->
+<div class="modal-backdrop" *ngIf="isEditing">
+  <div class="modal-content animate-pop">
+    <div class="modal-header">
+      <h3>Chỉnh sửa thông tin</h3>
+      <button class="close-btn" (click)="cancelEdit()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-grid-modal">
+        <!-- Fullname -->
+        <div class="form-group">
+          <label>Họ và tên</label>
+          <input type="text" [(ngModel)]="formdata.fullname" class="form-control">
+        </div>
+         <!-- Email -->
+         <div class="form-group">
+          <label>Email</label>
+          <input type="email" [(ngModel)]="formdata.email" class="form-control">
+        </div>
+        <!-- Phone -->
+        <div class="form-group">
+          <label>Số điện thoại</label>
+          <input type="text" [(ngModel)]="formdata.phonenumber" class="form-control" maxlength="12">
+        </div>
+        <!-- Address -->
+        <div class="form-group full-width">
+          <label>Địa chỉ</label>
+          <input type="text" [(ngModel)]="formdata.address" class="form-control">
+        </div>
+        
+        <!-- CCCD -->
+        <div class="form-group">
+          <label>CCCD/CMND</label>
+          <input type="text" [(ngModel)]="formdata.cccd" class="form-control">
+        </div>
+        
+         <!-- Gender -->
+         <div class="form-group">
+          <label>Giới tính</label>
+          <select [(ngModel)]="formdata.gender" class="form-control">
+              <option [ngValue]="true">Nam</option>
+              <option [ngValue]="false">Nữ</option>
+          </select>
+        </div>
+        
+        <!-- Birth -->
+        <div class="form-group">
+          <label>Ngày sinh</label>
+          <input type="date" [(ngModel)]="formdata.birth" class="form-control">
+        </div>
+
+        <!-- Bank Info -->
+        <div class="form-group">
+            <label>Ngân hàng</label>
+            <input type="text" [(ngModel)]="formdata.bankName" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Số tài khoản</label>
+            <input type="text" [(ngModel)]="formdata.bankAccount" class="form-control">
+        </div>
+
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-outline" (click)="cancelEdit()">Hủy bỏ</button>
+      <button class="btn-primary" (click)="saveChanges()">
+        <span class="material-symbols-outlined">save</span> Lưu thay đổi
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- CÁC COMPONENT PHỤ TRỢ (Giữ nguyên logic của bạn) -->
+<app-loading *ngIf="isloading"></app-loading>
+
+<app-comfirm *ngIf="isconfirm" 
+  [message]="confirmMessage" 
+  (result)="onConfirmResult($event)">
+</app-comfirm>
+
+<app-alert *ngIf="isalert" 
+  [message]="notifyMessage" 
+  [notifyType]="notifyType" 
+  (hidden)="isalert = false">
+</app-alert>

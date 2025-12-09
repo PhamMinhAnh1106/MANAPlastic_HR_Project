@@ -76,7 +76,7 @@
             </span>
           </td>
 
-          <td class="text-right">
+          <td class="text-right" *ngIf="item.status != 'APPROVED'">
             <button class="btn-icon delete" (click)="deleteRequest(item.leaverequestID)" title="Hủy yêu cầu">
               <span class="material-symbols-outlined">delete</span>
             </button>

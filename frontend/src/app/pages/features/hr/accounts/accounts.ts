@@ -107,8 +107,8 @@ export class Accounts implements OnInit {
 
       const res = await FilterUser(query, this.role);
 
-      if (res.length > 0) {
-        this.employee.push(res);
+      if (res.content.length > 0) {
+        this.employee.push(res.content);
         this.toggleAdvancedFilter();
         this.totalPages = 1;
         this.totalElements = res.length;

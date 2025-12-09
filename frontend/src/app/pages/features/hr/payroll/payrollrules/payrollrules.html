@@ -1,0 +1,250 @@
+<div class="app-container">
+  
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo">
+        <i class="fa-solid fa-sack-dollar"></i>
+      </div>
+      <h1>Cấu Hình Lương</h1>
+
+      <div class="nav-tabs">
+        <button [class.active]="activeTab === 'rules'" (click)="switchTab('rules')">
+          <i class="fa-solid fa-calculator"></i> Công Thức (Rules)
+        </button>
+        <button [class.active]="activeTab === 'variables'" (click)="switchTab('variables')">
+          <i class="fa-solid fa-database"></i> Biến Số (Variables)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN BODY -->
+  <div class="main-layout">
+
+    <!-- ================= VIEW: RULES ================= -->
+    <div class="view-panel" *ngIf="activeTab === 'rules'">
+      <!-- Sidebar List -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <span>Danh sách Rule</span>
+          <button class="btn-xs btn-primary-outline" (click)="resetRuleEditor()">
+            <i class="fa-solid fa-plus"></i> Tạo mới
+          </button>
+        </div>
+        <div class="list-container">
+          <div *ngFor="let r of rules" 
+               class="list-item" 
+               [class.selected]="r.ruleCode === currentRule.ruleCode"
+               (click)="selectRule(r)">
+            <div class="item-head">
+              <span class="code">{{r.ruleCode}}</span>
+              <span class="badge">{{r.status}}</span>
+            </div>
+            <div class="name">{{r.name}}</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Editor Area -->
+      <main class="editor-area">
+        <!-- Editor Toolbar -->
+        <div class="editor-toolbar">
+          <div class="info-group">
+            <div class="code-wrapper">
+              <h2 [(ngModel)]="currentRule.ruleCode" ngDefaultControl>{{currentRule.ruleCode}}</h2>
+              <span class="badge-status">{{currentRule.status}}</span>
+            </div>
+            <input type="text" class="input-invisible" [(ngModel)]="currentRule.name" placeholder="Nhập tên mô tả rule...">
+          </div>
+
+          <div class="action-group">
+            <div class="mode-switch">
+              <button [class.active]="uiMode === 'formula'" (click)="setRuleMode('formula')"><i class="fa-solid fa-calculator"></i> Text</button>
+              <button [class.active]="uiMode === 'visual'" (click)="setRuleMode('visual')"><i class="fa-solid fa-sitemap"></i> Tree</button>
+              <button [class.active]="uiMode === 'json'" (click)="setRuleMode('json')"><i class="fa-solid fa-code"></i> Raw</button>
+            </div>
+            <div class="divider"></div>
+            
+            <!-- CONDITION: Chỉ hiện nút Xóa khi ruleId tồn tại -->
+            <button *ngIf="currentRule.ruleId" class="btn-xs btn-danger-ghost" (click)="deleteRule()">
+              <i class="fa-solid fa-trash-can"></i> Xóa
+            </button>
+            
+            <button class="btn-xs btn-primary" (click)="saveRule()"><i class="fa-solid fa-save"></i> Lưu</button>
+          </div>
+        </div>
+
+        <div class="editor-content-wrapper">
+          <div class="canvas">
+            
+            <!-- MODE: FORMULA TEXT (WITH PREVIEW) -->
+            <div class="editor-box formula-mode" *ngIf="uiMode === 'formula'">
+              <div class="box-header">
+                <label>Soạn thảo công thức</label>
+                <div class="operators">
+                  <button (click)="insertOperator('+')">+</button>
+                  <button (click)="insertOperator('-')">-</button>
+                  <button (click)="insertOperator('*')">*</button>
+                  <button (click)="insertOperator('/')">/</button>
+                  <button (click)="insertOperator('(')">(</button>
+                  <button (click)="insertOperator(')')">)</button>
+                </div>
+              </div>
+              
+              <div class="formula-container">
+                <textarea [(ngModel)]="formulaInput" class="textarea-formula" placeholder="Nhập công thức (ví dụ: BASE_SALARY / 26 * WORK_DAYS)..."></textarea>
+                
+                <div class="preview-label">Xem trước (Highlight):</div>
+                <div class="formula-preview" [innerHTML]="formattedFormula"></div>
+              </div>
+            </div>
+
+            <!-- MODE: VISUAL TREE -->
+            <div class="editor-box visual-box" *ngIf="uiMode === 'visual'">
+              <ng-container *ngTemplateOutlet="nodeTemplate; context:{$implicit: currentRule.dslJson}"></ng-container>
+            </div>
+
+            <!-- MODE: JSON -->
+            <div class="editor-box" *ngIf="uiMode === 'json'">
+              <div class="box-header"><label>Raw JSON DSL</label></div>
+              <textarea [(ngModel)]="jsonInput" class="textarea-json"></textarea>
+            </div>
+
+          </div>
+
+          <!-- Variable Palette -->
+          <div class="palette">
+            <div class="palette-header">Biến số có sẵn</div>
+            <div class="palette-list">
+              <div *ngFor="let v of variables" class="palette-item" (click)="insertVariable(v.code)">
+                <span class="var-code">{{v.code}}</span>
+                <span class="var-name">{{v.name}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- VIEW: VARIABLES -->
+    <div class="view-panel" *ngIf="activeTab === 'variables'">
+      <ng-container *ngTemplateOutlet="variablesView"></ng-container>
+    </div>
+
+  </div>
+</div>
+
+<!-- TEMPLATE: VARIABLES VIEW -->
+<ng-template #variablesView>
+   <aside class="sidebar">
+        <div class="sidebar-header">
+          <span>Danh sách Biến</span>
+          <button class="btn-xs btn-success-outline" (click)="resetVarEditor()">+ Thêm Biến</button>
+        </div>
+        <div class="list-container">
+          <div *ngFor="let v of variables" 
+               class="list-item var-item" 
+               [class.selected]="v.code === currentVar.code"
+               (click)="selectVar(v)">
+            {{v.code}}
+          </div>
+        </div>
+   </aside>
+   <main class="editor-area var-editor">
+        <div class="var-card">
+          <div class="card-header">
+            <h3>Chi tiết biến số</h3>
+            <div class="mode-switch-sm">
+              <button [class.active]="varMode === 'wizard'" (click)="setVarMode('wizard')">Đơn giản</button>
+              <button [class.active]="varMode === 'sql'" (click)="setVarMode('sql')">Nâng cao (SQL)</button>
+            </div>
+            <div class="actions">
+              <button *ngIf="currentVar.variableId || currentVar.id" class="btn-xs btn-danger-ghost" (click)="deleteVariable()">Xóa</button>
+              <button class="btn-xs btn-success" (click)="saveVariable()"><span class="material-symbols-outlined">
+save
+</span> Lưu Biến</button>
+            </div>
+          </div>
+          <div class="card-body">
+              <div class="form-grid">
+                  <div class="form-group">
+                      <label>Mã Biến (Code)</label>
+                      <input type="text" [(ngModel)]="currentVar.code" class="input-code">
+                  </div>
+                  <div class="form-group">
+                      <label>Tên hiển thị</label>
+                      <input type="text" [(ngModel)]="currentVar.name">
+                  </div>
+              </div>
+              <div class="wizard-panel" *ngIf="varMode === 'wizard'">
+                  <label><i class="fa-solid fa-wand-magic-sparkles"></i> Trình tạo công thức (Wizard)</label>
+                  <select [(ngModel)]="wizSource" (change)="onWizSourceChange()">
+                      <option value="">-- Chọn nguồn dữ liệu --</option>
+                      <option value="contract">📋 Hợp đồng (Lương, Phụ cấp...)</option>
+                      <option value="attendance">⏰ Chấm công (Ngày công, Phép...)</option>
+                      <option value="overtime">🚀 Tăng ca (Giờ OT)</option>
+                      <option value="reward">🎁 Thưởng / Phạt</option>
+                      <option value="dependents">👨‍👩‍👧‍👦 Gia cảnh</option>
+                  </select>
+                  <div class="wiz-preview" *ngIf="wizResultSql">{{wizResultSql}}</div>
+              </div>
+              <div class="sql-panel" [class.hidden]="varMode !== 'sql'">
+                  <label>Native Query (SQL)</label>
+                  <div class="codemirror-wrapper"><textarea #sqlTextarea></textarea></div>
+                  <p class="hint"><i class="fa-solid fa-info-circle"></i> Tham số: :userId, :startDate, :endDate, :month, :year</p>
+              </div>
+              <div class="audit-section">
+                <h4><i class="fa-solid fa-microscope"></i> Kiểm Tra Dữ Liệu</h4>
+                <div class="audit-controls">
+                  <div class="control">
+                    <label>Nhân viên</label>
+                    <select [(ngModel)]="simEmployeeId">
+                      <option value="">-- Chọn --</option>
+                      <option *ngFor="let e of employees" [value]="e.userID">{{e.fullname }} - {{e.userID}}</option>
+                    </select>
+                  </div>
+                  <div class="control w-sm"><label>Kỳ lương</label><input type="month" [(ngModel)]="simPeriod"></div>
+                  <button class="btn-check" (click)="testVariable()"><i class="fa-solid fa-play"></i> Kiểm tra</button>
+                </div>
+                <div class="audit-result" *ngIf="isSimulating || simResult !== '---'">
+                  <div class="result-row"><span>Kết quả:</span><strong class="value">{{simResult}}</strong></div>
+                  <div class="debug-log">{{simDebug}}</div>
+                </div>
+              </div>
+           </div>
+        </div>
+   </main>
+</ng-template>
+
+<!-- RECURSIVE TEMPLATE FOR VISUAL BUILDER -->
+<ng-template #nodeTemplate let-node>
+  <div class="rb-node" [ngClass]="'type-' + getTypeGroup(node.type)">
+    <div class="rb-header">
+      <select [ngModel]="node.type" (ngModelChange)="updateNodeType(node, $event)">
+        <option *ngFor="let key of objectKeys(RULE_TYPES)" [value]="key">
+          {{RULE_TYPES[key].label}}
+        </option>
+      </select>
+    </div>
+    <div class="rb-body">
+      <ng-container *ngIf="node.type === 'CONSTANT'">
+        <input type="number" [(ngModel)]="node.value" class="rb-input">
+      </ng-container>
+      <ng-container *ngIf="node.type === 'VARIABLE'">
+        <select [(ngModel)]="node.name" class="rb-select-var">
+          <option value="">-- Chọn biến --</option>
+          <option *ngFor="let v of variables" [value]="v.code">{{v.code}} - {{v.name}}</option>
+        </select>
+      </ng-container>
+      <ng-container *ngIf="RULE_TYPES[node.type]?.args">
+        <ng-container *ngFor="let arg of RULE_TYPES[node.type].args">
+          <span class="rb-label">{{arg}}</span>
+          <div class="rb-children">
+             <ng-container *ngTemplateOutlet="nodeTemplate; context:{$implicit: node[arg]}"></ng-container>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>

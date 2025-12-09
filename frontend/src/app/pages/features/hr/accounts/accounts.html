@@ -88,7 +88,7 @@
 
         <tbody>
           <tr *ngFor="let emp of employee[0]">
-            <td><strong>#{{ emp.userID }}</strong></td>
+            <td><strong>#{{ emp.username }}</strong></td>
             
             <!-- Cột Nhân viên: Avatar + Tên + Username -->
             <td>
@@ -98,7 +98,7 @@
                 </div>
                 <div class="info-text">
                   <div class="fullname">{{ emp.fullname || 'Chưa cập nhật' }}</div>
-                  <div class="username">@{{ emp.username }}</div>
+                  <div class="username">@{{ emp.userID }}</div>
                   <div class="cccd-text" title="CCCD"><small>{{ emp.cccd }}</small></div>
                 </div>
               </div>
