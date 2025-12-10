@@ -71,14 +71,14 @@ export class Payrollrules implements OnInit, AfterViewInit {
 
   // --- DEFINITIONS ---
   RULE_TYPES: any = {
-    'ADD': { label: '➕ Cộng (Add)', group: 'math', args: ['left', 'right'] },
-    'SUB': { label: '➖ Trừ (Sub)', group: 'math', args: ['left', 'right'] },
-    'MUL': { label: '✖ Nhân (Mul)', group: 'math', args: ['left', 'right'] },
-    'DIV': { label: '➗ Chia (Div)', group: 'math', args: ['left', 'right'] },
-    'GT': { label: '> Lớn hơn', group: 'comp', args: ['left', 'right'] },
-    'LT': { label: '< Nhỏ hơn', group: 'comp', args: ['left', 'right'] },
-    'GTE': { label: '>= Lớn hơn bằng', group: 'comp', args: ['left', 'right'] },
-    'LTE': { label: '<= Nhỏ hơn bằng', group: 'comp', args: ['left', 'right'] },
+    'ADD': { label: '➕ Cộng (Add)', group: 'math', args: ['left', 'right'], op: '+' },
+    'SUB': { label: '➖ Trừ (Sub)', group: 'math', args: ['left', 'right'], op: '-' },
+    'MUL': { label: '✖ Nhân (Mul)', group: 'math', args: ['left', 'right'], op: '*' },
+    'DIV': { label: '➗ Chia (Div)', group: 'math', args: ['left', 'right'], op: '/' },
+    'GT': { label: '> Lớn hơn', group: 'comp', args: ['left', 'right'], op: '>' },
+    'LT': { label: '< Nhỏ hơn', group: 'comp', args: ['left', 'right'], op: '<' },
+    'GTE': { label: '>= Lớn hơn bằng', group: 'comp', args: ['left', 'right'], op: '>=' },
+    'LTE': { label: '<= Nhỏ hơn bằng', group: 'comp', args: ['left', 'right'], op: '<=' },
     'IF_ELSE': { label: '❓ Nếu...Thì... (IF)', group: 'logic', args: ['condition', 'true_case', 'false_case'] },
     'VARIABLE': { label: '📦 Biến số (Data)', group: 'data', args: [] },
     'CONSTANT': { label: '#️⃣ Số cố định', group: 'const', args: [] }
@@ -92,6 +92,10 @@ export class Payrollrules implements OnInit, AfterViewInit {
   ) { }
 
   ngOnInit() {
+    const savedTab = sessionStorage.getItem('payroll_active_tab');
+    if (savedTab === 'rules' || savedTab === 'variables') {
+      this.activeTab = savedTab;
+    }
     this.loadRules();
     this.loadVariables();
     this.loadEmployees();
@@ -113,6 +117,45 @@ export class Payrollrules implements OnInit, AfterViewInit {
     }
   }
 
+  // --- LOGIC CHUYỂN AST (RAW) SANG TEXT FORMULA ---
+  // Hàm đệ quy để duyệt cây JSON và tạo chuỗi
+  convertAstToString(node: any): string {
+    if (!node) return '';
+
+    // 1. Nếu là Biến
+    if (node.type === 'VARIABLE') {
+      return node.name || 'UNKNOWN_VAR';
+    }
+
+    // 2. Nếu là Hằng số
+    if (node.type === 'CONSTANT') {
+      return node.value !== undefined ? String(node.value) : '0';
+    }
+
+    // 3. Nếu là Phép toán (ADD, SUB, MUL, DIV, GT, LT...)
+    const typeDef = this.RULE_TYPES[node.type];
+    if (typeDef && typeDef.op) {
+      const left = this.convertAstToString(node.left);
+      const right = this.convertAstToString(node.right);
+      return `(${left} ${typeDef.op} ${right})`;
+    }
+
+    // 4. Nếu là Logic IF_ELSE
+    if (node.type === 'IF_ELSE') {
+      const cond = this.convertAstToString(node.condition);
+      const trueCase = this.convertAstToString(node.true_case);
+      const falseCase = this.convertAstToString(node.false_case);
+      return `IF ${cond} THEN { ${trueCase} } ELSE { ${falseCase} }`;
+    }
+
+    // 5. Nếu là RAW_FORMULA (trường hợp đặc biệt)
+    if (node.type === 'RAW_FORMULA') {
+      return node.expression || '';
+    }
+
+    return '';
+  }
+
   // --- HIGHLIGHT FORMULA LOGIC ---
   get formattedFormula(): SafeHtml {
     if (!this.formulaInput) return '';
@@ -121,7 +164,6 @@ export class Payrollrules implements OnInit, AfterViewInit {
 
   highlightFormula(text: string): SafeHtml {
     if (!text) return '';
-    // Tách token: Toán tử, Ngoặc, Khoảng trắng, và các từ (Biến/Số)
     const tokens = text.split(/([+\-*/()<>!=&| ]+)/);
     let html = '';
     const knownVars = new Set(this.variables.map(v => v.code));
@@ -129,23 +171,29 @@ export class Payrollrules implements OnInit, AfterViewInit {
     tokens.forEach(token => {
       const trimmed = token.trim();
       if (!trimmed) {
-        html += token; // Giữ nguyên khoảng trắng
+        html += token;
       } else if (knownVars.has(trimmed)) {
         html += `<span class="badge-var">${token}</span>`;
       } else if (!isNaN(Number(trimmed))) {
         html += `<span class="token-number">${token}</span>`;
-      } else if (['+', '-', '*', '/', '(', ')', '>', '<', '=', '&', '|'].some(op => token.includes(op))) {
-        let opHtml = '';
-        for (let char of token) {
-          if (char === '(' || char === ')') {
-            opHtml += `<span class="token-bracket">${char}</span>`;
-          } else if (['+', '-', '*', '/'].includes(char)) {
-            opHtml += `<span class="token-op">${char}</span>`;
-          } else {
-            opHtml += char;
+      } else if (['+', '-', '*', '/', '(', ')', '>', '<', '=', '&', '|', 'IF', 'THEN', 'ELSE', '{', '}'].some(op => token.includes(op))) {
+        // Highlight keyword IF/THEN/ELSE
+        if (['IF', 'THEN', 'ELSE'].includes(trimmed)) {
+          html += `<span class="token-keyword">${token}</span>`;
+        } else {
+          // Toán tử
+          let opHtml = '';
+          for (let char of token) {
+            if (char === '(' || char === ')' || char === '{' || char === '}') {
+              opHtml += `<span class="token-bracket">${char}</span>`;
+            } else if (['+', '-', '*', '/'].includes(char)) {
+              opHtml += `<span class="token-op">${char}</span>`;
+            } else {
+              opHtml += char;
+            }
           }
+          html += opHtml;
         }
-        html += opHtml;
       } else {
         html += `<span class="token-unknown">${token}</span>`;
       }
@@ -154,10 +202,13 @@ export class Payrollrules implements OnInit, AfterViewInit {
     return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 
-
   // ================= TABS & MODES =================
   switchTab(tab: 'rules' | 'variables') {
     this.activeTab = tab;
+
+    // 2. LƯU TRẠNG THÁI VÀO SESSION KHI CLICK
+    sessionStorage.setItem('payroll_active_tab', tab);
+
     if (tab === 'variables' && this.sqlEditorInstance) {
       setTimeout(() => this.sqlEditorInstance.refresh(), 100);
     }
@@ -188,15 +239,15 @@ export class Payrollrules implements OnInit, AfterViewInit {
   async loadRules() {
     const data = await getRules();
     if (data && Array.isArray(data)) {
-      this.rules = data;
+      this.rules = data.filter((r: Rule) => r.status !== 'RETIRED');
       this.cdr.detectChanges();
     }
   }
 
   resetRuleEditor() {
     this.currentRule = {
-      ruleId: undefined, // Reset về undefined để ẩn nút xóa
-      ruleCode: 'NEW_RULE',
+      ruleId: undefined,
+      ruleCode: '',
       name: '',
       status: 'DRAFT',
       dslJson: { type: 'CONSTANT', value: 0 }
@@ -212,6 +263,7 @@ export class Payrollrules implements OnInit, AfterViewInit {
     this.currentRule = { ...rule };
     this.formulaInput = '';
 
+    // 1. Parse JSON string nếu cần
     if (typeof this.currentRule.dslJson === 'string') {
       try {
         this.currentRule.dslJson = JSON.parse(this.currentRule.dslJson);
@@ -220,12 +272,17 @@ export class Payrollrules implements OnInit, AfterViewInit {
       }
     }
 
+    // 2. Xử lý hiển thị Text Formula (Reverse Parsing)
+    // Nếu nó đã là RAW_FORMULA thì lấy expression
     if (this.currentRule.dslJson?.type === 'RAW_FORMULA') {
       this.formulaInput = this.currentRule.dslJson.expression;
-      this.setRuleMode('formula');
     } else {
-      this.setRuleMode('visual');
+      // Nếu là cây AST (ADD, MUL...) -> Chuyển đổi sang Text để hiển thị
+      this.formulaInput = this.convertAstToString(this.currentRule.dslJson);
     }
+
+    // Mặc định vào tab Formula để xem trước
+    this.setRuleMode('formula');
 
     this.jsonInput = JSON.stringify(this.currentRule.dslJson, null, 2);
   }
@@ -256,6 +313,8 @@ export class Payrollrules implements OnInit, AfterViewInit {
   }
 
   async saveRule() {
+    // Nếu đang ở mode Formula -> Lưu dạng RAW_FORMULA
+    // (Bởi vì user có thể đã sửa text, parse ngược lại thành cây AST rất phức tạp)
     if (this.uiMode === 'formula') {
       this.currentRule.dslJson = { type: 'RAW_FORMULA', expression: this.formulaInput };
     } else if (this.uiMode === 'json') {
@@ -386,7 +445,6 @@ export class Payrollrules implements OnInit, AfterViewInit {
   }
 
   async testVariable() {
-
     if (!this.currentVar.sqlQuery) { alert('Chưa có SQL!'); return; }
     if (!this.simEmployeeId) { alert('Chọn nhân viên!'); return; }
     if (!this.simPeriod) { alert('Chọn kỳ lương!'); return; }
@@ -414,12 +472,16 @@ export class Payrollrules implements OnInit, AfterViewInit {
         this.cdr.detectChanges();
       } else {
         this.simResult = val;
+        this.cdr.detectChanges();
+
       }
       this.simDebug = `Context: ${data.auditContext || 'OK'}`;
 
     } catch (err: any) {
       this.isSimulating = false;
       this.simResult = 'LỖI SQL';
+      this.cdr.detectChanges();
+
       this.simDebug = err?.response?.data || err.message;
     }
   }

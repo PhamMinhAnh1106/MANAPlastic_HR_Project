@@ -4,7 +4,9 @@
   <header class="app-header">
     <div class="brand">
       <div class="logo">
-        <i class="fa-solid fa-sack-dollar"></i>
+       <span class="material-symbols-outlined">
+money_bag
+</span>
       </div>
       <h1>Cấu Hình Lương</h1>
 
@@ -52,7 +54,18 @@
         <div class="editor-toolbar">
           <div class="info-group">
             <div class="code-wrapper">
-              <h2 [(ngModel)]="currentRule.ruleCode" ngDefaultControl>{{currentRule.ruleCode}}</h2>
+               <!-- TRƯỜNG HỢP 1: Đã lưu (Có ID) -> Chỉ hiển thị Text -->
+    <h2 *ngIf="currentRule.ruleId" class="text-rule-code">
+      {{ currentRule.ruleCode }}
+    </h2>
+
+    <!-- TRƯỜNG HỢP 2: Tạo mới (Chưa có ID) -> Hiển thị Input -->
+    <input *ngIf="!currentRule.ruleId" 
+           type="text" 
+           [(ngModel)]="currentRule.ruleCode" 
+           class="input-rule-code" 
+           placeholder="Nhập mã Rule (VD: NET_SALARY)"
+           title="Mã Rule (Viết hoa, không dấu)">
               <span class="badge-status">{{currentRule.status}}</span>
             </div>
             <input type="text" class="input-invisible" [(ngModel)]="currentRule.name" placeholder="Nhập tên mô tả rule...">
@@ -66,7 +79,6 @@
             </div>
             <div class="divider"></div>
             
-            <!-- CONDITION: Chỉ hiện nút Xóa khi ruleId tồn tại -->
             <button *ngIf="currentRule.ruleId" class="btn-xs btn-danger-ghost" (click)="deleteRule()">
               <i class="fa-solid fa-trash-can"></i> Xóa
             </button>
@@ -166,7 +178,9 @@ save
 </span> Lưu Biến</button>
             </div>
           </div>
+
           <div class="card-body">
+              <!-- Form Grid -->
               <div class="form-grid">
                   <div class="form-group">
                       <label>Mã Biến (Code)</label>
@@ -177,6 +191,8 @@ save
                       <input type="text" [(ngModel)]="currentVar.name">
                   </div>
               </div>
+
+              <!-- Wizard Panel -->
               <div class="wizard-panel" *ngIf="varMode === 'wizard'">
                   <label><i class="fa-solid fa-wand-magic-sparkles"></i> Trình tạo công thức (Wizard)</label>
                   <select [(ngModel)]="wizSource" (change)="onWizSourceChange()">
@@ -189,24 +205,41 @@ save
                   </select>
                   <div class="wiz-preview" *ngIf="wizResultSql">{{wizResultSql}}</div>
               </div>
+
+              <!-- SQL Panel -->
               <div class="sql-panel" [class.hidden]="varMode !== 'sql'">
                   <label>Native Query (SQL)</label>
                   <div class="codemirror-wrapper"><textarea #sqlTextarea></textarea></div>
                   <p class="hint"><i class="fa-solid fa-info-circle"></i> Tham số: :userId, :startDate, :endDate, :month, :year</p>
               </div>
+
+              <!-- Audit Section -->
               <div class="audit-section">
                 <h4><i class="fa-solid fa-microscope"></i> Kiểm Tra Dữ Liệu</h4>
                 <div class="audit-controls">
-                  <div class="control">
+                  <!-- Cột Nhân viên -->
+                  <div class="control-employee">
                     <label>Nhân viên</label>
                     <select [(ngModel)]="simEmployeeId">
                       <option value="">-- Chọn --</option>
-                      <option *ngFor="let e of employees" [value]="e.userID">{{e.fullname }} - {{e.userID}}</option>
+                      <option *ngFor="let e of employees" [value]="e.userID">{{e.fullname}} - {{e.userID}}</option>
                     </select>
                   </div>
-                  <div class="control w-sm"><label>Kỳ lương</label><input type="month" [(ngModel)]="simPeriod"></div>
-                  <button class="btn-check" (click)="testVariable()"><i class="fa-solid fa-play"></i> Kiểm tra</button>
+                  
+                  <!-- Cột Kỳ lương -->
+                  <div class="control-period">
+                    <label>Kỳ lương</label>
+                    <input type="month" [(ngModel)]="simPeriod">
+                  </div>
+
+                  <!-- Nút Kiểm tra -->
+                  <button class="btn-check" (click)="testVariable()">
+                    <span class="material-symbols-outlined">
+arrow_right
+</span>Kiểm tra
+                  </button>
                 </div>
+
                 <div class="audit-result" *ngIf="isSimulating || simResult !== '---'">
                   <div class="result-row"><span>Kết quả:</span><strong class="value">{{simResult}}</strong></div>
                   <div class="debug-log">{{simDebug}}</div>

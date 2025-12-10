@@ -99,7 +99,10 @@ export class Home implements OnInit {
   checkrole() {
     const icon = [{
       iconName: "home", path: "/home/info", task: [{ name: "Trang chủ", path: "/home/info" }]
+
     },
+
+
     ];
     this.role = DecodeTokenRole(this.token);
     if (this.role.length > 0)
@@ -108,7 +111,7 @@ export class Home implements OnInit {
       case "Admin":
         const icon_admin = [
           { iconName: "group", path: "/home/user/account", task: [{ name: "Quản Lí Nhân sự", path: "/home/user/account" }] },
-          { iconName: "receipt", path: "/home/payroll/rules", task: [{ name: "Quản Lí lương", path: "/home/payroll/rules" }], },
+          { iconName: "receipt", path: "/home/payroll", task: [{ name: "Quản Lí lương", path: "/home/payroll" }, { name: "Tính Lương", path: "/home/payroll/rules" }], },
 
         ];
         icon.push(...icon_admin)
@@ -122,7 +125,7 @@ export class Home implements OnInit {
             { name: "Quản lí phép", path: "/home/leaverequest/manage" }]
           },
           { iconName: "contract", path: "/home/contracts", task: [{ name: "Quản Lí hợp đồng", path: "/home/contracts" }], },
-          { iconName: "receipt", path: "/home/payroll", task: [{ name: "Quản Lí lương", path: "/home/payroll" }], },
+          { iconName: "receipt", path: "/home/payroll", task: [{ name: "Quản Lí lương", path: "/home/payroll" }, { name: "Tính Lương", path: "/home/payroll/rules" }, { name: "Xem lương", path: "/home/payroll/payslip" }], },
 
         ];
         icon.push(...icon_hr)
@@ -134,6 +137,8 @@ export class Home implements OnInit {
             iconName: "calendar_month", path: "/home/user/attendance", task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" },
             { name: "Lịch làm việc", path: "/home/schedule" }, { name: "Quản lí phép", path: "/home/leaverequest/manage" }]
           }, { iconName: "assignment_add", path: "/home/leaverequest", task: [{ name: "Nghỉ Phép", path: "/home/leaverequest" }] }
+          , { iconName: "receipt", path: "/home/payroll/payslip", task: [{ name: "Xem lương", path: "/home/payroll/payslip" }], },
+
         ]
         icon.push(...icon_manager)
         this.icon_handleBar = icon;
@@ -145,6 +150,8 @@ export class Home implements OnInit {
             { name: "Lịch làm việc", path: "/home/schedule" },
             ]
           }, { iconName: "assignment_add", path: "/home/leaverequest", task: [{ name: "Nghỉ Phép", path: "/home/leaverequest" }] }
+          , { iconName: "receipt", path: "/home/payroll/payslip", task: [{ name: "Xem lương", path: "/home/payroll/payslip" }], },
+
         ]
         icon.push(...icon_employee)
         this.icon_handleBar = icon;

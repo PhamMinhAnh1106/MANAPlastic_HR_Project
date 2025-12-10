@@ -1,17 +1,20 @@
 // --- Variables ---
-$primary: #4f46e5; // Indigo 600
+$primary: #4f46e5;
 $primary-light: #e0e7ff;
-$success: #10b981; // Emerald 500
+$success: #10b981;
+$success-dark: #059669;
 $success-light: #d1fae5;
-$danger: #ef4444; // Red 500
-$bg-body: #f8fafc; // Slate 50
+$danger: #ef4444;
+$danger-dark: #dc2626;
+$danger-light: #fee2e2;
+$bg-body: #f8fafc;
 $bg-white: #ffffff;
-$border-color: #e2e8f0; // Slate 200
-$text-main: #334155; // Slate 700
-$text-muted: #64748b; // Slate 500
+$border-color: #e2e8f0;
+$text-main: #334155;
+$text-muted: #64748b;
 $font-mono: 'Fira Code', monospace;
 
-// --- Global Resets & Mixins ---
+// --- Global Resets ---
 :host {
     display: block;
     height: 100vh;
@@ -20,19 +23,19 @@ $font-mono: 'Fira Code', monospace;
     background-color: $bg-body;
     overflow: hidden;
     display: flex;
-    flex-direction: column;
     padding: 3rem 0.5rem 0.5rem 5rem;
 
+    flex-direction: column;
 }
 
 button {
     cursor: pointer;
     border: none;
     background: none;
-    transition: all 0.2s;
+    transition: all 0.2s ease-in-out;
 
     &:active {
-        transform: scale(0.98);
+        transform: translateY(1px);
     }
 }
 
@@ -41,20 +44,25 @@ select,
 textarea {
     outline: none;
     border: 1px solid $border-color;
-    border-radius: 4px;
-    padding: 6px 10px;
+    border-radius: 6px;
+    padding: 8px 12px;
     font-size: 13px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
 
     &:focus {
         border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.1);
     }
 }
 
-// --- Layout ---
+// --- Layout & Header ---
 .app-container {
     display: flex;
     flex-direction: column;
     height: 100%;
+    overflow: hidden;
 }
 
 .app-header {
@@ -119,12 +127,14 @@ textarea {
     flex: 1;
     overflow: hidden;
     position: relative;
+    height: 100%;
 }
 
 .view-panel {
     display: grid;
     grid-template-columns: 280px 1fr;
     height: 100%;
+    overflow: hidden;
 }
 
 // --- Sidebar ---
@@ -133,6 +143,8 @@ textarea {
     border-right: 1px solid $border-color;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    overflow: hidden;
 
     .sidebar-header {
         padding: 16px;
@@ -144,13 +156,24 @@ textarea {
         font-size: 12px;
         color: $text-muted;
         text-transform: uppercase;
+        flex-shrink: 0;
     }
 
     .list-container {
         flex: 1;
         overflow-y: auto;
+        min-height: 0;
         padding: 8px;
         background: rgba($bg-body, 0.5);
+
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 3px;
+        }
 
         .list-item {
             padding: 12px;
@@ -208,15 +231,39 @@ textarea {
     }
 }
 
-// --- Buttons ---
+// --- BUTTONS ---
 .btn-xs {
     font-size: 12px;
-    padding: 6px 10px;
-    border-radius: 4px;
+    height: 32px;
+    padding: 0 16px;
+    border-radius: 6px;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.btn-success {
+    background: $success;
+    color: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+        background: $success-dark;
+    }
+}
+
+.btn-danger-ghost {
+    background: white;
+    color: $danger;
+    border: 1px solid $danger-light;
+
+    &:hover {
+        background: $danger-light;
+        border-color: $danger;
+    }
 }
 
 .btn-primary {
@@ -237,25 +284,6 @@ textarea {
     }
 }
 
-.btn-success {
-    background: $success;
-    color: white;
-}
-
-.btn-success-outline {
-    border: 1px solid $success-light;
-    color: $success;
-    background: #ecfdf5;
-}
-
-.btn-danger-ghost {
-    color: $danger;
-
-    &:hover {
-        background: #fef2f2;
-    }
-}
-
 .btn-check {
     background: purple;
     color: white;
@@ -266,6 +294,8 @@ textarea {
     display: flex;
     align-items: center;
     gap: 6px;
+    height: 38px;
+    margin-bottom: 0;
 
     &:hover {
         background: darken(purple, 10%);
@@ -278,6 +308,7 @@ textarea {
     flex-direction: column;
     background: $bg-body;
     overflow: hidden;
+    height: 100%;
 
     .editor-toolbar {
         height: 64px;
@@ -290,21 +321,57 @@ textarea {
         flex-shrink: 0;
 
         .info-group {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
             .code-wrapper {
                 display: flex;
                 align-items: center;
                 gap: 8px;
+                margin-bottom: 2px;
 
-                h2 {
+                .text-rule-code {
                     font-size: 16px;
-                    font-weight: 700;
-                    margin: 0;
+                    font-weight: 800;
                     color: $text-main;
-                    outline: none;
-                    border-bottom: 1px dashed transparent;
+                    margin: 0;
+                    padding: 4px 8px; // Padding tương đương input để thẳng hàng
+                    margin-left: -8px;
+                    font-family: $font-mono;
+                    cursor: default;
+                }
+
+                .input-rule-code {
+                    font-size: 16px;
+                    font-weight: 800; // Chữ đậm như thẻ H2
+                    color: $text-main;
+                    border: 1px dashed transparent; // Viền trong suốt mặc định
+                    background: transparent;
+                    padding: 4px 8px;
+                    margin-left: -8px; // Căn lề trái khớp
+                    width: auto;
+                    min-width: 150px;
+                    max-width: 400px;
+                    text-transform: uppercase; // Tự động viết hoa khi hiển thị
+                    font-family: $font-mono; // Dùng font code cho đẹp
+
+                    &:hover {
+                        border-color: #cbd5e1; // Hiện viền mờ khi di chuột
+                        background: #fff;
+                    }
 
                     &:focus {
-                        border-bottom-color: $primary;
+                        border-color: $primary; // Viền tím khi nhập
+                        background: #fff;
+                        outline: none;
+                        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+                    }
+
+                    &::placeholder {
+                        color: #cbd5e1;
+                        font-weight: 400;
+                        text-transform: none;
                     }
                 }
 
@@ -314,6 +381,9 @@ textarea {
                     padding: 2px 6px;
                     border-radius: 4px;
                     font-weight: 700;
+                    color: $text-muted;
+                    border: 1px solid #e2e8f0;
+                    white-space: nowrap;
                 }
             }
 
@@ -324,10 +394,6 @@ textarea {
                 font-size: 12px;
                 color: $text-muted;
                 width: 300px;
-
-                &::placeholder {
-                    color: #cbd5e1;
-                }
             }
         }
 
@@ -370,19 +436,23 @@ textarea {
         flex: 1;
         display: flex;
         overflow: hidden;
+        height: 100%;
     }
 
     .canvas {
         flex: 1;
         padding: 24px;
         overflow-y: auto;
+        height: 100%;
 
         .editor-box {
             background: $bg-white;
             border: 1px solid $border-color;
             border-radius: 8px;
             overflow: hidden;
-            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            min-height: 300px;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 
             .box-header {
@@ -392,6 +462,7 @@ textarea {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                flex-shrink: 0;
 
                 label {
                     font-size: 11px;
@@ -413,15 +484,17 @@ textarea {
                 }
             }
 
-            .textarea-json {
+            .textarea-json,
+            .textarea-formula {
+                flex: 1;
                 width: 100%;
-                height: 300px;
                 border: none;
                 padding: 16px;
                 resize: none;
                 font-family: $font-mono;
                 font-size: 14px;
                 color: $text-main;
+                line-height: 1.6;
 
                 &:focus {
                     outline: none;
@@ -429,88 +502,53 @@ textarea {
             }
         }
 
-        // --- FORMULA MODE WITH HIGHLIGHTING ---
         .formula-mode {
-            display: flex;
-            flex-direction: column;
+            min-height: 400px;
 
             .formula-container {
                 flex: 1;
                 display: flex;
                 flex-direction: column;
-                padding: 16px;
-                gap: 16px;
-            }
+                padding: 0;
 
-            .textarea-formula {
-                width: 100%;
-                min-height: 120px;
-                border: 1px solid $border-color;
-                border-radius: 6px;
-                padding: 12px;
-                resize: vertical;
-                font-family: $font-mono;
-                font-size: 14px;
-                color: #334155;
-                line-height: 1.6;
-
-                &:focus {
-                    outline: none;
-                    border-color: $primary;
-                    box-shadow: 0 0 0 2px rgba($primary, 0.1);
+                .textarea-formula {
+                    border-bottom: 1px dashed $border-color;
+                    min-height: 150px;
                 }
-            }
 
-            .preview-label {
-                font-size: 11px;
-                font-weight: 700;
-                text-transform: uppercase;
-                color: #94a3b8;
-            }
+                .preview-label {
+                    padding: 8px 16px 0 16px;
+                    font-size: 11px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    color: #94a3b8;
+                }
 
-            .formula-preview {
-                background: #f8fafc;
-                border: 1px solid $border-color;
-                border-radius: 6px;
-                padding: 16px;
-                min-height: 80px;
-                font-family: $font-mono;
-                font-size: 14px;
-                line-height: 2;
-                word-break: break-word;
+                .formula-preview {
+                    flex: 1;
+                    background: #fcfcfc;
+                    padding: 16px;
+                    overflow-y: auto;
+                    font-family: $font-mono;
+                    font-size: 14px;
 
-                // Syntax Highlighting Tokens (Angular ViewEncapsulation needs ::ng-deep here if scoped)
-                ::ng-deep {
-                    .badge-var {
-                        background: #eff6ff;
-                        color: #1d4ed8;
-                        border: 1px solid #dbeafe;
-                        padding: 2px 6px;
-                        border-radius: 4px;
-                        font-weight: 600;
-                        margin: 0 2px;
-                        display: inline-block;
-                    }
+                    ::ng-deep {
+                        .badge-var {
+                            background: #eff6ff;
+                            color: #1d4ed8;
+                            padding: 2px 6px;
+                            border-radius: 4px;
+                            border: 1px solid #dbeafe;
+                            display: inline-block;
+                            margin: 2px;
+                        }
 
-                    .token-op {
-                        color: #dc2626;
-                        font-weight: 900;
-                        font-size: 1.1em;
-                        margin: 0 4px;
-                    }
-
-                    .token-bracket {
-                        color: #64748b;
-                        font-weight: bold;
-                    }
-
-                    .token-number {
-                        color: #059669;
-                        font-weight: bold;
-                    }
-
-                    .token-unknown {
-                        color: #334155;
+                        .token-op {
+                            color: #dc2626;
+                            font-weight: 900;
+                            font-size: 1.1em;
+                            margin: 0 4px;
+                        }
                     }
                 }
             }
@@ -528,6 +566,8 @@ textarea {
         border-left: 1px solid $border-color;
         display: flex;
         flex-direction: column;
+        height: 100%;
+        overflow: hidden;
 
         .palette-header {
             padding: 16px;
@@ -536,11 +576,13 @@ textarea {
             color: darken($primary, 20%);
             font-weight: 700;
             font-size: 13px;
+            flex-shrink: 0;
         }
 
         .palette-list {
             padding: 12px;
             overflow-y: auto;
+            flex: 1;
 
             .palette-item {
                 padding: 8px;
@@ -571,87 +613,11 @@ textarea {
     }
 }
 
-// --- Visual Builder Nodes ---
-.rb-node {
-    background: white;
-    border: 1px solid $border-color;
-    border-radius: 8px;
-    padding: 10px;
-    margin-top: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-    transition: all 0.2s;
-
-    &:hover {
-        border-color: #94a3b8;
-    }
-
-    &.type-math {
-        border-left: 4px solid #3b82f6;
-    }
-
-    &.type-logic {
-        border-left: 4px solid #f59e0b;
-    }
-
-    &.type-data {
-        border-left: 4px solid #10b981;
-    }
-
-    &.type-const {
-        border-left: 4px solid #64748b;
-    }
-
-    &.type-comp {
-        border-left: 4px solid #8b5cf6;
-    }
-
-    .rb-header {
-        margin-bottom: 6px;
-    }
-
-    .rb-body {
-        display: flex;
-        flex-direction: column;
-
-        .rb-input {
-            width: 100px;
-            font-weight: bold;
-        }
-
-        .rb-select-var {
-            width: 200px;
-        }
-
-        .rb-label {
-            font-size: 9px;
-            font-weight: 800;
-            color: #94a3b8;
-            text-transform: uppercase;
-            margin: 8px 0 2px 0;
-        }
-
-        .rb-children {
-            margin-left: 20px;
-            padding-left: 16px;
-            border-left: 2px dashed #cbd5e1;
-            position: relative;
-
-            &::before {
-                content: '';
-                position: absolute;
-                left: -2px;
-                top: 18px;
-                width: 16px;
-                height: 2px;
-                background: #cbd5e1;
-            }
-        }
-    }
-}
-
 // --- Variable Editor ---
 .var-editor {
     padding: 24px;
+    height: 100%;
+    overflow: hidden;
 
     .var-card {
         background: $bg-white;
@@ -661,6 +627,7 @@ textarea {
         height: 100%;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
 
         .card-header {
             padding: 16px 24px;
@@ -668,6 +635,38 @@ textarea {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
+
+            .mode-switch-sm {
+                background: #f1f5f9; // Màu nền xám nhạt cho cả khung
+                padding: 4px;
+                border-radius: 8px; // Bo góc khung lớn hơn chút
+                display: flex;
+                gap: 4px; // Khoảng cách giữa các nút
+                border: 1px solid #e2e8f0;
+
+                button {
+                    font-size: 12px;
+                    padding: 6px 16px; // Nút to hơn chút cho dễ bấm
+                    border-radius: 6px;
+                    font-weight: 600;
+                    color: #64748b; // Màu chữ xám khi chưa active
+                    transition: all 0.2s ease;
+                    border: 1px solid transparent;
+
+                    &:hover {
+                        color: #334155;
+                        background: rgba(255, 255, 255, 0.6);
+                    }
+
+                    &.active {
+                        background: #ffffff; // Nền trắng nổi bật
+                        color: $primary; // Chữ màu chủ đạo (Indigo)
+                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); // Đổ bóng nhẹ
+                        border-color: #e2e8f0; // Viền mỏng
+                    }
+                }
+            }
 
             h3 {
                 margin: 0;
@@ -675,24 +674,9 @@ textarea {
                 color: $text-main;
             }
 
-            .mode-switch-sm {
-                background: #f1f5f9;
-                padding: 3px;
-                border-radius: 6px;
-
-                button {
-                    font-size: 11px;
-                    padding: 4px 12px;
-                    border-radius: 4px;
-                    font-weight: 600;
-                    color: $text-muted;
-
-                    &.active {
-                        background: white;
-                        color: $primary;
-                        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-                    }
-                }
+            .actions {
+                display: flex;
+                gap: 12px;
             }
         }
 
@@ -701,55 +685,93 @@ textarea {
             flex: 1;
             overflow-y: auto;
 
-            .form-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 16px;
-                margin-bottom: 16px;
-
-                label {
-                    display: block;
-                    font-size: 12px;
-                    font-weight: 600;
-                    color: $text-muted;
-                    margin-bottom: 4px;
-                }
-
-                .input-code {
-                    font-family: $font-mono;
-                    color: darken($success, 10%);
-                    font-weight: bold;
-                    background: #f8fafc;
-                }
-            }
-
             .wizard-panel {
-                background: #f8fafc;
-                padding: 16px;
-                border-radius: 8px;
-                border: 1px solid $border-color;
+                background: #ffffff;
+                padding: 0; // Reset padding panel nếu cần
+                margin-bottom: 24px;
 
                 label {
                     font-weight: 700;
                     color: $text-main;
                     display: block;
                     margin-bottom: 8px;
+                    font-size: 13px;
+
+                    i {
+                        color: $primary;
+                        margin-right: 6px;
+                    }
+
+                    // Icon đũa thần màu tím
                 }
 
                 select {
                     width: 100%;
-                    margin-bottom: 8px;
+                    margin-bottom: 12px;
+                    border-color: #cbd5e1;
+                    padding: 10px;
+
+                    &:focus {
+                        border-color: $primary;
+                        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+                    }
                 }
 
+                // --- 2. STYLE CHO KHUNG PREVIEW SQL ---
                 .wiz-preview {
-                    font-size: 11px;
-                    color: $text-muted;
-                    padding: 8px;
-                    background: white;
-                    border: 1px solid $border-color;
-                    border-radius: 4px;
-                    font-family: $font-mono;
+                    font-size: 13px;
+                    line-height: 1.6;
+                    color: #334155;
+                    padding: 16px;
+                    background: #f8fafc; // Nền code xám rất nhạt
+                    border: 1px solid #e2e8f0; // Border bao quanh
+                    border-radius: 8px;
+                    font-family: 'Fira Code', 'Consolas', monospace; // Font code
+
+                    // Thêm điểm nhấn: Đường viền trái màu đậm hơn
+                    border-left: 4px solid $primary;
+
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+                    word-break: break-word; // Xuống dòng nếu SQL quá dài
+
+                    // Hiệu ứng khi hover vào vùng code
+                    transition: border-color 0.2s;
+
+                    &:hover {
+                        border-color: #cbd5e1;
+                        border-left-color: $primary;
+                    }
                 }
+            }
+
+            .form-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 24px;
+                margin-bottom: 24px;
+
+                .form-group {
+                    width: 100%;
+
+                    label {
+                        display: block;
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: $text-muted;
+                        margin-bottom: 6px;
+                    }
+
+                    .input-code {
+                        font-family: $font-mono;
+                        color: darken($success, 10%);
+                        font-weight: bold;
+                        background: #f8fafc;
+                    }
+                }
+            }
+
+            .wizard-panel {
+                /* ... */
             }
 
             .sql-panel {
@@ -761,16 +783,27 @@ textarea {
 
                 .codemirror-wrapper {
                     border: 1px solid $border-color;
-                    border-radius: 4px;
+                    border-radius: 6px;
                     overflow: hidden;
-                    height: 150px;
+                    height: 300px;
+                    width: 100%;
+
+                    textarea {
+                        width: 100%;
+                        height: 100%;
+                        resize: none;
+                        padding: 12px;
+                        font-family: $font-mono;
+                        border: none;
+                        display: block;
+                    }
                 }
 
                 .hint {
-                    font-size: 10px;
+                    margin-top: 8px;
+                    font-size: 11px;
                     color: $text-muted;
                     font-style: italic;
-                    margin-top: 4px;
                 }
             }
 
@@ -794,14 +827,14 @@ textarea {
 
                 .audit-controls {
                     display: flex;
-                    gap: 12px;
                     align-items: flex-end;
+                    gap: 16px;
                     background: #faf5ff;
                     padding: 16px;
                     border: 1px solid #f3e8ff;
                     border-radius: 8px;
 
-                    .control {
+                    .control-employee {
                         flex: 1;
 
                         label {
@@ -813,18 +846,38 @@ textarea {
                             margin-bottom: 4px;
                         }
 
-                        select,
-                        input {
+                        select {
                             width: 100%;
                             border-color: #e9d5ff;
+                            height: 38px;
 
                             &:focus {
                                 border-color: purple;
                             }
                         }
+                    }
 
-                        &.w-sm {
-                            flex: 0 0 140px;
+                    .control-period {
+                        width: 180px;
+                        flex-shrink: 0;
+
+                        label {
+                            display: block;
+                            font-size: 10px;
+                            font-weight: 700;
+                            text-transform: uppercase;
+                            color: purple;
+                            margin-bottom: 4px;
+                        }
+
+                        input {
+                            width: 100%;
+                            border-color: #e9d5ff;
+                            height: 38px;
+
+                            &:focus {
+                                border-color: purple;
+                            }
                         }
                     }
                 }
