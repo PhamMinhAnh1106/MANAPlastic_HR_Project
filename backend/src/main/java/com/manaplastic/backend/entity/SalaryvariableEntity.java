@@ -5,6 +5,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.util.Map;
 
 @Getter
 @Setter
@@ -32,7 +36,7 @@ public class SalaryvariableEntity {
 
     @Lob
     @Column(name = "SQLQuery")
-    private String sQLQuery;
+    private String sqlQuery;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rule_id")
@@ -40,5 +44,9 @@ public class SalaryvariableEntity {
 
     @Column(name = "dsl_version_id")
     private Integer dslVersionId;
+
+
+    @Column(name = "builderMetadata", columnDefinition = "json")
+    private String builderMetadata;
 
 }

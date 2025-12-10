@@ -7,8 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +33,7 @@ public class AdminService {
     @Autowired
     private LeaveBalanceRepository leaveBalanceRepository;
 
+    @Transactional(rollbackFor = Exception.class)
     public UserEntity createUser(UserEntity newUser) {
         String password = String.valueOf(newUser.getCccd()); // lấy số cccd làm pass
 
@@ -43,6 +47,10 @@ public class AdminService {
 
         if (newUser.getFullname() == null || newUser.getFullname().trim().isEmpty()) {
             throw new IllegalArgumentException("Trường 'fullName' không được để trống.");
+        }
+
+        if (newUser.getGender() == null) {
+            throw new IllegalArgumentException("Trường 'gender' là bắt buộc để tính toán ngày phép.");
         }
 
         newUser.setHiredate(LocalDate.now());
@@ -92,7 +100,8 @@ public class AdminService {
             List<LeavepolicyEntity> policies = leavePolicyRepository.findPolicyMatches(
                     leaveType.getShiftnameAsEnum(),
                     0, // Nhân viên mới tinh thì thâm niên là 0
-                    user.getJobtype()
+                    user.getJobtype(),
+                    user.getGender()
             );
 
             Optional<LeavepolicyEntity> policyOpt = policies.stream().findFirst();
@@ -114,6 +123,7 @@ public class AdminService {
             newBalance.setTotalGranted(daysToGrant);
             newBalance.setCarriedOver(0); // Mới vào chưa có phép tồn
             newBalance.setDaysUsed(0);    // Mới vào chưa dùng phép
+            newBalance.setLastUpdated(Instant.now());
 
             leaveBalanceRepository.save(newBalance);
         }

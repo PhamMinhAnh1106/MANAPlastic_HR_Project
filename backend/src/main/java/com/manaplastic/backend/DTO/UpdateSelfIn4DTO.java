@@ -1,5 +1,6 @@
 package com.manaplastic.backend.DTO;
 
+import com.manaplastic.backend.constant.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +18,7 @@ public class UpdateSelfIn4DTO {
     private String cccd;
     private String email;
     private String phonenumber;
-    private Boolean gender;
+    private Gender gender;
     private LocalDate birth;
     private String address;
     private String bankAccount;

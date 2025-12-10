@@ -406,7 +406,8 @@ public class LeaverequestService {
                 List<LeavepolicyEntity> policies = leavePolicyRepository.findPolicyMatches(
                         leaveType.getShiftnameAsEnum(),
                         thamNien,
-                        user.getJobtype()
+                        user.getJobtype(),
+                        user.getGender()
                 );
                 Optional<LeavepolicyEntity> policyOpt = policies.stream().findFirst();
 

@@ -1,5 +1,6 @@
 package com.manaplastic.backend.entity;
 
+import com.manaplastic.backend.constant.Gender;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -14,6 +15,11 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "leavepolicy")
 public class LeavepolicyEntity {
 
+
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gendertarget")
+    private Gender gendertarget;
 
     public enum LeaveType {ANNUAL, SICK, MATERNITY, PATERNITY}
 
@@ -32,7 +38,7 @@ public class LeavepolicyEntity {
     private String description;
 
     @NotNull
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "leavetype", nullable = false)
     private LeaveType leavetype;
 

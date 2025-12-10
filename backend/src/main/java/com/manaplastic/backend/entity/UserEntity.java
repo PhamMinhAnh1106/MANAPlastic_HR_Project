@@ -1,5 +1,6 @@
 package com.manaplastic.backend.entity;
 
+import com.manaplastic.backend.constant.Gender;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -19,6 +20,8 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 public class UserEntity implements UserDetails {
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userID", nullable = false)
@@ -45,8 +48,9 @@ public class UserEntity implements UserDetails {
     @Column(name = "birth")
     private LocalDate birth;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "gender")
-    private Boolean gender;
+    private Gender gender;
 
     @Column(name = "address")
     private String address;

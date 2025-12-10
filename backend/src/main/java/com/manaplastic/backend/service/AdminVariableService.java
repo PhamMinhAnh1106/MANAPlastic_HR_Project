@@ -1,5 +1,7 @@
 package com.manaplastic.backend.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.manaplastic.backend.DTO.VariableRuleRequest;
 import com.manaplastic.backend.entity.SalaryvariableEntity;
 import com.manaplastic.backend.repository.SalaryVariableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,41 +16,40 @@ public class AdminVariableService {
 
     @Autowired
     private SalaryVariableRepository variableRepo;
+    @Autowired
+    private SqlGeneratorService sqlGenerator;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     public List<SalaryvariableEntity> getAllVariables() {
         return variableRepo.findAll();
     }
 
     @Transactional
-    public SalaryvariableEntity saveVariable(SalaryvariableEntity payload) {
-        // Validate dữ liệu đầu vào
-        if (payload.getCode() == null || payload.getCode().trim().isEmpty()) {
-            throw new IllegalArgumentException("Mã biến không được để trống!");
+    public SalaryvariableEntity createVariable(VariableRuleRequest request) {
+        String code = request.getCode().trim();
+
+        if (variableRepo.findByCode(code).isPresent()) {
+            throw new IllegalArgumentException("Mã biến '" + code + "' đã tồn tại!");
         }
 
-        String code = payload.getCode().trim();
-        payload.setCode(code); // trim space
+        SalaryvariableEntity entity = new SalaryvariableEntity();
+        return processAndSave(entity, request);
+    }
 
-        // Kiểm tra trùng Code
-        Optional<SalaryvariableEntity> existingOpt = variableRepo.findByCode(code);
 
-        if (payload.getId() == null) {
-            // Case: Tạo mới
-            if (existingOpt.isPresent()) {
-                throw new IllegalArgumentException("Mã biến '" + code + "' đã tồn tại!");
-            }
-        } else {
-            // Case: Cập nhật
-            if (existingOpt.isPresent()) {
-                SalaryvariableEntity existing = existingOpt.get();
-                // Nếu tìm thấy code trùng, nhưng ID lại khác ID đang sửa -> Trùng với người khác
-                if (!existing.getId().equals(payload.getId())) {
-                    throw new IllegalArgumentException("Mã biến '" + code + "' đã được sử dụng bởi biến khác!");
-                }
-            }
+    @Transactional
+    public SalaryvariableEntity updateVariable(Integer id, VariableRuleRequest request) {
+        SalaryvariableEntity entity = variableRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy biến với ID: " + id));
+
+        String newCode = request.getCode().trim();
+        Optional<SalaryvariableEntity> duplicateCheck = variableRepo.findByCode(newCode);
+        if (duplicateCheck.isPresent() && !duplicateCheck.get().getId().equals(id)) {
+            throw new IllegalArgumentException("Mã biến '" + newCode + "' đã được sử dụng!");
         }
 
-        return variableRepo.save(payload);
+        return processAndSave(entity, request);
     }
 
     @Transactional
@@ -57,5 +58,27 @@ public class AdminVariableService {
             throw new IllegalArgumentException("Biến không tồn tại với ID: " + id);
         }
         variableRepo.deleteById(id);
+    }
+
+   // Dùng chung cho save và úpdate
+    private SalaryvariableEntity processAndSave(SalaryvariableEntity entity, VariableRuleRequest request) {
+        // Map thông tin cơ bản
+        entity.setCode(request.getCode().trim());
+        entity.setName(request.getName());
+        entity.setDescription(request.getDescription());
+
+        // Sinh SQL từ JSON Logic (Core feature)
+        String generatedSql = sqlGenerator.generateSql(request);
+        entity.setSqlQuery(generatedSql);
+
+        // Lưu Metadata (JSON gốc) để UI load lại form
+        try {
+            String metadataJson = objectMapper.writeValueAsString(request);
+            entity.setBuilderMetadata(metadataJson);
+        } catch (Exception e) {
+            System.err.println("Lỗi parse metadata: " + e.getMessage());
+        }
+
+        return variableRepo.save(entity);
     }
 }

@@ -22,7 +22,7 @@ public class AdminRuleController {
     private JdbcTemplate jdbcTemplate;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('HR') or hasAuthority('Admin')")
+    @PreAuthorize("hasAnyAuthority('HR','Admin')")
     public ResponseEntity<?> getAllRules() {
         // Ép kiểu created_at sang String (DATE_FORMAT) để tránh lỗi Java Time
         String sql = """
@@ -44,7 +44,7 @@ public class AdminRuleController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('HR') or hasAuthority('Admin')")
+    @PreAuthorize("hasAnyAuthority('HR','Admin')")
     public ResponseEntity<?> saveRule(@RequestBody Map<String, String> payload) {
         try {
             String code = payload.get("code");
@@ -60,7 +60,7 @@ public class AdminRuleController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('HR') or hasAuthority('Admin')")
+    @PreAuthorize("hasAnyAuthority('HR','Admin')")
     public ResponseEntity<?> deleteRule(@PathVariable int id) {
         adminService.deleteRule(id);
         return ResponseEntity.ok("Đã ẩn công thức này.");

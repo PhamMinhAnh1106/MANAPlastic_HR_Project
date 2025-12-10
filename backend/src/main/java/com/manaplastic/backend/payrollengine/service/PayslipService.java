@@ -26,7 +26,7 @@ public class PayslipService {
     @Autowired
     private PayrollsRepository payrollRepository;
 
-   // Lấy phiếu lương chi tiết
+    // Lấy phiếu lương chi tiết
     public Map<String, Object> getMyPayslip(Integer userId, int month, int year) {
         String payPeriod = String.format("%d-%02d", year, month);
         Map<String, Object> payslip = new HashMap<>();
@@ -103,7 +103,7 @@ public class PayslipService {
         payslip.put("company_contributions", companyCosts);
         payslip.put("net_salary", netSalary);
 
-    // chi tiết thưởng phạt
+        // chi tiết thưởng phạt
         String startDate = year + "-" + month + "-01";
         String endDate = year + "-" + month + "-31";
         String sqlDetails = "SELECT Type, Reason, Amount, DecisionDate FROM rewardpunishmentdecisions WHERE UserID = ? AND Status IN ('APPROVED', 'PROCESSED') AND DecisionDate BETWEEN ? AND ?";

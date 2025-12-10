@@ -90,21 +90,58 @@ public class PayrollEngineService {
         }
     }
 
+
     private void saveFinalPayroll(Integer empId, String period, Map<String, BigDecimal> ctx) {
-        String sql = "UPDATE payrolls SET " +
-                "netsalary = ?, totalincome = ?, PIT = ?, basesalary = ?, " +
-                "bhxh_emp = ?, bhyt_emp = ?, bhtn_emp = ? " +
-                "WHERE userID = ? AND payperiod = ?";
+        String sql = """
+                    INSERT INTO payrolls (
+                        userID, payperiod, status,
+                        netsalary, totalincome, 
+                        pit, bhxh_emp, bhyt_emp, bhtn_emp,
+                        basesalarysnapshot, insurancesalarysnapshot, 
+                        standardworkdays, actualworkdays, othours, dependentcount
+                    ) VALUES (
+                        ?, ?, 'DRAFT',
+                        ?, ?, 
+                        ?, ?, ?, ?,
+                        ?, ?, 
+                        ?, ?, ?, ?
+                    )
+                    ON DUPLICATE KEY UPDATE
+                        netsalary = VALUES(netsalary),
+                        totalincome = VALUES(totalincome),
+                        pit = VALUES(pit),
+                        bhxh_emp = VALUES(bhxh_emp),
+                        bhyt_emp = VALUES(bhyt_emp),
+                        bhtn_emp = VALUES(bhtn_emp),
+                        basesalarysnapshot = VALUES(basesalarysnapshot),
+                        insurancesalarysnapshot = VALUES(insurancesalarysnapshot),
+                        standardworkdays = VALUES(standardworkdays),
+                        actualworkdays = VALUES(actualworkdays),
+                        othours = VALUES(othours),
+                        dependentcount = VALUES(dependentcount),
+                        status = 'DRAFT'
+                """;
 
         jdbcTemplate.update(sql,
+                empId, period,
+
+                // Kết quả tính toán (Output Rules)
                 ctx.getOrDefault("NET_SALARY", BigDecimal.ZERO),
                 ctx.getOrDefault("TOTAL_INCOME", BigDecimal.ZERO),
                 ctx.getOrDefault("PIT_TAX", BigDecimal.ZERO),
-                ctx.getOrDefault("BASE_SALARY", BigDecimal.ZERO),
                 ctx.getOrDefault("BHXH_EMP", BigDecimal.ZERO),
                 ctx.getOrDefault("BHYT_EMP", BigDecimal.ZERO),
                 ctx.getOrDefault("BHTN_EMP", BigDecimal.ZERO),
-                empId, period
+
+                // Dữ liệu Snapshot (Input Variables - Lấy từ salaryvariables)
+                ctx.getOrDefault("BASE_SALARY", BigDecimal.ZERO),       // basesalarysnapshot
+                ctx.getOrDefault("INSURANCE_SALARY", BigDecimal.ZERO),  // insurancesalarysnapshot
+                ctx.getOrDefault("STD_DAYS", BigDecimal.ZERO),          // standardworkdays
+                ctx.getOrDefault("REAL_WORK_DAYS", BigDecimal.ZERO),    // actualworkdays
+
+                // Lưu ý: Nếu biến OT HOURS chưa có, lấy tạm tiền OT hoặc 0
+                ctx.getOrDefault("TOTAL_OT_HOURS", BigDecimal.ZERO),    // othours
+                ctx.getOrDefault("DEPENDENT_COUNT", BigDecimal.ZERO)    // dependentcount
         );
     }
 }

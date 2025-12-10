@@ -2,6 +2,7 @@ package com.manaplastic.backend.DTO;
 
 // package com.manaplastic.backend.DTO;
 
+import com.manaplastic.backend.constant.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +21,7 @@ public class UpdateAccountDTO {
     private String phonenumber;
     private String address;
     private String cccd;
-    private Boolean gender;
+    private Gender gender;
     private LocalDate birth;
     private String bankAccount;
     private String bankName;
