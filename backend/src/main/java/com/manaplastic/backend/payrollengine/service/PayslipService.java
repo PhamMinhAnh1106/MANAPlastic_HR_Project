@@ -64,12 +64,15 @@ public class PayslipService {
         }
 
         //  Lấy chi tiết các biến
-        String sqlItems =
-                "SELECT r.rule_code, r.name, svc.value " +
-                        "FROM salary_variable_cache svc " +
-                        "JOIN salary_rule r ON svc.variable_id = r.rule_id " +
-                        "WHERE svc.employee_id = ? AND svc.payperiod = ? " +
-                        "ORDER BY r.priority ASC";
+        String sqlItems = """
+                SELECT r.rule_code, r.name, svc.value 
+                FROM salary_variable_cache svc 
+                JOIN salary_rule r ON svc.rule_id = r.rule_id  -- <--- ĐÃ SỬA: JOIN theo rule_id
+                WHERE svc.employee_id = ? 
+                  AND svc.payperiod = ? 
+                  AND svc.rule_id IS NOT NULL -- Chỉ lấy kết quả Rule, không lấy Variable input
+                ORDER BY r.priority ASC
+                """;
 
         List<Map<String, Object>> items = jdbcTemplate.queryForList(sqlItems, userId, payPeriod);
 
