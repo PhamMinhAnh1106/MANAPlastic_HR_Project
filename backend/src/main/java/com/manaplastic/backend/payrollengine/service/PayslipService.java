@@ -126,13 +126,19 @@ public class PayslipService {
                 .jobType(entity.getUserID().getJobtype())
                 .payPeriod(entity.getPayperiod())
 
-                .baseSalary(entity.getBasesalary())
+                .baseSalary(entity.getBasesalarysnapshot())
                 .actualWorkDays(entity.getActualworkdays())
                 .totalIncome(entity.getTotalincome())   // Tổng thu nhập
                 .netSalary(entity.getNetsalary())       // Thực lĩnh
 
-                .totalAllowance(entity.getTotalallowance())
-                .totalOvertimePay(entity.getTotalovertimepay())
+                .bhxhEmp(entity.getBhxhEmp())
+                .bhytEmp(entity.getBhytEmp())
+                .bhtnEmp(entity.getBhtnEmp())
+
+                .bhxhComp(entity.getBhxhComp())
+                .bhytComp(entity.getBhytComp())
+                .bhtnComp(entity.getBhtnComp())
+
                 .pit(entity.getPit())
                 .build()
         );

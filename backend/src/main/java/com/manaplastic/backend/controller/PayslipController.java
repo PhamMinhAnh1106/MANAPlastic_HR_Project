@@ -87,11 +87,7 @@ public class PayslipController {
             @RequestParam int month,
             @RequestParam int year
     ) {
-        try {
             Map<String, Object> payslipDetail = payslipService.getMyPayslip(userId, month, year);
             return ResponseEntity.ok(payslipDetail);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Lỗi lấy chi tiết lương: " + e.getMessage());
-        }
     }
 }

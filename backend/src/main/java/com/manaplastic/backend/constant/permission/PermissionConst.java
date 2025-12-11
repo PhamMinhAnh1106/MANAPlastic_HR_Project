@@ -55,4 +55,7 @@ public final class PermissionConst {
     // --- H. ĐÁNH GIÁ ---
     public static final String EVALUATE_VIEW = "EVALUATE_VIEW";
     public static final String EVALUATE_CREATE = "EVALUATE_CREATE";
+
+    // --- I. LỊCH LÀM ---
+
 }

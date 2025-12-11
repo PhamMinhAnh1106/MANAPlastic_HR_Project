@@ -69,14 +69,9 @@ public class LeaverequestController {
     @RequiredPermission(PermissionConst.LEAVE_CANCEL)
     public ResponseEntity<String> deleteMyLeaveRequest(@PathVariable("id") Integer leaveRequestId,
                                                        @AuthenticationPrincipal UserEntity currentUser) {
-        try {
             leaverequestService.deleteMyLeaveRequest(leaveRequestId, currentUser);
             String responseMessage = "Đã xóa đơn nghỉ phép thành công.";
             return ResponseEntity.ok(responseMessage);
-
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
     }
     //Lọc đơn
 //    @GetMapping("/user/leaverequest/filter")
@@ -136,12 +131,8 @@ public class LeaverequestController {
     @RequiredPermission(PermissionConst.LEAVE_APPROVE)
     public ResponseEntity<String> approveRequest(@PathVariable("id") Integer leaveRequestId,
                                                  @AuthenticationPrincipal UserEntity currentUser) {
-        try {
             leaverequestService.approveRequest(leaveRequestId,currentUser);
             return ResponseEntity.ok("Đã duyệt (APPROVED) đơn nghỉ phép thành công. Email thông báo đang được gửi.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
     }
 
     @PatchMapping("/user/leaverequest/reject/{id}")
@@ -149,12 +140,9 @@ public class LeaverequestController {
     @RequiredPermission(PermissionConst.LEAVE_APPROVE)
     public ResponseEntity<String> rejectRequest(@PathVariable("id") Integer leaveRequestId,
                                                 @AuthenticationPrincipal UserEntity currentUser) {
-        try {
             leaverequestService.rejectRequest(leaveRequestId,currentUser);
             return ResponseEntity.ok("Đã từ chối (REJECTED) đơn nghỉ phép. Email thông báo đang được gửi.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+
     }
 
     @GetMapping("/user/leaverequest/myBalances")

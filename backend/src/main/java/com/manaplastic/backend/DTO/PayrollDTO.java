@@ -25,8 +25,6 @@ public class PayrollDTO {
     private BigDecimal pit;
     private BigDecimal netSalary;
 
-    private BigDecimal insuranceBase;
-    private BigDecimal insuranceEmp;
 
     private BigDecimal bhxhEmp;
     private BigDecimal bhytEmp;
@@ -36,6 +34,5 @@ public class PayrollDTO {
     private BigDecimal bhytComp;
     private BigDecimal bhtnComp;
 
-    private BigDecimal otTaxExempt;
 
 }

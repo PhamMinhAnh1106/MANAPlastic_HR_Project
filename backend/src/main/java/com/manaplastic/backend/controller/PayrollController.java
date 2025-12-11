@@ -36,7 +36,6 @@ public class PayrollController {
     public ResponseEntity<?> calculatePayroll(
             @RequestParam int month,
             @RequestParam int year) {
-        try {
             if (month < 1 || month > 12) {
                 return ResponseEntity.badRequest().body("Tháng không hợp lệ!");
             }
@@ -59,10 +58,6 @@ public class PayrollController {
                 message += ". Chi tiết lỗi: " + errors.toString();
             }
             return ResponseEntity.ok().body(message);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("Lỗi hệ thống: " + e.getMessage());
-        }
     }
 
 
@@ -73,7 +68,6 @@ public class PayrollController {
             @RequestParam int employeeId,
             @RequestParam int month,
             @RequestParam int year) {
-        try {
             String payPeriod = year + "-" + (month < 10 ? "0" + month : month);
 
             String sql = """
@@ -95,8 +89,5 @@ public class PayrollController {
 
             List<Map<String, Object>> results = jdbcTemplate.queryForList(sql, employeeId, payPeriod);
             return ResponseEntity.ok(results);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Lỗi debug: " + e.getMessage());
-        }
     }
 }

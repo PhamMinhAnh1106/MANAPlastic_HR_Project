@@ -1,5 +1,6 @@
 package com.manaplastic.backend.entity;
 
+import com.manaplastic.backend.constant.LogType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,5 +31,14 @@ public class ActivitylogEntity {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "userID")
     private com.manaplastic.backend.entity.UserEntity userID;
+
+    @ColumnDefault("'INFO'")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "logType")
+    private LogType logType;
+
+    @Lob
+    @Column(name = "details")
+    private String details;
 
 }

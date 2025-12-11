@@ -38,13 +38,9 @@ public class PermissionController {
     @PostMapping("/update")
     @RequiredPermission(PermissionConst.ACCOUNT_PERMISSION)
     public ResponseEntity<String> updatePermission(@RequestBody UpdateUserPermissionDTO request) {
-        try {
             permissionManageService.updateUserPermission(request);
             String action = (request.getActivePermission() == 1) ? "CẤP (Whitelist)" : "CHẶN (Blacklist)";
             return ResponseEntity.ok("Đã " + action + " quyền thành công cho user.");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Lỗi: " + e.getMessage());
-        }
     }
 
     // Xóa cấu hình (Reset về mặc định Role)
@@ -66,11 +62,8 @@ public class PermissionController {
             @PathVariable Integer permissionId,
             @RequestParam String username
     ) {
-        try {
-            permissionManageService.resetUserPermission(username, permissionId);
-            return ResponseEntity.ok("Đã reset quyền (ID: " + permissionId + ") của user [" + username + "] về mặc định.");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Lỗi: " + e.getMessage());
-        }
+
+        permissionManageService.resetUserPermission(username, permissionId);
+        return ResponseEntity.ok("Đã reset quyền (ID: " + permissionId + ") của user [" + username + "] về mặc định.");
     }
 }

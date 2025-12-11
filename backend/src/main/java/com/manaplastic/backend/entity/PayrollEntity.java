@@ -19,20 +19,6 @@ public class PayrollEntity {
     @Column(name = "payID", nullable = false)
     private Integer id;
 
-    @Column(name = "basesalary", nullable = false, precision = 15, scale = 2)
-    private BigDecimal basesalary;
-
-    @ColumnDefault("0.00")
-    @Column(name = "bonus", precision = 15, scale = 2)
-    private BigDecimal bonus;
-
-    @ColumnDefault("0.00")
-    @Column(name = "penalty", precision = 15, scale = 2)
-    private BigDecimal penalty;
-
-    @Column(name = "hoursofwork")
-    private Float hoursofwork;
-
     @ColumnDefault("0.00")
     @Column(name = "PIT", precision = 15, scale = 2)
     private BigDecimal pit;
@@ -52,32 +38,10 @@ public class PayrollEntity {
     @Column(name = "totalincome", precision = 15, scale = 2)
     private BigDecimal totalincome;
 
-    @ColumnDefault("0.00")
-    @Column(name = "totalinsuranceemployee", precision = 15, scale = 2)
-    private BigDecimal totalinsuranceemployee;
-
-    @ColumnDefault("0.00")
-    @Column(name = "assessableincome", precision = 15, scale = 2)
-    private BigDecimal assessableincome;
-
-    @ColumnDefault("0.00")
-    @Column(name = "taxableincome", precision = 15, scale = 2)
-    private BigDecimal taxableincome;
 
     @ColumnDefault("0")
     @Column(name = "actualworkdays")
     private Double actualworkdays;
-
-    @ColumnDefault("0.00")
-    @Column(name = "totalovertimepay", precision = 15, scale = 2)
-    private BigDecimal totalovertimepay;
-
-    @ColumnDefault("0.00")
-    @Column(name = "totalallowance", precision = 15, scale = 2)
-    private BigDecimal totalallowance;
-
-    @Column(name = "insurancebase", precision = 15, scale = 2)
-    private BigDecimal insurancebase;
 
     @Column(name = "bhxh_emp", precision = 15, scale = 2)
     private BigDecimal bhxhEmp;
@@ -97,13 +61,29 @@ public class PayrollEntity {
     @Column(name = "bhtn_comp", precision = 15, scale = 2)
     private BigDecimal bhtnComp;
 
-    @ColumnDefault("0.00")
-    @Column(name = "OtTaxExempt", precision = 15, scale = 2)
-    private BigDecimal otTaxExempt;
-
     @ColumnDefault("'DRAFT'")
     @Lob
     @Column(name = "status")
     private String status;
+
+    @ColumnDefault("0.00")
+    @Column(name = "basesalarysnapshot", precision = 15, scale = 2)
+    private BigDecimal basesalarysnapshot;
+
+    @ColumnDefault("0.00")
+    @Column(name = "insurancesalarysnapshot", precision = 15, scale = 2)
+    private BigDecimal insurancesalarysnapshot;
+
+    @ColumnDefault("26.00")
+    @Column(name = "standardworkdays", precision = 4, scale = 2)
+    private BigDecimal standardworkdays;
+
+    @ColumnDefault("0.00")
+    @Column(name = "othours", precision = 5, scale = 2)
+    private BigDecimal othours;
+
+    @ColumnDefault("0")
+    @Column(name = "dependentcount")
+    private Integer dependentcount;
 
 }

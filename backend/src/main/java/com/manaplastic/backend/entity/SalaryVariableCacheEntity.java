@@ -34,4 +34,7 @@ public class SalaryVariableCacheEntity {
     @Column(name = "evaluated_at")
     private Instant evaluatedAt;
 
+    @Column(name = "rule_id")
+    private Integer ruleId;
+
 }

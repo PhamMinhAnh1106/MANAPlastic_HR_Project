@@ -93,8 +93,6 @@ public class AdminVariableController {
         try {
             variableService.deleteVariable(id);
             return ResponseEntity.ok("Đã xóa biến thành công.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
         } catch (Exception e) {
             // Thường là lỗi Foreign Key constraint nếu biến đang được dùng
             return ResponseEntity.badRequest().body("Không thể xóa biến này (có thể đang được sử dụng trong công thức hoặc lịch sử lương).");

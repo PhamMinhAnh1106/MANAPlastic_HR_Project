@@ -106,16 +106,17 @@ public class ScheduleController {
         return ResponseEntity.ok(officialSchedules);
     }
 
-    @PutMapping("/manager/shiftSchedule/official/batch")
-    @PreAuthorize("hasAuthority('Manager')")
-    @RequiredPermission(PermissionConst.SHIFT_ASSIGN)
-    public ResponseEntity<?> updateDepartmentOfficialSchedule(
-            @AuthenticationPrincipal UserEntity manager,
-            @RequestBody List<ManagerOfficialUpdateDTO> dtos
-    ) {
-        scheduleService.updateOfficialScheduleBatch(dtos, manager.getId());
-        return ResponseEntity.ok("Đã cập nhật lịch chính thức.");
-    }
+//    @PutMapping("/manager/shiftSchedule/official/batch")
+//    @PreAuthorize("hasAuthority('Manager')")
+//    @RequiredPermission(PermissionConst.SHIFT_ASSIGN)
+//    public ResponseEntity<?> updateDepartmentOfficialSchedule(
+//            @AuthenticationPrincipal UserEntity manager,
+//            @RequestBody List<ManagerOfficialUpdateDTO> dtos
+//    ) {
+//        scheduleService.updateOfficialScheduleBatch(dtos, manager.getId());
+//        return ResponseEntity.ok("Đã cập nhật lịch chính thức.");
+//    }
+    // muốn sửa lịch thì phải duyệt hoặc từ chối đơn xin đổi ca
 
 
 

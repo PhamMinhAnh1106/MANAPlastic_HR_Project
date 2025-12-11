@@ -84,23 +84,23 @@ public class AdminController {
     @PutMapping("/updateProfile")
     @RequiredPermission(PermissionConst.PROFILE_UPDATE)
     public ResponseEntity<String> updateMyProfile(@AuthenticationPrincipal UserEntity currentUser, @RequestBody UpdateSelfIn4DTO updateRequest) {
-        try {
+//        try {
             userService.updateUserProfile(currentUser.getId(), updateRequest);
             String responseMessage = "Tài khoản đã được cập nhật thành công.";
             return ResponseEntity.ok(responseMessage);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+//        } catch (IllegalArgumentException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//        }
     }
 
     @PutMapping("/changePass")
     public ResponseEntity<String> changePassword(@AuthenticationPrincipal UserEntity currentUser, @RequestBody ChangePasswordDTO request) {
-        try {
+//        try {
             userService.changeUserPassword(currentUser, request.getOldPassword(), request.getNewPassword());
             return ResponseEntity.ok("Đổi mật khẩu thành công.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+//        } catch (IllegalArgumentException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//        }
     }
 
     // Bộ lọc user theo các tiêu chi
