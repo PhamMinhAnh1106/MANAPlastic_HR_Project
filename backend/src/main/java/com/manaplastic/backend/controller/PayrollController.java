@@ -61,33 +61,55 @@ public class PayrollController {
     }
 
 
-    @GetMapping("/debug-details") // TEST xem lương, công thức
+    // TEST xem lương, công thức
+    @GetMapping("/debug-details")
     @PreAuthorize("hasAuthority('HR')")
     @RequiredPermission(PermissionConst.PAYROLL_VIEW_ALL)
     public ResponseEntity<?> getPayrollDebugDetails(
             @RequestParam int employeeId,
             @RequestParam int month,
             @RequestParam int year) {
-            String payPeriod = year + "-" + (month < 10 ? "0" + month : month);
 
-            String sql = """
-                SELECT 
-                    COALESCE(r.rule_code, v.Code) as code,
-                    COALESCE(r.name, v.Name) as name,
-                    svc.value,
-                    svc.evaluated_at,
-                    -- Lấy công thức từ Rule Version mới nhất
-                    (SELECT dsl_json FROM salary_rule_version srv WHERE srv.version_id = r.current_version_id) as formula_dsl,
-                    v.Description as input_desc,
-                    v.SQLQuery as input_sql
-                FROM salary_variable_cache svc
-                LEFT JOIN salary_rule r ON svc.variable_id = r.rule_id
-                LEFT JOIN salaryvariables v ON r.rule_code = v.Code OR (r.rule_id IS NULL AND svc.variable_id IS NULL) -- Logic join tạm thời
-                WHERE svc.employee_id = ? AND svc.payperiod = ?
-                ORDER BY svc.evaluated_at ASC
-            """;
+        String payPeriod = year + "-" + (month < 10 ? "0" + month : month);
 
-            List<Map<String, Object>> results = jdbcTemplate.queryForList(sql, employeeId, payPeriod);
-            return ResponseEntity.ok(results);
+        String sql = """
+                    SELECT 
+                        -- Xác định Code: Ưu tiên Rule Code, nếu null thì lấy Variable Code
+                        CASE 
+                            WHEN svc.rule_id IS NOT NULL THEN r.rule_code
+                            WHEN svc.variable_id IS NOT NULL THEN v.Code
+                            ELSE 'UNKNOWN'
+                        END as code,
+                
+                        -- Xác định Name
+                        CASE 
+                            WHEN svc.rule_id IS NOT NULL THEN r.name
+                            WHEN svc.variable_id IS NOT NULL THEN v.Name
+                            ELSE 'Không xác định'
+                        END as name,
+                
+                        svc.value,
+                        svc.evaluated_at,
+                
+                        -- Lấy công thức DSL (Chỉ có nếu là Rule)
+                        (SELECT dsl_json FROM salary_rule_version srv WHERE srv.version_id = r.current_version_id) as formula_dsl,
+                
+                        -- Lấy mô tả/SQL gốc (Chỉ có nếu là Variable)
+                        v.Description as input_desc,
+                        v.SQLQuery as input_sql
+                
+                    FROM salary_variable_cache svc
+                    -- Join Bảng Rule nếu dòng cache này lưu Rule
+                    LEFT JOIN salary_rule r ON svc.rule_id = r.rule_id
+                    -- Join Bảng Variable nếu dòng cache này lưu Variable
+                    LEFT JOIN salaryvariables v ON svc.variable_id = v.VariableID
+                
+                    WHERE svc.employee_id = ? 
+                      AND svc.payperiod = ?
+                    ORDER BY svc.evaluated_at ASC, svc.cache_id ASC
+                """;
+
+        List<Map<String, Object>> results = jdbcTemplate.queryForList(sql, employeeId, payPeriod);
+        return ResponseEntity.ok(results);
     }
 }
