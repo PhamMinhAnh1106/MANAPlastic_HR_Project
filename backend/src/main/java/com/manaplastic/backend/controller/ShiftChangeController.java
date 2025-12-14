@@ -2,6 +2,8 @@ package com.manaplastic.backend.controller;
 
 import com.manaplastic.backend.DTO.ShiftChangeDTO;
 
+import com.manaplastic.backend.DTO.ShiftChangeFilterCriteria;
+import com.manaplastic.backend.constant.RequestStatus;
 import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
 import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
@@ -18,6 +20,16 @@ import org.springframework.web.bind.annotation.*;
 public class ShiftChangeController {
 
     private final ShiftChangeService service;
+
+    // Lấy ds đơn xin đổi ca
+    @GetMapping("/filter")
+    public ResponseEntity<?> getShiftChangeRequests(
+            @ModelAttribute ShiftChangeFilterCriteria criteria,
+            @AuthenticationPrincipal UserEntity currentUser
+    ) {
+        var result = service.getRequests(criteria, currentUser.getId());
+        return ResponseEntity.ok(result);
+    }
 
     //Yêu cầu đổi
     @PostMapping

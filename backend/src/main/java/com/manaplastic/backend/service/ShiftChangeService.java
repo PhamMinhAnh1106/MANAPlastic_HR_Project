@@ -1,18 +1,24 @@
 package com.manaplastic.backend.service;
 
 import com.manaplastic.backend.DTO.ShiftChangeDTO;
+import com.manaplastic.backend.DTO.ShiftChangeFilterCriteria;
+import com.manaplastic.backend.DTO.ShiftChangeListDTO;
 import com.manaplastic.backend.constant.LogType;
 import com.manaplastic.backend.constant.RequestStatus;
 import com.manaplastic.backend.entity.*; // Import hết các entity
+import com.manaplastic.backend.filters.ShiftChangeFilter;
 import com.manaplastic.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -180,5 +186,56 @@ public class ShiftChangeService {
         schedule.setPublishedDate(Instant.now());
 
         scheduleRepo.save(schedule);
+    }
+
+    // Lấy ds YC đổi ca
+    public List<ShiftChangeListDTO> getRequests(ShiftChangeFilterCriteria criteria, Integer currentUserId) {
+        UserEntity currentUser = getUserOrThrow(currentUserId);
+
+        boolean isManager = currentUser.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("Manager"));
+
+        if (isManager) {
+            if (currentUser.getDepartmentID() != null) {
+                criteria.setDepartmentId(currentUser.getDepartmentID().getId());
+            }
+        } else { // là nhân viên
+            criteria.setEmployeeId(currentUser.getId());
+            criteria.setDepartmentId(null);
+        }
+
+        Specification<ShiftChangeRequestEntity> spec = ShiftChangeFilter.withCriteria(criteria);
+
+        List<ShiftChangeRequestEntity> requests = requestRepo.findAll(spec);
+
+        return requests.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    private ShiftChangeListDTO convertToDTO(ShiftChangeRequestEntity entity) {
+        return ShiftChangeListDTO.builder()
+                .id(entity.getId())
+                .employeeId(entity.getEmployeeID().getId())
+                .employeeName(entity.getEmployeeID().getFullname())
+                .departmentName(entity.getEmployeeID().getDepartmentID() != null
+                        ? entity.getEmployeeID().getDepartmentID().getDepartmentname() : "N/A")
+                .targetDate(entity.getDate())
+                .currentShiftName(entity.getCurrentShiftID() != null
+                        ? getShiftNameById(entity.getCurrentShiftID()) : "Ngày nghỉ")
+                .newShiftName(entity.getNewShiftID() != null
+                        ? entity.getNewShiftID().getShiftname() : "Xin nghỉ (Off)")
+                .reason(entity.getReason())
+                .status(entity.getStatus())
+                .approverName(entity.getApproverID() != null ? entity.getApproverID().getFullname() : null)
+                .createdAt(entity.getCreatedAt())
+                .build();
+    }
+
+    private String getShiftNameById(Integer shiftId) {
+        return shiftRepository.findById(shiftId)
+                .map(ShiftEntity::getShiftname)
+                .orElse("Unknown Shift");
     }
 }
