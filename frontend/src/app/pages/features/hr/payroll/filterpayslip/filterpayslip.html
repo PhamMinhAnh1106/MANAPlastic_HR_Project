@@ -1,0 +1,232 @@
+    <div class="main-container">
+      
+      <!-- Header -->
+      <div class="header">
+        <h1 class="page-title">Chi Tiết Bảng Lương</h1>
+        <p class="page-subtitle">Hệ thống tra cứu và lọc dữ liệu lương nhân viên</p>
+      </div>
+
+      <!-- Filter Section -->
+      <div class="filter-card">
+        <div class="filter-grid">
+          
+          <div class="form-group">
+            <label>Mã Phòng Ban</label>
+            <input 
+              type="number" 
+              [(ngModel)]="filters.departmentId" 
+              placeholder="Nhập ID..."
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Lương tối thiểu</label>
+            <input 
+              type="number" 
+              [(ngModel)]="filters.minSalary" 
+              placeholder="VD: 10,000,000"
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Lương tối đa</label>
+            <input 
+              type="number" 
+              [(ngModel)]="filters.maxSalary" 
+              placeholder="VD: 20,000,000"
+            >
+          </div>
+
+           <div class="form-group">
+            <label>Kỳ Lương</label>
+            <input 
+              type="month" 
+              [(ngModel)]="filters.payPeriod" 
+            >
+          </div>
+
+          <div class="actions">
+            <button 
+              (click)="onFilter()"
+              class="btn btn-primary"
+              [disabled]="loading()"
+            >
+              <span *ngIf="loading()" class="spinner"></span>
+              {{ loading() ? 'Đang tải' : 'Tìm kiếm' }}
+            </button>
+            <button 
+              (click)="resetFilters()"
+              class="btn btn-secondary"
+            >
+              Xóa
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="error()" class="alert alert-error">
+        <strong>Lỗi:</strong> {{ error() }}
+      </div>
+
+      <!-- Main Data Table -->
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <!-- Cột ID -->
+                <th class="sticky-col col-id text-center sortable" (click)="onSort('userId')">
+                  ID 
+                  <span class="sort-icon" *ngIf="sortField() === 'userId'">
+                    {{ sortDirection() === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </th>
+                
+                <!-- Cột Họ và Tên -->
+                <th class="sticky-col col-name sortable" (click)="onSort('fullName')">
+                  Họ và Tên
+                  <span class="sort-icon" *ngIf="sortField() === 'fullName'">
+                    {{ sortDirection() === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </th>
+                
+                <!-- Cột Phòng Ban -->
+                <th class="sortable" (click)="onSort('departmentName')">
+                  Phòng Ban
+                  <span class="sort-icon" *ngIf="sortField() === 'departmentName'">
+                    {{ sortDirection() === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </th>
+                
+                <th>Loại HĐ</th>
+                <th>Kỳ Lương</th>
+                
+                <!-- Cột Lương CB -->
+                <th class="text-right sortable" (click)="onSort('baseSalary')">
+                  Lương CB
+                  <span class="sort-icon" *ngIf="sortField() === 'baseSalary'">
+                    {{ sortDirection() === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </th>
+                
+                <!-- Cột Ngày Công -->
+                <th class="text-center sortable" (click)="onSort('actualWorkDays')">
+                  Ngày Công
+                  <span class="sort-icon" *ngIf="sortField() === 'actualWorkDays'">
+                    {{ sortDirection() === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </th>
+                
+                <th class="text-right">Làm thêm</th>
+                <th class="text-right">Phụ cấp</th>
+                
+                <!-- Cột Tổng Thu Nhập -->
+                <th class="text-right bg-green-light sortable" (click)="onSort('totalIncome')">
+                  Tổng Thu Nhập
+                  <span class="sort-icon" *ngIf="sortField() === 'totalIncome'">
+                    {{ sortDirection() === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </th>
+                
+                <th class="text-right">Thu nhập chịu thuế</th>
+                <th class="text-right text-red">Thuế TNCN</th>
+                
+                <!-- Insurance Emp -->
+                <th class="text-right bg-orange-light">BHXH (NV)</th>
+                <th class="text-right bg-orange-light">BHYT (NV)</th>
+                <th class="text-right bg-orange-light">BHTN (NV)</th>
+
+                <!-- Insurance Comp -->
+                <th class="text-right bg-blue-light">BHXH (Cty)</th>
+                <th class="text-right bg-blue-light">BHYT (Cty)</th>
+                <th class="text-right bg-blue-light">BHTN (Cty)</th>
+
+                <!-- Cột Thực Lĩnh -->
+                <th class="text-right sticky-col col-net bg-blue-medium sortable" (click)="onSort('netSalary')">
+                  Thực Lĩnh
+                  <span class="sort-icon" *ngIf="sortField() === 'netSalary'">
+                    {{ sortDirection() === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of data()?.content; let i = index; let odd = odd" [class.row-odd]="odd">
+                <!-- Sticky ID -->
+                <td class="sticky-col col-id text-center">{{ item.userId }}</td>
+                <!-- Sticky Name -->
+                <td class="sticky-col col-name font-bold">{{ item.fullName }}</td>
+                
+                <td>{{ item.departmentName }}</td>
+                <td>
+                   <span class="badge" [class.badge-normal]="item.jobType === 'NORMAL'">
+                     {{ item.jobType }}
+                   </span>
+                </td>
+                <td class="text-gray">{{ item.payPeriod }}</td>
+                <td class="text-right font-mono">{{ item.baseSalary | number:'1.0-0' }}</td>
+                <td class="text-center font-bold">{{ item.actualWorkDays }}</td>
+                <td class="text-right font-mono text-gray">{{ (item.totalOvertimePay || 0) | number:'1.0-0' }}</td>
+                <td class="text-right font-mono text-gray">{{ (item.totalAllowance || 0) | number:'1.0-0' }}</td>
+                <td class="text-right font-mono font-bold text-green bg-green-light">{{ item.totalIncome | number:'1.0-0' }}</td>
+                <td class="text-right font-mono text-gray">{{ (item.taxableIncome || 0) | number:'1.0-0' }}</td>
+                <td class="text-right font-mono text-red">{{ item.pit | number:'1.0-0' }}</td>
+                
+                <!-- Insurance Emp -->
+                <td class="text-right font-mono text-gray bg-orange-light">{{ item.bhxhEmp | number:'1.0-0' }}</td>
+                <td class="text-right font-mono text-gray bg-orange-light">{{ item.bhytEmp | number:'1.0-0' }}</td>
+                <td class="text-right font-mono text-gray bg-orange-light">{{ item.bhtnEmp | number:'1.0-0' }}</td>
+
+                 <!-- Insurance Comp -->
+                <td class="text-right font-mono text-gray bg-blue-light">{{ item.bhxhComp | number:'1.0-0' }}</td>
+                <td class="text-right font-mono text-gray bg-blue-light">{{ item.bhytComp | number:'1.0-0' }}</td>
+                <td class="text-right font-mono text-gray bg-blue-light">{{ item.bhtnComp | number:'1.0-0' }}</td>
+
+                <!-- Sticky Net Salary -->
+                <td class="sticky-col col-net text-right font-bold font-mono text-blue-dark bg-blue-medium">
+                  {{ item.netSalary | number:'1.0-0' }} ₫
+                </td>
+              </tr>
+
+              <!-- Empty State -->
+              <tr *ngIf="!loading() && (!data() || data()?.content?.length === 0)">
+                <td colspan="19" class="empty-state">
+                   <p>Không tìm thấy dữ liệu.</p>
+                   <small>Vui lòng kiểm tra lại bộ lọc hoặc kết nối API.</small>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container" *ngIf="data()">
+          <div class="pagination-info">
+             Hiển thị <strong>{{ data()?.numberOfElements }}</strong> / Tổng <strong>{{ data()?.totalElements }}</strong> bản ghi
+          </div>
+          
+          <div class="pagination-controls">
+            <button 
+              [disabled]="data()?.first || loading()"
+              (click)="changePage(page() - 1)"
+              class="btn-page"
+            >
+              Trước
+            </button>
+            
+            <span class="page-current">
+              Trang {{ (data()?.number || 0) + 1 }} / {{ data()?.totalPages }}
+            </span>
+
+            <button 
+              [disabled]="data()?.last || loading()"
+              (click)="changePage(page() + 1)"
+              class="btn-page"
+            >
+              Sau
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>

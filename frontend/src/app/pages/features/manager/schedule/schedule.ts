@@ -9,10 +9,11 @@ import { Router } from '@angular/router';
 import { Loading } from '../../../shared/loading/loading';
 import { Alert } from '../../../shared/alert/alert';
 import { Comfirm } from '../../../shared/comfirm/comfirm';
+import { Reschedule } from '../../../shared/reschedule/reschedule';
 
 @Component({
   selector: 'app-schedule',
-  imports: [CommonModule, FormsModule, Tablemonth, NgIf, Loading, Alert, Comfirm],
+  imports: [CommonModule, FormsModule, Tablemonth, NgIf, Loading, Alert, Comfirm, Reschedule],
   templateUrl: './schedule.html',
   styleUrl: './schedule.scss',
 })
@@ -44,11 +45,28 @@ export class Schedule implements OnInit {
     this.alertType = type;
   }
   /////////////////////////
+
+
+
+  // quan li xin doi ca lam
+  isShowRescheduleModal: boolean = false;
+  selectedDate: string = '';
+
+  // Hàm xử lý khi click vào ngày trên lịch
   handleDayClick(event: any) {
-    this.date = event.date;
-    this.index = { row: event.row, col: event.col };
-    console.log(this.date);
+    // 1. Lấy dữ liệu ngày được click
+    this.selectedDate = event.date;
+    // 2. Mở Modal lên
+    if (this.dayData.length != 0) {
+      const today = this.dayData.find(item => item.date == this.selectedDate);
+      if (today.shiftId != null)
+        this.isShowRescheduleModal = true;
+
+    }
   }
+
+
+  ///
   dayData: any[] = [];
 
   handleMonthYear(event: any) {

@@ -6,7 +6,7 @@ export interface information {
     cccd: string,
     email: string,
     phonenumber: string,
-    gender: boolean,
+    gender: string,
     birth: string,
     address: string,
     bankAccount: string,

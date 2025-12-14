@@ -12,7 +12,11 @@
     <!-- Nội dung trong này đã được chuyển vào bên trong Tablemonth -->
   </app-tablemonth>
 </div>
-
+<app-reschedule 
+    *ngIf="isShowRescheduleModal " 
+    [date]="selectedDate" 
+    (closeEvent)="isShowRescheduleModal = false">
+</app-reschedule>
 <!-- Global Components -->
 <app-loading *ngIf="isloading"></app-loading>
 

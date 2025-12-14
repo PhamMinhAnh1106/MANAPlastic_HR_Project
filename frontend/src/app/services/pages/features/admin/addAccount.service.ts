@@ -3,6 +3,7 @@ import { api } from "../../../api.service";
 interface addaccount {
     fullname: string,
     cccd: string,
+    gender: string,
     role: number,
     department: number
 }
@@ -12,10 +13,13 @@ export async function addAccount(formdata: addaccount) {
     try {
         const res = await api.post("/admin/addAccount", {
             fullname: formdata.fullname,
-            cccd: formdata.cccd, roleID: {
+            cccd: formdata.cccd,
+            gender: formdata.gender,
+            roleID: {
                 id: formdata.role,
                 rolename: roleName[formdata.role - 1]
-            }, status: "active",
+            },
+            status: "active",
             departmentID: {
                 id: formdata.department
             }

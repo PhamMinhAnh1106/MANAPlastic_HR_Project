@@ -1,7 +1,7 @@
 import { CommonModule, NgFor, NgIf, NgClass, DatePipe } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { GetAccountInfo, UpdateAccounthr } from '../../../../services/pages/features/hr/accountManager.service';
+import { GetAccountInfo, GetOneAccountInfo, UpdateAccounthr } from '../../../../services/pages/features/hr/accountManager.service';
 import { Department } from '../../../../interface/user/user.interface';
 import { CookieService } from 'ngx-cookie-service';
 import { FilterUser } from '../../../../utils/filters.utils';
@@ -88,10 +88,10 @@ export class Accounts implements OnInit {
       this.filterEmployees();
     }
   }
-
+  searchAll = 0;
   // Xử lý thay đổi số lượng item trên trang hoặc khi bấm Lọc
   onPageSizeChange() {
-    this.currentPage = 0; // Reset về trang đầu
+    this.currentPage = 0;
     this.filterEmployees();
   }
 
@@ -122,18 +122,24 @@ export class Accounts implements OnInit {
   openEditModal(emp: any) {
     this.selectedEmployee = { ...emp };
   }
-
   async filterEmployees() {
     // Nếu filter.userID rỗng thì truyền giá trị mặc định là 0
-    const keyword = this.filter.userID ? Number(this.filter.userID) : 0;
+    if (this.filter.userID == "") {
+
+      this.showNotification("Còn thiếu username hoặc id nhân viên", false);
+      return;
+    }
+    const keyword = this.filter.userID;
+
 
     this.isloading = true;
 
     // Reset mảng dữ liệu hiển thị
     if (this.employee.length > 0) this.employee = [];
-
+    console.log(keyword);
     // Gọi API mới với page và size
-    const res = await GetAccountInfo(keyword, this.role, this.currentPage, this.pageSize);
+
+    const res = await GetOneAccountInfo(keyword, this.role);
 
     this.isloading = false;
 

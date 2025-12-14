@@ -1,0 +1,459 @@
+    // --- Variables ---
+    $primary-color: #1d4ed8; // Blue 700
+    $primary-hover: #1e40af; // Blue 800
+    $secondary-color: #f3f4f6; // Gray 100
+    $secondary-hover: #e5e7eb; // Gray 200
+    $text-color: #1f2937; // Gray 800
+    $text-light: #6b7280; // Gray 500
+    $border-color: #e5e7eb; // Gray 200
+    $bg-main: #f9fafb; // Gray 50
+    $white: #ffffff;
+
+    // Status Colors
+    $success-bg: #f0fdf4; // Green 50
+    $success-text: #15803d; // Green 700
+    $warning-bg: #fff7ed; // Orange 50
+    $info-bg: #eff6ff; // Blue 50
+    $danger-text: #dc2626; // Red 600
+
+    // --- Global Layout ---
+    :host {
+        display: block;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        color: $text-color;
+        background-color: $bg-main;
+        padding: 3rem 0.5rem 0.5rem 5rem;
+        min-height: 100vh;
+    }
+
+    .main-container {
+        padding: 1.5rem;
+    }
+
+    // --- Header ---
+    .header {
+        margin-bottom: 1.5rem;
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e3a8a; // Dark Blue
+            margin: 0 0 0.5rem 0;
+        }
+
+        .page-subtitle {
+            font-size: 0.875rem;
+            color: $text-light;
+            margin: 0;
+        }
+    }
+
+    // --- Filters ---
+    .filter-card {
+        background: $white;
+        padding: 1.25rem;
+        border-radius: 0.5rem;
+        border: 1px solid $border-color;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        gap: 1rem;
+
+        @media (min-width: 768px) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        @media (min-width: 1024px) {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: $text-light;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        input {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.25rem;
+            outline: none;
+            transition: border-color 0.15s ease-in-out;
+
+            &:focus {
+                border-color: $primary-color;
+                box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+            }
+        }
+    }
+
+    .actions {
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: 0.25rem;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.15s ease-in-out;
+        height: 38px; // Match input height
+
+        &:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+    }
+
+    .btn-primary {
+        background-color: $primary-color;
+        color: $white;
+        flex: 1;
+
+        &:hover:not(:disabled) {
+            background-color: $primary-hover;
+        }
+    }
+
+    .btn-secondary {
+        background-color: $secondary-color;
+        color: $text-color;
+
+        &:hover {
+            background-color: $secondary-hover;
+        }
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 0.75rem;
+        height: 0.75rem;
+        border: 2px solid $white;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+        margin-right: 0.5rem;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    // --- Alerts ---
+    .alert {
+        padding: 0.75rem 1rem;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+    }
+
+    .alert-error {
+        background-color: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+    }
+
+    // --- Table ---
+    .table-card {
+        background: $white;
+        border-radius: 0.5rem;
+        border: 1px solid $border-color;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        min-width: 1800px; // Force scroll
+        border-collapse: separate; // Needed for sticky
+        border-spacing: 0;
+
+        th,
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid $border-color;
+            border-right: 1px solid $border-color;
+            white-space: nowrap;
+            font-size: 0.875rem;
+        }
+
+        thead {
+            th {
+                background-color: #f3f4f6;
+                color: $text-light;
+                font-weight: 700;
+                text-transform: uppercase;
+                font-size: 0.75rem;
+                letter-spacing: 0.05em;
+                position: sticky;
+                top: 0;
+                z-index: 5;
+                user-select: none; // Prevent text selection on double click
+
+                &.sortable {
+                    cursor: pointer;
+
+                    &:hover {
+                        background-color: #e5e7eb;
+                        color: $primary-color;
+                    }
+                }
+            }
+        }
+
+        .sort-icon {
+            margin-left: 4px;
+            font-size: 0.7rem;
+            color: $primary-color;
+        }
+
+        tbody {
+            tr {
+                transition: background-color 0.1s;
+
+                &:hover {
+                    background-color: #eff6ff; // blue-50
+
+                    // Ensure sticky cols also get hover color
+                    td.sticky-col {
+                        background-color: #eff6ff;
+                    }
+                }
+            }
+
+            // Striped rows
+            tr.row-odd {
+                background-color: #f9fafb;
+
+                td.sticky-col {
+                    background-color: #f9fafb; // Match row bg
+                }
+            }
+
+            tr:not(.row-odd) {
+                background-color: $white;
+
+                td.sticky-col {
+                    background-color: $white;
+                }
+            }
+        }
+    }
+
+    // --- Sticky Columns Logic ---
+    .sticky-col {
+        position: sticky;
+        z-index: 10;
+
+        // Header z-index must be higher than body sticky cols
+        &.col-id,
+        &.col-name,
+        &.col-net {
+            // Headers need slightly higher z-index to stay above body
+        }
+    }
+
+    thead th.sticky-col {
+        z-index: 20; // Headers on top
+    }
+
+    .col-id {
+        left: 0;
+        width: 60px;
+        border-right: 1px solid #e5e7eb;
+    }
+
+    .col-name {
+        left: 60px; // Width of col-id
+        width: 200px;
+        border-right: 1px solid #e5e7eb;
+        // Add shadow to right edge
+        box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.1);
+    }
+
+    .col-net {
+        right: 0;
+        border-left: 1px solid #bfdbfe;
+        // Add shadow to left edge
+        box-shadow: -2px 0 5px -2px rgba(0, 0, 0, 0.1);
+    }
+
+    // --- Table Typography & Colors ---
+    .text-center {
+        text-align: center;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .font-bold {
+        font-weight: 600;
+    }
+
+    .font-mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .text-gray {
+        color: #4b5563;
+    }
+
+    .text-red {
+        color: $danger-text;
+    }
+
+    .text-green {
+        color: $success-text;
+    }
+
+    .text-blue-dark {
+        color: #1e40af;
+    }
+
+    .bg-green-light {
+        background-color: $success-bg !important;
+    }
+
+    .bg-orange-light {
+        background-color: $warning-bg !important;
+    }
+
+    .bg-blue-light {
+        background-color: $info-bg !important;
+    }
+
+    // Special background for Net Salary column
+    .bg-blue-medium {
+        background-color: #dbeafe !important;
+    }
+
+    // blue-100
+
+    // --- Badges ---
+    .badge {
+        padding: 0.125rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        border: 1px solid #e5e7eb;
+        background-color: #f3f4f6;
+        color: #4b5563;
+
+        &.badge-normal {
+            background-color: $success-bg;
+            color: $success-text;
+            border-color: #bbf7d0;
+        }
+    }
+
+    // --- Empty State ---
+    .empty-state {
+        padding: 2.5rem;
+        text-align: center;
+        color: $text-light;
+
+        p {
+            margin: 0 0 0.5rem 0;
+            font-weight: 500;
+        }
+    }
+
+    // --- Pagination ---
+    .pagination-container {
+        background-color: #f9fafb;
+        border-top: 1px solid $border-color;
+        padding: 0.75rem 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+
+        @media (min-width: 640px) {
+            flex-direction: row;
+            justify-content: space-between;
+        }
+    }
+
+    .pagination-info {
+        font-size: 0.75rem;
+        color: $text-light;
+    }
+
+    .pagination-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-page {
+        background-color: $white;
+        border: 1px solid #d1d5db;
+        color: $text-light;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+
+        &:hover:not(:disabled) {
+            background-color: #f3f4f6;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+
+    .page-current {
+        font-size: 0.75rem;
+        font-weight: 500;
+        background-color: $white;
+        border: 1px solid $border-color;
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.25rem;
+    }
+
+    // Custom scrollbar
+    ::-webkit-scrollbar {
+        height: 8px;
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }

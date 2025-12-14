@@ -11,7 +11,7 @@ export async function UpdateAccount(formdata: updateaccount, role: string) {
             cccd: formdata.cccd == null ? 0 : formdata.cccd,
             email: formdata.email,
             phonenumber: formdata.phonenumber,
-            gender: formdata.gender as boolean,
+            gender: formdata.gender,
             birth: formdata.birth,
             bankAccount: formdata.bankAccount,
             bankName: formdata.bankName,

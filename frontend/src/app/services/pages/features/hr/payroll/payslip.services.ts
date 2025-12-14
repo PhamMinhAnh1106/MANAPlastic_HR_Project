@@ -31,3 +31,12 @@ export async function getUserPayrollDetail(id: number | string, month: number, y
         throw error;
     }
 }
+export async function Fillterpayslip(params: string) {
+    try {
+        // Truyền id vào đường dẫn (path variable) và month/year vào query params
+        const res = await api.get(`/user/payroll/filter?${params}`);
+        return res.data;
+    } catch (error) {
+        throw error;
+    }
+}

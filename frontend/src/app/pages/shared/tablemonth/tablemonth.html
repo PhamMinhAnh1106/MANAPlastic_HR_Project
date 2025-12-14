@@ -26,7 +26,7 @@
             <option *ngIf="role=='manager'" value="3">Lịch chính thức</option>
         </select>
   
-        <button class="btn-primary" (click)="emitChooseSchedule()">Lưu</button>
+        <button class="btn-primary" (click)="emitChooseSchedule()">Lọc</button>
   
         <button *ngIf="role=='manager'" class="btn-success" (click)="emitUpOffice()">
             Đăng Lịch Chính Thức
@@ -39,6 +39,10 @@
         <span *ngIf="role == 'employee'" class="material-symbols-outlined add-icon" (click)="emitRegister()">
             add
         </span>
+        <div *ngIf="role == 'employee'" class="instruction-badge">
+          <span class="material-symbols-outlined icon-touch">touch_app</span>
+          <span>Click vào ô muốn đổi ca để đổi (ca đã có đăng ký)</span>
+      </div>
       </div>
     </div>
     

@@ -10,6 +10,14 @@ export async function GetAccountInfo(id: number, role: string, page: number, siz
         return "co loi xay ra " + error;
     }
 }
+export async function GetOneAccountInfo(id: number | string, role: string,) {
+    try {
+        const res = await api.get(`/${role.toLowerCase()}/userFilter?keyword=${id}`);
+        return res.data;
+    } catch (error) {
+        return "co loi xay ra " + error;
+    }
+}
 
 export async function UpdateAccounthr(formdata: information, role: string) {
     try {

@@ -1,3 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+
 // --- Variables ---
 $primary: #4f46e5;
 $primary-light: #e0e7ff;
@@ -24,7 +28,6 @@ $font-mono: 'Fira Code', monospace;
     overflow: hidden;
     display: flex;
     padding: 3rem 0.5rem 0.5rem 5rem;
-
     flex-direction: column;
 }
 
@@ -336,7 +339,7 @@ textarea {
                     font-weight: 800;
                     color: $text-main;
                     margin: 0;
-                    padding: 4px 8px; // Padding tương đương input để thẳng hàng
+                    padding: 4px 8px;
                     margin-left: -8px;
                     font-family: $font-mono;
                     cursor: default;
@@ -344,25 +347,25 @@ textarea {
 
                 .input-rule-code {
                     font-size: 16px;
-                    font-weight: 800; // Chữ đậm như thẻ H2
+                    font-weight: 800;
                     color: $text-main;
-                    border: 1px dashed transparent; // Viền trong suốt mặc định
+                    border: 1px dashed transparent;
                     background: transparent;
                     padding: 4px 8px;
-                    margin-left: -8px; // Căn lề trái khớp
+                    margin-left: -8px;
                     width: auto;
                     min-width: 150px;
                     max-width: 400px;
-                    text-transform: uppercase; // Tự động viết hoa khi hiển thị
-                    font-family: $font-mono; // Dùng font code cho đẹp
+                    text-transform: uppercase;
+                    font-family: $font-mono;
 
                     &:hover {
-                        border-color: #cbd5e1; // Hiện viền mờ khi di chuột
+                        border-color: #cbd5e1;
                         background: #fff;
                     }
 
                     &:focus {
-                        border-color: $primary; // Viền tím khi nhập
+                        border-color: $primary;
                         background: #fff;
                         outline: none;
                         box-shadow: 0 0 0 3px rgba($primary, 0.1);
@@ -554,9 +557,127 @@ textarea {
             }
         }
 
+        // --- VISUAL TREE STYLING (NEW) ---
         .visual-box {
-            padding: 24px;
-            min-height: 400px;
+            padding: 32px;
+            background: #fcfcfc; // Nền sáng nhẹ
+            min-height: 500px;
+            overflow: auto;
+            border: 1px dashed #e2e8f0; // Viền nét đứt cho cả box
+
+            .rb-node {
+                background: #ffffff;
+                border: 1px solid #e2e8f0; // Viền xám mỏng
+                border-radius: 6px;
+                padding: 16px;
+                margin-bottom: 16px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); // Đổ bóng nhẹ
+                position: relative;
+                width: fit-content;
+                min-width: 400px;
+
+                // Dải màu bên trái phân loại
+                border-left-width: 4px;
+                border-left-style: solid;
+                border-left-color: #cbd5e1; // Mặc định xám
+
+                &.type-math {
+                    border-left-color: #3b82f6; // Xanh dương (Toán)
+
+                    .rb-header select {
+                        color: #1d4ed8;
+                    }
+                }
+
+                &.type-logic {
+                    border-left-color: #8b5cf6; // Tím (Logic)
+
+                    .rb-header select {
+                        color: #6d28d9;
+                    }
+                }
+
+                &.type-data {
+                    border-left-color: #10b981; // Xanh lá (Dữ liệu)
+
+                    .rb-header select {
+                        color: #059669;
+                    }
+                }
+
+                &.type-const {
+                    border-left-color: #f59e0b; // Cam (Hằng số)
+                }
+
+                .rb-header {
+                    margin-bottom: 12px;
+
+                    select {
+                        width: auto;
+                        min-width: 200px;
+                        padding: 6px 12px;
+                        font-weight: 600;
+                        font-size: 13px;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 4px;
+                        background-color: #f8fafc;
+                        cursor: pointer;
+                        transition: all 0.2s;
+
+                        &:hover {
+                            background-color: #fff;
+                            border-color: #cbd5e1;
+                        }
+
+                        &:focus {
+                            border-color: $primary;
+                            box-shadow: 0 0 0 2px rgba($primary, 0.1);
+                        }
+                    }
+                }
+
+                .rb-body {
+
+                    // Styles cho inputs/values
+                    .rb-input,
+                    .rb-select-var {
+                        width: 100%;
+                        max-width: 300px;
+                        padding: 6px 10px;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 4px;
+                        font-size: 13px;
+
+                        &:focus {
+                            border-color: $primary;
+                        }
+                    }
+
+                    // Styles cho Labels (VẾ TRÁI, VẾ PHẢI...)
+                    .rb-label {
+                        display: block;
+                        font-size: 10px;
+                        font-weight: 700;
+                        color: #94a3b8; // Màu xám nhạt
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        margin-top: 12px;
+                        margin-bottom: 8px;
+                    }
+
+                    // Container chứa node con -> Tạo hiệu ứng cây (Indent + Dashed Line)
+                    .rb-children {
+                        padding-left: 24px; // Thụt lề
+                        border-left: 1px dashed #cbd5e1; // Đường kẻ nét đứt dọc
+                        margin-left: 4px; // Căn chỉnh đường kẻ
+
+                        // Đè margin node con cuối cùng để gọn hơn
+                        .rb-node:last-child {
+                            margin-bottom: 0;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -638,19 +759,19 @@ textarea {
             flex-shrink: 0;
 
             .mode-switch-sm {
-                background: #f1f5f9; // Màu nền xám nhạt cho cả khung
+                background: #f1f5f9;
                 padding: 4px;
-                border-radius: 8px; // Bo góc khung lớn hơn chút
+                border-radius: 8px;
                 display: flex;
-                gap: 4px; // Khoảng cách giữa các nút
+                gap: 4px;
                 border: 1px solid #e2e8f0;
 
                 button {
                     font-size: 12px;
-                    padding: 6px 16px; // Nút to hơn chút cho dễ bấm
+                    padding: 6px 16px;
                     border-radius: 6px;
                     font-weight: 600;
-                    color: #64748b; // Màu chữ xám khi chưa active
+                    color: #64748b;
                     transition: all 0.2s ease;
                     border: 1px solid transparent;
 
@@ -660,10 +781,10 @@ textarea {
                     }
 
                     &.active {
-                        background: #ffffff; // Nền trắng nổi bật
-                        color: $primary; // Chữ màu chủ đạo (Indigo)
-                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); // Đổ bóng nhẹ
-                        border-color: #e2e8f0; // Viền mỏng
+                        background: #ffffff;
+                        color: $primary;
+                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+                        border-color: #e2e8f0;
                     }
                 }
             }
@@ -687,7 +808,7 @@ textarea {
 
             .wizard-panel {
                 background: #ffffff;
-                padding: 0; // Reset padding panel nếu cần
+                padding: 0;
                 margin-bottom: 24px;
 
                 label {
@@ -701,8 +822,21 @@ textarea {
                         color: $primary;
                         margin-right: 6px;
                     }
+                }
 
-                    // Icon đũa thần màu tím
+                .wiz-description {
+                    background: #f0f9ff;
+                    border: 1px solid #bae6fd;
+                    color: #0369a1;
+                    padding: 10px;
+                    border-radius: 6px;
+                    font-size: 12px;
+                    margin-bottom: 12px;
+                    line-height: 1.5;
+
+                    i {
+                        margin-right: 6px;
+                    }
                 }
 
                 select {
@@ -717,24 +851,18 @@ textarea {
                     }
                 }
 
-                // --- 2. STYLE CHO KHUNG PREVIEW SQL ---
                 .wiz-preview {
                     font-size: 13px;
                     line-height: 1.6;
                     color: #334155;
                     padding: 16px;
-                    background: #f8fafc; // Nền code xám rất nhạt
-                    border: 1px solid #e2e8f0; // Border bao quanh
+                    background: #f8fafc;
+                    border: 1px solid #e2e8f0;
                     border-radius: 8px;
-                    font-family: 'Fira Code', 'Consolas', monospace; // Font code
-
-                    // Thêm điểm nhấn: Đường viền trái màu đậm hơn
+                    font-family: 'Fira Code', 'Consolas', monospace;
                     border-left: 4px solid $primary;
-
                     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-                    word-break: break-word; // Xuống dòng nếu SQL quá dài
-
-                    // Hiệu ứng khi hover vào vùng code
+                    word-break: break-word;
                     transition: border-color 0.2s;
 
                     &:hover {
@@ -763,15 +891,12 @@ textarea {
 
                     .input-code {
                         font-family: $font-mono;
-                        color: darken($success, 10%);
-                        font-weight: bold;
+                        color: #10b981;
+                        font-weight: 700;
                         background: #f8fafc;
+                        font-size: 14px;
                     }
                 }
-            }
-
-            .wizard-panel {
-                /* ... */
             }
 
             .sql-panel {

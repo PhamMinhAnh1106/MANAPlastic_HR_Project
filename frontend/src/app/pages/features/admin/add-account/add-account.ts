@@ -29,6 +29,7 @@ export class AddAccount {
   account = {
     fullname: '',
     cccd: '',
+    gender: '',
     role: 0,
     department: 0
   };
@@ -78,6 +79,7 @@ export class AddAccount {
           this.account = {
             fullname: '',
             cccd: '',
+            gender: '',
             role: 0,
             department: 0
           };

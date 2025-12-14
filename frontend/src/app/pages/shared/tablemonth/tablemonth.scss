@@ -535,3 +535,58 @@ $cell-min-height: 0;
 .fade-in {
     animation: fadeIn 0.2s ease-out;
 }
+
+.instruction-badge {
+    // Layout & Spacing
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    margin: 15px 0; // Tạo khoảng cách với các phần tử xung quanh
+
+    // Colors & Background
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); // Gradient xanh nhẹ
+    color: #1565c0; // Màu chữ xanh đậm tương phản tốt
+
+    // Typography
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    // Borders & Shadows
+    border-radius: 50px; // Bo tròn dạng viên thuốc (Pill shape)
+    border: 1px solid rgba(255, 255, 255, 0.6); // Viền trắng mờ tạo độ nổi
+    box-shadow: 0 4px 6px rgba(33, 150, 243, 0.15); // Đổ bóng nhẹ
+
+    // Interaction
+    cursor: default;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    user-select: none;
+
+    &:hover {
+        transform: translateY(-2px); // Nổi lên khi hover
+        box-shadow: 0 6px 12px rgba(33, 150, 243, 0.25);
+        background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
+    }
+
+    // Icon Style
+    .icon-touch {
+        font-size: 20px;
+        animation: tapHint 2s infinite ease-in-out; // Hiệu ứng nhắc nhở
+    }
+}
+
+// Animation mô phỏng thao tác click/tap
+@keyframes tapHint {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(0.85);
+        opacity: 0.8;
+    }
+}

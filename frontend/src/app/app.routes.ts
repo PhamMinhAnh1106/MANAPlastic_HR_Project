@@ -20,6 +20,8 @@ import { AutoSchedule } from './pages/features/manager/auto-schedule/auto-schedu
 import { Payrollmain } from './pages/features/hr/payroll/payrollmain/payrollmain';
 import { Payrollrules } from './pages/features/hr/payroll/payrollrules/payrollrules';
 import { Payrollpayslip } from './pages/features/hr/payroll/payrollpayslip/payrollpayslip';
+import { Permissions } from './pages/features/admin/permissions/permissions';
+import { Filterpayslip } from './pages/features/hr/payroll/filterpayslip/filterpayslip';
 
 
 export const routes: Routes = [
@@ -36,13 +38,15 @@ export const routes: Routes = [
 
             //admin
             { path: 'add/account', component: AddAccount },
+            { path: 'permission', component: Permissions },
+
             //hr
             { path: 'user/account', component: Accounts },
             { path: 'user/attendance', component: Attendant },
             { path: 'payroll', component: Payrollmain },
             { path: 'payroll/rules', component: Payrollrules },
             { path: 'payroll/payslip', component: Payrollpayslip },
-
+            { path: 'payroll/payslip/filter', component: Filterpayslip },
             //manager 
             { path: 'leaverequest/manage', component: Leaverequestcheck },
             { path: 'contracts', component: Contracts },

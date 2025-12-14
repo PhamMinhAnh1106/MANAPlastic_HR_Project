@@ -98,3 +98,53 @@ export async function UpSchedule(month_year: string) {
 
     }
 }
+
+export interface rescheduleinterface {
+    targetDate: string,
+    newShiftId: number,
+    reason: string
+}
+export async function RescheduleAPI(form: rescheduleinterface) {
+    try {
+        const res = await api.post("/user/shiftChanges", form);
+        return res.data;
+    } catch (error) {
+        return error;
+    }
+}
+
+
+
+export async function getReschedule(query: string) {
+    try {
+        if (query != '') {
+            const res = await api.get(`/user/shiftChanges/filter?${query}`);
+            return res.data;
+        }
+        const res = await api.get(`/user/shiftChanges/filter`);
+        return res.data;
+
+    } catch (error) {
+        return error;
+    }
+}
+
+export async function ApproveReschedule(id: number) {
+    try {
+        const res = await api.put(`/user/shiftChanges/approve/${id}`);
+        return res.data;
+
+    } catch (error) {
+        return error;
+    }
+}
+
+export async function RejectReschedule(id: number) {
+    try {
+        const res = await api.put(`/user/shiftChanges/reject/${id}`);
+        return res.data;
+
+    } catch (error) {
+        return error;
+    }
+}

@@ -118,9 +118,10 @@
           </div>
 
           <!-- Giới tính -->
+          <!-- Sử dụng $any() để tránh lỗi type checking tạm thời nếu interface chưa kịp sửa -->
           <div class="form-group">
             <label>GIỚI TÍNH</label>
-            <div class="static-field">{{ userInfo.gender ? 'Nam' : 'Nữ' }}</div>
+            <div class="static-field">{{ $any(userInfo).gender === 'MALE' ? 'Nam' : 'Nữ' }}</div>
           </div>
 
           <!-- Ngày sinh -->
@@ -207,11 +208,12 @@
         </div>
         
          <!-- Gender -->
+         <!-- SỬA LỖI TẠI ĐÂY: Dùng value="" thay vì [ngValue]="" -->
          <div class="form-group">
           <label>Giới tính</label>
           <select [(ngModel)]="formdata.gender" class="form-control">
-              <option [ngValue]="true">Nam</option>
-              <option [ngValue]="false">Nữ</option>
+              <option value="MALE">Nam</option>
+              <option value="FEMALE">Nữ</option>
           </select>
         </div>
         
@@ -243,7 +245,7 @@
   </div>
 </div>
 
-<!-- CÁC COMPONENT PHỤ TRỢ (Giữ nguyên logic của bạn) -->
+<!-- CÁC COMPONENT PHỤ TRỢ -->
 <app-loading *ngIf="isloading"></app-loading>
 
 <app-comfirm *ngIf="isconfirm" 

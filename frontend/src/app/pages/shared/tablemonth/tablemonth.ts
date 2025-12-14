@@ -3,26 +3,15 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, O
 import { FormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
 import { scheduleList } from '../../../utils/listSchedule.utils';
+import { Loading } from '../loading/loading';
+import { Alert } from '../alert/alert';
+import { Comfirm } from '../comfirm/comfirm';
+import { ChangeScheduleDraftManager, ChangeScheduleOfficeManager } from '../../../services/pages/features/employee/shedule.services';
 
-// --- IMPORT GỐC (Bỏ comment khi dùng trong dự án thật) ---
-// import { userSchedule } from '../../../interface/schedule.interface';
-// import { scheduleList } from '../../../utils/listSchedule.utils';
-// import { Loading } from '../loading/loading';
-// import { Alert } from '../alert/alert';
-// import { Comfirm } from '../comfirm/comfirm';
-// import { ChangeScheduleDraftManager, ChangeScheduleOfficeManager } from '../../../services/pages/features/employee/shedule.services';
-// import { Schedule } from '../../features/manager/schedule/schedule';
 
 // --- ĐỊNH NGHĨA TẠM THỜI ĐỂ FIX LỖI COMPILE (Xóa khi dùng thật) ---
 export interface userSchedule { employeeId: number; employeeFullName: string; drafts?: any[]; }
-export const ChangeScheduleDraftManager = async (payload: any) => ({ status: 200, data: 'Cập nhật nháp thành công' });
-export const ChangeScheduleOfficeManager = async (payload: any) => ({ status: 200, data: 'Cập nhật chính thức thành công' });
 export class Schedule { loadData() { console.log('Reload data'); } }
-
-@Component({ selector: 'app-loading', standalone: true, template: '<div style="position:fixed;top:50%;left:50%;background:black;color:white;padding:10px">Loading...</div>' }) export class Loading { }
-@Component({ selector: 'app-alert', standalone: true, template: '<div style="position:fixed;top:10px;right:10px;background:green;color:white;padding:10px" *ngIf="message">{{message}}</div>' }) export class Alert { @Input() message: any; @Input() notifyType: any; }
-@Component({ selector: 'app-comfirm', standalone: true, template: '<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;border:1px solid #ccc;padding:20px" *ngIf="message"><p>{{message}}</p><button (click)="result.emit(true)">OK</button><button (click)="result.emit(false)">Cancel</button></div>' }) export class Comfirm { @Input() message: any; @Output() result = new EventEmitter(); }
-// -------------------------------------------------------------
 
 interface DayObj {
   date: Date;

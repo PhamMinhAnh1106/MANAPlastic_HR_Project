@@ -1,0 +1,93 @@
+<!-- Overlay nền mờ -->
+<div class="modal-overlay" (click)="closeModal()">
+    <!-- Hộp nội dung chính (Click vào đây không bị đóng) -->
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        
+        <!-- Header -->
+        <div class="modal-header">
+            <h3>Đăng ký đổi lịch</h3>
+            <button class="close-btn" (click)="closeModal()">&times;</button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="label-highlight">Ngày đăng ký:</label>
+                <span class="date-display">{{ date }}</span>
+            </div>
+
+            <!-- 1. Chọn Loại Ca -->
+            <div class="form-group">
+                <label>Loại ca</label>
+                <div class="radio-group">
+                    <label class="radio-btn">
+                        <input type="radio" name="type" [ngModel]="selectedType" (ngModelChange)="changeType(8)" [value]="8" />
+                        <span>Ca 8H</span>
+                    </label>
+                    <label class="radio-btn">
+                        <input type="radio" name="type" [ngModel]="selectedType" (ngModelChange)="changeType(6)" [value]="6" />
+                        <span>Ca 6H</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 2. Dropdown Chọn Ca -->
+            <div class="form-group">
+                <label>Chọn ca mới <span class="required">*</span></label>
+                <select [(ngModel)]="newShiftId" class="custom-select">
+                    <option [ngValue]="null" disabled selected>-- Chọn ca làm việc --</option>
+                    
+                    <!-- Danh sách ca động từ TS -->
+                    <optgroup label="Ca làm việc">
+                        <option *ngFor="let s of list" [value]="s.shift_id">
+                            {{ s.shift_name }} ({{ s.start_time }} - {{ s.end_time }})
+                        </option>
+                    </optgroup>
+
+                    <!-- Danh sách nghỉ phép tĩnh -->
+                    <optgroup label="Nghỉ phép">
+                        <option [value]="53">AL (Annual Leave)</option>
+                        <option [value]="54">SL (Sick Leave)</option>
+                        <option [value]="55">PL (Personal Leave)</option>
+                        <option [value]="56">ML (Marriage Leave)</option>
+                        <option [value]="57">UL (Unpaid Leave)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <!-- 3. Nhập Lý Do -->
+            <div class="form-group">
+                <label>Lý do <span class="required">*</span></label>
+                <textarea 
+                    [(ngModel)]="reason" 
+                    rows="3" 
+                    class="form-control" 
+                    placeholder="Nhập lý do đổi lịch...">
+                </textarea>
+            </div>
+        </div>
+
+        <!-- Footer Buttons -->
+        <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeModal()">Hủy bỏ</button>
+            <button class="btn btn-primary" (click)="reschedule()">Gửi yêu cầu</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- Components phụ trợ -->
+<app-loading *ngIf="isloading"></app-loading>
+
+<app-comfirm 
+    *ngIf="isconfirm" 
+    [message]="confirmMessage" 
+    (result)="onConfirmResult($event)">
+</app-comfirm>
+
+<app-alert 
+    *ngIf="isalert" 
+    [message]="alertmessage" 
+    [notifyType]="alertType" 
+    (hidden)="isalert = false">
+</app-alert>
