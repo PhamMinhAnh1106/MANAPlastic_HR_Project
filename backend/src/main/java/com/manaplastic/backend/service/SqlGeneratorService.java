@@ -1,7 +1,7 @@
 package com.manaplastic.backend.service;
 
-import com.manaplastic.backend.DTO.RuleCondition;
-import com.manaplastic.backend.DTO.VariableRuleRequest;
+import com.manaplastic.backend.DTO.payroll.RuleCondition;
+import com.manaplastic.backend.DTO.payroll.VariableRuleRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;

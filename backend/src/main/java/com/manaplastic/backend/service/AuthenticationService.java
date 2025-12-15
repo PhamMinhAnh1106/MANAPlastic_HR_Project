@@ -1,8 +1,8 @@
 package com.manaplastic.backend.service;
 
-import com.manaplastic.backend.DTO.AuthenticationRequest;
-import com.manaplastic.backend.DTO.AuthenticationResponse;
-import com.manaplastic.backend.DTO.RefreshTokenRequest;
+import com.manaplastic.backend.DTO.account.AuthenticationRequest;
+import com.manaplastic.backend.DTO.account.AuthenticationResponse;
+import com.manaplastic.backend.DTO.account.RefreshTokenRequest;
 import com.manaplastic.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;

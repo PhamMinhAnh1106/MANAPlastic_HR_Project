@@ -1,7 +1,7 @@
 package com.manaplastic.backend.service;
 
-import com.manaplastic.backend.DTO.AttendanceDTO;
-import com.manaplastic.backend.DTO.AttendanceFilterCriteria;
+import com.manaplastic.backend.DTO.attendance.AttendanceDTO;
+import com.manaplastic.backend.DTO.criteria.AttendanceFilterCriteria;
 import com.manaplastic.backend.entity.AttendanceEntity;
 import com.manaplastic.backend.exportfile.ExcelHelper;
 import com.manaplastic.backend.filters.AttendanceFilter;
@@ -14,7 +14,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 

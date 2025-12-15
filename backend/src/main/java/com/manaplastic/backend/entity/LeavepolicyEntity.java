@@ -1,5 +1,6 @@
 package com.manaplastic.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.manaplastic.backend.constant.Gender;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -56,6 +57,7 @@ public class LeavepolicyEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "leavetypeid")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})  // dòng này để Jackson không cố serialize cái Proxy của Hibernate
     private ShiftEntity leavetypeid;
 
 }

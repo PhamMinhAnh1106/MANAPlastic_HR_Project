@@ -1,6 +1,6 @@
 //package com.manaplastic.backend.service;
 //
-//import com.manaplastic.backend.DTO.PayrollDTO;
+//import com.manaplastic.backend.DTO.payroll.PayrollDTO;
 //import com.manaplastic.backend.entity.*;
 //import com.manaplastic.backend.repository.*;
 //import jakarta.transaction.Transactional;

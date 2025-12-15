@@ -1,7 +1,7 @@
 package com.manaplastic.backend.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.manaplastic.backend.DTO.VariableRuleRequest;
+import com.manaplastic.backend.DTO.payroll.VariableRuleRequest;
 import com.manaplastic.backend.entity.SalaryvariableEntity;
 import com.manaplastic.backend.repository.SalaryVariableRepository;
 import org.springframework.beans.factory.annotation.Autowired;

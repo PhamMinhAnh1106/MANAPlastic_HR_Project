@@ -1,6 +1,6 @@
 package com.manaplastic.backend.filters;
 
-import com.manaplastic.backend.DTO.PayrollFilterCriteria;
+import com.manaplastic.backend.DTO.criteria.PayrollFilterCriteria;
 import com.manaplastic.backend.entity.DepartmentEntity;
 import com.manaplastic.backend.entity.PayrollEntity;
 import com.manaplastic.backend.entity.UserEntity;

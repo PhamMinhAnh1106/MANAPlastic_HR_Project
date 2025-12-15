@@ -101,7 +101,7 @@ public class PayrollDataFetcher {
             }
         }
 
-        // Luôn làm tròn 2 chữ số thập phân để tránh sai số (VD: 10.33333 -> 10.33)
-        return result.setScale(2, RoundingMode.HALF_UP);
+        // Luôn làm tròn 4 chữ số thập phân để tránh sai số (VD: 10.33333 -> 10.3333)
+        return result.setScale(4, RoundingMode.HALF_UP);
     }
 }

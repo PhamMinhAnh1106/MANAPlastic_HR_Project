@@ -28,7 +28,7 @@ public class SalaryVariableCacheEntity {
     @Column(name = "payperiod", length = 7)
     private String payperiod;
 
-    @Column(name = "value", precision = 20, scale = 2)
+    @Column(name = "value", precision = 20, scale = 4)
     private BigDecimal value;
 
     @Column(name = "evaluated_at")

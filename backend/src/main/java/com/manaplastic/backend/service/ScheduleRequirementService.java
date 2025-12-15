@@ -1,7 +1,7 @@
 package com.manaplastic.backend.service;
 
-import com.manaplastic.backend.DTO.RequirementRuleDTO;
-import com.manaplastic.backend.DTO.ScheduleRequirementDTO;
+import com.manaplastic.backend.DTO.schedule.RequirementRuleDTO;
+import com.manaplastic.backend.DTO.schedule.ScheduleRequirementDTO;
 import com.manaplastic.backend.entity.RequirementrulesEntity;
 import com.manaplastic.backend.entity.SchedulerequirementEntity;
 import com.manaplastic.backend.entity.UserEntity;

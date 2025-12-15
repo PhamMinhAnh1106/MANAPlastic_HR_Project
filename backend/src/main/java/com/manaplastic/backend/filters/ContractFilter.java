@@ -1,6 +1,6 @@
 package com.manaplastic.backend.filters;
 
-import com.manaplastic.backend.DTO.ContractFilterCriteria;
+import com.manaplastic.backend.DTO.criteria.ContractFilterCriteria;
 import com.manaplastic.backend.entity.ContractEntity;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;

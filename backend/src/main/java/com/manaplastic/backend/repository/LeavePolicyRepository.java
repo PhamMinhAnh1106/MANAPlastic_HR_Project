@@ -25,4 +25,5 @@ public interface LeavePolicyRepository extends JpaRepository<LeavepolicyEntity, 
             @Param("jobType") String jobType,
             @Param("gender") Gender gender
     );
+    List<LeavepolicyEntity> findByLeavetype(String leavetype);
 }

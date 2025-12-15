@@ -1,8 +1,8 @@
 package com.manaplastic.backend.service;
 
-import com.manaplastic.backend.DTO.ContractCreateDTO;
-import com.manaplastic.backend.DTO.ContractFilterCriteria;
-import com.manaplastic.backend.DTO.ContractDTO;
+import com.manaplastic.backend.DTO.payroll.ContractCreateDTO;
+import com.manaplastic.backend.DTO.criteria.ContractFilterCriteria;
+import com.manaplastic.backend.DTO.payroll.ContractDTO;
 import com.manaplastic.backend.entity.ContractEntity;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.exportfile.ExcelHelper;

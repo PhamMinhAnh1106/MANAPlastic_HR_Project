@@ -1,6 +1,6 @@
 package com.manaplastic.backend.filters;
 
-import com.manaplastic.backend.DTO.ShiftChangeFilterCriteria;
+import com.manaplastic.backend.DTO.schedule.ShiftChangeFilterCriteria;
 import com.manaplastic.backend.constant.RequestStatus;
 import com.manaplastic.backend.entity.ShiftChangeRequestEntity;
 import jakarta.persistence.criteria.Predicate;

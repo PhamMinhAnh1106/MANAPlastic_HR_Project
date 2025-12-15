@@ -1,6 +1,6 @@
 package com.manaplastic.backend.filters;
 
-import com.manaplastic.backend.DTO.AttendanceFilterCriteria;
+import com.manaplastic.backend.DTO.criteria.AttendanceFilterCriteria;
 import com.manaplastic.backend.entity.AttendanceEntity;
 import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.Predicate;

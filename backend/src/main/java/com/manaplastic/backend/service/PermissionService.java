@@ -1,8 +1,8 @@
 package com.manaplastic.backend.service;
 
-import com.manaplastic.backend.DTO.PermissionDTO;
-import com.manaplastic.backend.DTO.PermissionFilterCriteria;
-import com.manaplastic.backend.DTO.UpdateUserPermissionDTO;
+import com.manaplastic.backend.DTO.account.PermissionDTO;
+import com.manaplastic.backend.DTO.criteria.PermissionFilterCriteria;
+import com.manaplastic.backend.DTO.account.UpdateUserPermissionDTO;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.repository.PermissionRepository;
 import com.manaplastic.backend.repository.UserPermissionRepository;

@@ -1,23 +1,17 @@
 package com.manaplastic.backend.service;
 
-import com.manaplastic.backend.DTO.AdminUserDTO;
+import com.manaplastic.backend.DTO.account.AdminUserDTO;
 import com.manaplastic.backend.entity.*;
 import com.manaplastic.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service

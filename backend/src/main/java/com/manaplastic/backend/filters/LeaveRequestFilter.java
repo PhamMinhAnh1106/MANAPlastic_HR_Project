@@ -1,6 +1,6 @@
 package com.manaplastic.backend.filters;
 
-import com.manaplastic.backend.DTO.LeaveRequestFilterCriteria;
+import com.manaplastic.backend.DTO.criteria.LeaveRequestFilterCriteria;
 import com.manaplastic.backend.entity.LeaverequestEntity;
 import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.Predicate;

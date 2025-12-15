@@ -1,7 +1,7 @@
 //package com.manaplastic.backend.service;
 //
-//import com.manaplastic.backend.DTO.PayrollDTO;
-//import com.manaplastic.backend.DTO.PayrollFilterCriteria;
+//import com.manaplastic.backend.DTO.payroll.PayrollDTO;
+//import com.manaplastic.backend.DTO.criteria.PayrollFilterCriteria;
 //import com.manaplastic.backend.entity.*;
 //import com.manaplastic.backend.filters.PayrollFilter;
 //import com.manaplastic.backend.repository.*;

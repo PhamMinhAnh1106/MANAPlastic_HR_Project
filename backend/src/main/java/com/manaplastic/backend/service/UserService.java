@@ -1,9 +1,9 @@
 package com.manaplastic.backend.service;
 
-import com.manaplastic.backend.DTO.UpdateAccountDTO;
-import com.manaplastic.backend.DTO.UserFilterCriteria;
-import com.manaplastic.backend.DTO.UserProfileDTO;
-import com.manaplastic.backend.DTO.UpdateSelfIn4DTO;
+import com.manaplastic.backend.DTO.account.UpdateAccountDTO;
+import com.manaplastic.backend.DTO.criteria.UserFilterCriteria;
+import com.manaplastic.backend.DTO.account.UserProfileDTO;
+import com.manaplastic.backend.DTO.account.UpdateSelfIn4DTO;
 import com.manaplastic.backend.entity.DepartmentEntity;
 import com.manaplastic.backend.entity.RoleEntity;
 import com.manaplastic.backend.entity.UserEntity;
@@ -13,16 +13,12 @@ import com.manaplastic.backend.repository.RoleRepository;
 import com.manaplastic.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

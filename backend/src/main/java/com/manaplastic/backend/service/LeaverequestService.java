@@ -1,12 +1,11 @@
 package com.manaplastic.backend.service;
 
-import com.manaplastic.backend.DTO.AddLeaverequestDTO;
-import com.manaplastic.backend.DTO.LeaveBalanceDTO;
-import com.manaplastic.backend.DTO.LeaveRequestFilterCriteria;
-import com.manaplastic.backend.DTO.LeaverequestDTO;
+import com.manaplastic.backend.DTO.schedule.AddLeaverequestDTO;
+import com.manaplastic.backend.DTO.schedule.LeaveBalanceDTO;
+import com.manaplastic.backend.DTO.criteria.LeaveRequestFilterCriteria;
+import com.manaplastic.backend.DTO.schedule.LeaverequestDTO;
 import com.manaplastic.backend.entity.*;
 import com.manaplastic.backend.filters.LeaveRequestFilter;
-import com.manaplastic.backend.filters.UserFilter;
 import com.manaplastic.backend.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.manaplastic.backend.exportfile;
 
-import com.manaplastic.backend.DTO.AttendanceDTO;
-import com.manaplastic.backend.DTO.ContractDTO;
+import com.manaplastic.backend.DTO.attendance.AttendanceDTO;
+import com.manaplastic.backend.DTO.payroll.ContractDTO;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 

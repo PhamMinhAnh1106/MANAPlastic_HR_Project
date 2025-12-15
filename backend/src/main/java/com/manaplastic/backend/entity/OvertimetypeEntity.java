@@ -14,6 +14,18 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "overtimetypes")
 public class OvertimetypeEntity {
+    public enum CalculationType {
+        MULTIPLIER,     // Nhân hệ số (1.5, 2.0)
+        ADDITIVE,       // Cộng thêm % (+30%)
+        FIXED_AMOUNT    // Số tiền cố định
+    }
+    public enum TaxExemptFormula {
+        NONE,           // Không miễn thuế
+        EXCESS_ONLY,    // Chỉ miễn phần vượt (VD: trả 150%, miễn thuế 50%)
+        FULL_AMOUNT,    // Miễn toàn bộ
+        PERCENTAGE,     // Miễn theo % cụ thể
+        CUSTOM          // Công thức riêng
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "OvertimeTypeID", nullable = false)
@@ -38,14 +50,14 @@ public class OvertimetypeEntity {
     private Boolean isTaxExemptPart;
 
     @ColumnDefault("'MULTIPLIER'")
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "CalculationType")
-    private String calculationType;
+    private CalculationType calculationType;
 
     @ColumnDefault("'EXCESS_ONLY'")
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "TaxExemptFormula")
-    private String taxExemptFormula;
+    private TaxExemptFormula taxExemptFormula;
 
     @ColumnDefault("0.00")
     @Column(name = "TaxExemptPercentage", precision = 5, scale = 2)

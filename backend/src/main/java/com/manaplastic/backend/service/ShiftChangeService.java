@@ -1,8 +1,8 @@
 package com.manaplastic.backend.service;
 
-import com.manaplastic.backend.DTO.ShiftChangeDTO;
-import com.manaplastic.backend.DTO.ShiftChangeFilterCriteria;
-import com.manaplastic.backend.DTO.ShiftChangeListDTO;
+import com.manaplastic.backend.DTO.schedule.ShiftChangeDTO;
+import com.manaplastic.backend.DTO.schedule.ShiftChangeFilterCriteria;
+import com.manaplastic.backend.DTO.schedule.ShiftChangeListDTO;
 import com.manaplastic.backend.constant.LogType;
 import com.manaplastic.backend.constant.RequestStatus;
 import com.manaplastic.backend.entity.*; // Import hết các entity

@@ -26,7 +26,7 @@ public class TaxsettingEntity {
     private String settingKey;
 
     @NotNull
-    @Column(name = "Value", nullable = false, precision = 15, scale = 2)
+    @Column(name = "Value", nullable = false, precision = 15, scale = 4)
     private BigDecimal value;
 
     @NotNull

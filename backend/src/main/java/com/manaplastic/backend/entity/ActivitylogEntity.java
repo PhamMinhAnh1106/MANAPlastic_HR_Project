@@ -41,4 +41,5 @@ public class ActivitylogEntity {
     @Column(name = "details")
     private String details;
 
+
 }

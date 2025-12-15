@@ -1,6 +1,6 @@
 package com.manaplastic.backend.service;
 
-import com.manaplastic.backend.DTO.ScheduleValidationDTO;
+import com.manaplastic.backend.DTO.schedule.ScheduleValidationDTO;
 import com.manaplastic.backend.entity.*;
 import com.manaplastic.backend.repository.*;
 import lombok.RequiredArgsConstructor;
