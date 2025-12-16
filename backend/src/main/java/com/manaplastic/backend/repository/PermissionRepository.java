@@ -3,13 +3,14 @@ package com.manaplastic.backend.repository;
 import com.manaplastic.backend.entity.PermissionEntity;
 import com.manaplastic.backend.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface PermissionRepository extends JpaRepository<PermissionEntity, Integer> {
+public interface PermissionRepository extends JpaRepository<PermissionEntity, Integer> , JpaSpecificationExecutor<PermissionEntity> {
     /**
      * Check 1: Kiểm tra xem User có bị CHẶN (activepermission = 0) quyền này không?
      *

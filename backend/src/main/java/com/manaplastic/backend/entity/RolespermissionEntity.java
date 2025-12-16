@@ -1,8 +1,10 @@
 package com.manaplastic.backend.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -25,5 +27,10 @@ public class RolespermissionEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "permissionID", nullable = false)
     private PermissionEntity permissionID;
+
+    @NotNull
+    @ColumnDefault("1")
+    @Column(name = "active", nullable = false)
+    private Boolean active = false;
 
 }
