@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th12 16, 2025 lúc 06:38 PM
+-- Thời gian đã tạo: Th12 15, 2025 lúc 05:45 PM
 -- Phiên bản máy phục vụ: 8.2.0
 -- Phiên bản PHP: 8.2.13
 
@@ -1317,7 +1317,6 @@ DROP TABLE IF EXISTS `rolespermissions`;
 CREATE TABLE IF NOT EXISTS `rolespermissions` (
   `roleID` int NOT NULL,
   `permissionID` int NOT NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`roleID`,`permissionID`),
   KEY `permissionID` (`permissionID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1326,75 +1325,74 @@ CREATE TABLE IF NOT EXISTS `rolespermissions` (
 -- Đang đổ dữ liệu cho bảng `rolespermissions`
 --
 
-INSERT INTO `rolespermissions` (`roleID`, `permissionID`, `active`) VALUES
-(1, 1, 1),
-(1, 2, 1),
-(1, 3, 1),
-(1, 4, 1),
-(1, 5, 1),
-(1, 6, 1),
-(1, 7, 1),
-(1, 8, 1),
-(1, 9, 1),
-(1, 10, 1),
-(1, 11, 1),
-(1, 12, 1),
-(1, 13, 1),
-(2, 1, 1),
-(2, 2, 1),
-(2, 3, 1),
-(2, 4, 1),
-(2, 5, 1),
-(2, 6, 1),
-(2, 7, 1),
-(2, 8, 1),
-(2, 14, 1),
-(2, 17, 1),
-(2, 18, 1),
-(2, 19, 1),
-(2, 20, 1),
-(2, 28, 1),
-(2, 29, 1),
-(2, 30, 1),
-(2, 31, 1),
-(2, 32, 1),
-(2, 33, 1),
-(2, 34, 1),
-(2, 35, 1),
-(2, 36, 1),
-(2, 37, 1),
-(2, 38, 1),
-(3, 1, 1),
-(3, 2, 1),
-(3, 3, 1),
-(3, 4, 1),
-(3, 5, 1),
-(3, 6, 1),
-(3, 14, 1),
-(3, 15, 1),
-(3, 16, 1),
-(3, 19, 1),
-(3, 21, 1),
-(3, 22, 1),
-(3, 24, 1),
-(3, 25, 1),
-(3, 27, 1),
-(3, 29, 1),
-(3, 30, 1),
-(3, 39, 1),
-(3, 40, 1),
-(4, 1, 1),
-(4, 2, 1),
-(4, 3, 1),
-(4, 4, 1),
-(4, 5, 0),
-(4, 14, 1),
-(4, 21, 1),
-(4, 23, 1),
-(4, 24, 1),
-(4, 25, 1),
-(4, 26, 1),
-(4, 30, 1);
+INSERT INTO `rolespermissions` (`roleID`, `permissionID`) VALUES
+(1, 1),
+(2, 1),
+(3, 1),
+(4, 1),
+(1, 2),
+(2, 2),
+(3, 2),
+(4, 2),
+(1, 3),
+(2, 3),
+(3, 3),
+(4, 3),
+(1, 4),
+(2, 4),
+(3, 4),
+(4, 4),
+(1, 5),
+(2, 5),
+(3, 5),
+(1, 6),
+(2, 6),
+(3, 6),
+(1, 7),
+(2, 7),
+(1, 8),
+(2, 8),
+(1, 9),
+(1, 10),
+(1, 11),
+(1, 12),
+(1, 13),
+(2, 14),
+(3, 14),
+(4, 14),
+(3, 15),
+(3, 16),
+(2, 17),
+(2, 18),
+(2, 19),
+(3, 19),
+(2, 20),
+(3, 21),
+(4, 21),
+(3, 22),
+(4, 23),
+(3, 24),
+(4, 24),
+(3, 25),
+(4, 25),
+(4, 26),
+(3, 27),
+(2, 28),
+(2, 29),
+(3, 29),
+(2, 30),
+(3, 30),
+(4, 30),
+(2, 31),
+(2, 32),
+(2, 33),
+(2, 34),
+(2, 35),
+(2, 36),
+(2, 37),
+(2, 38),
+(3, 39),
+(3, 40);
 
 -- --------------------------------------------------------
 
@@ -1505,8 +1503,8 @@ CREATE TABLE IF NOT EXISTS `salary_rule_version` (
   `dsl_json` json DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`version_id`),
-  KEY `FK_RuleVersion_Rule` (`rule_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `rule_id` (`rule_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `salary_rule_version`
@@ -1558,9 +1556,8 @@ CREATE TABLE IF NOT EXISTS `salary_variable_cache` (
   `evaluated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`cache_id`),
   UNIQUE KEY `UQ_Cache_Var` (`variable_id`,`employee_id`,`payperiod`),
-  UNIQUE KEY `UQ_Cache_Rule` (`rule_id`,`employee_id`,`payperiod`),
-  KEY `FK_Cache_Employee` (`employee_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=898 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `UQ_Cache_Rule` (`rule_id`,`employee_id`,`payperiod`)
+) ENGINE=MyISAM AUTO_INCREMENT=898 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `salary_variable_cache`
@@ -2741,21 +2738,21 @@ INSERT INTO `users` (`userID`, `username`, `password`, `fullname`, `cccd`, `emai
 --
 DROP VIEW IF EXISTS `v_employee_profile_flat`;
 CREATE TABLE IF NOT EXISTS `v_employee_profile_flat` (
-`AGE` bigint
-,`BASE_SALARY` decimal(15,2)
-,`CONTRACT_TYPE` varchar(100)
-,`DEPENDENT_COUNT` bigint
-,`DEPT_NAME` varchar(255)
+`userID` int
 ,`GENDER` enum('MALE','FEMALE')
-,`INSURANCE_BASE` decimal(15,2)
-,`IS_OFFICE` bit(1)
 ,`JOB_TYPE` varchar(100)
-,`ROLE_NAME` varchar(100)
+,`SKILL_GRADE` int
+,`AGE` bigint
 ,`SENIORITY_DAYS` int
 ,`SENIORITY_MONTHS` bigint
-,`SKILL_GRADE` int
+,`BASE_SALARY` decimal(15,2)
+,`CONTRACT_TYPE` varchar(100)
 ,`TOXIC_TYPE` enum('NONE','CASH','IN_KIND')
-,`userID` int
+,`INSURANCE_BASE` decimal(15,2)
+,`DEPT_NAME` varchar(255)
+,`IS_OFFICE` bit(1)
+,`ROLE_NAME` varchar(100)
+,`DEPENDENT_COUNT` bigint
 );
 
 -- --------------------------------------------------------
@@ -2889,20 +2886,6 @@ ALTER TABLE `rolespermissions`
 --
 ALTER TABLE `salaryvariables`
   ADD CONSTRAINT `fk_salaryvariables_rule_fix` FOREIGN KEY (`rule_id`) REFERENCES `salary_rule` (`rule_id`);
-
---
--- Các ràng buộc cho bảng `salary_rule_version`
---
-ALTER TABLE `salary_rule_version`
-  ADD CONSTRAINT `FK_RuleVersion_Rule` FOREIGN KEY (`rule_id`) REFERENCES `salary_rule` (`rule_id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Các ràng buộc cho bảng `salary_variable_cache`
---
-ALTER TABLE `salary_variable_cache`
-  ADD CONSTRAINT `FK_Cache_Employee` FOREIGN KEY (`employee_id`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_Cache_Rule` FOREIGN KEY (`rule_id`) REFERENCES `salary_rule` (`rule_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_Cache_Variable` FOREIGN KEY (`variable_id`) REFERENCES `salaryvariables` (`VariableID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `schedulerequirements`
