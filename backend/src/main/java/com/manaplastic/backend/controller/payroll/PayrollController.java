@@ -6,6 +6,7 @@ import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.payrollengine.service.PayrollEngineService;
 import com.manaplastic.backend.repository.UserRepository; // Giả định bạn có repo này
 // import com.manaplastic.backend.service.PayrollService; // Bỏ service cũ
+import com.manaplastic.backend.service.PdfService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,6 +27,9 @@ public class PayrollController {
     private UserRepository userRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private PdfService pdfService;
+
 
     @PostMapping("/calculate")
     @PreAuthorize("hasAnyAuthority('HR','Admin')")
@@ -108,5 +112,18 @@ public class PayrollController {
 
         List<Map<String, Object>> results = jdbcTemplate.queryForList(sql, employeeId, payPeriod);
         return ResponseEntity.ok(results);
+    }
+
+    @PostMapping("/finalize")
+    @PreAuthorize("hasAnyAuthority('HR','Admin')")
+    // @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
+    public ResponseEntity<?> finalizePayroll(@RequestParam int month, @RequestParam int year) {
+        try {
+            payrollEngineService.finalizePayrollAndSendMail(month, year);
+            return ResponseEntity.ok("Đã chốt lương và bắt đầu tiến trình gửi email.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Lỗi khi chốt lương: " + e.getMessage());
+        }
     }
 }

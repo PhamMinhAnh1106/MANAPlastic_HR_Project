@@ -38,7 +38,7 @@ public class PayslipController {
             if (currentUser == null) {
                 return ResponseEntity.status(401).body("User chưa đăng nhập!");
             }
-            int userId = currentUser.getId();
+            Integer userId = currentUser.getId();
             Map<String, Object> payslip = payslipService.getMyPayslip(userId, month, year);
             return ResponseEntity.ok(payslip);
         } catch (Exception e) {

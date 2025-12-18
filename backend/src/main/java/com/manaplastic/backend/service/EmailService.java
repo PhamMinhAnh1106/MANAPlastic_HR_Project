@@ -2,9 +2,12 @@ package com.manaplastic.backend.service;
 
 import com.manaplastic.backend.entity.LeaverequestEntity;
 import com.manaplastic.backend.entity.UserEntity;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -104,6 +107,44 @@ public class EmailService {
             mailSender.send(message);
         } catch (Exception e) {
             System.err.println("Lỗi khi gửi email OTP: " + e.getMessage());
+        }
+    }
+
+    // Luồng gửi phiếu lương
+    @Async
+    public void sendPayslipEmail(String userEmail, String userFullname, String payPeriod, byte[] pdfBytes) {
+        if (userEmail == null || userEmail.isEmpty()) {
+            System.out.println("WARN: User " + userFullname + " không có email. Bỏ qua gửi payslip.");
+            return;
+        }
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            // multipart = true để hỗ trợ đính kèm
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(userEmail);
+            helper.setSubject("[MANAPlastic] Phiếu lương tháng " + payPeriod);
+
+            String text = String.format(
+                    "Xin chào %s,\n\n" +
+                            "Phòng Nhân sự xin gửi bạn phiếu lương tháng %s.\n" +
+                            "Vui lòng xem file PDF đính kèm để biết chi tiết.\n\n" +
+                            "Mọi thắc mắc vui lòng liên hệ bộ phận HR.\n\n" +
+                            "MANAPlastic trân trọng.",
+                    userFullname, payPeriod
+            );
+            helper.setText(text);
+
+            // Đính kèm file PDF
+            String fileName = "Phieu_luong_" + payPeriod + ".pdf";
+            helper.addAttachment(fileName, new ByteArrayResource(pdfBytes));
+
+            mailSender.send(message);
+            System.out.println("-> Đã gửi mail lương cho: " + userEmail);
+
+        } catch (Exception e) {
+            System.err.println("Lỗi khi gửi email lương cho " + userEmail + ": " + e.getMessage());
         }
     }
 }

@@ -32,10 +32,10 @@ public class PayslipService {
         Map<String, Object> payslip = new HashMap<>();
 
         String sqlHeader = """
-            SELECT p.*, 
-                   u.fullname, 
-                   u.username, 
-                   u.jobtype, 
+            SELECT p.*,
+                   u.fullname,
+                   u.username,
+                   u.jobtype,
                    d.departmentname
             FROM payrolls p
             JOIN users u ON p.userID = u.userID
@@ -65,11 +65,11 @@ public class PayslipService {
 
         //  Lấy chi tiết các biến
         String sqlItems = """
-                SELECT r.rule_code, r.name, svc.value 
-                FROM salary_variable_cache svc 
-                JOIN salary_rule r ON svc.rule_id = r.rule_id  -- <--- ĐÃ SỬA: JOIN theo rule_id
-                WHERE svc.employee_id = ? 
-                  AND svc.payperiod = ? 
+                SELECT r.rule_code, r.name, svc.value
+                FROM salary_variable_cache svc
+                JOIN salary_rule r ON svc.rule_id = r.rule_id  -- <--- JOIN theo rule_id
+                WHERE svc.employee_id = ?
+                  AND svc.payperiod = ?
                   AND svc.rule_id IS NOT NULL -- Chỉ lấy kết quả Rule, không lấy Variable input
                 ORDER BY r.priority ASC
                 """;
@@ -114,6 +114,83 @@ public class PayslipService {
 
         return payslip;
     }
+
+
+    public Map<String, Object> getMyPayslipPDF(Integer userId, int month, int year) {
+        String payPeriod = String.format("%d-%02d", year, month);
+        Map<String, Object> payslip = new HashMap<>();
+
+        // HEADER
+        String sqlHeader = """
+            SELECT 
+                p.userID, u.username, p.payperiod, p.netsalary, p.totalincome,
+                u.fullname, u.email, d.departmentname, u.jobtype as job_type 
+            FROM payrolls p
+            LEFT JOIN users u ON p.userID = u.userID
+            LEFT JOIN departments d ON u.departmentID = d.departmentID
+            WHERE p.userID = ? AND p.payperiod = ?
+        """;
+
+        try {
+            payslip.put("header", jdbcTemplate.queryForMap(sqlHeader, userId, payPeriod));
+        } catch (Exception e) {
+            return null;
+        }
+
+        //  ITEMS (Đã lọc sạch các biến rác từ DB )
+        String sqlItems = """
+            SELECT 
+                COALESCE(r.rule_code, v.Code) as code,
+                COALESCE(r.name, v.Name, 'Điều chỉnh') as item_name,
+                svc.value as item_value
+                
+            FROM salary_variable_cache svc
+            LEFT JOIN salary_rule r ON svc.rule_id = r.rule_id
+            LEFT JOIN salaryvariables v ON svc.variable_id = v.VariableID
+            WHERE svc.employee_id = ? 
+              AND svc.payperiod = ?
+              AND svc.value != 0
+              
+              --  (BLACKLIST)
+          
+              AND (
+                  -- Lấy code từ Rule hoặc Variable
+                  COALESCE(r.rule_code, v.Code) NOT IN (
+                      -- Các biến cấu hình hệ thống (Config)
+                      'BASIC_SALARY_STATE',       -- Lương cơ sở nhà nước
+                      'REGION_MIN_SALARY',        -- Lương tối thiểu vùng
+                      'INSURANCE_CAP_MULTIPLIER', -- Hệ số trần bảo hiểm
+                      'LUNCH_ALLOWANCE_LIMIT',    -- Giới hạn ăn ca miễn thuế
+                      'STD_DAYS',                 -- Ngày công chuẩn (thường hiện ở header rồi)
+                      
+                      -- Các tỷ lệ phần trăm (Rates)
+                      'RATE_BHXH_EMP', 'RATE_BHYT_EMP', 'RATE_BHTN_EMP', 
+                      'RATE_BHXH_COMP', 'RATE_BHYT_COMP', 'RATE_BHTN_COMP',
+                      'RATE_NIGHT_SHIFT',
+                      
+                      -- Các biến tính toán trung gian (Intermediate)
+                      'HOURLY_MONEY',             -- Lương 1 giờ (quy đổi)
+                      'TAX_EXEMPT_INCOME',        -- Thu nhập miễn thuế (ẩn đi cho gọn)
+                      'TAXABLE_INCOME',        -- Thu nhập tính thuế (ẩn đi cho gọn)
+                      'INSURANCE_AMT',            -- Tiền BH tổng (đã có chi tiết từng loại)
+                      'FAMILY_DEDUCTION',         -- Tổng giảm trừ gia cảnh (đã hiện số người phụ thuộc)
+                      'PERSONAL_DEDUCTION',       -- Mức giảm trừ bản thân (cố định 11tr)
+                      'DEPENDENT_DEDUCTION'       -- Mức giảm trừ NPT (cố định 4.4tr)
+                  )
+                  
+                  -- Loại bỏ các biến bắt đầu bằng từ khóa hệ thống
+                  AND COALESCE(r.rule_code, v.Code) NOT LIKE 'TEMP_%'  -- Chặn biến tạm
+              )
+              
+            ORDER BY svc.evaluated_at ASC
+        """;
+
+        List<Map<String, Object>> items = jdbcTemplate.queryForList(sqlItems, userId, payPeriod);
+        payslip.put("items", items);
+
+        return payslip;
+    }
+
 
     public Page<PayrollDTO> getPayrollList(PayrollFilterCriteria criteria, Pageable pageable) {
         Specification<PayrollEntity> spec = PayrollFilter.filterBy(criteria);
