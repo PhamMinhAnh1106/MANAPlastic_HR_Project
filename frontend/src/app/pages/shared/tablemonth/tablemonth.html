@@ -16,7 +16,6 @@
         <input type="number" [(ngModel)]="selectedYear" min="2025" max="2030" (ngModelChange)="onMonthYearChange()" />
       </div>
 
-      <!-- --- NEW CONTROLS (Đã chuyển vào trong) --- -->
       <div class="extra-controls-group">
         <select [(ngModel)]="selectStatus" class="status-select">
             <option value="">Chọn Lịch</option>
@@ -36,20 +35,31 @@
             Xếp lịch tự động
         </button>
   
-        <span *ngIf="role == 'employee'" class="material-symbols-outlined add-icon" (click)="emitRegister()">
-            add
-        </span>
-        <div *ngIf="role == 'employee'" class="instruction-badge">
-          <span class="material-symbols-outlined icon-touch">touch_app</span>
-          <span>Click vào ô muốn đổi ca để đổi (ca đã có đăng ký)</span>
-      </div>
+       <span *ngIf="role == 'employee'" class="add-1icon" (click)="emitRegister()">
+    <!-- Icon nằm riêng trong thẻ này -->
+    <span class="material-symbols-outlined">add</span>
+    <!-- Chữ nằm bên cạnh -->
+    <span>Đăng Ký Ca</span>
+</span>
       </div>
     </div>
     
-    <!-- Legend -->
-    <div class="legend" *ngIf="role === 'manager'">
-       <span class="badge draft" *ngIf="statusSchedule === 'draft'">Draft</span>
-       <span class="badge official" *ngIf="statusSchedule === 'office'">Office</span>
+    <!-- RIGHT SIDE: Notification & Legend -->
+    <div class="header-right-side">
+        <!-- NOTIFICATION ICON -->
+        <div class="notification-container" *ngIf="role === 'manager' || role === 'employee'">
+            <div class="bell-icon-wrapper" (click)="toggleNotifiModal()">
+                <span class="material-symbols-outlined bell-icon">notifications</span>
+                <!-- Chỉ hiển thị số lượng nếu có đơn pending -->
+                <span class="badge-count" *ngIf="countnotifi > 0">{{ countnotifi }}</span>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend" *ngIf="role === 'manager'">
+           <span class="badge draft" *ngIf="statusSchedule === 'draft'">Draft</span>
+           <span class="badge official" *ngIf="statusSchedule === 'office'">Office</span>
+        </div>
     </div>
   </div>
 
@@ -100,7 +110,88 @@
     </div>
   </div>
 
-  <!-- POPUPS (Edit & Details) giữ nguyên -->
+  <!-- MODALS SECTION -->
+  
+  <!-- 1. FULL PAGE NOTIFICATION MODAL -->
+  <div class="modal-overlay full-page" *ngIf="isNotifiOpen">
+      <div class="modal-container">
+          <div class="modal-header-lg">
+              <h2>Quản lý yêu cầu đổi ca</h2>
+              <button class="close-btn" (click)="closeNotifiModal()">
+                  <span class="material-symbols-outlined">close</span>
+              </button>
+          </div>
+          
+          <!-- TABS -->
+          <div class="modal-tabs">
+              <button class="tab-item" [class.active]="currentTab === 'PENDING'" (click)="setTab('PENDING')">
+                  Đang chờ ({{ countnotifi }})
+              </button>
+              <button class="tab-item" [class.active]="currentTab === 'APPROVED'" (click)="setTab('APPROVED')">
+                  Đã duyệt
+              </button>
+              <button class="tab-item" [class.active]="currentTab === 'REJECTED'" (click)="setTab('REJECTED')">
+                  Từ chối
+              </button>
+          </div>
+
+          <!-- LIST BODY -->
+          <div class="modal-body-lg custom-scroll">
+              <div class="empty-state" *ngIf="displayGroupedRequests.length === 0">
+                  <span class="material-symbols-outlined">inbox</span>
+                  <p>Không có dữ liệu.</p>
+              </div>
+
+              <!-- GROUP LOOP: Nhân viên -->
+              <div class="employee-group" *ngFor="let group of displayGroupedRequests">
+                  <div class="group-header">
+                      <div class="avatar-placeholder">{{ group.employeeName.charAt(0) }}</div>
+                      <div class="group-info">
+                          <span class="emp-name">{{ group.employeeName }}</span>
+                          <span class="dept-name">{{ group.departmentName }}</span>
+                      </div>
+                  </div>
+
+                  <!-- REQUEST LOOP: Đơn của nhân viên đó -->
+                  <div class="group-requests">
+                      <div class="request-row" *ngFor="let req of group.items">
+                          <div class="req-date">
+                              <span class="label">Ngày xin đổi:</span>
+                              <strong>{{ req.targetDate | date:'dd/MM/yyyy' }}</strong>
+                          </div>
+                          
+                          <div class="req-content">
+                              <span class="shift-box from">{{ req.currentShiftName }}</span>
+                              <i class="material-symbols-outlined arrow">arrow_forward</i>
+                              <span class="shift-box to">{{ req.newShiftName }}</span>
+                              <span class="reason-text" title="{{req.reason}}">"{{ req.reason }}"</span>
+                          </div>
+
+                          <!-- Actions: Manager only sees buttons on PENDING tab -->
+                          <div class="req-actions" *ngIf="role === 'manager' && currentTab === 'PENDING'">
+                              <button class="btn-action approve" (click)="onApprove(req.id, $event)">
+                                  <span class="material-symbols-outlined">check</span> Duyệt
+                              </button>
+                              <button class="btn-action reject" (click)="onReject(req.id, $event)">
+                                  <span class="material-symbols-outlined">close</span> Từ chối
+                              </button>
+                          </div>
+
+                          <!-- Display Status for other tabs or Employee -->
+                          <div class="req-status" *ngIf="currentTab !== 'PENDING' || role !== 'manager'">
+                               <span class="status-badge" [ngClass]="req.status.toLowerCase()">
+                                   {{ req.status === 'APPROVED' ? 'Đã duyệt' : (req.status === 'REJECTED' ? 'Đã từ chối' : 'Chờ duyệt') }}
+                               </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+
+  <!-- 2. EDIT SHIFT POPUP -->
   <div class="modal-backdrop" *ngIf="selectedShiftData && role === 'manager'">
     <div class="modal-content fade-in">
         <div class="modal-header">
@@ -133,6 +224,10 @@
                     </optgroup>
                 </select>
             </div>
+            <div class="form-group">
+                <label>Lý Do</label>
+                <textarea [(ngModel)]="reason"></textarea>
+            </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-secondary" (click)="selectedShiftData = null">Hủy bỏ</button>
@@ -141,6 +236,7 @@
     </div>
   </div>
 
+  <!-- 3. DAY DETAILS POPUP -->
   <div class="modal-backdrop" *ngIf="showDayDetailsPopup">
     <div class="modal-content day-details fade-in">
         <div class="modal-header">

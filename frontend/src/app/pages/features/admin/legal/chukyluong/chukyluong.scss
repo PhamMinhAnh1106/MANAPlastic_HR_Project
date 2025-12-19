@@ -1,0 +1,722 @@
+    // 1. VARIABLES
+    $primary-color: #2563eb;
+    $primary-hover: #1d4ed8;
+    $indigo-color: #4f46e5;
+    $indigo-hover: #4338ca;
+    $danger-color: #dc2626;
+    $success-bg: #dcfce7;
+    $success-text: #166534;
+    $error-bg: #fee2e2;
+    $error-text: #991b1b;
+
+    $gray-50: #f9fafb;
+    $gray-100: #f3f4f6;
+    $gray-200: #e5e7eb;
+    $gray-300: #d1d5db;
+    $gray-400: #9ca3af;
+    $gray-500: #6b7280;
+    $gray-600: #4b5563;
+    $gray-700: #374151;
+    $gray-900: #111827;
+
+    $shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    $shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    $shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+    $radius-md: 0.375rem;
+    $radius-lg: 0.5rem;
+    $radius-xl: 0.75rem;
+
+    // FONT SIZES (Reduced by approx 0.3rem)
+    $font-xs: 0.7rem; // was 0.75rem
+    $font-sm: 0.75rem; // was 0.875rem
+    $font-base: 0.7rem; // was 1rem
+    $font-lg: 0.825rem; // was 1.125rem
+    $font-xl: 0.95rem; // was 1.25rem
+    $font-2xl: 1.2rem; // was 1.5rem
+
+    // 2. GENERAL LAYOUT
+    .salary-cycle-container {
+        min-height: 100vh;
+        background-color: $gray-50;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        padding: 1.5rem;
+    }
+
+    .btn-icon {
+        padding: 6px;
+        border-radius: 6px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &.edit {
+            color: $primary-color;
+
+            &:hover {
+                background: rgba($primary-color, 0.1);
+            }
+        }
+
+        &.delete {
+            color: $danger-color;
+
+            &:hover {
+                background: rgba($danger-color, 0.1);
+            }
+        }
+    }
+
+    .main-wrapper {
+        max-width: 72rem;
+        width: 54rem;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    // 3. HEADER CARD
+    .header-card {
+        background-color: white;
+        border-radius: $radius-xl;
+        padding: 1.5rem;
+        box-shadow: $shadow-sm;
+        border: 1px solid $gray-200;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+
+        @media (min-width: 640px) {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-info {
+            .page-title {
+                font-size: $font-2xl; // Reduced
+                font-weight: 700;
+                color: $gray-900;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin: 0;
+
+                .icon-primary {
+                    color: $primary-color;
+                }
+            }
+
+            .page-subtitle {
+                margin-top: 0.25rem;
+                margin-bottom: 0;
+                color: $gray-500;
+                font-size: $font-sm; // Reduced
+            }
+        }
+    }
+
+    // 4. ACTIONS GROUP
+    .actions-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+
+        .year-selector {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border: 1px solid $gray-300;
+            border-radius: $radius-lg;
+            padding: 0.25rem;
+            box-shadow: $shadow-sm;
+
+            .year-btn {
+                background: none;
+                border: none;
+                padding: 0.5rem;
+                border-radius: $radius-md;
+                color: $gray-500;
+                transition: all 0.2s;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+
+                &:hover {
+                    background-color: $gray-100;
+                    color: $gray-900;
+                }
+            }
+
+            .year-display {
+                padding: 0 1rem;
+                font-weight: 600;
+                font-size: $font-lg; // Reduced
+                color: $gray-900;
+                font-variant-numeric: tabular-nums;
+            }
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background-color: $primary-color;
+            border: none;
+            color: white;
+            padding: 0.625rem 1.25rem;
+            border-radius: $radius-lg;
+            font-weight: 500;
+            font-size: $font-base; // Reduced
+            box-shadow: $shadow-sm;
+            cursor: pointer;
+            transition: background-color 0.2s;
+
+            &:hover {
+                background-color: $primary-hover;
+            }
+        }
+    }
+
+    // 5. ALERTS & NOTIFICATIONS
+    .alert {
+        padding: 1rem;
+        border-radius: $radius-lg;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        font-size: $font-sm; // Reduced
+        animation: slideIn 0.3s ease-out;
+
+        &.alert-success {
+            background-color: $success-bg;
+            color: $success-text;
+        }
+
+        &.alert-error {
+            background-color: $error-bg;
+            color: $error-text;
+        }
+
+        .alert-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-close-alert {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: inherit;
+            opacity: 0.6;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
+
+    // 6. TABLE STYLES
+    .table-container {
+        background-color: white;
+        border-radius: $radius-xl;
+        box-shadow: $shadow-sm;
+        border: 1px solid $gray-200;
+        overflow: hidden;
+
+        .loading-state {
+            padding: 3rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: $gray-500;
+            font-size: $font-base; // Reduced
+
+            .spinner {
+                height: 2rem;
+                width: 2rem;
+                color: $primary-color;
+                animation: spin 1s linear infinite;
+            }
+
+            .loading-text {
+                margin-left: 0.75rem;
+                font-weight: 500;
+            }
+        }
+
+        .empty-state {
+            padding: 4rem 1rem;
+            text-align: center;
+            color: $gray-500;
+            font-size: $font-base; // Reduced
+
+            .link-btn {
+                background: none;
+                border: none;
+                color: $primary-color;
+                font-weight: 600;
+                cursor: pointer;
+                text-decoration: underline;
+                margin-left: 0.5rem;
+                font-size: inherit;
+
+                &:hover {
+                    color: $primary-hover;
+                }
+            }
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: $font-sm; // Reduced
+
+            thead {
+                background-color: $gray-50;
+                border-bottom: 1px solid $gray-200;
+
+                th {
+                    padding: 0.75rem 1.5rem;
+                    font-weight: 600;
+                    font-size: $font-xs; // Reduced
+                    text-transform: uppercase;
+                    color: $gray-500;
+                    letter-spacing: 0.05em;
+                }
+            }
+
+            tbody {
+                .table-row {
+                    border-bottom: 1px solid $gray-100;
+                    transition: background-color 0.15s;
+
+                    &:hover {
+                        background-color: #f8fafc;
+                    }
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+                }
+
+                td {
+                    padding: 1rem 1.5rem;
+                    vertical-align: middle;
+                }
+
+                .col-month {
+                    font-weight: 500;
+                    color: $gray-900;
+
+                    .month-wrapper {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                    }
+
+                    .month-badge {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 2rem; // Reduced
+                        height: 2rem; // Reduced
+                        border-radius: 9999px;
+                        background-color: #eff6ff;
+                        color: $primary-color;
+                        font-weight: 700;
+                        font-size: $font-sm; // Reduced
+                    }
+
+                    .month-text {
+                        display: none;
+
+                        @media(min-width: 640px) {
+                            display: inline;
+                        }
+                    }
+                }
+
+                .col-date {
+                    color: $gray-600;
+                    font-family: monospace;
+                    font-size: $font-base; // Reduced
+                }
+            }
+        }
+
+        .workday-badge {
+            display: inline-flex;
+            padding: 0.2rem 0.6rem; // Reduced padding
+            border-radius: 9999px;
+            background-color: $gray-100;
+            color: $gray-700;
+            font-weight: 500;
+            font-size: $font-sm; // Reduced
+        }
+
+        .action-btn {
+            padding: 0.5rem;
+            color: $gray-400;
+            background: none;
+            border: none;
+            border-radius: $radius-md;
+            transition: all 0.2s;
+            cursor: pointer;
+
+            &:hover {
+                color: $indigo-color;
+                background-color: #eef2ff;
+            }
+        }
+    }
+
+    // 7. MODALS
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 50;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+
+    .modal-card {
+        background-color: white;
+        border-radius: $radius-xl;
+        box-shadow: $shadow-lg;
+        width: 100%;
+        max-width: 28rem;
+        overflow: hidden;
+        animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        flex-direction: column;
+
+        &.modal-sm {
+            max-width: 24rem;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid $gray-100;
+            background-color: white;
+
+            &.header-indigo {
+                background-color: #eef2ff;
+                border-bottom-color: #e0e7ff;
+            }
+
+            .modal-title {
+                font-size: $font-lg; // Reduced
+                font-weight: 600;
+                color: $gray-900;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin: 0;
+
+                .icon-primary {
+                    color: $primary-color;
+                }
+
+                &.text-indigo {
+                    color: #312e81;
+                }
+            }
+
+            .close-btn {
+                color: $gray-400;
+                padding: 0.25rem;
+                border-radius: $radius-md;
+                background: none;
+                border: none;
+                cursor: pointer;
+
+                &:hover {
+                    color: $gray-500;
+                    background-color: rgba(0, 0, 0, 0.05);
+                }
+
+                &.btn-indigo {
+                    color: #818cf8;
+
+                    &:hover {
+                        color: $indigo-color;
+                    }
+                }
+            }
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .info-box {
+            background-color: $gray-50;
+            padding: 1rem;
+            border-radius: $radius-lg;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            border: 1px solid $gray-100;
+
+            .info-label {
+                font-size: $font-xs;
+                text-transform: uppercase;
+                font-weight: 700;
+                color: $gray-400;
+                display: block;
+            }
+
+            .info-value {
+                font-family: monospace;
+                color: $gray-700;
+                font-weight: 500;
+                margin: 0;
+                font-size: $font-base;
+            }
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+            border-top: 1px solid $gray-100;
+
+            button {
+                padding: 0.5rem 1rem;
+                border-radius: $radius-lg;
+                font-weight: 500;
+                font-size: $font-sm; // Reduced
+                transition: all 0.2s;
+                cursor: pointer;
+                border: none;
+            }
+
+            .btn-cancel {
+                background-color: white;
+                color: $gray-700;
+                border: 1px solid $gray-300;
+
+                &:hover {
+                    background-color: $gray-50;
+                }
+            }
+
+            .btn-submit {
+                background-color: $primary-color;
+                color: white;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+
+                &:hover {
+                    background-color: $primary-hover;
+                }
+
+                &:disabled {
+                    opacity: 0.7;
+                    cursor: not-allowed;
+                }
+
+                &.btn-primary-dark {
+                    background-color: $indigo-color;
+
+                    &:hover {
+                        background-color: $indigo-hover;
+                    }
+                }
+
+                .spinner-sm {
+                    width: 1rem;
+                    height: 1rem;
+                    animation: spin 1s linear infinite;
+                }
+            }
+        }
+    }
+
+    // 8. FORMS & INPUTS
+    .form-group {
+        display: block;
+    }
+
+    .form-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .form-group-end {
+        display: flex;
+        align-items: flex-end;
+        padding-bottom: 0.75rem;
+    }
+
+    .form-label {
+        display: block;
+        font-size: $font-sm; // Reduced
+        font-weight: 500;
+        color: $gray-700;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border-radius: $radius-lg;
+        border: 1px solid $gray-300;
+        background-color: white;
+        color: $gray-900;
+        box-shadow: $shadow-sm;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        font-size: $font-base; // Reduced
+        box-sizing: border-box;
+
+        &:focus {
+            outline: none;
+            border-color: $primary-color;
+            box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+        }
+
+        &.input-large-center {
+            font-size: $font-lg;
+            font-weight: 500;
+            text-align: center;
+
+            &:focus {
+                border-color: $indigo-color;
+                box-shadow: 0 0 0 2px rgba($indigo-color, 0.2);
+            }
+        }
+    }
+
+    // Custom Toggle Switch
+    .toggle-switch {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+
+        .relative {
+            position: relative;
+            width: 2.5rem; // Reduced
+            height: 1.3rem; // Reduced
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        input:checked~.toggle-bg {
+            background-color: $primary-color;
+        }
+
+        input:checked~.toggle-bg::after {
+            transform: translateX(100%);
+            border-color: white;
+        }
+
+        .toggle-bg {
+            width: 100%;
+            height: 100%;
+            background-color: $gray-200;
+            border-radius: 9999px;
+            transition: background-color 0.2s;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                background-color: white;
+                border: 1px solid $gray-300;
+                border-radius: 50%;
+                height: 1rem; // Reduced
+                width: 1rem; // Reduced
+                transition: all 0.2s;
+            }
+        }
+
+        .toggle-label {
+            margin-left: 0.75rem;
+            font-size: $font-sm; // Reduced
+            font-weight: 500;
+            color: $gray-700;
+        }
+    }
+
+    // UTILITIES
+    .text-center {
+        text-align: center;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes modalPop {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }

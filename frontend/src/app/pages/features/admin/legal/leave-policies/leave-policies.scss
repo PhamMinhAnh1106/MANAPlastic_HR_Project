@@ -1,0 +1,422 @@
+$primary-color: #3b82f6;
+$primary-hover: #2563eb;
+$danger-color: #ef4444;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-500: #6b7280;
+$gray-700: #374151;
+
+.page-container {
+    padding: 24px;
+    width: 55rem;
+    background-color: #f9fafb;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+}
+
+.icon-lg {
+    width: 28px;
+    height: 28px;
+}
+
+.icon-sm {
+    width: 20px;
+    height: 20px;
+}
+
+.icon-xs {
+    width: 16px;
+    height: 16px;
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+    }
+
+    .page-subtitle {
+        color: $gray-500;
+        margin-top: 4px;
+        font-size: 0.875rem;
+    }
+}
+
+.actions-bar {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+
+    .year-filter {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+        padding: 4px 12px;
+        border-radius: 8px;
+        border: 1px solid $gray-200;
+
+        .label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: $gray-700;
+        }
+
+        .input-year {
+            border: none;
+            width: 60px;
+            font-weight: bold;
+            color: $primary-color;
+            outline: none;
+            background: transparent;
+        }
+    }
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+
+    &.btn-primary {
+        background: $primary-color;
+        color: white;
+
+        &:hover {
+            background: $primary-hover;
+        }
+
+        &:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+    }
+
+    &.btn-secondary {
+        background: white;
+        border: 1px solid $gray-200;
+        color: $gray-700;
+
+        &:hover {
+            background: $gray-100;
+        }
+    }
+}
+
+.year-selector {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+    .year-btn {
+        background: none;
+        border: none;
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        color: #6b7280;
+        transition: all 0.2s;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+
+        &:hover {
+            background-color: #f3f4f6;
+            color: #111827;
+        }
+    }
+
+    .year-display {
+        padding: 0 1rem;
+        font-weight: 600;
+        font-size: 0.825rem;
+        color: #111827;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+.btn-icon {
+    padding: 6px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &.edit {
+        color: $primary-color;
+
+        &:hover {
+            background: rgba($primary-color, 0.1);
+        }
+    }
+
+    &.delete {
+        color: $danger-color;
+
+        &:hover {
+            background: rgba($danger-color, 0.1);
+        }
+    }
+}
+
+.table-container {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid $gray-200;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.policy-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead th {
+        padding: 12px 16px;
+        text-align: left;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: $gray-500;
+        background: $gray-100;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+    }
+
+    tbody td {
+        padding: 16px;
+        vertical-align: middle;
+        border-bottom: 1px solid $gray-200;
+        font-size: 0.875rem;
+        color: $gray-700;
+    }
+
+    tbody tr:hover {
+        background: #fcfcfc;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        font-style: italic;
+        color: $gray-500;
+    }
+}
+
+.leave-type-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+
+    &.annual {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    &.sick {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    &.maternity {
+        background: #fce7f3;
+        color: #9d174d;
+    }
+
+    &.default {
+        background: $gray-100;
+        color: $gray-700;
+    }
+}
+
+.range-badge {
+    background: $gray-100;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-family: monospace;
+    color: $gray-700;
+}
+
+.gender-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+
+    &.male {
+        color: #2563eb;
+    }
+
+    &.female {
+        color: #db2777;
+    }
+
+    &.all {
+        color: $gray-500;
+    }
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    animation: slideIn 0.3s ease-out;
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid $gray-200;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .btn-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: $gray-500;
+
+        &:hover {
+            color: #111827;
+        }
+    }
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    background: $gray-100;
+    border-top: 1px solid $gray-200;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+
+    &.half {
+        flex: 1;
+        margin-bottom: 0;
+    }
+
+    &.full-width {
+        width: 100%;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: $gray-700;
+
+        .required {
+            color: $danger-color;
+        }
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid $gray-200;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        outline: none;
+        transition: border-color 0.2s;
+
+        &:focus {
+            border-color: $primary-color;
+            box-shadow: 0 0 0 2px rgba($primary-color, 0.1);
+        }
+    }
+
+    .error-msg {
+        color: $danger-color;
+        font-size: 0.75rem;
+        margin-top: 4px;
+    }
+}
+
+.loading-state {
+    text-align: center;
+    padding: 20px;
+    color: $primary-color;
+    font-weight: 500;
+}
+
+.error-banner {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 12px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    border: 1px solid #fca5a5;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

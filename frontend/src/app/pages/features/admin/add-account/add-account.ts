@@ -96,6 +96,6 @@ export class AddAccount {
   }
 
   closeForm() {
-    this.router.navigate(["/home/info"]);
+    this.router.navigate(["/home/user/account"]);
   }
 }

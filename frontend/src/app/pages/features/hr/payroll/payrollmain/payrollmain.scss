@@ -1,19 +1,19 @@
 /* --- COLORS PALETTE --- */
 $bg-body: #f3f4f6;
 $bg-white: #ffffff;
-$primary-blue: #4f46e5; // Button Blue
+$primary-blue: #4f46e5;
 $primary-hover: #4338ca;
-$btn-green: #10b981; // Button Green
+$btn-green: #10b981;
 $text-dark: #1f2937;
 $text-gray: #6b7280;
 $border-light: #e5e7eb;
 
-$badge-rule-bg: #f3e8ff; // Purple/Pink tint
+$badge-rule-bg: #f3e8ff;
 $badge-rule-text: #9333ea;
 $badge-input-bg: #f3f4f6;
 $badge-input-text: #6b7280;
 
-$row-danger-bg: #fef2f2; // Light Red for Tax
+$row-danger-bg: #fef2f2;
 $row-hover: #f9fafb;
 
 /* --- GLOBAL LAYOUT --- */
@@ -23,7 +23,6 @@ $row-hover: #f9fafb;
     background-color: $bg-body;
     min-height: 100vh;
     padding: 3rem 0.5rem 0.5rem 5rem;
-
     color: $text-dark;
 }
 
@@ -76,48 +75,12 @@ $row-hover: #f9fafb;
             }
         }
     }
-
-    .user-section {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-
-        .user-info {
-            text-align: right;
-
-            .role {
-                display: block;
-                font-size: 0.7rem;
-                color: #9ca3af;
-            }
-
-            .id {
-                display: block;
-                font-weight: 700;
-                color: $primary-blue;
-                font-size: 1rem;
-            }
-        }
-
-        .btn-logout {
-            background: transparent;
-            border: none;
-            color: #9ca3af;
-            font-size: 1.2rem;
-            cursor: pointer;
-
-            &:hover {
-                color: #ef4444;
-            }
-        }
-    }
 }
 
 /* --- LAYOUT GRID --- */
 .layout-grid {
     display: grid;
     grid-template-columns: 320px 1fr;
-    /* Sidebar fixed width, Content fluid */
     gap: 24px;
     align-items: start;
 }
@@ -164,7 +127,7 @@ $row-hover: #f9fafb;
         }
 
         input {
-            width: 100%;
+            width: 85%;
             padding: 10px;
             border: 1px solid $border-light;
             border-radius: 8px;
@@ -255,7 +218,6 @@ $row-hover: #f9fafb;
 /* --- MAIN CONTENT: RESULT TABLE --- */
 .result-card {
     padding: 0;
-    /* Remove padding for edge-to-edge table */
     overflow: hidden;
 
     .card-header-row {
@@ -317,17 +279,13 @@ $row-hover: #f9fafb;
             background-color: $row-hover;
         }
 
-        /* Special row colors from TS logic */
         &.row-highlight-success {
             background-color: #f0fdf4;
         }
 
-        /* Green tint */
         &.row-highlight-danger {
             background-color: $row-danger-bg;
         }
-
-        /* Red tint (Like PIT_TAX) */
     }
 
     td {
@@ -348,11 +306,9 @@ $row-hover: #f9fafb;
         font-weight: 700;
         font-size: 0.95rem;
         color: $primary-blue;
-        /* Default blue for vars */
         font-family: 'Segoe UI', sans-serif;
     }
 
-    /* Override colors based on TS logic classes */
     .code-salary {
         color: #059669;
     }
@@ -386,7 +342,165 @@ $row-hover: #f9fafb;
     }
 }
 
-/* --- DYNAMIC HTML CONTENT (DSL) STYLES --- */
+/* --- NEW FORMULA BUTTON & COLUMN --- */
+.col-formula {
+    .btn-view-detail {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background-color: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        color: #374151;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        .material-symbols-outlined {
+            font-size: 16px;
+            color: $primary-blue;
+        }
+
+        &:hover {
+            background-color: #f3f4f6;
+            border-color: #9ca3af;
+            color: $primary-blue;
+        }
+    }
+
+    .mini-desc {
+        margin-top: 4px;
+        font-size: 0.75rem;
+        color: #9ca3af;
+        font-style: italic;
+    }
+}
+
+/* --- MODAL STYLES (NEW) --- */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-panel {
+    background: white;
+    width: 90%;
+    max-width: 900px;
+    max-height: 85vh;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    animation: scaleIn 0.2s ease-out;
+
+    .modal-header {
+        padding: 16px 24px;
+        border-bottom: 1px solid $border-light;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        .modal-title-group {
+            h3 {
+                margin: 0;
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: $text-dark;
+            }
+
+            .modal-subtitle {
+                font-size: 0.85rem;
+                color: $primary-blue;
+                font-weight: 600;
+                margin-top: 2px;
+                display: block;
+            }
+        }
+
+        .btn-close-modal {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #9ca3af;
+
+            &:hover {
+                color: #ef4444;
+            }
+        }
+    }
+
+    .modal-body {
+        padding: 24px;
+        overflow-y: auto;
+        background: #f8fafc;
+        /* Light gray background for code area */
+    }
+
+    .modal-footer {
+        padding: 16px 24px;
+        border-top: 1px solid $border-light;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+
+        .footer-info {
+            font-size: 0.9rem;
+            color: $text-dark;
+        }
+
+        .btn-primary {
+            background: $primary-blue;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+
+            &:hover {
+                background: $primary-hover;
+            }
+        }
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* --- DYNAMIC HTML CONTENT (DSL) --- */
 ::ng-deep {
 
     /* Badges */
@@ -414,11 +528,17 @@ $row-hover: #f9fafb;
     .dsl-container {
         font-size: 0.85rem;
         line-height: 1.8;
+
+        /* Modal Large View */
+        &.large-view {
+            font-size: 1rem;
+            /* Bigger font in modal */
+            line-height: 2;
+        }
     }
 
     /* Variables inside formula */
     .dsl-container span[style*="background"] {
-        /* Style for VARIABLE nodes in DSL */
         background-color: #eff6ff !important;
         color: #2563eb !important;
         border: 1px solid #dbeafe !important;
@@ -426,7 +546,9 @@ $row-hover: #f9fafb;
         border-radius: 12px !important;
         font-weight: 600 !important;
         font-family: 'Segoe UI', sans-serif !important;
-        font-size: 0.75rem !important;
+        font-size: 0.9em !important;
+        /* Slightly larger */
+        cursor: default;
     }
 
     /* Constant values inside formula */
@@ -445,59 +567,52 @@ $row-hover: #f9fafb;
         color: #10b981;
     }
 
-    /* Green + */
     .op-sub {
         color: #ef4444;
     }
 
-    /* Red - */
     .op-mul {
         color: #3b82f6;
     }
-
-    /* Blue x */
 
     /* --- LOGIC TREE (IF/ELSE) --- */
     .logic-tree {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 8px;
         font-family: 'Roboto Mono', monospace;
-        font-size: 0.8rem;
-        margin-top: 4px;
+        font-size: 0.9em;
+        margin-top: 8px;
 
         .logic-branch {
             position: relative;
-            padding: 4px 0;
+            padding: 6px 0;
         }
 
         /* Indentation Lines */
         .logic-branch[style*="padding-left:16px"] {
-            padding-left: 20px !important;
-            /* Increase indent */
+            padding-left: 24px !important;
 
-            /* Green Line for THEN */
             &[style*="border-left:1px solid #86efac"] {
-                border-left: 2px solid #86efac !important;
+                border-left: 3px solid #86efac !important;
             }
 
-            /* Red Line for ELSE */
             &[style*="border-left:1px solid #fca5a5"] {
-                border-left: 2px solid #fca5a5 !important;
+                border-left: 3px solid #fca5a5 !important;
             }
         }
     }
 
-    /* Logic Labels (IF, THEN, ELSE) */
+    /* Logic Labels */
     .logic-label {
         display: inline-block;
-        width: 36px;
+        width: 40px;
         text-align: center;
-        font-size: 0.65rem;
+        font-size: 0.75rem;
         font-weight: 800;
-        padding: 2px 0;
+        padding: 3px 0;
         border-radius: 4px;
-        margin-right: 8px;
+        margin-right: 10px;
     }
 
     .label-if {
@@ -505,19 +620,26 @@ $row-hover: #f9fafb;
         color: #ea580c;
     }
 
-    /* Orange */
     .label-then {
         background: #f0fdf4;
         color: #16a34a;
     }
 
-    /* Green */
     .label-else {
         background: #fef2f2;
         color: #dc2626;
     }
 
-    /* Red */
+    /* SQL Tooltip override for Modal */
+    .sql-tooltip {
+        background: #1e293b;
+        color: #e2e8f0;
+        padding: 12px;
+        border-radius: 8px;
+        font-family: monospace;
+        white-space: pre-wrap;
+        margin-top: 8px;
+    }
 }
 
 /* --- RESPONSIVE --- */

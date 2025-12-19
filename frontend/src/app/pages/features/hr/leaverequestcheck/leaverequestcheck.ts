@@ -57,10 +57,11 @@ export class Leaverequestcheck implements OnInit {
     this.alertType = type;
   }
 
-  // --- LOGIC FETCH DATA ---
+  // --- LOGIC FETCH DATA (Bảng dữ liệu) ---
   async filterLeave() {
     this.isloading = true;
     try {
+      // Gọi API lấy dữ liệu cho bảng (có phân trang và filter hiện tại)
       const res: any = await getleaverequestManage(this.filter.username, this.page, this.size);
 
       if (res) {
@@ -75,25 +76,35 @@ export class Leaverequestcheck implements OnInit {
         this.totalPages = res.totalPages || 0;
         this.totalElements = res.totalElements || 0;
 
-        // Tính toán thống kê sau khi lấy dữ liệu
-        // Lưu ý: Nếu API phân trang, đây chỉ đếm trên trang hiện tại hoặc danh sách trả về.
-        // Để chính xác tuyệt đối, backend nên trả về object stats riêng hoặc ta phải fetch all.
-        // Ở đây mình đếm dựa trên dữ liệu content hiện có.
-        this.calculateStats(this.leaveRequests);
+        // ĐÃ XÓA: Không gọi calculateStats ở đây nữa để tránh tính lại khi filter
 
       } else {
         this.leaveRequests = [];
         this.totalElements = 0;
-        this.resetStats();
       }
 
     } catch (error) {
       this.Onalert("Lỗi tải dữ liệu", false);
       this.leaveRequests = [];
-      this.resetStats();
     } finally {
       this.isloading = false;
       this.cdr.detectChanges();
+    }
+  }
+
+  // --- LOGIC TÍNH STATS (Chạy 1 lần) ---
+  async loadInitialStats() {
+    try {
+      // Gọi API riêng để lấy dữ liệu thống kê tổng quát.
+      // Lưu ý: Để thống kê chính xác, ta cần lấy toàn bộ dữ liệu (hoặc số lượng lớn) mà KHÔNG có filter status.
+      // Ta truyền username rỗng và page size lớn (ví dụ 1000) để đếm được tổng quan.
+      const res: any = await getleaverequestManage('', 0, 1000);
+
+      if (res && res.content) {
+        this.calculateStats(res.content);
+      }
+    } catch (error) {
+      console.error("Lỗi tải thống kê", error);
     }
   }
 
@@ -173,7 +184,8 @@ export class Leaverequestcheck implements OnInit {
 
       if (res.status === 200 || res.status === 201) {
         this.Onalert(res.data, true);
-        await this.filterLeave(); // Load lại data và cập nhật stats
+        await this.filterLeave(); // Load lại bảng dữ liệu
+        await this.loadInitialStats(); // Cập nhật lại stats sau khi duyệt/từ chối thành công
       } else {
         this.Onalert(res.data || "Có lỗi xảy ra", false);
       }
@@ -203,7 +215,10 @@ export class Leaverequestcheck implements OnInit {
     if (this.cookie.get('role')) {
       this.role = this.cookie.get('role');
     }
-    // Gọi load data ban đầu
+    // Load dữ liệu bảng
     this.filterLeave();
+
+    // Load thống kê (chạy riêng biệt)
+    this.loadInitialStats();
   }
 }

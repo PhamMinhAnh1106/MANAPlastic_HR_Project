@@ -53,7 +53,6 @@
         <button class="btn btn-primary" (click)="onViewClick()">
           <i class="fa-solid fa-filter"></i> Xem Phiếu
         </button>
-       
       </div>
     </div>
   </div>
@@ -90,9 +89,9 @@
       <div class="payslip-header">
         <div class="brand-info">
           <div class="logo-area">
-            <div class="logo-box"><span class="material-symbols-outlined">
-bookmark_stacks
-</span></div>
+            <div class="logo-box">
+              <span class="material-symbols-outlined">bookmark_stacks</span>
+            </div>
             <span class="brand-name">MANAPLASTIC</span>
           </div>
           <h1>PHIẾU LƯƠNG CHI TIẾT</h1>
@@ -109,8 +108,8 @@ bookmark_stacks
       <div class="employee-info-section">
         <div class="info-grid">
           <div class="info-item">
-            <label>Username</label>
-            <p>{{ payslipData.header.username }}</p>
+            <label>Mã NV / Username</label>
+            <p>{{ payslipData.header.username }} (ID: {{ payslipData.header.userID }})</p>
           </div>
           <div class="info-item col-span-2">
             <label>Họ và tên</label>
@@ -122,15 +121,16 @@ bookmark_stacks
           </div>
           <div class="info-item">
             <label>Lương Cơ Bản</label>
-            <p>{{ payslipData.header.basesalary | number:'1.0-0' }} ₫</p>
+            <!-- Sử dụng basesalarysnapshot -->
+            <p>{{ payslipData.header.basesalarysnapshot | number:'1.0-0' }} ₫</p>
           </div>
           <div class="info-item">
             <label>Loại HĐ</label>
             <p>{{ payslipData.header.jobtype }}</p>
           </div>
           <div class="info-item">
-            <label>Ngày công TT</label>
-            <p>{{ payslipData.header.actualworkdays }} công</p>
+            <label>Ngày công (TT/Chuẩn)</label>
+            <p>{{ payslipData.header.actualworkdays }} / {{ payslipData.header.standardworkdays }}</p>
           </div>
         </div>
       </div>
@@ -151,6 +151,9 @@ bookmark_stacks
                   <tr *ngFor="let item of filterItems(payslipData.incomes)">
                     <td>{{ item.name }}</td>
                     <td>{{ item.value | number:'1.0-0' }} ₫</td>
+                  </tr>
+                  <tr *ngIf="!payslipData.incomes || filterItems(payslipData.incomes).length === 0">
+                    <td colspan="2" class="text-center italic text-gray-400 py-4">Không có phát sinh thu nhập</td>
                   </tr>
                 </tbody>
               </table>
@@ -178,9 +181,9 @@ bookmark_stacks
               </table>
             </div>
 
-            <div class="sub-info" *ngIf="taxableIncome > 0">
+            <div class="sub-info" *ngIf="taxableIncome !== 0">
               <div class="row-between">
-                <span>TN Chịu thuế:</span>
+                <span>TN Chịu thuế (Taxable):</span>
                 <span>{{ taxableIncome | number:'1.0-0' }} ₫</span>
               </div>
             </div>
@@ -192,33 +195,27 @@ bookmark_stacks
           </div>
         </div>
 
-        <!-- Company Cost -->
-        <div class="company-cost-section" 
-             *ngIf="(payslipData.header.bhxh_comp || 0) + (payslipData.header.bhyt_comp || 0) > 0">
+        <!-- Company Cost: Dùng mảng company_contributions từ data -->
+        <div class="company-cost-section" *ngIf="payslipData.company_contributions && payslipData.company_contributions.length > 0">
           <div class="divider-title">
-            <span>Phúc lợi & Chi phí công ty</span>
+            <span>Phúc lợi & Chi phí công ty chi trả</span>
           </div>
           <div class="cost-grid">
-            <div *ngIf="payslipData.header.bhxh_comp">
-              <span>BHXH (CT)</span>
-              <span>{{ payslipData.header.bhxh_comp | number:'1.0-0' }} ₫</span>
-            </div>
-            <div *ngIf="payslipData.header.bhyt_comp">
-              <span>BHYT (CT)</span>
-              <span>{{ payslipData.header.bhyt_comp | number:'1.0-0' }} ₫</span>
-            </div>
-            <div *ngIf="payslipData.header.bhtn_comp">
-              <span>BHTN (CT)</span>
-              <span>{{ payslipData.header.bhtn_comp | number:'1.0-0' }} ₫</span>
+            <div *ngFor="let item of payslipData.company_contributions">
+              <span>{{ item.name }}</span>
+              <span>{{ item.value | number:'1.0-0' }} ₫</span>
             </div>
           </div>
         </div>
 
         <!-- Net Salary -->
-        <div class="net-salary-banner">
+        <!-- Thêm class negative để xử lý style nếu lương âm -->
+        <div class="net-salary-banner" [class.negative]="payslipData.net_salary < 0">
           <div class="net-label">
             <p class="title">Thực lĩnh cuối cùng (Net Salary)</p>
-            <p class="subtitle no-print">Số tiền sẽ được chuyển vào tài khoản ngân hàng</p>
+            <p class="subtitle no-print">
+              {{ payslipData.net_salary < 0 ? 'Số tiền nhân viên cần hoàn lại công ty' : 'Số tiền sẽ được chuyển vào tài khoản ngân hàng' }}
+            </p>
           </div>
           <div class="net-value">{{ payslipData.net_salary | number:'1.0-0' }} VND</div>
         </div>

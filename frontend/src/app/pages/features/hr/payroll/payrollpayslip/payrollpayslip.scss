@@ -35,7 +35,6 @@ $color-bg-danger: #fff1f2;
 .control-panel {
     width: 100%;
     max-width: 1100px;
-    /* TĂNG CHIỀU RỘNG */
     margin-bottom: 1rem;
 }
 
@@ -161,7 +160,6 @@ $color-bg-danger: #fff1f2;
 .payslip-wrapper {
     width: 100%;
     max-width: 1100px;
-    /* TĂNG CHIỀU RỘNG */
     background: $white;
     border-radius: 0.6rem;
     overflow: hidden;
@@ -295,7 +293,6 @@ $color-bg-danger: #fff1f2;
                 font-size: 0.85rem;
             }
 
-            /* FONT NHỎ */
             .text-large {
                 font-size: 1rem;
             }
@@ -457,7 +454,6 @@ $color-bg-danger: #fff1f2;
 .data-table {
     width: 100%;
     font-size: 0.8125rem;
-    /* FONT NHỎ: 13px */
     border-collapse: collapse;
 
     tr {
@@ -474,7 +470,7 @@ $color-bg-danger: #fff1f2;
         font-weight: 500;
 
         &:last-child {
-            text-align: right;
+            text-align: justify;
             color: $text-dark;
             font-weight: 700;
         }
@@ -531,7 +527,8 @@ $color-bg-danger: #fff1f2;
         gap: 0.8rem;
 
         @media (min-width: 768px) {
-            grid-template-columns: repeat(4, 1fr);
+            // Tự động điều chỉnh cột tùy theo số lượng item
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         }
 
         div {
@@ -564,6 +561,19 @@ $color-bg-danger: #fff1f2;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+
+    // Style cho lương âm
+    &.negative {
+        background: linear-gradient(to right, #991b1b, #7f1d1d);
+
+        .net-label .title {
+            color: #fecaca;
+        }
+
+        .net-label .subtitle {
+            color: #fca5a5;
+        }
+    }
 
     @media (min-width: 768px) {
         flex-direction: row;
@@ -668,6 +678,11 @@ $color-bg-danger: #fff1f2;
         background: #f1f5f9 !important;
         color: #000 !important;
         border: 1px solid #cbd5e1;
+
+        &.negative {
+            background: #fff1f2 !important;
+            color: #991b1b !important;
+        }
 
         .net-label .title {
             color: #64748b;

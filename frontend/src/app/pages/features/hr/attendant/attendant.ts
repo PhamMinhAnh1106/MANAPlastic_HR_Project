@@ -102,7 +102,7 @@ export class Attendant implements OnInit {
 
     // Gọi API với query param, role, page và size
     // Lưu ý: page backend thường bắt đầu từ 0
-    const res = await GetAttendants(query, this.role, this.page, this.size);
+    const res = await GetAttendants(query, this.page, this.size);
 
     this.isloading = false;
 

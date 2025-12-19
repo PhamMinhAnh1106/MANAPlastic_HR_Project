@@ -13,6 +13,7 @@ import { Reschedule } from '../../../shared/reschedule/reschedule';
 
 @Component({
   selector: 'app-schedule',
+  standalone: true,
   imports: [CommonModule, FormsModule, Tablemonth, NgIf, Loading, Alert, Comfirm, Reschedule],
   templateUrl: './schedule.html',
   styleUrl: './schedule.scss',
@@ -46,25 +47,31 @@ export class Schedule implements OnInit {
   }
   /////////////////////////
 
-
-
   // quan li xin doi ca lam
   isShowRescheduleModal: boolean = false;
   selectedDate: string = '';
 
   // Hàm xử lý khi click vào ngày trên lịch
   handleDayClick(event: any) {
+    // --- ĐIỀU KIỆN MỚI ---
+    // Chỉ cho phép mở modal khi đang xem Lịch chính thức (Employee: 1, Manager: 3)
+    if (this.selectStatus !== '1' && this.selectStatus !== '3') {
+      return;
+    }
+
     // 1. Lấy dữ liệu ngày được click
     this.selectedDate = event.date;
+
     // 2. Mở Modal lên
     if (this.dayData.length != 0) {
       const today = this.dayData.find(item => item.date == this.selectedDate);
-      if (today.shiftId != null)
-        this.isShowRescheduleModal = true;
 
+      // Kiểm tra: phải tồn tại ngày đó và có ca làm việc (shiftId != null) mới cho đổi
+      if (today && today.shiftId != null) {
+        this.isShowRescheduleModal = true;
+      }
     }
   }
-
 
   ///
   dayData: any[] = [];
@@ -78,9 +85,9 @@ export class Schedule implements OnInit {
     this.router.navigate(["home/schedule/auto"]);
   }
   public async loadData() {
-    const year_month = `${this.year}-${this.month}`;
-    let res: any[] = [];
+    const year_month = `${this.year}-${String(this.month).padStart(2, '0')}`;
 
+    let res: any[] = [];
     switch (this.selectStatus) {
       case '0':
         res = await GetScheduleEmployeeDraft(year_month);
@@ -148,11 +155,11 @@ export class Schedule implements OnInit {
 
       this.isconfirm = false;
     }
-
-
   }
+
   ngOnInit() {
-    this.role = this.cookie.get("role").toLowerCase();
+    // Đảm bảo cookie trả về string trước khi toLowerCase() để tránh lỗi null
+    const roleCookie = this.cookie.get("role");
+    this.role = roleCookie ? roleCookie.toLowerCase() : '';
   }
 }
-

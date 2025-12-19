@@ -32,8 +32,9 @@ export class Payrollpayslip implements OnInit {
   // UI State
   loading = false;
   errorMsg = '';
-  hasSearched = false; // Biến cờ để kiểm soát việc hiển thị thông báo ban đầu
+  hasSearched = false;
 
+  // CÁC QUY TẮC CẦN ẨN KHỎI BẢNG CHI TIẾT (Vì đã hiển thị ở phần tổng hoặc header)
   readonly HIDDEN_RULES = ['TOTAL_INCOME', 'NET_SALARY', 'TAXABLE_INCOME', 'INSURANCE_AMT', 'ASSESSABLE_INCOME'];
 
   constructor(private cdr: ChangeDetectorRef) { }
@@ -45,11 +46,7 @@ export class Payrollpayslip implements OnInit {
     // 2. Load danh sách nhân viên nếu là HR
     if (this.role === 'HR') {
       await this.loadAuditUsers();
-
     }
-
-    // 3. QUAN TRỌNG: KHÔNG gọi loadData() ở đây nữa theo yêu cầu của bạn.
-    // Người dùng phải bấm nút mới load.
   }
 
   // --- ACTIONS ---
@@ -58,24 +55,24 @@ export class Payrollpayslip implements OnInit {
     this.activeTab = tab;
     this.errorMsg = '';
     this.payslipData = null;
-    this.hasSearched = false; // Reset trạng thái tìm kiếm
-
-    // KHÔNG tự động load khi chuyển tab nữa
+    this.hasSearched = false;
+    this.selectedEmpId = ''; // Reset selection khi chuyển tab
   }
 
   async onViewClick() {
-    this.hasSearched = true; // Đánh dấu là đã bấm nút tìm
+    this.hasSearched = true;
     await this.loadData();
     this.cdr.detectChanges();
   }
 
-
-
   // --- DATA LOADING ---
 
   async loadAuditUsers() {
-    this.auditUsers = await getAuditUsers();
-
+    try {
+      this.auditUsers = await getAuditUsers();
+    } catch (e) {
+      console.error("Error loading audit users", e);
+    }
   }
 
   async loadData() {
@@ -90,17 +87,16 @@ export class Payrollpayslip implements OnInit {
         if (!this.selectedEmpId) {
           throw new Error("Vui lòng chọn nhân viên cần xem.");
         }
+        // Gọi API lấy lương nhân viên
         data = await getUserPayrollDetail(this.selectedEmpId, this.selectedMonth, this.selectedYear);
-        this.cdr.detectChanges();
-
       } else {
+        // Gọi API lấy lương bản thân
         data = await getMyPayslip(this.selectedMonth, this.selectedYear);
-        this.cdr.detectChanges();
-
       }
 
       if (data) {
         this.payslipData = data;
+        // console.log('Payslip Data:', this.payslipData);
       } else {
         throw new Error("Không có dữ liệu trả về.");
       }
@@ -110,6 +106,7 @@ export class Payrollpayslip implements OnInit {
       this.errorMsg = error.response?.data?.message || error.message || "Có lỗi xảy ra khi tải dữ liệu.";
     } finally {
       this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -125,10 +122,12 @@ export class Payrollpayslip implements OnInit {
     return `PAY-${this.payslipData.header.payperiod}-${this.payslipData.header.userID}`;
   }
 
+  // Lấy giá trị Thu nhập chịu thuế từ mảng deductions
   get taxableIncome(): number {
     return this.payslipData?.deductions.find(i => i.rule_code === 'TAXABLE_INCOME')?.value || 0;
   }
 
+  // Tính tổng các khoản khấu trừ (loại bỏ các dòng tổng hợp ẩn)
   get totalCalculatedDeduction(): number {
     if (!this.payslipData) return 0;
     return this.payslipData.deductions
@@ -136,7 +135,9 @@ export class Payrollpayslip implements OnInit {
       .reduce((sum, item) => sum + Math.abs(item.value), 0);
   }
 
+  // Lọc các item để hiển thị lên bảng (loại bỏ các dòng ẩn và dòng có giá trị 0 nếu muốn)
   filterItems(items: PayslipItem[]): PayslipItem[] {
+    if (!items) return [];
     return items.filter(i => !this.HIDDEN_RULES.includes(i.rule_code) && Math.abs(i.value) > 0);
   }
 

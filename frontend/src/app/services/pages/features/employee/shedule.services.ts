@@ -69,22 +69,22 @@ export async function ChangeScheduleDraftManager(forms: ChangeSchedule) {
         return `co loi xay ra ` + error;
     }
 }
-export async function ChangeScheduleOfficeManager(forms: ChangeSchedule) {
-    try {
-        const res = await api.put("/manager/shiftSchedule/official/batch", [{
-            employeeId: forms.employeeId,
-            date: forms.date,
-            shiftId: forms.shiftId,
-            isDayOff: forms.isDayOff
-        }]);
-        return {
-            data: res.data,
-            status: res.status
-        }
-    } catch (error) {
-        return `co loi xay ra ` + error;
-    }
-}
+// export async function ChangeScheduleOfficeManager(forms: ChangeSchedule) {
+//     try {
+//         const res = await api.put("/manager/shiftSchedule/official/batch", [{
+//             employeeId: forms.employeeId,
+//             date: forms.date,
+//             shiftId: forms.shiftId,
+//             isDayOff: forms.isDayOff
+//         }]);
+//         return {
+//             data: res.data,
+//             status: res.status
+//         }
+//     } catch (error) {
+//         return `co loi xay ra ` + error;
+//     }
+// }
 
 export async function UpSchedule(month_year: string) {
     try {
@@ -107,7 +107,10 @@ export interface rescheduleinterface {
 export async function RescheduleAPI(form: rescheduleinterface) {
     try {
         const res = await api.post("/user/shiftChanges", form);
-        return res.data;
+        return {
+            data: res.data,
+            status: res.status
+        }
     } catch (error) {
         return error;
     }

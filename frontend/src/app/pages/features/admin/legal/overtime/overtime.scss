@@ -1,0 +1,338 @@
+// Variables - Colors
+$primary-color: #007bff;
+$danger-color: #dc3545;
+$success-color: #28a745;
+$secondary-color: #6c757d;
+$background-bg: #f4f6f9;
+$border-color: #dee2e6;
+$text-color: #333;
+$white: #ffffff;
+$primary-color: #3b82f6;
+$primary-hover: #2563eb;
+$danger-color: #ef4444;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-500: #6b7280;
+$gray-700: #374151;
+// Variables - Font Sizes
+// Logic: Giá trị gốc + 0.2rem
+$font-size-xs: calc(12px + 0.2rem); // Dành cho badge, error text
+$font-size-sm: calc(14px + 0.2rem); // Dành cho body text, input, label, table
+$font-size-lg: calc(20px + 0.2rem); // Dành cho modal header
+$font-size-xl: calc(24px + 0.2rem); // Dành cho page header
+
+// Mixins
+@mixin btn-base {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: opacity 0.2s;
+    // Thêm font-size vào button để đồng bộ
+    font-size: $font-size-sm;
+
+    &:hover {
+        opacity: 0.9;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+// Global Container
+.container {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 72rem;
+    width: 55rem;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f4f6f9;
+    min-height: 100vh;
+    color: #333;
+    // Thiết lập font cơ bản cho container nếu cần
+    font-size: $font-size-sm;
+}
+
+// Header Section
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    background: $white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    h1 {
+        margin: 0;
+        font-size: $font-size-xl; // Đã thay thế (was 24px)
+        color: #2c3e50;
+    }
+
+    .actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+
+        .year-select {
+            padding: 8px;
+            border: 1px solid $border-color;
+            border-radius: 4px;
+            outline: none;
+            font-size: $font-size-sm; // Thêm font-size để input đồng bộ
+
+            &:focus {
+                border-color: $primary-color;
+            }
+        }
+    }
+}
+
+// Buttons
+.btn-icon {
+    padding: 6px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &.edit {
+        color: $primary-color;
+
+        &:hover {
+            background: rgba($primary-color, 0.1);
+        }
+    }
+
+    &.delete {
+        color: $danger-color;
+
+        &:hover {
+            background: rgba($danger-color, 0.1);
+        }
+    }
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+
+    &.btn-primary {
+        background: $primary-color;
+        color: white;
+
+        &:hover {
+            background: $primary-hover;
+        }
+
+        &:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+    }
+
+    &.btn-secondary {
+        background: white;
+        border: 1px solid $gray-200;
+        color: $gray-700;
+
+        &:hover {
+            background: $gray-100;
+        }
+    }
+}
+
+// Table Styles
+.table-container {
+    background: $white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+    padding: 1px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+        background-color: #f8f9fa;
+
+        th {
+            text-align: left;
+            padding: 14px;
+            border-bottom: 2px solid $border-color;
+            font-weight: 600;
+            color: #495057;
+            font-size: $font-size-sm; // Đảm bảo đồng bộ font size
+        }
+    }
+
+    tbody {
+        tr {
+            &:hover {
+                background-color: rgba(0, 123, 255, 0.05);
+            }
+
+            td {
+                padding: 12px 14px;
+                border-bottom: 1px solid $border-color;
+                vertical-align: middle;
+                font-size: $font-size-sm; // Đảm bảo đồng bộ font size
+            }
+        }
+    }
+}
+
+// Badges
+.badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: $font-size-xs; // Đã thay thế (was 12px)
+    font-weight: 600;
+
+    &.badge-success {
+        background-color: rgba($success-color, 0.1);
+        color: $success-color;
+    }
+
+    &.badge-secondary {
+        background-color: rgba($secondary-color, 0.1);
+        color: $secondary-color;
+    }
+}
+
+// Modal Styles
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: $white;
+    padding: 24px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: slideDown 0.3s ease-out;
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid $border-color;
+        padding-bottom: 10px;
+
+        h2 {
+            margin: 0;
+            font-size: $font-size-lg; // Đã thay thế (was 20px)
+        }
+    }
+
+    .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .modal-footer {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid $border-color;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+}
+
+// Form Styles
+.form-group {
+    margin-bottom: 16px;
+
+    label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 500;
+        font-size: $font-size-sm; // Đã thay thế (was 14px)
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+        font-size: $font-size-sm; // Đã thay thế (was 14px)
+        box-sizing: border-box;
+
+        &:focus {
+            border-color: $primary-color;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+        }
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+    }
+
+    .error-msg {
+        color: $danger-color;
+        font-size: $font-size-xs; // Đã thay thế (was 12px)
+        margin-top: 4px;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

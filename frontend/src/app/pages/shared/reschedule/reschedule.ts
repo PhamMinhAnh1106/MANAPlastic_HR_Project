@@ -81,18 +81,18 @@ export class Reschedule {
       };
 
       try {
-        const res = await RescheduleAPI(form);
+        const res = await RescheduleAPI(form) as { data: any, status: number } | any;
         // Giả sử res trả về object có field 'message' hoặc check status
-        if (res && res.status === 200) {
+        if (res.status == 200) {
           this.Onalert("Đăng ký đổi lịch thành công!", true);
           // Reset form sau khi thành công
           this.reason = '';
           this.newShiftId = null;
-        } else {
-          this.Onalert(res.message || "Có lỗi xảy ra", false);
+          return;
         }
-      } catch (error) {
-        this.Onalert("Lỗi kết nối server", false);
+        if (res.status == 400) {
+          this.Onalert(res.response.data.message, false);
+        }
       } finally {
         this.isloading = false;
         this.cdr.detectChanges();

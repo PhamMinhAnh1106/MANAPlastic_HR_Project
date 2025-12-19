@@ -1,0 +1,43 @@
+<div class="app-container">
+
+  <!-- HEADER -->
+  <header class="app-header">
+   
+
+    <!-- NAVIGATION TABS -->
+    <nav class="header-tabs">
+      @for (tab of tabs; track tab.id) {
+        <button 
+          class="tab-item" 
+          [class.active]="currentTab === tab.id"
+          (click)="selectTab(tab.id)">
+          {{ tab.label }}
+        </button>
+      }
+    </nav>
+  </header>
+
+  <!-- CONTENT AREA -->
+  <main class="main-content">
+    <div class="content-wrapper">
+      
+      <!-- DYNAMIC COMPONENT LOADER -->
+      <!-- Đảm bảo selector (thẻ) khớp với selector trong file .ts của từng component con -->
+      @switch (currentTab) {
+        @case ('chukyluong') { 
+          <app-chukyluong></app-chukyluong> 
+        }
+        @case ('leave-policies') { 
+          <app-leave-policies></app-leave-policies> 
+        }
+        @case ('overtime') { 
+          <app-overtime></app-overtime> 
+        }
+        @case ('tax') { 
+          <app-tax></app-tax> 
+        }
+      }
+    </div>
+  </main>
+
+</div>

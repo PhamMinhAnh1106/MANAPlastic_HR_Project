@@ -1,36 +1,30 @@
 <div class="payroll-container">
-  
+
   <!-- TOP HEADER -->
   <header class="app-header">
     <div class="brand-section">
       <div class="logo-box">
-        <span class="material-symbols-outlined">
-memory
-</span>
+        <span class="material-symbols-outlined">memory</span>
       </div>
       <div class="title-group">
         <h1>Payroll Engine Debugger</h1>
         <p>Phiên bản Developer: Soi chi tiết công thức</p>
       </div>
     </div>
-    
-   
   </header>
 
   <!-- MAIN LAYOUT GRID -->
   <div class="layout-grid">
-    
+
     <!-- LEFT SIDEBAR -->
     <aside class="sidebar">
-      
+
       <!-- Card 1: Run Parameters -->
       <div class="card param-card">
         <div class="card-title">
-         <span class="material-symbols-outlined">
-tune
-</span>THAM SỐ CHẠY
+          <span class="material-symbols-outlined">tune</span>THAM SỐ CHẠY
         </div>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label>Tháng</label>
@@ -43,29 +37,23 @@ tune
         </div>
 
         <button class="btn btn-run-batch" (click)="runCalculation()">
-          <span class="material-symbols-outlined">
-play_arrow
-</span>Tính Lương (Batch)
+          <span class="material-symbols-outlined">play_arrow</span>Tính Lương (Batch)
         </button>
       </div>
 
       <!-- Card 2: Cache Inspect -->
       <div class="card search-card">
         <div class="card-title">
-          <span class="material-symbols-outlined">
-search
-</span> SOI KẾT QUẢ (CACHE)
+          <span class="material-symbols-outlined">search</span> SOI KẾT QUẢ (CACHE)
         </div>
 
         <div class="search-input-group">
           <input type="number" [(ngModel)]="empId" class="form-control" placeholder="1">
           <button class="btn btn-search" (click)="fetchDetails()">
-            <span class="material-symbols-outlined">
-search
-</span>
+            <span class="material-symbols-outlined">search</span>
           </button>
         </div>
-        
+
         <p class="helper-text">
           Nhập ID nhân viên để xem toàn bộ biến số đã tính và công thức tương ứng.
         </p>
@@ -75,7 +63,7 @@ search
 
     <!-- RIGHT CONTENT: RESULT TABLE -->
     <main class="main-content">
-      
+
       <div class="card result-card">
         <!-- Card Header -->
         <div class="card-header-row">
@@ -101,7 +89,7 @@ search
             <tbody>
               <!-- Loop Data -->
               <tr *ngFor="let row of debugData" [ngClass]="row.cssClass">
-                
+
                 <!-- Col 1: Variable Name -->
                 <td class="col-variable">
                   <div class="var-group">
@@ -113,13 +101,19 @@ search
                 </td>
 
                 <!-- Col 2: Value -->
-                <td class="col-value" style="font-size: 0.9rem;">
+                <td class="col-value">
                   {{ row.value | number:'1.0-0' }} <span class="currency-unit">₫</span>
                 </td>
 
-                <!-- Col 3: Formula DSL -->
+                <!-- Col 3: Formula Button (NEW) -->
                 <td class="col-formula">
-                   <div class="dsl-container" [innerHTML]="row.safeHtmlDisplay"></div>
+                   <button class="btn-view-detail" (click)="openFormulaModal(row)">
+                      <span class="material-symbols-outlined">visibility</span>
+                      Xem công thức
+                   </button>
+                   <div class="mini-desc" *ngIf="!row.formula_dsl">
+                      {{ row.input_desc || 'Input Value' }}
+                   </div>
                 </td>
               </tr>
 
@@ -144,5 +138,32 @@ search
   <!-- Alerts/Confirms -->
   <app-alert *ngIf="isalert" [message]="alertmessage" [notifyType]="alertType" (hidden)="isalert = false"></app-alert>
   <app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
+
+  <!-- FORMULA DETAIL MODAL (NEW) -->
+  <div class="modal-backdrop" *ngIf="isFormulaModalOpen" (click)="closeFormulaModal()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-group">
+            <h3>Chi tiết công thức</h3>
+            <span class="modal-subtitle">{{ selectedRow?.code }} - {{ selectedRow?.name }}</span>
+        </div>
+        <button class="btn-close-modal" (click)="closeFormulaModal()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- Render DSL/SQL here -->
+        <div class="dsl-container large-view" [innerHTML]="selectedRow?.safeHtmlDisplay"></div>
+      </div>
+      
+      <div class="modal-footer">
+        <div class="footer-info">
+             <span *ngIf="selectedRow?.value !== undefined">Giá trị hiện tại: <strong>{{ selectedRow?.value | number:'1.0-0' }} ₫</strong></span>
+        </div>
+        <button class="btn btn-primary" (click)="closeFormulaModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
 
 </div>

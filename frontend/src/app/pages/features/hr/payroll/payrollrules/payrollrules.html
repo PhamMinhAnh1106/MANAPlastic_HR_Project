@@ -1,139 +1,83 @@
 <div class="app-container">
-      
-    <!-- HEADER -->
     <header class="app-header">
       <div class="brand">
-        <div class="logo">
-          <span class="material-symbols-outlined">money_bag</span>
-        </div>
+        <div class="logo"><span class="material-symbols-outlined">money_bag</span></div>
         <h1>Cấu Hình Lương</h1>
-
         <div class="nav-tabs">
-          <button [class.active]="activeTab === 'rules'" (click)="switchTab('rules')">
-            <i class="fa-solid fa-calculator"></i> Công Thức (Rules)
-          </button>
-          <button [class.active]="activeTab === 'variables'" (click)="switchTab('variables')">
-            <i class="fa-solid fa-database"></i> Biến Số (Variables)
-          </button>
+          <button [class.active]="activeTab === 'rules'" (click)="switchTab('rules')"><i class="fa-solid fa-calculator"></i> Công Thức (Rules)</button>
+          <button [class.active]="activeTab === 'variables'" (click)="switchTab('variables')"><i class="fa-solid fa-database"></i> Biến Số (Variables)</button>
         </div>
       </div>
     </header>
 
-    <!-- MAIN BODY -->
     <div class="main-layout">
-
-      <!-- ================= VIEW: RULES ================= -->
+      <!-- RULE VIEW -->
       <div class="view-panel" *ngIf="activeTab === 'rules'">
-        <!-- Sidebar List -->
         <aside class="sidebar">
-          <div class="sidebar-header">
-            <span>Danh sách Rule</span>
-            <button class="btn-xs btn-primary-outline" (click)="resetRuleEditor()">
-              <i class="fa-solid fa-plus"></i> Tạo mới
-            </button>
-          </div>
+          <div class="sidebar-header"><span>Danh sách Rule</span><button class="btn-xs btn-primary-outline" (click)="resetRuleEditor()">+ Tạo mới</button></div>
           <div class="list-container">
-            <div *ngFor="let r of rules" 
-                 class="list-item" 
-                 [class.selected]="r.ruleCode === currentRule.ruleCode"
-                 (click)="selectRule(r)">
-              <div class="item-head">
-                <span class="code">{{r.ruleCode}}</span>
-                <span class="badge">{{r.status}}</span>
-              </div>
+            <div *ngFor="let r of rules" class="list-item" [class.selected]="r.ruleCode === currentRule.ruleCode" (click)="selectRule(r)">
+              <div class="item-head"><span class="code">{{r.ruleCode}}</span><span class="badge">{{r.status}}</span></div>
               <div class="name">{{r.name}}</div>
             </div>
           </div>
         </aside>
 
-        <!-- Editor Area -->
         <main class="editor-area">
-          <!-- Editor Toolbar -->
           <div class="editor-toolbar">
             <div class="info-group">
               <div class="code-wrapper">
-                <!-- TRƯỜNG HỢP 1: Đã lưu (Có ID) -> Chỉ hiển thị Text -->
-                <h2 *ngIf="currentRule.ruleId" class="text-rule-code">
-                  {{ currentRule.ruleCode }}
-                </h2>
-
-                <!-- TRƯỜNG HỢP 2: Tạo mới (Chưa có ID) -> Hiển thị Input -->
-                <input *ngIf="!currentRule.ruleId" 
-                       type="text" 
-                       [(ngModel)]="currentRule.ruleCode" 
-                       class="input-rule-code" 
-                       placeholder="Nhập mã Rule (VD: NET_SALARY)"
-                       title="Mã Rule (Viết hoa, không dấu)">
+                <h2 *ngIf="currentRule.ruleId" class="text-rule-code">{{ currentRule.ruleCode }}</h2>
+                <input *ngIf="!currentRule.ruleId" type="text" [(ngModel)]="currentRule.ruleCode" class="input-rule-code" placeholder="Mã Rule (VD: NET_SALARY)">
                 <span class="badge-status">{{currentRule.status}}</span>
               </div>
               <input type="text" class="input-invisible" [(ngModel)]="currentRule.name" placeholder="Nhập tên mô tả rule...">
             </div>
-
             <div class="action-group">
               <div class="mode-switch">
-                <button [class.active]="uiMode === 'formula'" (click)="setRuleMode('formula')"><i class="fa-solid fa-calculator"></i> Text</button>
-                <button [class.active]="uiMode === 'visual'" (click)="setRuleMode('visual')"><i class="fa-solid fa-sitemap"></i> Tree</button>
-                <button [class.active]="uiMode === 'json'" (click)="setRuleMode('json')"><i class="fa-solid fa-code"></i> Raw</button>
+                <button [class.active]="uiMode === 'formula'" (click)="setRuleMode('formula')">Text</button>
+                <button [class.active]="uiMode === 'visual'" (click)="setRuleMode('visual')">Tree</button>
+                <button [class.active]="uiMode === 'json'" (click)="setRuleMode('json')">Raw</button>
               </div>
-              <div class="divider"></div>
-              
-              <button *ngIf="currentRule.ruleId" class="btn-xs btn-danger-ghost" (click)="deleteRule()">
-                <i class="fa-solid fa-trash-can"></i> Xóa
-              </button>
-              
-              <button class="btn-xs btn-primary" (click)="saveRule()"><i class="fa-solid fa-save"></i> Lưu</button>
+              <button *ngIf="currentRule.ruleId" class="btn-xs btn-danger-ghost" (click)="deleteRule()">Xóa</button>
+              <button class="btn-xs btn-primary" (click)="saveRule()">Lưu</button>
             </div>
           </div>
 
           <div class="editor-content-wrapper">
             <div class="canvas">
-              
-              <!-- MODE: FORMULA TEXT (WITH PREVIEW) -->
               <div class="editor-box formula-mode" *ngIf="uiMode === 'formula'">
                 <div class="box-header">
                   <label>Soạn thảo công thức</label>
                   <div class="operators">
-                    <button (click)="insertOperator('+')">+</button>
-                    <button (click)="insertOperator('-')">-</button>
-                    <button (click)="insertOperator('*')">*</button>
-                    <button (click)="insertOperator('/')">/</button>
-                    <button (click)="insertOperator('(')">(</button>
-                    <button (click)="insertOperator(')')">)</button>
+                    <button (click)="insertOperator('+')">+</button><button (click)="insertOperator('-')">-</button>
+                    <button (click)="insertOperator('*')">*</button><button (click)="insertOperator('/')">/</button>
+                    <button (click)="insertOperator('(')">(</button><button (click)="insertOperator(')')">)</button>
                   </div>
                 </div>
-                
                 <div class="formula-container">
-                  <textarea
-                    [(ngModel)]="formulaInput"
-                    class="textarea-formula"
-                    placeholder="Nhập công thức (VD: BASE_SALARY + BONUS - PIT)..."
-                  ></textarea>
-
-                  <div class="preview-label">Xem trước (Highlight):</div>
+                  <textarea [(ngModel)]="formulaInput" class="textarea-formula" placeholder="Nhập công thức..."></textarea>
+                  <div class="preview-label">Xem trước:</div>
                   <div class="formula-preview" [innerHTML]="formattedFormula"></div>
                 </div>
               </div>
 
-              <!-- MODE: VISUAL TREE -->
               <div class="editor-box visual-box" *ngIf="uiMode === 'visual'">
                 <ng-container *ngTemplateOutlet="nodeTemplate; context:{$implicit: currentRule.dslJson}"></ng-container>
               </div>
 
-              <!-- MODE: JSON -->
-              <div class="editor-box" *ngIf="uiMode === 'json'">
+              <!-- FIX: Thêm class full-height-editor để JSON box full chiều cao -->
+              <div class="editor-box full-height-editor" *ngIf="uiMode === 'json'">
                 <div class="box-header"><label>Raw JSON DSL</label></div>
                 <textarea [(ngModel)]="jsonInput" class="textarea-json"></textarea>
               </div>
-
             </div>
 
-            <!-- Variable Palette -->
             <div class="palette">
               <div class="palette-header">Biến số có sẵn</div>
               <div class="palette-list">
                 <div *ngFor="let v of variables" class="palette-item" (click)="insertVariable(v.code)">
-                  <span class="var-code">{{v.code}}</span>
-                  <span class="var-name">{{v.name}}</span>
+                  <span class="var-code">{{v.code}}</span><span class="var-name">{{v.name}}</span>
                 </div>
               </div>
             </div>
@@ -141,109 +85,94 @@
         </main>
       </div>
 
-      <!-- VIEW: VARIABLES -->
+      <!-- VARIABLE VIEW -->
       <div class="view-panel" *ngIf="activeTab === 'variables'">
         <ng-container *ngTemplateOutlet="variablesView"></ng-container>
       </div>
-
     </div>
 </div>
 
-<!-- TEMPLATE: VARIABLES VIEW -->
 <ng-template #variablesView>
     <aside class="sidebar">
-      <div class="sidebar-header">
-        <span>Danh sách Biến</span>
-        <button class="btn-xs btn-success-outline" (click)="resetVarEditor()">+ Thêm Biến</button>
-      </div>
+      <div class="sidebar-header"><span>Danh sách Biến</span><button class="btn-xs btn-success-outline" (click)="resetVarEditor()">+ Thêm</button></div>
       <div class="list-container">
-        <div *ngFor="let v of variables" 
-              class="list-item var-item" 
-              [class.selected]="v.code === currentVar.code"
-              (click)="selectVar(v)">
-          {{v.code}}
-        </div>
+        <div *ngFor="let v of variables" class="list-item var-item" [class.selected]="v.code === currentVar.code" (click)="selectVar(v)">{{v.code}}</div>
       </div>
     </aside>
     <main class="editor-area var-editor">
       <div class="var-card">
         <div class="card-header">
           <h3>Chi tiết biến số</h3>
-          <div class="mode-switch-sm">
-            <button [class.active]="varMode === 'wizard'" (click)="setVarMode('wizard')">Đơn giản</button>
-            <button [class.active]="varMode === 'sql'" (click)="setVarMode('sql')">Nâng cao (SQL)</button>
-          </div>
+          <div class="mode-switch-sm"><button [class.active]="varMode === 'wizard'" (click)="setVarMode('wizard')">Wizard</button><button [class.active]="varMode === 'sql'" (click)="setVarMode('sql')">SQL</button></div>
           <div class="actions">
-            <button *ngIf="currentVar.variableId || currentVar.id" class="btn-xs btn-danger-ghost" (click)="deleteVariable()">Xóa</button>
-            <button class="btn-xs btn-success" (click)="saveVariable()"><span class="material-symbols-outlined">save</span> Lưu Biến</button>
+            <!-- NÚT XÓA: Chỉ hiện khi xem (không sửa) và đã có ID -->
+            <button *ngIf="!isEditingVar && (currentVar.id || currentVar.variableId)" class="btn-xs btn-danger-ghost" (click)="deleteVariable()">Xóa</button>
+            
+            <!-- NÚT SỬA: Chỉ hiện khi xem và đã có ID -->
+            <button *ngIf="!isEditingVar && (currentVar.id || currentVar.variableId)" class="btn-xs btn-primary-outline" (click)="startEditVar()">
+               <i class="fa-solid fa-pen-to-square"></i> Sửa
+            </button>
+
+            <!-- GROUP LƯU/HỦY: Chỉ hiện khi đang sửa -->
+            <ng-container *ngIf="isEditingVar">
+                <button class="btn-xs btn-danger-ghost" (click)="cancelEditVar()">Hủy</button>
+                <button class="btn-xs btn-success" (click)="saveVariable()"><span class="material-symbols-outlined">save</span> Lưu</button>
+            </ng-container>
           </div>
         </div>
-
+        
         <div class="card-body">
-          <!-- Common Fields for both modes -->
           <div class="form-grid">
             <div class="form-group">
-              <label>Mã Biến (Code)</label>
-              <input type="text" [(ngModel)]="currentVar.code" class="input-code">
+                <label>Mã Biến (Code)</label>
+                <!-- Disabled logic: 
+                     - Nếu không phải chế độ sửa: Khóa
+                     - Nếu đang sửa nhưng là biến cũ (đã có ID): Khóa (không cho sửa Code)
+                     - Chỉ mở khi đang Tạo mới -->
+                <input type="text" [(ngModel)]="currentVar.code" class="input-code" 
+                       [disabled]="!isEditingVar || (currentVar.id !== undefined && currentVar.id !== null)">
             </div>
             <div class="form-group">
-              <label>Tên hiển thị</label>
-              <input type="text" [(ngModel)]="currentVar.name">
+                <label>Tên hiển thị</label>
+                <!-- Tương tự Code, Tên hiển thị cũng khóa khi sửa biến cũ (theo yêu cầu) -->
+                <input type="text" [(ngModel)]="currentVar.name" 
+                       [disabled]="!isEditingVar || (currentVar.id !== undefined && currentVar.id !== null)">
             </div>
           </div>
-          
-          <!-- NEW: Description field (Full width, editable) -->
           <div class="form-group full-width" style="margin-bottom: 24px;">
-            <label>Mô tả</label>
-            <input type="text" [(ngModel)]="currentVar.description" placeholder="Nhập mô tả biến...">
+              <label>Mô tả</label>
+              <!-- Mô tả được phép sửa khi bật chế độ Edit -->
+              <input type="text" [(ngModel)]="currentVar.description" placeholder="Nhập mô tả biến..." 
+                     [disabled]="!isEditingVar">
           </div>
-
-          <!-- Wizard Panel -->
+          
           <div class="wizard-panel" *ngIf="varMode === 'wizard'">
             <label><i class="fa-solid fa-wand-magic-sparkles"></i> Chọn mẫu biến có sẵn (Templates)</label>
-            
-            <select [(ngModel)]="wizSource" (change)="onWizSourceChange()">
+            <select [(ngModel)]="wizSource" (change)="onWizSourceChange()" >
               <option value="">-- Chọn biến để xem công thức --</option>
-              <option *ngFor="let v of variables" [value]="v.code">
-                {{v.name}} ({{v.code}})
-              </option>
+              <option *ngFor="let v of variables" [value]="v.code">{{v.name}} ({{v.code}})</option>
             </select>
-            
             <div class="wiz-preview" *ngIf="wizResultSql">{{wizResultSql}}</div>
           </div>
 
-          <!-- SQL Panel -->
           <div class="sql-panel" [class.hidden]="varMode !== 'sql'">
             <label>Câu lệnh SQL (Native Query)</label>
-            <div class="codemirror-wrapper"><textarea *ngIf="wizResultSql">{{wizResultSql}}</textarea></div>
+            <!-- CodeMirror wrapper (việc enable/disable readonly được xử lý trong TS) -->
+            <div class="codemirror-wrapper"><textarea *ngIf="wizResultSql" [disabled]="!isEditingVar">{{wizResultSql}}</textarea></div>
             <p class="hint"><i class="fa-solid fa-info-circle"></i> Tham số hỗ trợ: :userId, :startDate, :endDate, :month, :year</p>
           </div>
 
-          <!-- Audit Section -->
+          <!-- Audit section always active for testing -->
           <div class="audit-section">
             <h4><i class="fa-solid fa-microscope"></i> Kiểm Tra Dữ Liệu (Audit)</h4>
             <div class="audit-controls">
-              <!-- Cột Nhân viên -->
               <div class="control-employee">
                 <label>Nhân viên</label>
-                <select [(ngModel)]="simEmployeeId">
-                  <option value="">-- Chọn --</option>
-                  <option *ngFor="let e of employees" [value]="e.userID">{{e.fullname}} - {{e.userID}}</option>
-                </select>
+                <select [(ngModel)]="simEmployeeId"><option value="">-- Chọn --</option><option *ngFor="let e of employees" [value]="e.userID">{{e.fullname}} - {{e.userID}}</option></select>
               </div>
-              
-              <!-- Cột Kỳ lương -->
-              <div class="control-period">
-                <label>Kỳ lương</label>
-                <input type="month" [(ngModel)]="simPeriod">
-              </div>
-
-              <!-- Nút Kiểm tra -->
-              <button class="btn-check" (click)="testVariable()">
-                <span class="material-symbols-outlined">arrow_right</span>Kiểm tra
-              </button>
+              <div class="control-period"><label>Kỳ lương</label><input type="month" [(ngModel)]="simPeriod"></div>
+              <button class="btn-check" (click)="testVariable()"><span class="material-symbols-outlined">arrow_right</span>Kiểm tra</button>
             </div>
-
             <div class="audit-result" *ngIf="isSimulating || simResult !== '---'">
               <div class="result-row"><span>Kết quả:</span><strong class="value">{{simResult}}</strong></div>
               <div class="debug-log">{{simDebug}}</div>
@@ -254,32 +183,26 @@
     </main>
 </ng-template>
 
-<!-- RECURSIVE TEMPLATE FOR VISUAL BUILDER -->
 <ng-template #nodeTemplate let-node>
     <div class="rb-node" [ngClass]="'type-' + getTypeGroup(node.type)">
       <div class="rb-header">
         <select [ngModel]="node.type" (ngModelChange)="updateNodeType(node, $event)">
-          <option *ngFor="let key of objectKeys(RULE_TYPES)" [value]="key">
-            {{RULE_TYPES[key].label}}
-          </option>
+          <option *ngFor="let key of objectKeys(RULE_TYPES)" [value]="key">{{RULE_TYPES[key].label}}</option>
         </select>
       </div>
       <div class="rb-body">
-        <ng-container *ngIf="node.type === 'CONSTANT'">
-          <input type="number" [(ngModel)]="node.value" class="rb-input">
-        </ng-container>
-        <ng-container *ngIf="node.type === 'VARIABLE'">
+        <ng-container *ngIf="node.type === 'CONSTANT'"><input type="number" [(ngModel)]="node.value" class="rb-input"></ng-container>
+        <ng-container *ngIf="node.type === 'VARIABLE' || node.type === 'REFERENCE'">
           <select [(ngModel)]="node.name" class="rb-select-var">
             <option value="">-- Chọn biến --</option>
+            <option *ngIf="node.name" [value]="node.name" hidden>{{node.name}}</option>
             <option *ngFor="let v of variables" [value]="v.code">{{v.code}} - {{v.name}}</option>
           </select>
         </ng-container>
         <ng-container *ngIf="RULE_TYPES[node.type]?.args">
           <ng-container *ngFor="let arg of RULE_TYPES[node.type].args">
             <span class="rb-label">{{arg}}</span>
-            <div class="rb-children">
-              <ng-container *ngTemplateOutlet="nodeTemplate; context:{$implicit: node[arg]}"></ng-container>
-            </div>
+            <div class="rb-children"><ng-container *ngTemplateOutlet="nodeTemplate; context:{$implicit: node[arg]}"></ng-container></div>
           </ng-container>
         </ng-container>
       </div>

@@ -1,20 +1,10 @@
 <header class="task-bar">
 
-  <!-- NOTIFICATION SECTION -->
-  <div class="notification-wrapper" *ngIf="role[0] == 'Manager' " #notifiDrop >
-    <div class="notification-icon-box" (click)="toggleNotifiDropdown()">
-      <!-- Badge hiển thị số lượng (chỉ hiện khi > 0) -->
-      <span class="badge" *ngIf="countnotifi > 0">{{ countnotifi }}</span>
-      <span class="material-symbols-outlined bell-icon">
-        notifications
-      </span>
-    </div>
-  </div>
+  <!-- NOTIFICATION SECTION REMOVED -->
 
   <div class="user-actions">
     <!-- Nút thêm tài khoản -->
     <div class="add-dropdown" #addDrop>
-      <span class="material-symbols-outlined add-icon" (click)="toggleAddDropdown()">add</span>
 
       <div class="dropdown-menu" *ngIf="isAddOpen">
         <div class="feature" *ngFor="let feature of featureAdd">
@@ -37,62 +27,7 @@
 
 </header>
 
-<!-- FULL PAGE NOTIFICATION MODAL -->
-<div class="notification-overlay" *ngIf="isNotifiOpen" (click)="closeNotification()">
-  <div class="notification-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Yêu cầu đổi ca chờ duyệt ({{ countnotifi }})</h3>
-      <button class="close-btn" (click)="closeNotification()">
-        <span class="material-symbols-outlined">close</span>
-      </button>
-    </div>
-
-    <div class="modal-body">
-      <!-- Empty State -->
-      <div class="empty-state" *ngIf="pendingRequests.length === 0">
-        <span class="material-symbols-outlined">inbox</span>
-        <p>Không có yêu cầu nào.</p>
-      </div>
-
-      <!-- Request List TABLE -->
-      <div class="table-responsive" *ngIf="pendingRequests.length > 0">
-        <table class="request-table">
-          <thead>
-            <tr>
-              <th>Nhân viên</th>
-              <th>Phòng ban</th>
-              <th>Ngày</th>
-              <th>Ca hiện tại</th>
-              <th>Ca mới</th>
-              <th>Lý do</th>
-              <th class="text-center">Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let req of pendingRequests">
-              <td><strong>{{ req.employeeName }}</strong></td>
-              <td>{{ req.departmentName }}</td>
-              <td>{{ req.targetDate | date:'dd/MM/yyyy' }}</td>
-              <td><span class="badge-shift current">{{ req.currentShiftName }}</span></td>
-              <td><span class="badge-shift new">{{ req.newShiftName }}</span></td>
-              <td class="reason-cell" title="{{ req.reason }}">{{ req.reason }}</td>
-              <td>
-                <div class="action-buttons">
-                  <button class="btn-action approve" (click)="onApprove(req.id, $event)" title="Duyệt">
-                    <span class="material-symbols-outlined">check</span>
-                  </button>
-                  <button class="btn-action reject" (click)="onReject(req.id, $event)" title="Từ chối">
-                    <span class="material-symbols-outlined">close</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- NOTIFICATION MODAL REMOVED -->
 
 <div class="main-body-container">
   <div class="left_handle">

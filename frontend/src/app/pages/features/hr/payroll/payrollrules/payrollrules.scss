@@ -18,6 +18,16 @@ $text-main: #334155;
 $text-muted: #64748b;
 $font-mono: 'Fira Code', monospace;
 
+// --- Font Sizes (Increased by +0.4rem as requested) ---
+// Base mapping: 10px -> 1.025rem, 12px -> 1.15rem, etc.
+$fs-xs: 0.7rem; // Original ~10px
+$fs-11: 0.7rem; // Original ~11px
+$fs-sm: 0.7rem; // Original ~12px
+$fs-13: 0.7rem; // Original ~13px
+$fs-base: 0.7rem; // Original ~14px
+$fs-md: 0.7rem; // Original ~16px
+$fs-lg: 0.7rem; // Original ~18px
+
 // --- Global Resets ---
 :host {
     display: block;
@@ -27,8 +37,10 @@ $font-mono: 'Fira Code', monospace;
     background-color: $bg-body;
     overflow: hidden;
     display: flex;
-    padding: 3rem 0.5rem 0.5rem 5rem;
+    padding: 3rem 0.5rem 0.5rem 4.5rem;
     flex-direction: column;
+    // Set a base font size if needed, but we use variables below
+    font-size: $fs-base;
 }
 
 button {
@@ -49,12 +61,20 @@ textarea {
     border: 1px solid $border-color;
     border-radius: 6px;
     padding: 8px 12px;
-    font-size: 13px;
+    font-size: $fs-13; // Was 13px
     width: 100%;
     box-sizing: border-box;
     transition: border-color 0.2s;
 
-    &:focus {
+    // Style cho trạng thái disabled
+    &:disabled {
+        background-color: #f1f5f9;
+        color: #94a3b8;
+        cursor: not-allowed;
+        border-color: #e2e8f0;
+    }
+
+    &:focus:not(:disabled) {
         border-color: $primary;
         box-shadow: 0 0 0 3px rgba($primary, 0.1);
     }
@@ -95,7 +115,7 @@ textarea {
         }
 
         h1 {
-            font-size: 18px;
+            font-size: $fs-lg; // Was 18px
             font-weight: 700;
             margin: 0;
         }
@@ -106,7 +126,7 @@ textarea {
             margin-left: 32px;
 
             button {
-                font-size: 14px;
+                font-size: $fs-base; // Was 14px
                 font-weight: 500;
                 color: $text-muted;
                 padding: 18px 0;
@@ -156,7 +176,7 @@ textarea {
         justify-content: space-between;
         align-items: center;
         font-weight: 700;
-        font-size: 12px;
+        font-size: $fs-sm; // Was 12px
         color: $text-muted;
         text-transform: uppercase;
         flex-shrink: 0;
@@ -205,11 +225,11 @@ textarea {
                     font-family: $font-mono;
                     font-weight: 700;
                     color: $primary;
-                    font-size: 12px;
+                    font-size: $fs-sm; // Was 12px
                 }
 
                 .badge {
-                    font-size: 10px;
+                    font-size: $fs-xs; // Was 10px
                     background: #f1f5f9;
                     padding: 2px 6px;
                     border-radius: 4px;
@@ -217,7 +237,7 @@ textarea {
             }
 
             .name {
-                font-size: 11px;
+                font-size: $fs-11; // Was 11px
                 color: $text-muted;
                 white-space: nowrap;
                 overflow: hidden;
@@ -228,7 +248,7 @@ textarea {
                 font-family: $font-mono;
                 font-weight: 600;
                 color: darken($success, 10%);
-                font-size: 12px;
+                font-size: $fs-sm; // Was 12px
             }
         }
     }
@@ -236,7 +256,7 @@ textarea {
 
 // --- BUTTONS ---
 .btn-xs {
-    font-size: 12px;
+    font-size: $fs-sm; // Was 12px
     height: 32px;
     padding: 0 16px;
     border-radius: 6px;
@@ -293,7 +313,7 @@ textarea {
     padding: 8px 16px;
     border-radius: 4px;
     font-weight: bold;
-    font-size: 13px;
+    font-size: $fs-13; // Was 13px
     display: flex;
     align-items: center;
     gap: 6px;
@@ -335,7 +355,7 @@ textarea {
                 margin-bottom: 2px;
 
                 .text-rule-code {
-                    font-size: 16px;
+                    font-size: $fs-md; // Was 16px
                     font-weight: 800;
                     color: $text-main;
                     margin: 0;
@@ -346,7 +366,7 @@ textarea {
                 }
 
                 .input-rule-code {
-                    font-size: 16px;
+                    font-size: $fs-md; // Was 16px
                     font-weight: 800;
                     color: $text-main;
                     border: 1px dashed transparent;
@@ -379,7 +399,7 @@ textarea {
                 }
 
                 .badge-status {
-                    font-size: 10px;
+                    font-size: $fs-xs; // Was 10px
                     background: #f1f5f9;
                     padding: 2px 6px;
                     border-radius: 4px;
@@ -394,7 +414,7 @@ textarea {
                 border: none;
                 padding: 0;
                 background: transparent;
-                font-size: 12px;
+                font-size: $fs-sm; // Was 12px
                 color: $text-muted;
                 width: 300px;
             }
@@ -413,7 +433,7 @@ textarea {
                 border: 1px solid $border-color;
 
                 button {
-                    font-size: 12px;
+                    font-size: $fs-sm; // Was 12px
                     padding: 4px 12px;
                     border-radius: 4px;
                     font-weight: 600;
@@ -458,6 +478,11 @@ textarea {
             min-height: 300px;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 
+            &.full-height-editor {
+                height: 100%;
+                min-height: 0;
+            }
+
             .box-header {
                 background: #f8fafc;
                 border-bottom: 1px solid $border-color;
@@ -468,7 +493,7 @@ textarea {
                 flex-shrink: 0;
 
                 label {
-                    font-size: 11px;
+                    font-size: $fs-11; // Was 11px
                     font-weight: 700;
                     text-transform: uppercase;
                     color: $text-muted;
@@ -495,7 +520,7 @@ textarea {
                 padding: 16px;
                 resize: none;
                 font-family: $font-mono;
-                font-size: 14px;
+                font-size: $fs-base; // Was 14px
                 color: $text-main;
                 line-height: 1.6;
 
@@ -521,7 +546,7 @@ textarea {
 
                 .preview-label {
                     padding: 8px 16px 0 16px;
-                    font-size: 11px;
+                    font-size: $fs-11; // Was 11px
                     font-weight: 700;
                     text-transform: uppercase;
                     color: #94a3b8;
@@ -533,7 +558,7 @@ textarea {
                     padding: 16px;
                     overflow-y: auto;
                     font-family: $font-mono;
-                    font-size: 14px;
+                    font-size: $fs-base; // Was 14px
 
                     ::ng-deep {
                         .badge-var {
@@ -557,32 +582,29 @@ textarea {
             }
         }
 
-        // --- VISUAL TREE STYLING (NEW) ---
         .visual-box {
             padding: 32px;
-            background: #fcfcfc; // Nền sáng nhẹ
+            background: #fcfcfc;
             min-height: 500px;
             overflow: auto;
-            border: 1px dashed #e2e8f0; // Viền nét đứt cho cả box
+            border: 1px dashed #e2e8f0;
 
             .rb-node {
                 background: #ffffff;
-                border: 1px solid #e2e8f0; // Viền xám mỏng
+                border: 1px solid #e2e8f0;
                 border-radius: 6px;
                 padding: 16px;
                 margin-bottom: 16px;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); // Đổ bóng nhẹ
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
                 position: relative;
                 width: fit-content;
                 min-width: 400px;
-
-                // Dải màu bên trái phân loại
                 border-left-width: 4px;
                 border-left-style: solid;
-                border-left-color: #cbd5e1; // Mặc định xám
+                border-left-color: #cbd5e1;
 
                 &.type-math {
-                    border-left-color: #3b82f6; // Xanh dương (Toán)
+                    border-left-color: #3b82f6;
 
                     .rb-header select {
                         color: #1d4ed8;
@@ -590,7 +612,7 @@ textarea {
                 }
 
                 &.type-logic {
-                    border-left-color: #8b5cf6; // Tím (Logic)
+                    border-left-color: #8b5cf6;
 
                     .rb-header select {
                         color: #6d28d9;
@@ -598,7 +620,7 @@ textarea {
                 }
 
                 &.type-data {
-                    border-left-color: #10b981; // Xanh lá (Dữ liệu)
+                    border-left-color: #10b981;
 
                     .rb-header select {
                         color: #059669;
@@ -606,7 +628,7 @@ textarea {
                 }
 
                 &.type-const {
-                    border-left-color: #f59e0b; // Cam (Hằng số)
+                    border-left-color: #f59e0b;
                 }
 
                 .rb-header {
@@ -617,7 +639,7 @@ textarea {
                         min-width: 200px;
                         padding: 6px 12px;
                         font-weight: 600;
-                        font-size: 13px;
+                        font-size: $fs-13; // Was 13px
                         border: 1px solid #e2e8f0;
                         border-radius: 4px;
                         background-color: #f8fafc;
@@ -638,7 +660,6 @@ textarea {
 
                 .rb-body {
 
-                    // Styles cho inputs/values
                     .rb-input,
                     .rb-select-var {
                         width: 100%;
@@ -646,32 +667,29 @@ textarea {
                         padding: 6px 10px;
                         border: 1px solid #e2e8f0;
                         border-radius: 4px;
-                        font-size: 13px;
+                        font-size: $fs-13; // Was 13px
 
                         &:focus {
                             border-color: $primary;
                         }
                     }
 
-                    // Styles cho Labels (VẾ TRÁI, VẾ PHẢI...)
                     .rb-label {
                         display: block;
-                        font-size: 10px;
+                        font-size: $fs-xs; // Was 10px
                         font-weight: 700;
-                        color: #94a3b8; // Màu xám nhạt
+                        color: #94a3b8;
                         text-transform: uppercase;
                         letter-spacing: 0.5px;
                         margin-top: 12px;
                         margin-bottom: 8px;
                     }
 
-                    // Container chứa node con -> Tạo hiệu ứng cây (Indent + Dashed Line)
                     .rb-children {
-                        padding-left: 24px; // Thụt lề
-                        border-left: 1px dashed #cbd5e1; // Đường kẻ nét đứt dọc
-                        margin-left: 4px; // Căn chỉnh đường kẻ
+                        padding-left: 24px;
+                        border-left: 1px dashed #cbd5e1;
+                        margin-left: 4px;
 
-                        // Đè margin node con cuối cùng để gọn hơn
                         .rb-node:last-child {
                             margin-bottom: 0;
                         }
@@ -696,7 +714,7 @@ textarea {
             background: #eef2ff;
             color: darken($primary, 20%);
             font-weight: 700;
-            font-size: 13px;
+            font-size: $fs-13; // Was 13px
             flex-shrink: 0;
         }
 
@@ -721,12 +739,12 @@ textarea {
                     display: block;
                     font-family: $font-mono;
                     font-weight: 700;
-                    font-size: 12px;
+                    font-size: $fs-sm; // Was 12px
                     color: $text-main;
                 }
 
                 .var-name {
-                    font-size: 11px;
+                    font-size: $fs-11; // Was 11px
                     color: $text-muted;
                 }
             }
@@ -767,7 +785,7 @@ textarea {
                 border: 1px solid #e2e8f0;
 
                 button {
-                    font-size: 12px;
+                    font-size: $fs-sm; // Was 12px
                     padding: 6px 16px;
                     border-radius: 6px;
                     font-weight: 600;
@@ -791,7 +809,7 @@ textarea {
 
             h3 {
                 margin: 0;
-                font-size: 16px;
+                font-size: $fs-md; // Was 16px
                 color: $text-main;
             }
 
@@ -816,25 +834,10 @@ textarea {
                     color: $text-main;
                     display: block;
                     margin-bottom: 8px;
-                    font-size: 13px;
+                    font-size: $fs-13; // Was 13px
 
                     i {
                         color: $primary;
-                        margin-right: 6px;
-                    }
-                }
-
-                .wiz-description {
-                    background: #f0f9ff;
-                    border: 1px solid #bae6fd;
-                    color: #0369a1;
-                    padding: 10px;
-                    border-radius: 6px;
-                    font-size: 12px;
-                    margin-bottom: 12px;
-                    line-height: 1.5;
-
-                    i {
                         margin-right: 6px;
                     }
                 }
@@ -852,7 +855,7 @@ textarea {
                 }
 
                 .wiz-preview {
-                    font-size: 13px;
+                    font-size: $fs-13; // Was 13px
                     line-height: 1.6;
                     color: #334155;
                     padding: 16px;
@@ -883,7 +886,7 @@ textarea {
 
                     label {
                         display: block;
-                        font-size: 12px;
+                        font-size: $fs-sm; // Was 12px
                         font-weight: 600;
                         color: $text-muted;
                         margin-bottom: 6px;
@@ -894,7 +897,7 @@ textarea {
                         color: #10b981;
                         font-weight: 700;
                         background: #f8fafc;
-                        font-size: 14px;
+                        font-size: $fs-base; // Was 14px
                     }
                 }
             }
@@ -926,7 +929,7 @@ textarea {
 
                 .hint {
                     margin-top: 8px;
-                    font-size: 11px;
+                    font-size: $fs-11; // Was 11px
                     color: $text-muted;
                     font-style: italic;
                 }
@@ -938,7 +941,7 @@ textarea {
                 border-top: 1px solid $border-color;
 
                 h4 {
-                    font-size: 14px;
+                    font-size: $fs-base; // Was 14px
                     font-weight: 700;
                     margin-bottom: 12px;
                     display: flex;
@@ -964,7 +967,7 @@ textarea {
 
                         label {
                             display: block;
-                            font-size: 10px;
+                            font-size: $fs-xs; // Was 10px
                             font-weight: 700;
                             text-transform: uppercase;
                             color: purple;
@@ -988,7 +991,7 @@ textarea {
 
                         label {
                             display: block;
-                            font-size: 10px;
+                            font-size: $fs-xs; // Was 10px
                             font-weight: 700;
                             text-transform: uppercase;
                             color: purple;
@@ -1019,7 +1022,7 @@ textarea {
                         border-radius: 6px;
 
                         .value {
-                            font-size: 18px;
+                            font-size: $fs-lg; // Was 18px
                             color: purple;
                             font-family: $font-mono;
                         }
@@ -1027,7 +1030,7 @@ textarea {
 
                     .debug-log {
                         margin-top: 8px;
-                        font-size: 10px;
+                        font-size: $fs-xs; // Was 10px
                         font-family: $font-mono;
                         color: $text-muted;
                         background: #f8fafc;

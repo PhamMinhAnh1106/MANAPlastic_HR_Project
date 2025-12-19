@@ -1,10 +1,10 @@
 import { api } from "../../../api.service";
 
 
-export async function GetAttendants(params: string, role: string, page: number, size: number) {
+export async function GetAttendants(params: string, page: number, size: number) {
     try {
 
-        const res = await api.get(`/${role.toLowerCase()}/chamCong?page=${page}&size=${size}&${params}`);
+        const res = await api.get(`/chamCong?page=${page}&size=${size}&${params}`);
         return res.data;
     } catch (error) {
         return "co loi xay ra " + error;

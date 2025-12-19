@@ -2,7 +2,6 @@ import { Component, inject, CUSTOM_ELEMENTS_SCHEMA, ChangeDetectorRef } from '@a
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-// Giả định đường dẫn import service vẫn giữ nguyên như code cũ của bạn
 import { calculatePayroll, RulesPayroll } from '../../../../../services/pages/features/hr/payroll/main.services';
 
 // Interface cho cấu trúc dữ liệu
@@ -22,8 +21,7 @@ interface DebugRecord {
 @Component({
   selector: 'app-payrollmain',
   standalone: true,
-  // Đảm bảo bạn đã import AppLoading, AppConfirm, AppAlert hoặc có chúng trong schema
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule], // Ensure shared components are imported if needed
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './payrollmain.html',
   styleUrls: ['./payrollmain.scss'],
@@ -43,7 +41,7 @@ export class Payrollmain {
   debugData: DebugRecord[] = [];
 
   // --- COMPONENT STATES (Loading, Confirm, Alert) ---
-  isloading = false; // Biến loading duy nhất
+  isloading = false;
 
   // Confirm Dialog State
   isconfirm = false;
@@ -54,8 +52,22 @@ export class Payrollmain {
   alertmessage = '';
   alertType = false;
 
-  // --- HELPER METHODS FOR COMPONENTS ---
+  // --- NEW: FORMULA MODAL STATE ---
+  isFormulaModalOpen = false;
+  selectedRow: DebugRecord | null = null;
 
+  // --- MODAL METHODS ---
+  openFormulaModal(row: DebugRecord) {
+    this.selectedRow = row;
+    this.isFormulaModalOpen = true;
+  }
+
+  closeFormulaModal() {
+    this.isFormulaModalOpen = false;
+    this.selectedRow = null;
+  }
+
+  // --- HELPER METHODS FOR COMPONENTS ---
   showAlert(message: string, type: boolean) {
     this.alertmessage = message;
     this.alertType = type;
@@ -66,19 +78,13 @@ export class Payrollmain {
     this.isconfirm = false;
     if (result) {
       console.log('Confirmed!');
-      // Có thể gọi hàm xử lý tiếp theo ở đây nếu cần
     }
   }
 
   // --- BUSINESS LOGIC ---
-
   async runCalculation() {
-    // Chỉ dùng isloading
     this.isloading = true;
-
-    // Reset status (không cần hiện text 'Đang gửi...' vì đã có app-loading quay rồi)
     this.runStatus = '';
-
     const m = String(this.month);
     const y = String(this.year);
 
@@ -96,8 +102,6 @@ export class Payrollmain {
           `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check-circle"></i> Thành công! ${response}</span>`
         );
         this.showAlert(`Tính lương thành công! ${response}`, true);
-
-        // Tải lại dữ liệu chi tiết sau khi tính xong
         await this.fetchDetails();
       } else {
         throw new Error("Không nhận được phản hồi từ server");
@@ -109,7 +113,6 @@ export class Payrollmain {
       );
       this.showAlert(`Lỗi kết nối: ${msg}`, false);
     } finally {
-      // Tắt loading trong mọi trường hợp (thành công hay thất bại)
       this.isloading = false;
     }
   }
@@ -122,7 +125,6 @@ export class Payrollmain {
 
     this.isloading = true;
     this.debugData = [];
-
     const m = String(this.month);
     const y = String(this.year);
 
@@ -139,15 +141,12 @@ export class Payrollmain {
       console.error(err);
       this.showAlert('Lỗi khi tải dữ liệu chi tiết', false);
     } finally {
-      // Đảm bảo tắt loading sau khi tải xong
       this.isloading = false;
     }
   }
 
   // --- HELPER: Process Row Data ---
-
   processRow(row: DebugRecord): DebugRecord {
-    // 1. Determine Row Styles
     row.cssClass = "row-hover";
 
     if (row.code === 'NET_SALARY') {
@@ -160,37 +159,31 @@ export class Payrollmain {
       row.codeStyle = "code-income";
     }
 
-    // 2. Generate Description HTML
     let htmlContent = '';
 
     if (row.formula_dsl) {
-      // It's a Rule
       row.typeBadge = this.sanitizer.bypassSecurityTrustHtml(`<span class="badge badge-rule">Rule</span>`);
       const parsedDSL = this.parseDSL(row.formula_dsl);
-      htmlContent = `<div class="code-block">${parsedDSL}</div>`;
+      htmlContent = `${parsedDSL}`; // Direct DSL content
     } else {
-      // It's an Input
       row.typeBadge = this.sanitizer.bypassSecurityTrustHtml(`<span class="badge badge-input">Input</span>`);
       const sqlTooltip = row.input_sql ?
-        `<div class="sql-tooltip" title="${row.input_sql}">${row.input_sql}</div>` : '';
+        `<div class="sql-tooltip">${row.input_sql}</div>` : '';
 
       htmlContent = `
-        <div style="display:flex; flex-direction:column; gap:4px;">
-            <span style="font-size:0.75rem; color:#64748b; font-style:italic;">
+        <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="font-weight:600; color:#334155;">
               <i class="fa-solid fa-database"></i> ${row.input_desc || 'Dữ liệu thô từ DB'}
-            </span>
+            </div>
             ${sqlTooltip}
         </div>`;
     }
 
-    // 3. Sanitize HTML for Binding
     row.safeHtmlDisplay = this.sanitizer.bypassSecurityTrustHtml(htmlContent);
-
     return row;
   }
 
   // --- CORE: PARSER JSON DSL ---
-
   parseDSL(jsonStr: any): string {
     if (!jsonStr) return 'null';
     try {

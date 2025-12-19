@@ -2,11 +2,10 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
-// Restore original imports
+
 import { DecodeTokenRole } from '../../utils/token.utils';
 import { Loout_service } from '../../services/pages/login.service';
-import { ApproveReschedule, getReschedule, RejectReschedule } from '../../services/pages/features/employee/shedule.services';
-import { ShiftChangeRequest } from '../../interface/schedule.interface';
+// Removed Schedule/Notification related imports
 
 @Component({
   selector: 'app-home',
@@ -20,7 +19,7 @@ export class Home implements OnInit {
 
   @ViewChild('addDrop') addDrop!: ElementRef;
   @ViewChild('userDrop') userDrop!: ElementRef;
-  @ViewChild('notifiDrop') notifiDrop!: ElementRef;
+  // Removed notifiDrop ViewChild
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent) {
@@ -35,9 +34,6 @@ export class Home implements OnInit {
     if (this.isUserOpen && this.userDrop && !this.userDrop.nativeElement.contains(target)) {
       this.isUserOpen = false;
     }
-
-    // --- NOTIFICATION DROPDOWN ---
-    // Không cần check click outside ở đây nữa vì đã dùng Overlay modal
   }
 
   isMenuOpen: boolean = false;
@@ -55,57 +51,20 @@ export class Home implements OnInit {
   icon_handleBar: any;
   isUserOpen = false;
   isAddOpen = false;
-  isNotifiOpen = false;
+  // Removed isNotifiOpen
   featureAdd: any = [{ name: "", path: "" }]
 
-  // List of pending requests
-  pendingRequests: ShiftChangeRequest[] = [];
+  // Removed pendingRequests list
 
   toggleUserDropdown() {
     this.isUserOpen = !this.isUserOpen;
     this.isAddOpen = false;
-    this.isNotifiOpen = false;
   }
 
-  toggleAddDropdown() {
-    this.isAddOpen = !this.isAddOpen;
-    this.isUserOpen = false;
-    this.isNotifiOpen = false;
-    this.cdr.detectChanges();
-    if (this.isAddOpen == true) {
-      if (this.role.length > 0) {
-        // Safe check for role existence
-        const currentRole = this.role[0] ? this.role[0].toLowerCase() : '';
-        switch (currentRole) {
-          case "admin":
-            this.featureAdd = [{ name: "Cấp tài khoản", path: "/home/add/account" }, { name: "Cấp quyền hạn", path: "/home/permission" }];
-            break;
-          case "hr":
-            this.featureAdd = [{ name: "Thêm hợp đồng", path: "/home/contracts/add" }];
-            break;
-          case "employee":
-            this.featureAdd = [
-              { name: "Đăng Ký Phép", path: "/home/leaverequest/add" }
-            ];
-            break;
-          case "manager":
-            this.featureAdd = [{ name: "Lịch làm việc", path: "/home/schedule" }, { name: "Xếp ca làm việc", path: "/home/schedule/auto" }];
-            break;
-        }
-      }
-    }
-  }
 
-  toggleNotifiDropdown() {
-    // Luôn mở để xem, kể cả khi 0 thông báo (để hiển thị empty state)
-    this.isNotifiOpen = !this.isNotifiOpen;
-    this.isAddOpen = false;
-    this.isUserOpen = false;
-  }
 
-  closeNotification() {
-    this.isNotifiOpen = false;
-  }
+  // Removed toggleNotifiDropdown
+  // Removed closeNotification
 
   openAddAccount() {
     console.log("Cấp tài khoản");
@@ -135,12 +94,16 @@ export class Home implements OnInit {
           {
             iconName: "manage_accounts", // Khác biệt: Quản lý user
             path: "/home/user/account",
-            task: [{ name: "Quản Lí Nhân sự", path: "/home/user/account" }]
+            task: [{ name: "Quản Lí Tài Khoản", path: "/home/user/account" }, { name: "Cấp quyền hạn", path: "/home/permission" }]
           },
           {
             iconName: "paid", // Khác biệt: Quản lý tiền lương
             path: "/home/payroll",
-            task: [{ name: "Quản Lí lương", path: "/home/payroll" }, { name: "Tính Lương", path: "/home/payroll/rules" }],
+            task: [{ name: "Tính Lương", path: "/home/payroll" }, { name: "Cấu Hình Lương", path: "/home/payroll/rules" }],
+          }, {
+            iconName: "gavel", // Khác biệt: Hợp đồng (document)
+            path: "/home/law",
+            task: [{ name: "quản lý cấu hình luật", path: "/home/law" }],
           },
         ];
         icon.push(...icon_admin)
@@ -167,7 +130,11 @@ export class Home implements OnInit {
           {
             iconName: "currency_exchange", // Khác biệt: Tiền tệ/Lương
             path: "/home/payroll",
-            task: [{ name: "Quản Lí lương", path: "/home/payroll" }, { name: "Tính Lương", path: "/home/payroll/rules" }, { name: "Xem lương", path: "/home/payroll/payslip" }, { name: "Lọc DS Lương", path: "/home/payroll/payslip/filter" }],
+            task: [{ name: "Tính Lương", path: "/home/payroll" }, { name: "Cấu Hình Lương", path: "/home/payroll/rules" }, { name: "Xem lương", path: "/home/payroll/payslip" }, { name: "Lọc DS Lương", path: "/home/payroll/payslip/filter" }],
+          }, {
+            iconName: "gavel", // Khác biệt: Hợp đồng (document)
+            path: "/home/law",
+            task: [{ name: "quản lý cấu hình luật", path: "/home/law" }],
           },
         ];
         icon.push(...icon_hr)
@@ -179,12 +146,12 @@ export class Home implements OnInit {
           {
             iconName: "edit_calendar", // Khác biệt: Quản lý lịch
             path: "/home/user/attendance",
-            task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" }, { name: "Lịch làm việc", path: "/home/schedule" }, { name: "Quản lí phép", path: "/home/leaverequest/manage" }]
+            task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" }, { name: "Lịch làm việc", path: "/home/schedule" }]
           },
           {
             iconName: "flight_takeoff", // Khác biệt: Nghỉ phép
             path: "/home/leaverequest",
-            task: [{ name: "Nghỉ Phép", path: "/home/leaverequest" }]
+            task: [{ name: "Nghỉ Phép", path: "/home/leaverequest" }, { name: "Quản lí phép", path: "/home/leaverequest/manage" }]
           },
           {
             iconName: "receipt_long", // Khác biệt: Hóa đơn/Phiếu lương
@@ -244,56 +211,13 @@ export class Home implements OnInit {
       this.cdr.detectChanges();
       this.router.navigate(['/login']);
     }
-
-  }
-  countnotifi: number = 0;
-  query = '';
-
-  async getNotification() {
-    const res = await getReschedule(this.query) as any[];
-    if (res && Array.isArray(res)) {
-      const pending = res.filter((item: ShiftChangeRequest) => item.status == 'PENDING');
-      this.pendingRequests = pending;
-      this.countnotifi = pending.length;
-      this.cdr.detectChanges();
-    }
   }
 
-  // --- LOGIC DUYỆT / TỪ CHỐI ---
-  async onApprove(id: number, event: Event) {
-    event.stopPropagation();
-    console.log("Approve request ID:", id);
-    // TODO: Call API to approve here
-    await ApproveReschedule(id);
-
-    // Refresh list UI 
-    this.pendingRequests = this.pendingRequests.filter(req => req.id !== id);
-    this.countnotifi = this.pendingRequests.length;
-    if (this.countnotifi === 0) {
-      // Có thể đóng modal nếu muốn: this.isNotifiOpen = false;
-    }
-    this.getNotification();
-  }
-
-  async onReject(id: number, event: Event) {
-    event.stopPropagation();
-    console.log("Reject request ID:", id);
-    // TODO: Call API to reject here
-    await RejectReschedule(id);
-
-    // Refresh list UI
-    this.pendingRequests = this.pendingRequests.filter(req => req.id !== id);
-    this.countnotifi = this.pendingRequests.length;
-    if (this.countnotifi === 0) {
-      // Có thể đóng modal nếu muốn
-    }
-    this.getNotification();
-  }
+  // Removed getNotification, onApprove, onReject, countnotifi, query
 
   ngOnInit() {
     this.CheckLogin();
     this.checkrole();
-    this.getNotification();
-
+    // Removed getNotification call
   }
 }

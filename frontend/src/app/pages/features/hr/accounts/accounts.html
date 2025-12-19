@@ -8,6 +8,9 @@
     
     <!-- Quick Filter Bar -->
     <div class="quick-filter">
+      <button class="btn-primary" (click)="addaccount()">
+        <span class="material-symbols-outlined">add</span> Cấp Tài Khoản
+      </button>
       <div class="search-box">
         <span class="material-symbols-outlined icon">search</span>
         <input type="text" placeholder="Tìm theo Mã NV..." [(ngModel)]="filter.userID" (keyup.enter)="onPageSizeChange()" />
@@ -115,7 +118,7 @@
             <!-- Giới tính -->
             <td>
               <span class="badge" [ngClass]="emp.gender ? 'male' : 'female'">
-                {{ emp.gender === true ? 'Nam' : (emp.gender === false ? 'Nữ' : 'N/A') }}
+                {{ emp.gender === 'MALE' ? 'Nam' : (emp.gender === 'FEMALE' ? 'Nữ' : 'N/A') }}
               </span>
             </td>
 
@@ -201,8 +204,8 @@
         <div class="form-group">
           <label>Giới tính</label>
           <select [(ngModel)]="selectedEmployee.gender">
-            <option [ngValue]="true">Nam</option>
-            <option [ngValue]="false">Nữ</option>
+            <option [ngValue]="'MALE'">Nam</option>
+            <option [ngValue]="'FEMALE'">Nữ</option>
           </select>
         </div>
 

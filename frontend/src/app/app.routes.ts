@@ -22,6 +22,7 @@ import { Payrollrules } from './pages/features/hr/payroll/payrollrules/payrollru
 import { Payrollpayslip } from './pages/features/hr/payroll/payrollpayslip/payrollpayslip';
 import { Permissions } from './pages/features/admin/permissions/permissions';
 import { Filterpayslip } from './pages/features/hr/payroll/filterpayslip/filterpayslip';
+import { Main } from './pages/features/admin/legal/main/main';
 
 
 export const routes: Routes = [
@@ -39,6 +40,7 @@ export const routes: Routes = [
             //admin
             { path: 'add/account', component: AddAccount },
             { path: 'permission', component: Permissions },
+            { path: 'law', component: Main },
 
             //hr
             { path: 'user/account', component: Accounts },

@@ -2,12 +2,13 @@ import { CommonModule, NgFor, NgIf, NgClass, DatePipe } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GetAccountInfo, GetOneAccountInfo, UpdateAccounthr } from '../../../../services/pages/features/hr/accountManager.service';
-import { Department } from '../../../../interface/user/user.interface';
+import { Department, information } from '../../../../interface/user/user.interface';
 import { CookieService } from 'ngx-cookie-service';
 import { FilterUser } from '../../../../utils/filters.utils';
 import { Loading } from '../../../shared/loading/loading';
 import { Comfirm } from '../../../shared/comfirm/comfirm';
 import { Alert } from '../../../shared/alert/alert';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-accounts',
@@ -22,7 +23,7 @@ export class Accounts implements OnInit {
   sortByGenderDesc: boolean = false;
   sortByBirthdayDesc: boolean = false;
 
-  constructor(private cdr: ChangeDetectorRef, private cookie: CookieService) { }
+  constructor(private cdr: ChangeDetectorRef, private cookie: CookieService, private route: Router) { }
 
   employee: any = [];
   editID: number | null = null;
@@ -101,22 +102,20 @@ export class Accounts implements OnInit {
       .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
       .join('&');
 
-    if (query.length > 0) {
-      this.isloading = true;
-      if (this.employee.length > 0) this.employee = [];
+    this.isloading = true;
+    if (this.employee.length > 0) this.employee = [];
 
-      const res = await FilterUser(query, this.role);
+    const res = await FilterUser(query, this.role);
 
-      if (res.content.length > 0) {
-        this.employee.push(res.content);
-        this.toggleAdvancedFilter();
-        this.totalPages = 1;
-        this.totalElements = res.length;
-      }
-
-      this.isloading = false;
-      this.cdr.detectChanges();
+    if (res.content.length > 0) {
+      this.employee.push(res.content);
+      this.toggleAdvancedFilter();
+      this.totalPages = 1;
+      this.totalElements = res.length;
     }
+
+    this.isloading = false;
+    this.cdr.detectChanges();
   }
 
   openEditModal(emp: any) {
@@ -136,7 +135,6 @@ export class Accounts implements OnInit {
 
     // Reset mảng dữ liệu hiển thị
     if (this.employee.length > 0) this.employee = [];
-    console.log(keyword);
     // Gọi API mới với page và size
 
     const res = await GetOneAccountInfo(keyword, this.role);
@@ -147,6 +145,7 @@ export class Accounts implements OnInit {
       this.employee.push(res.content);
       this.totalPages = res.totalPages;
       this.totalElements = res.totalElements;
+      this.cdr.detectChanges();
     } else {
       this.totalPages = 0;
       this.totalElements = 0;
@@ -159,6 +158,7 @@ export class Accounts implements OnInit {
     this.isconfirm = true;
     this.confirmMessage = "Bạn có chắc muốn sửa thông tin nhân viên này?";
     this.emp = emp;
+    console.log(this.emp)
   }
 
   async onConfirmResult(event: any) {
@@ -182,7 +182,9 @@ export class Accounts implements OnInit {
   cancelEdit() {
     this.selectedEmployee = null;
   }
-
+  addaccount() {
+    this.route.navigate(['/home/add/account'])
+  }
   sort(x: any) {
     if (!this.employee || this.employee.length === 0) return;
 
@@ -207,9 +209,13 @@ export class Accounts implements OnInit {
 
       case 'gender':
         if (this.sortByGenderDesc) {
-          this.employee[0].sort((a: any, b: any) => Number(a.gender) - Number(b.gender));
+          this.employee[0].sort((a: any, b: any) =>
+            a.gender.localeCompare(b.gender)
+          );
         } else {
-          this.employee[0].sort((a: any, b: any) => Number(b.gender) - Number(a.gender));
+          this.employee[0].sort((a: any, b: any) =>
+            b.gender.localeCompare(a.gender)
+          );
         }
         this.sortByGenderDesc = !this.sortByGenderDesc;
         break;
