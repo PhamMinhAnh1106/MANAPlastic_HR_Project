@@ -3,6 +3,10 @@ package com.manaplastic.backend.controller.legalsetting;
 
 import com.manaplastic.backend.DTO.legalsetting.GenegatedYearlyConfigRequestDTO;
 import com.manaplastic.backend.DTO.legalsetting.UpdateMonthlyConfigRequestDTO;
+import com.manaplastic.backend.constant.LogType;
+import com.manaplastic.backend.constant.customAnotation.LogActivity;
+import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
+import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.MonthlypayrollconfigEntity;
 import com.manaplastic.backend.service.MonthlyConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +33,8 @@ public class MonthlyPayrollConfigController {
 
     // Cập nhật 1 tháng
     @PutMapping("/{id}")
+    @LogActivity(action = "UPDATE_MONTHLY_CONFIG", description = "Cập nhật chu kỳ lương", logType = LogType.WARNING)
+    @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
     public ResponseEntity<String> update(@PathVariable int id, @RequestBody UpdateMonthlyConfigRequestDTO req) {
         return ResponseEntity.ok(service.updateConfig(id, req));
     }

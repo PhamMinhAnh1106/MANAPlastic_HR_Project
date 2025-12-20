@@ -3,6 +3,8 @@ package com.manaplastic.backend.controller.account;
 import com.manaplastic.backend.DTO.account.PermissionDTO;
 import com.manaplastic.backend.DTO.criteria.PermissionFilterCriteria;
 import com.manaplastic.backend.DTO.account.UpdateUserPermissionDTO;
+import com.manaplastic.backend.constant.LogType;
+import com.manaplastic.backend.constant.customAnotation.LogActivity;
 import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
 import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.service.PermissionService;
@@ -34,6 +36,7 @@ public class PermissionController {
 
     // Cấp hoặc Chặn quyền
     @PostMapping("/update")
+    @LogActivity(action="ADD_ACCOUNT_PERMISSION", description = "Cấp / Chặn quyền của tài khoản")
     @RequiredPermission(PermissionConst.ACCOUNT_PERMISSION)
     public ResponseEntity<String> updatePermission(@RequestBody UpdateUserPermissionDTO request) {
             permissionManageService.updateUserPermission(request);
@@ -55,6 +58,7 @@ public class PermissionController {
 
 
     @DeleteMapping("/reset/{permissionId}")
+    @LogActivity(action = "RESET_ACCOUNT_PERMISSION", description = "Trả về quyền mặc định của tài khoản",logType = LogType.DANGER)
     @RequiredPermission(PermissionConst.ACCOUNT_PERMISSION)
     public ResponseEntity<String> resetPermission(
             @PathVariable Integer permissionId,

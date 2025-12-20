@@ -4,6 +4,7 @@ import com.manaplastic.backend.DTO.schedule.AddLeaverequestDTO;
 import com.manaplastic.backend.DTO.schedule.LeaveBalanceDTO;
 import com.manaplastic.backend.DTO.criteria.LeaveRequestFilterCriteria;
 import com.manaplastic.backend.DTO.schedule.LeaverequestDTO;
+import com.manaplastic.backend.constant.LogType;
 import com.manaplastic.backend.entity.*;
 import com.manaplastic.backend.filters.LeaveRequestFilter;
 import com.manaplastic.backend.repository.*;
@@ -16,7 +17,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +40,10 @@ public class LeaverequestService {
     private UserRepository userRepository;
     @Autowired
     private LeavePolicyRepository leavePolicyRepository;
+    @Autowired
+    private ActivityLogRepository activityLogRepository;
+    @Autowired
+    private EmployeeOfficialScheduleRepository scheduleRepository;
 
     private String getShiftNameFromEnum(LeaverequestEntity.LeaveType type) {
         switch (type) {
@@ -204,6 +212,8 @@ public class LeaverequestService {
         LeaverequestEntity savedRequest = leaveRequestRepository.save(request);
 
         updateLeaveBalanceOnApproval(savedRequest);// Trừ ngày phép
+        updateScheduleForLeaveRange(savedRequest);
+        logLeaveApprovalAction(approver, requester, savedRequest);
 
         String email = savedRequest.getUserID().getEmail();
         String fullname = savedRequest.getUserID().getFullname();
@@ -316,7 +326,73 @@ public class LeaverequestService {
         }
     }
 
+    // Ghi log  duyệt nghỉ phép
+    private void logLeaveApprovalAction(UserEntity approver, UserEntity requester, LeaverequestEntity request) {
+        ActivitylogEntity log = new ActivitylogEntity();
+        log.setUserID(approver); // Người duyệt (HR hoặc Manager)
+        log.setActiontime(LocalDateTime.now());
 
+        // Phân loại Action dựa trên Role người duyệt
+        String approverRole = (approver.getRoleID() != null) ? approver.getRoleID().getRolename() : "Unknown";
+
+        if ("Manager".equalsIgnoreCase(approverRole)) {
+            log.setAction("MANAGER_APPROVE_LEAVE");
+            log.setLogType(LogType.INFO); // Dùng Enum LogType.INFO nếu đã define
+            log.setDetails("Manager " + approver.getFullname() + " duyệt đơn nghỉ phép cho nhân viên: " + requester.getFullname());
+        } else {
+            // Mặc định là HR hoặc Admin
+            log.setAction("HR_APPROVE_LEAVE");
+            log.setLogType(LogType.INFO);
+            log.setDetails("HR " + approver.getFullname() + " duyệt hoàn tất đơn nghỉ phép cho: " + requester.getFullname());
+        }
+
+        // Bổ sung thông tin ngày vào details
+        String dateRange = " | Từ: " + request.getStartdate() + " Đến: " + request.getEnddate();
+        log.setDetails(log.getDetails() + dateRange + " (Mã đơn: " + request.getId() + ")");
+
+        activityLogRepository.save(log);
+    }
+
+    private void updateScheduleForLeaveRange(LeaverequestEntity request) {
+        UserEntity employee = request.getUserID();
+        LocalDate startDate = request.getStartdate();
+        LocalDate endDate = request.getEnddate();
+
+        // Lấy ShiftID từ request. Nếu null thì tìm lại theo Enum
+        ShiftEntity leaveShift = request.getShiftID();
+        if (leaveShift == null) {
+            String shiftName = getShiftNameFromEnum(request.getLeavetype());
+            leaveShift = shiftRepository.findByShiftname(shiftName).orElse(null);
+        }
+
+        if (leaveShift == null) return; // Không tìm thấy ca làm việc, không update lịch
+
+        final ShiftEntity finalShift = leaveShift;
+
+        // Duyệt qua từng ngày từ start -> end
+        startDate.datesUntil(endDate.plusDays(1)).forEach(date -> {
+            updateOfficialSchedule(employee, date, finalShift);
+        });
+    }
+
+    // Cập nhật/Tạo lịch làm việc cho 1 ngày cụ thể
+    private void updateOfficialSchedule(UserEntity employee, LocalDate date, ShiftEntity newShift) {
+        EmployeeofficialscheduleEntity schedule = scheduleRepository.findByEmployeeIDAndDate(employee, date)
+                .orElse(new EmployeeofficialscheduleEntity());
+
+        schedule.setEmployeeID(employee);
+        schedule.setDate(date);
+        schedule.setShiftID(newShift);
+
+        // Nếu newShift null thì là ngày nghỉ, nhưng mà ở đây newShift luôn là loại ca "Leave" (AL, SL...)
+        schedule.setIsDayOff(newShift == null);
+
+        // Format tháng năm (MM-yyyy)
+        schedule.setMonthYear(date.format(DateTimeFormatter.ofPattern("MM-yyyy")));
+        schedule.setPublishedDate(Instant.now());
+
+        scheduleRepository.save(schedule);
+    }
 
 
 //    //Tạo số dư mới cho nhân sự mới

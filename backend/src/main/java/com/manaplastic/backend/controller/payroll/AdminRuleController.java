@@ -1,5 +1,9 @@
 package com.manaplastic.backend.controller.payroll;
 
+import com.manaplastic.backend.constant.LogType;
+import com.manaplastic.backend.constant.customAnotation.LogActivity;
+import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
+import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.service.SalaryRuleAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +49,8 @@ public class AdminRuleController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('HR','Admin')")
+    @LogActivity(action="CREATE_RULE_SALARY", description = "Thêm mới công thức tính lương")
+    @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
     public ResponseEntity<?> saveRule(@RequestBody Map<String, String> payload) {
         try {
             String code = payload.get("code");
@@ -61,6 +67,8 @@ public class AdminRuleController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('HR','Admin')")
+    @LogActivity(action="DELETE_RULE_SALARY", description = "Xóa (ẩn) công thức tính lương", logType = LogType.DANGER)
+    @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
     public ResponseEntity<?> deleteRule(@PathVariable int id) {
         adminService.deleteRule(id);
         return ResponseEntity.ok("Đã ẩn công thức này.");

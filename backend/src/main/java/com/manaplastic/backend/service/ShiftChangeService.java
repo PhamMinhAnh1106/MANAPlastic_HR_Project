@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,23 +60,7 @@ public class ShiftChangeService {
         requestRepo.save(request);
 
         updateOfficialSchedule(employee, request.getDate(), request.getNewShiftID());
-
-        //Ghi log
-        ActivitylogEntity log = new ActivitylogEntity();
-        log.setUserID(manager);
-        log.setActiontime(Instant.now());
-
-        if (isSelfApproval) {
-            log.setAction("SELF_APPROVAL_SCHEDULE");
-            log.setLogType(LogType.WARNING); // Đảm bảo đã có Enum LogType
-            log.setDetails("CẢNH BÁO: Quản lý " + manager.getFullname() + " đã tự duyệt yêu cầu đổi ca. Lý do: " + request.getReason());
-        } else {
-            log.setAction("APPROVE_SHIFT_CHANGE");
-            log.setLogType(LogType.INFO);
-            log.setDetails("Duyệt đổi ca cho nhân viên: " + employee.getFullname());
-        }
-
-        logRepo.save(log);
+        logApprovalAction(manager, employee, request);
     }
 
     //Yêu cầu đổi ca
@@ -155,14 +140,6 @@ public class ShiftChangeService {
         request.setApproverID(manager);
         requestRepo.save(request);
 
-        // Ghi log
-        ActivitylogEntity log = new ActivitylogEntity();
-        log.setUserID(manager);
-        log.setAction("REJECT_SHIFT_CHANGE");
-        log.setLogType(LogType.INFO);
-        log.setDetails("Từ chối đơn đổi ca của: " + request.getEmployeeID().getFullname());
-        log.setActiontime(Instant.now());
-        logRepo.save(log);
     }
 
 
@@ -170,7 +147,25 @@ public class ShiftChangeService {
         return userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
     }
+    private void logApprovalAction(UserEntity manager, UserEntity employee, ShiftChangeRequestEntity request) {
+        ActivitylogEntity log = new ActivitylogEntity();
+        log.setUserID(manager); // Người thực hiện là Manager
+        log.setActiontime(LocalDateTime.now());
 
+        // Logic nghiệp vụ xác định mức độ quan trọng của Log
+        if (manager.getId().equals(employee.getId())) {
+            log.setAction("SELF_APPROVAL_SCHEDULE");
+            log.setLogType(LogType.valueOf("WARNING"));
+            log.setDetails("CẢNH BÁO: Tự duyệt yêu cầu đổi ca. Lý do: " + request.getReason());
+        } else {
+            log.setAction("APPROVE_SHIFT_CHANGE");
+            log.setLogType(LogType.valueOf("INFO"));
+            log.setDetails("Duyệt đổi ca cho nhân viên: " + employee.getFullname()
+                    + " (Mã đơn: " + request.getId() + ")");
+        }
+
+        logRepo.save(log);
+    }
     private void updateOfficialSchedule(UserEntity employee, LocalDate date, ShiftEntity newShift) {
         // Tìm lịch ngày hôm đó, nếu chưa có thì tạo mới
         EmployeeofficialscheduleEntity schedule = scheduleRepo.findByEmployeeIDAndDate(employee, date)

@@ -3,6 +3,7 @@ package com.manaplastic.backend.controller.payroll;
 import com.manaplastic.backend.DTO.payroll.ContractCreateDTO;
 import com.manaplastic.backend.DTO.criteria.ContractFilterCriteria;
 import com.manaplastic.backend.DTO.payroll.ContractDTO;
+import com.manaplastic.backend.constant.customAnotation.LogActivity;
 import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
 import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.service.ContractService;
@@ -53,6 +54,7 @@ public class ContractController {
 
     // Tạo hợp đồng mới (Kèm upload file)
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @LogActivity(action = "CREATE_CONTRACT",description = "Tạo mới hợp đồng lao động")
     @RequiredPermission(PermissionConst.CONTRACT_CREATE)
     public ResponseEntity<?> createContract(@ModelAttribute ContractCreateDTO contractDTO) {
         try {

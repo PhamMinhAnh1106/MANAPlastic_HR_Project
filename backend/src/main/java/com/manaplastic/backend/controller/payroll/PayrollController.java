@@ -1,5 +1,7 @@
 package com.manaplastic.backend.controller.payroll;
 
+import com.manaplastic.backend.constant.LogType;
+import com.manaplastic.backend.constant.customAnotation.LogActivity;
 import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
 import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
@@ -33,6 +35,7 @@ public class PayrollController {
 
     @PostMapping("/calculate")
     @PreAuthorize("hasAnyAuthority('HR','Admin')")
+    @LogActivity(action ="PAYROLL_CALCULATE", description = "Chạy tính lương")
     @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
     public ResponseEntity<?> calculatePayroll(
             @RequestParam int month,
@@ -116,7 +119,8 @@ public class PayrollController {
 
     @PostMapping("/finalize")
     @PreAuthorize("hasAnyAuthority('HR','Admin')")
-    // @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
+    @LogActivity(action = "FINALIZE_PAYROLL", description = "Chốt lương tháng", logType = LogType.DANGER)
+     @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
     public ResponseEntity<?> finalizePayroll(@RequestParam int month, @RequestParam int year) {
         try {
             payrollEngineService.finalizePayrollAndSendMail(month, year);

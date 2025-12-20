@@ -3,6 +3,10 @@ package com.manaplastic.backend.controller.payroll;
 
 import com.manaplastic.backend.DTO.account.AdminUserDTO;
 import com.manaplastic.backend.DTO.payroll.VariableRuleRequest;
+import com.manaplastic.backend.constant.LogType;
+import com.manaplastic.backend.constant.customAnotation.LogActivity;
+import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
+import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.MonthlypayrollconfigEntity;
 import com.manaplastic.backend.entity.SalaryvariableEntity;
 import com.manaplastic.backend.repository.MonthlyPayrollConfigsRepository;
@@ -61,6 +65,8 @@ public class AdminVariableController {
 //        }
 //    }
     @PostMapping("/builder")
+    @LogActivity(action="CREATE_VARIABLE_SALARY", description = "Thêm mới biến/ giá trị đầu vào tính lương")
+    @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
     public ResponseEntity<?> createVariable(@RequestBody VariableRuleRequest request) {
         try {
             return ResponseEntity.ok(variableService.createVariable(request));
@@ -71,6 +77,8 @@ public class AdminVariableController {
 
     // Cập nhật biến
     @PutMapping("/builder/{id}")
+    @LogActivity(action="UPDATE_VARIABLE_SALARY", description = "Chỉnh sửa nguồn truy xuất biến tính lương",logType = LogType.WARNING)
+    @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
     public ResponseEntity<?> updateVariable(@PathVariable Integer id, @RequestBody VariableRuleRequest request) {
         try {
             return ResponseEntity.ok(variableService.updateVariable(id, request));
@@ -89,6 +97,8 @@ public class AdminVariableController {
     // Xóa biến
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('HR','Admin')")
+    @LogActivity(action="DELETE_VARIABLE_SALARY", description = "Xóa biến/ giá trị đầu vào tính lương",logType = LogType.DANGER)
+    @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
     public ResponseEntity<?> deleteVariable(@PathVariable int id) {
         try {
             variableService.deleteVariable(id);

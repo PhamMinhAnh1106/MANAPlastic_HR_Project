@@ -2,6 +2,8 @@ package com.manaplastic.backend.controller.attendance;
 
 import com.manaplastic.backend.DTO.attendance.AttendanceDTO;
 import com.manaplastic.backend.DTO.criteria.AttendanceFilterCriteria;
+import com.manaplastic.backend.constant.LogType;
+import com.manaplastic.backend.constant.customAnotation.LogActivity;
 import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
 import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
@@ -59,6 +61,7 @@ public class AttendanceController {
 
     @DeleteMapping("/chamCong/{attendanceId}")
     @PreAuthorize("hasAuthority('HR')")
+    @LogActivity(action="DELETE_ATTENDANCE",description = "Xóa dữ liệu chấm công",logType = LogType.DANGER)
     @RequiredPermission(PermissionConst.ATTENDANCE_UPDATE)
     public ResponseEntity<String> deleteAttendance(@PathVariable int attendanceId) {
         attendanceService.deleteAttendance(attendanceId);

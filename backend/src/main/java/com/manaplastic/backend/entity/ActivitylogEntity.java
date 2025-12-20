@@ -2,6 +2,7 @@ package com.manaplastic.backend.entity;
 
 import com.manaplastic.backend.constant.LogType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -9,6 +10,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -25,7 +27,7 @@ public class ActivitylogEntity {
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "actiontime")
-    private Instant actiontime;
+    private LocalDateTime actiontime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
@@ -41,5 +43,8 @@ public class ActivitylogEntity {
     @Column(name = "details")
     private String details;
 
+    @Size(max = 50)
+    @Column(name = "username", length = 50)
+    private String username;
 
 }

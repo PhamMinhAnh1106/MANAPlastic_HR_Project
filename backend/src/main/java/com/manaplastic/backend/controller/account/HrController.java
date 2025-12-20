@@ -5,6 +5,7 @@ import com.manaplastic.backend.DTO.account.UpdateAccountDTO;
 import com.manaplastic.backend.DTO.account.UpdateSelfIn4DTO;
 import com.manaplastic.backend.DTO.account.UserProfileDTO;
 import com.manaplastic.backend.DTO.criteria.UserFilterCriteria;
+import com.manaplastic.backend.constant.customAnotation.LogActivity;
 import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
 import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
@@ -116,6 +117,7 @@ public class HrController {
 
     //sửa thông tin tài khoản cho nhân sự
     @PutMapping("/user/{userId}")
+    @LogActivity(action = "UPDATE_ACCOUNT", description = "Sửa thông tin tài khoản")
     @RequiredPermission(PermissionConst.ACCOUNT_UPDATE)
     public ResponseEntity<String> hrUpdateUser(
             @PathVariable int userId,

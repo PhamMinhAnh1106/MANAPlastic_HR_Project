@@ -2,6 +2,10 @@ package com.manaplastic.backend.controller.legalsetting;
 
 
 import com.manaplastic.backend.DTO.legalsetting.LeavePolicyDTO;
+import com.manaplastic.backend.constant.LogType;
+import com.manaplastic.backend.constant.customAnotation.LogActivity;
+import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
+import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.LeavepolicyEntity;
 import com.manaplastic.backend.service.LeavePolicyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,18 +31,24 @@ public class LeavePolicyConfigController {
 
     // Tạo mới
     @PostMapping
+    @LogActivity(action = "CREATE_LEAVE_POLICY", description = "Thêm mới chính sách nghỉ phép")
+    @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
     public ResponseEntity<LeavepolicyEntity> create(@RequestBody LeavePolicyDTO req) {
         return ResponseEntity.ok(service.createPolicy(req));
     }
 
     //Cập nhật
     @PutMapping("/{id}")
+    @LogActivity(action="UPDATE_LEAVE_POLICY",description = "Cập nhật chính sách nghỉ phép",logType = LogType.WARNING)
+    @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
     public ResponseEntity<LeavepolicyEntity> update(@PathVariable int id, @RequestBody LeavePolicyDTO req) {
         return ResponseEntity.ok(service.updatePolicy(id, req));
     }
 
     // Xóa
     @DeleteMapping("/{id}")
+    @LogActivity(action = "DELETE_LEAVE_POLICY", description = "Xóa chính sách nghỉ phép",logType = LogType.DANGER)
+    @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
     public ResponseEntity<String> delete(@PathVariable int id) {
         service.deletePolicy(id);
         return ResponseEntity.ok("Đã xóa thành công chính sách ID: " + id);
