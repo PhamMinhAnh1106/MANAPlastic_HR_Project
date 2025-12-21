@@ -189,9 +189,9 @@ public class LeaverequestService {
 
         // Nếu là Manager
         if (isManager) {
-            if (approver.getId().equals(requester.getId())) {
-                throw new RuntimeException("Manager không thể tự duyệt đơn nghỉ phép của chính mình.");
-            }
+//            if (approver.getId().equals(requester.getId())) {
+//                throw new RuntimeException("Manager không thể tự duyệt đơn nghỉ phép của chính mình.");
+//            }
 
             if (approver.getDepartmentID() == null) {
                 throw new RuntimeException("Lỗi hệ thống: Tài khoản Manager của bạn chưa được gán Phòng ban.");
@@ -236,9 +236,9 @@ public class LeaverequestService {
                 && "Manager".equalsIgnoreCase(rejecter.getRoleID().getRolename());
 
         if (isManager) {
-            if (rejecter.getId().equals(requester.getId())) {
-                throw new RuntimeException("Manager không thể tự xử lý đơn nghỉ phép của chính mình.");
-            }
+//            if (rejecter.getId().equals(requester.getId())) {
+//                throw new RuntimeException("Manager không thể tự xử lý đơn nghỉ phép của chính mình.");
+//            }
 
             if (rejecter.getDepartmentID() == null || requester.getDepartmentID() == null) {
                 throw new RuntimeException("Lỗi dữ liệu: Nhân viên hoặc Quản lý chưa được gán phòng ban.");
