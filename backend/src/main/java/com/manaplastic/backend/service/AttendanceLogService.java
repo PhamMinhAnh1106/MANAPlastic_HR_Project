@@ -37,7 +37,8 @@ public class AttendanceLogService {
     public AttendancelogEntity processAttendanceLog(AttendancelogEntity log) {
         AttendancelogEntity savedLog = attendancelogRepository.save(log);
         UserEntity user = savedLog.getUserID();
-        LocalDate logDate = savedLog.getTimestamp().atZone(zoneId).toLocalDate();
+//        LocalDate logDate = savedLog.getTimestamp().atZone(zoneId).toLocalDate();
+        LocalDate logDate = savedLog.getTimestamp().toLocalDate();
 
         Optional<AttendancelogEntity> lastLogOpt = attendancelogRepository.findTopByUserIDOrderByTimestampDesc(user);
         if (lastLogOpt.isPresent()) {
@@ -139,8 +140,10 @@ public class AttendanceLogService {
         }
 
         // Lấy giờ thực tế (Convert Instant sang LocalDateTime VN)
-        LocalDateTime actualCheckIn = attendance.getCheckin().atZone(zoneId).toLocalDateTime();
-        LocalDateTime actualCheckOut = attendance.getCheckout().atZone(zoneId).toLocalDateTime();
+//        LocalDateTime actualCheckIn = attendance.getCheckin().atZone(zoneId).toLocalDateTime();
+//        LocalDateTime actualCheckOut = attendance.getCheckout().atZone(zoneId).toLocalDateTime();
+        LocalDateTime actualCheckIn = attendance.getCheckin();
+        LocalDateTime actualCheckOut = attendance.getCheckout();
 
         // So sánh và gắn cờ (Cho phép trễ X phút tolerance, công ty cho 5p)
         boolean isLate = actualCheckIn.isAfter(expectedStartTime.plusMinutes(TOLERANCE_MINUTES));

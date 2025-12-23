@@ -1,5 +1,6 @@
 package com.manaplastic.backend.service;
 
+import com.manaplastic.backend.DTO.account.ActivityLogDTO;
 import com.manaplastic.backend.entity.ActivitylogEntity;
 import com.manaplastic.backend.repository.ActivityLogRepository;
 import jakarta.persistence.criteria.Predicate;
@@ -17,24 +18,21 @@ import java.util.List;
 
 @Service
 public class ActivityLogService {
-
     @Autowired
     private ActivityLogRepository logRepo;
 
-    public Page<ActivitylogEntity> getLogs(String keyword, int page, int size) {
+    public Page<ActivityLogDTO> getLogs(String keyword, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("actiontime").descending());
 
-        // Specification (Logic lọc)
         Specification<ActivitylogEntity> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (StringUtils.hasText(keyword)) {
+                // Chỉ cần lower keyword đầu vào
                 String likePattern = "%" + keyword.toLowerCase() + "%";
-
-                // Tìm kiếm keyword trong Action HOẶC Details HOẶC Username
                 Predicate hasAction = cb.like(cb.lower(root.get("action")), likePattern);
-                Predicate hasDetails = cb.like(cb.lower(root.get("details")), likePattern);
+                Predicate hasDetails = cb.like(root.get("details"), likePattern);
                 Predicate hasUsername = cb.like(cb.lower(root.get("username")), likePattern);
 
                 predicates.add(cb.or(hasAction, hasDetails, hasUsername));
@@ -43,6 +41,26 @@ public class ActivityLogService {
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
-        return logRepo.findAll(spec, pageable);
+        Page<ActivitylogEntity> entities = logRepo.findAll(spec, pageable);
+        return entities.map(this::convertToDTO);
+    }
+
+    private ActivityLogDTO convertToDTO(ActivitylogEntity entity) {
+        ActivityLogDTO dto = new ActivityLogDTO();
+        dto.setLogID(entity.getId());
+        dto.setAction(entity.getAction());
+        dto.setLogType(entity.getLogType() != null ? entity.getLogType().toString() : "INFO");
+        dto.setDetails(entity.getDetails());
+        dto.setActionTime(entity.getActiontime());
+
+        if (entity.getUserID() != null) {
+            dto.setPerformedBy(entity.getUserID().getUsername());
+            dto.setExecutorName(entity.getUserID().getFullname());
+        } else {
+            dto.setPerformedBy(entity.getUsername());
+            dto.setExecutorName("Unknown/System");
+        }
+
+        return dto;
     }
 }

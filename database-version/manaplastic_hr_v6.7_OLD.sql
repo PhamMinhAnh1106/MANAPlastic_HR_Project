@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th12 23, 2025 lúc 05:52 PM
+-- Thời gian đã tạo: Th12 20, 2025 lúc 08:25 AM
 -- Phiên bản máy phục vụ: 8.2.0
 -- Phiên bản PHP: 8.2.13
 
@@ -38,25 +38,14 @@ CREATE TABLE IF NOT EXISTS `activitylogs` (
   `userID` int DEFAULT NULL,
   PRIMARY KEY (`logID`),
   KEY `userID` (`userID`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `activitylogs`
 --
 
 INSERT INTO `activitylogs` (`logID`, `action`, `logType`, `details`, `actiontime`, `username`, `userID`) VALUES
-(1, 'CREATE_LEAVE_POLICY', 'INFO', 'Desc: Thêm mới chính sách nghỉ phép | Data: {\"headers\":{},\"body\":{\"gendertarget\":null,\"id\":17,\"days\":15,\"description\":\"Nhân viên thâm niên trên 20 năm\",\"leavetype\":\"ANNUAL\",\"minyearsservice\":20,\"maxyearsservice\":null,\"jobtype\":null,\"leavetypeid\":{\"id\":53,\"shiftname\":\"AL (Anually Leave)\",\"starttime\":\"00:00:00\",\"endtime\":\"00:00:00\",\"durationHours\":0,\"shiftnameAsEnum\":\"ANNUAL\"}},\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2025-12-20 14:21:53', '000022', NULL),
-(2, 'UPDATE_ACCOUNT', 'INFO', 'Desc: Sửa thông tin tài khoản | Data: {\"headers\":{},\"body\":\"Cập nhật tài khoản thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2025-12-22 01:00:10', 'hr_manager', 3),
-(3, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2025-12-22 01:26:39', 'admin', 1),
-(4, 'UPDATE_OVERTIME_TYPE', 'WARNING', 'Desc: Sửa chính sách loại tăng ca | Data: {\"headers\":{},\"body\":{\"id\":7,\"otCode\":\"OT_NIGHT_HOLIDAY\",\"otName\":\"Tăng ca đêm Lễ Tết (390%)\",\"rate\":3.8,\"isTaxExemptPart\":true,\"calculationType\":\"MULTIPLIER\",\"taxExemptFormula\":\"EXCESS_ONLY\",\"taxExemptPercentage\":0,\"description\":\"Làm thêm giờ vào ban đêm ngày Lễ/Tết\"},\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2025-12-22 01:27:19', 'admin', 1),
-(5, 'ADD_ACCOUNT_PERMISSION', 'INFO', 'Desc: Cấp / Chặn quyền của tài khoản | Data: {\"headers\":{},\"body\":\"Đã CHẶN (Blacklist) quyền thành công cho user.\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2025-12-22 01:32:10', 'admin', 1),
-(6, 'ADD_ACCOUNT_PERMISSION', 'INFO', 'Desc: Cấp / Chặn quyền của tài khoản | Data: {\"headers\":{},\"body\":\"Đã CẤP (Whitelist) quyền thành công cho user.\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2025-12-22 01:32:22', 'admin', 1),
-(7, 'RESET_ACCOUNT_PERMISSION', 'DANGER', 'Desc: Trả về quyền mặc định của tài khoản | Data: {\"headers\":{},\"body\":\"Đã reset quyền (ID: 1) của user [000021] về mặc định.\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2025-12-22 01:32:27', 'admin', 1),
-(8, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2025-12-23 22:47:26', 'admin', 1),
-(9, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2025-12-23 22:47:31', 'admin', 1),
-(10, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2025-12-23 22:48:48', 'admin', 1),
-(11, 'CREATE_ATTENDANCE_REQ', 'INFO', 'Desc: Gửi yêu cầu bổ sung công | Data: {\"headers\":{},\"body\":\"Gửi yêu cầu thành công! Vui lòng chờ quản lý duyệt.\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2025-12-23 23:55:16', '000020', 20),
-(12, 'APPROVE_ATTENDANCE_REQ', 'WARNING', 'Desc: Duyệt yêu cầu công | Data: {\"headers\":{},\"body\":\"Đã duyệt yêu cầu và cập nhật dữ liệu chấm công thành công.\",\"statusCodeValue\":200,\"statusCode\":\"OK\"}', '2025-12-24 00:11:52', '000022', 22);
+(1, 'CREATE_LEAVE_POLICY', 'INFO', 'Desc: Thêm mới chính sách nghỉ phép | Data: {\"headers\":{},\"body\":{\"gendertarget\":null,\"id\":17,\"days\":15,\"description\":\"Nhân viên thâm niên trên 20 năm\",\"leavetype\":\"ANNUAL\",\"minyearsservice\":20,\"maxyearsservice\":null,\"jobtype\":null,\"leavetypeid\":{\"id\":53,\"shiftname\":\"AL (Anually Leave)\",\"starttime\":\"00:00:00\",\"endtime\":\"00:00:00\",\"durationHours\":0,\"shiftnameAsEnum\":\"ANNUAL\"}},\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2025-12-20 14:21:53', '000022', NULL);
 
 -- --------------------------------------------------------
 
@@ -92,43 +81,6 @@ INSERT INTO `attendancelogs` (`attendanceLogID`, `timestamp`, `imgurl`, `userID`
 (11, '2025-11-02 17:05:00', 'https://img.url/checkout_9_1.jpg', 9),
 (16, '2025-11-19 11:00:12', '/uploads/47358d64-7cf1-4a33-8e1c-c5efbb7553d0.jpg', 20),
 (17, '2025-11-19 11:02:27', '/uploads/238acd2f-fd35-46f8-a36f-c4bfbe93b13d.jpg', 20);
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `attendancerequests`
---
-
-DROP TABLE IF EXISTS `attendancerequests`;
-CREATE TABLE IF NOT EXISTS `attendancerequests` (
-  `requestid` int NOT NULL AUTO_INCREMENT,
-  `userid` int NOT NULL COMMENT 'Nhân viên gửi yêu cầu',
-  `date` date NOT NULL COMMENT 'Ngày cần bổ sung công',
-  `shiftid` int DEFAULT NULL COMMENT 'Ca làm việc liên quan',
-  `requesttype` enum('CHECK_IN','CHECK_OUT','FULL_SHIFT') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `checkintime` datetime DEFAULT NULL,
-  `checkouttime` datetime DEFAULT NULL,
-  `imgproof` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `status` enum('PENDING','APPROVED','REJECTED') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'PENDING',
-  `approverid` int DEFAULT NULL COMMENT 'Người duyệt (HR/Manager)',
-  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `createdat` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updatedat` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`requestid`),
-  KEY `fk_attrequest_user` (`userid`),
-  KEY `fk_attrequest_approver` (`approverid`),
-  KEY `fk_attrequest_shift` (`shiftid`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Yêu cầu bổ sung dữ liệu chấm công';
-
---
--- Đang đổ dữ liệu cho bảng `attendancerequests`
---
-
-INSERT INTO `attendancerequests` (`requestid`, `userid`, `date`, `shiftid`, `requesttype`, `checkintime`, `checkouttime`, `imgproof`, `reason`, `status`, `approverid`, `comment`, `createdat`, `updatedat`) VALUES
-(1, 6, '2025-11-02', 1, 'CHECK_OUT', NULL, '2025-11-02 17:00:00', '/uploads/proofs/checkout_fix_6.jpg', 'Quên check-out khi về', 'PENDING', NULL, NULL, '2025-12-23 21:51:15', '2025-12-23 21:51:15'),
-(2, 8, '2025-11-04', 2, 'FULL_SHIFT', '2025-11-04 06:00:00', '2025-11-04 14:00:00', '/uploads/proofs/full_fix_8.jpg', 'Máy chấm công bị lỗi không nhận diện được', 'PENDING', NULL, NULL, '2025-12-23 21:51:15', '2025-12-23 21:51:15'),
-(3, 20, '2025-12-03', 36, 'CHECK_IN', '2025-12-03 08:00:00', NULL, '/uploads/proofs/a07b9472-6f8c-49e7-b5d9-a1939248dca0_Gemini_Generated_Image_1iwfj11iwfj11iwf (1).png', 'Chấm công hư máy', 'APPROVED', 22, NULL, '2025-12-23 23:55:15', '2025-12-24 00:11:52');
 
 -- --------------------------------------------------------
 
@@ -199,7 +151,7 @@ INSERT INTO `attendances` (`attendanceID`, `date`, `checkin`, `checkout`, `check
 (46, '2025-11-30', '2025-11-30 07:55:00', '2025-11-30 17:05:00', NULL, NULL, 'PRESENT', 36, 21, NULL, NULL),
 (47, '2025-12-01', '2025-12-01 07:55:00', '2025-12-01 17:00:00', NULL, NULL, 'PRESENT', 36, 20, NULL, NULL),
 (48, '2025-12-02', '2025-12-02 21:50:00', '2025-12-03 06:10:00', NULL, NULL, 'PRESENT', 50, 20, NULL, NULL),
-(49, '2025-12-03', '2025-12-03 08:00:00', '2025-12-03 17:05:00', NULL, NULL, 'PRESENT', 36, 20, NULL, NULL);
+(49, '2025-12-03', '2025-12-03 07:58:00', '2025-12-03 17:05:00', NULL, NULL, 'PRESENT', 36, 20, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -983,7 +935,7 @@ CREATE TABLE IF NOT EXISTS `leaverequests` (
   PRIMARY KEY (`leaverequestID`),
   KEY `userID` (`userID`),
   KEY `FK_Request_Shift` (`shiftID`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `leaverequests`
@@ -997,8 +949,7 @@ INSERT INTO `leaverequests` (`leaverequestID`, `leavetype`, `startdate`, `enddat
 (6, 'SICK', '2025-12-06', '2025-12-06', 'Test API tạo đơn từ Postman', 'REJECTED', '2025-11-13', 18, 54),
 (7, 'ANNUAL', '2025-12-02', '2025-12-02', 'đi chơi', 'APPROVED', '2025-11-24', 18, 53),
 (8, 'SICK', '2025-12-03', '2025-12-03', 'bệnh Ho ', 'APPROVED', '2025-11-24', 18, 54),
-(9, 'ANNUAL', '2025-12-25', '2025-12-26', 'Nghỉ phép test chức năng', 'PENDING', NULL, 6, NULL),
-(10, 'ANNUAL', '2025-12-23', '2025-12-23', 'test', 'PENDING', '2025-12-21', 8, 53);
+(9, 'ANNUAL', '2025-12-25', '2025-12-26', 'Nghỉ phép test chức năng', 'PENDING', NULL, 6, NULL);
 
 -- --------------------------------------------------------
 
@@ -1112,7 +1063,7 @@ INSERT INTO `overtimetypes` (`OvertimeTypeID`, `OtCode`, `OtName`, `Rate`, `Calc
 (4, 'NIGHT_SHIFT', 'Phụ cấp ca đêm (30%)', 0.30, 'ADDITIVE', 1, 'EXCESS_ONLY', 0.00, 'Phụ cấp dành cho giờ làm việc chính thức rơi vào khung 22h-06h'),
 (5, 'OT_NIGHT_WEEKDAY', 'Tăng ca đêm ngày thường (200%)', 2.00, 'MULTIPLIER', 1, 'EXCESS_ONLY', 0.00, 'Làm thêm giờ vào ban đêm ngày thường'),
 (6, 'OT_NIGHT_WEEKEND', 'Tăng ca đêm ngày nghỉ (260%)', 2.60, 'MULTIPLIER', 1, 'EXCESS_ONLY', 0.00, 'Làm thêm giờ vào ban đêm ngày nghỉ tuần'),
-(7, 'OT_NIGHT_HOLIDAY', 'Tăng ca đêm Lễ Tết (390%)', 3.80, 'MULTIPLIER', 1, 'EXCESS_ONLY', 0.00, 'Làm thêm giờ vào ban đêm ngày Lễ/Tết');
+(7, 'OT_NIGHT_HOLIDAY', 'Tăng ca đêm Lễ Tết (390%)', 3.90, 'MULTIPLIER', 1, 'EXCESS_ONLY', 0.00, 'Làm thêm giờ vào ban đêm ngày Lễ/Tết');
 
 -- --------------------------------------------------------
 
@@ -1389,7 +1340,6 @@ INSERT INTO `rolespermissions` (`roleID`, `permissionID`, `active`) VALUES
 (1, 11, 1),
 (1, 12, 1),
 (1, 13, 1),
-(1, 31, 1),
 (2, 1, 1),
 (2, 2, 1),
 (2, 3, 1),
@@ -1399,8 +1349,6 @@ INSERT INTO `rolespermissions` (`roleID`, `permissionID`, `active`) VALUES
 (2, 7, 1),
 (2, 8, 1),
 (2, 14, 1),
-(2, 15, 1),
-(2, 16, 1),
 (2, 17, 1),
 (2, 18, 1),
 (2, 19, 1),
@@ -1441,7 +1389,6 @@ INSERT INTO `rolespermissions` (`roleID`, `permissionID`, `active`) VALUES
 (4, 4, 1),
 (4, 5, 0),
 (4, 14, 1),
-(4, 15, 1),
 (4, 21, 1),
 (4, 23, 1),
 (4, 24, 1),
@@ -2649,7 +2596,7 @@ CREATE TABLE IF NOT EXISTS `shift_change_requests` (
   KEY `FK_Request_Employee` (`employeeID`),
   KEY `FK_Request_Approver` (`approverID`),
   KEY `FK_Request_NewShift` (`newShiftID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `shift_change_requests`
@@ -2658,8 +2605,7 @@ CREATE TABLE IF NOT EXISTS `shift_change_requests` (
 INSERT INTO `shift_change_requests` (`requestID`, `employeeID`, `date`, `currentShiftID`, `newShiftID`, `reason`, `status`, `approverID`, `created_at`, `updated_at`) VALUES
 (1, 9, '2025-12-03', 41, 41, 'Em bận việc gia đình buổi sáng nên xin đổi sang ca chiều', 'APPROVED', 9, '2025-12-11 09:54:13', NULL),
 (2, 9, '2025-12-03', 41, 36, 'Em bận việc gia đình buổi sáng nên xin đổi sang ca sáng', 'APPROVED', 9, '2025-12-11 09:54:44', NULL),
-(3, 20, '2025-12-17', 36, 41, 'test YC gửi xin đổi ca', 'APPROVED', 9, '2025-12-15 09:05:25', NULL),
-(4, 9, '2025-12-23', 41, 36, 'Test YC đổi ca lần 2', 'PENDING', NULL, '2025-12-21 19:07:48', NULL);
+(3, 20, '2025-12-17', 36, 41, 'test YC gửi xin đổi ca', 'APPROVED', 9, '2025-12-15 09:05:25', NULL);
 
 -- --------------------------------------------------------
 
@@ -2837,14 +2783,6 @@ ALTER TABLE `activitylogs`
 --
 ALTER TABLE `attendancelogs`
   ADD CONSTRAINT `attendancelogs_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE SET NULL ON UPDATE CASCADE;
-
---
--- Các ràng buộc cho bảng `attendancerequests`
---
-ALTER TABLE `attendancerequests`
-  ADD CONSTRAINT `fk_attrequest_approver` FOREIGN KEY (`approverid`) REFERENCES `users` (`userID`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_attrequest_shift` FOREIGN KEY (`shiftid`) REFERENCES `shifts` (`shiftID`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_attrequest_user` FOREIGN KEY (`userid`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `attendances`

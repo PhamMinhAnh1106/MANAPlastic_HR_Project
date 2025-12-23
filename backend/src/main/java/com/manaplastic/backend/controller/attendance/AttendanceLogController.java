@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -50,7 +51,7 @@ public class AttendanceLogController {
 
             AttendancelogEntity logEntity = new AttendancelogEntity();
             logEntity.setUserID(user);
-            logEntity.setTimestamp(Instant.now());
+            logEntity.setTimestamp(LocalDateTime.now());
             logEntity.setImgUrl(imgPath);
 
             attendanceLogService.processAttendanceLog(logEntity);

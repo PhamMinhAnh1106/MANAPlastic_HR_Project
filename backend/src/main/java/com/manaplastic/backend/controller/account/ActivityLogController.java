@@ -1,6 +1,7 @@
-package com.manaplastic.backend.controller;
+package com.manaplastic.backend.controller.account;
 
 
+import com.manaplastic.backend.DTO.account.ActivityLogDTO;
 import com.manaplastic.backend.entity.ActivitylogEntity;
 import com.manaplastic.backend.service.ActivityLogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +20,13 @@ public class ActivityLogController {
     private ActivityLogService logService;
 
     @GetMapping
-    public ResponseEntity<Page<ActivitylogEntity>> getLogs(
+    public ResponseEntity<Page<ActivityLogDTO>> getLogs(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword
     ) {
 
-        Page<ActivitylogEntity> result = logService.getLogs(keyword, page, size);
+        Page<ActivityLogDTO> result = logService.getLogs(keyword, page, size);
         return ResponseEntity.ok(result);
     }
 }

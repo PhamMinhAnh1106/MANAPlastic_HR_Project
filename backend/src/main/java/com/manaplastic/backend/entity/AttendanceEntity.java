@@ -10,6 +10,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -31,10 +32,10 @@ public class AttendanceEntity {
     private LocalDate date;
 
     @Column(name = "checkin")
-    private Instant checkin;
+    private LocalDateTime checkin;
 
     @Column(name = "checkout")
-    private Instant checkout;
+    private LocalDateTime checkout;
 
     @Column(name = "checkinimgurl")
     private String checkinImgUrl;
