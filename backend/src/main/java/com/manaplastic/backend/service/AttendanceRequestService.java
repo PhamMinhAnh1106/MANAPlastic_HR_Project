@@ -3,11 +3,10 @@ package com.manaplastic.backend.service;
 import com.manaplastic.backend.DTO.attendance.AttendanceRequestCreateDTO;
 import com.manaplastic.backend.DTO.attendance.AttendanceRequestResponseDTO;
 import com.manaplastic.backend.DTO.criteria.AttendanceRequestFilterCriteria;
-import com.manaplastic.backend.entity.AttendanceEntity;
-import com.manaplastic.backend.entity.AttendanceRequestEntity;
-import com.manaplastic.backend.entity.ShiftEntity;
-import com.manaplastic.backend.entity.UserEntity;
+import com.manaplastic.backend.constant.LogType;
+import com.manaplastic.backend.entity.*;
 import com.manaplastic.backend.filters.AttendanceRequestFilter;
+import com.manaplastic.backend.repository.ActivityLogRepository;
 import com.manaplastic.backend.repository.AttendanceRepository;
 import com.manaplastic.backend.repository.AttendanceRequestRepository;
 import com.manaplastic.backend.repository.UserRepository;
@@ -26,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.manaplastic.backend.entity.AttendanceRequestEntity.RequestType.*;
@@ -44,6 +44,8 @@ public class AttendanceRequestService {
     private UserRepository userRepo;
     @Value("${app.upload.proofs}")
     private String uploadDir;
+    @Autowired
+    private ActivityLogRepository activityLogRepository;
 
     //Tạo
     public AttendanceRequestEntity createRequest(AttendanceRequestCreateDTO dto, MultipartFile file, Integer userId) {
@@ -60,10 +62,31 @@ public class AttendanceRequestService {
             entity.setShiftid(shift);
         }
 
+        if (dto.getCheckInTime() != null && dto.getCheckOutTime() != null) {
+            if (dto.getCheckInTime().isAfter(dto.getCheckOutTime())) {
+                throw new IllegalArgumentException("Thời gian Check-in phải trước Check-out.");
+            }
+        }
+
+        if (dto.getRequestType() == FULL_SHIFT) {
+            if (dto.getCheckInTime() == null || dto.getCheckOutTime() == null) {
+                throw new IllegalArgumentException("Yêu cầu cả ca phải nhập đủ giờ vào và ra.");
+            }
+        } else if (dto.getRequestType() == CHECK_IN && dto.getCheckInTime() == null) {
+            throw new IllegalArgumentException("Yêu cầu Check-in thiếu giờ vào.");
+        } else if (dto.getRequestType() == CHECK_OUT && dto.getCheckOutTime() == null) {
+            throw new IllegalArgumentException("Yêu cầu Check-out thiếu giờ ra.");
+        }
+
+        if (requestRepo.existsByUseridAndDateAndStatus(user,dto.getDate(),PENDING)) {
+            throw new IllegalArgumentException("Bạn đang có một yêu cầu chờ duyệt cho ngày này rồi.");
+        }
+
         entity.setRequesttype(dto.getRequestType());
         entity.setCheckintime(dto.getCheckInTime());
         entity.setCheckouttime(dto.getCheckOutTime());
 //        entity.setImgproof(dto.getImgProof());
+
         if (file != null && !file.isEmpty()) {
             String imgPath = saveProofImage(file);
             entity.setImgproof(imgPath); // Lưu đường dẫn vào DB
@@ -80,12 +103,15 @@ public class AttendanceRequestService {
         AttendanceRequestEntity request = requestRepo.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
 
+        UserEntity approver = userRepo.findById(approverId)
+                .orElseThrow(() -> new RuntimeException("Người duyệt không tồn tại."));
+
         if (request.getStatus() != PENDING) {
             throw new RuntimeException("Yêu cầu này đã được xử lý trước đó.");
         }
 
-        UserEntity approver = new UserEntity();
-        approver.setId(approverId);
+//        UserEntity approver = new UserEntity();
+//        approver.setId(approverId);
 //        request.setStatus(AttendanceRequestEntity.RequestStatus.APPROVED);
         request.setStatus(APPROVED);
         request.setApproverid(approver);
@@ -93,6 +119,7 @@ public class AttendanceRequestService {
 
 
         updateAttendanceData(request);
+        logAttendanceApprovalAction(approver,request);
     }
 
     // Từ chối
@@ -180,6 +207,49 @@ public class AttendanceRequestService {
         return dto;
     }
 
+    // Ghi log duyệt yêu cầu chấm công
+    private void logAttendanceApprovalAction(UserEntity approver, AttendanceRequestEntity request) {
+        UserEntity requester = request.getUserid(); // Lấy người tạo đơn từ request
+
+        ActivitylogEntity log = new ActivitylogEntity();
+
+        log.setUserID(approver);
+        log.setActiontime(LocalDateTime.now());
+
+        boolean isSelfApproval = approver.getId().equals(requester.getId());
+
+        if (isSelfApproval) {
+           //Tự duyệt
+            log.setAction("SELF_APPROVE_ATTENDANCE");
+            log.setLogType(LogType.DANGER);
+            log.setDetails("CẢNH BÁO: " + approver.getFullname() + " đã TỰ DUYỆT yêu cầu chấm công cho chính mình.");
+        } else {
+            // Bình thươờng
+            log.setAction("APPROVE_ATTENDANCE_REQ");
+            log.setLogType(LogType.INFO);
+
+            String approverRole = (approver.getRoleID() != null) ? approver.getRoleID().getRolename() : "Admin/HR";
+            log.setDetails(approverRole + " " + approver.getFullname() + " duyệt yêu cầu chấm công cho: " + requester.getFullname());
+        }
+
+        // Bổ sung thông tin chi tiết của đơn (Ngày, Loại yêu cầu, Giờ sửa)
+        StringBuilder extraInfo = new StringBuilder();
+        extraInfo.append(" | Ngày: ").append(request.getDate());
+        extraInfo.append(" | Loại: ").append(request.getRequesttype()); // CHECK_IN, CHECK_OUT, FULL_SHIFT
+
+        if (request.getCheckintime() != null) {
+            extraInfo.append(" | Vào: ").append(request.getCheckintime());
+        }
+
+        if (request.getCheckouttime() != null) {
+            extraInfo.append(" | Ra: ").append(request.getCheckouttime());
+        }
+
+        extraInfo.append(" (Mã đơn: ").append(request.getId()).append(")");
+        log.setDetails(log.getDetails() + extraInfo.toString());
+
+        activityLogRepository.save(log);
+    }
 
     private void updateAttendanceData(AttendanceRequestEntity req) {
         // Tìm xem ngày đó nhân viên đã có record chấm công chưa

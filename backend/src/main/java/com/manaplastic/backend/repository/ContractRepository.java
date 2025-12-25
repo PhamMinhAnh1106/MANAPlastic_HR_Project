@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +31,8 @@ public interface ContractRepository extends JpaRepository<ContractEntity, Intege
     @Query("SELECT c FROM ContractEntity c WHERE c.userID.id = :userId AND c.status = 'ACTIVE'")
     Optional<ContractEntity> findActiveContractByUserId(@Param("userId") Integer userId);
 
-
+    @Query("SELECT c FROM ContractEntity c WHERE c.enddate BETWEEN :today AND :thresholdDate AND c.status = 'ACTIVE' ORDER BY c.enddate ASC")
+    List<ContractEntity> findExpiringContracts(@Param("today") LocalDate today, @Param("thresholdDate") LocalDate thresholdDate);
 
     // KIẾN THỨC LƯU Ý về Spring để tránh truy vấn db nhiều lần cho 1 tác vụ nhỏ
 //    Khi nào truyền Entity? Khi ta đã có sẵn đối tượng User đầy đủ trong tay (ví dụ lúc save contract mới).

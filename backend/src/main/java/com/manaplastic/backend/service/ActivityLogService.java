@@ -21,9 +21,9 @@ public class ActivityLogService {
     @Autowired
     private ActivityLogRepository logRepo;
 
-    public Page<ActivityLogDTO> getLogs(String keyword, int page, int size) {
+    public Page<ActivityLogDTO> getLogs(Pageable pageable, String keyword) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("actiontime").descending());
+//        Pageable pageable = PageRequest.of(page, size, Sort.by("actiontime").descending()); // test cách viết
 
         Specification<ActivitylogEntity> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();

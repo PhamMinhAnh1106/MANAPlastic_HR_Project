@@ -80,7 +80,7 @@ public class AttendanceRequestController {
     @PutMapping("/{requestId}/approve")
     @PreAuthorize("hasAnyAuthority('HR')")
     @RequiredPermission(PermissionConst.ATTENDANCE_APPROVE)
-    @LogActivity(action = "APPROVE_ATTENDANCE_REQ", description = "Duyệt yêu cầu công", logType = LogType.WARNING)
+//    @LogActivity(action = "APPROVE_ATTENDANCE_REQ", description = "Duyệt yêu cầu công", logType = LogType.WARNING)
     public ResponseEntity<String> approveRequest(
             @PathVariable int requestId,
             @AuthenticationPrincipal UserEntity currentUser) {

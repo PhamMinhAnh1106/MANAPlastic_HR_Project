@@ -3,6 +3,7 @@ package com.manaplastic.backend.controller.payroll;
 import com.manaplastic.backend.DTO.payroll.ContractCreateDTO;
 import com.manaplastic.backend.DTO.criteria.ContractFilterCriteria;
 import com.manaplastic.backend.DTO.payroll.ContractDTO;
+import com.manaplastic.backend.DTO.payroll.ContractExpiringDTO;
 import com.manaplastic.backend.constant.customAnotation.LogActivity;
 import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
 import com.manaplastic.backend.constant.permission.PermissionConst;
@@ -98,5 +99,14 @@ public class ContractController {
     @RequiredPermission(PermissionConst.CONTRACT_VIEW)
     public ResponseEntity<List<ContractDTO>> getContractsByEmployee(@PathVariable Integer userId) {
         return ResponseEntity.ok(contractService.getContractsByUserId(userId));
+    }
+
+    // Noti
+    @GetMapping("/expiringNoti")
+    @RequiredPermission(PermissionConst.CONTRACT_VIEW)
+    public ResponseEntity<List<ContractExpiringDTO>> getExpiringContractsForNotification() {
+        // Mặc định quét trước 30 ngày
+        List<ContractExpiringDTO> list = contractService.getExpiringContracts(30);
+        return ResponseEntity.ok(list);
     }
 }

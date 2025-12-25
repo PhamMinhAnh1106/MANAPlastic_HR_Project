@@ -49,7 +49,6 @@ public class LeaverequestEntity {
     private String reason;
 
     @ColumnDefault("'PENDING'")
-    @Lob
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private LeaverequestStatus status;

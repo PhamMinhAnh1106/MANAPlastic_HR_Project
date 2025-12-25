@@ -32,5 +32,12 @@ public interface LeaveRequestRepository extends JpaRepository<LeaverequestEntity
     @Transactional
     int deleteByIdAndUserIDAndStatus(Integer id, UserEntity userID, LeaverequestEntity.LeaverequestStatus status);
 
-
+    // check trùng lịch
+    @Query("SELECT COUNT(l) > 0 FROM LeaverequestEntity l " +
+            "WHERE l.userID = :user " +
+            "AND l.status IN ('PENDING', 'APPROVED') " +
+            "AND ((:start BETWEEN l.startdate AND l.enddate) " +
+            "OR (:end BETWEEN l.startdate AND l.enddate) " +
+            "OR (l.startdate BETWEEN :start AND :end))")
+    boolean existsOverlappingRequest(UserEntity user, LocalDate start, LocalDate end);
 }

@@ -20,6 +20,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.Period;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -39,7 +42,12 @@ public class UserService {
             userToUpdate.setFullname(request.getFullname());
         }
 
-        if (request.getPhonenumber() != null) {
+        if (request.getPhonenumber() != null ) {
+
+            if ( !request.getPhonenumber().matches("\\d{10,11}")){
+                throw new IllegalArgumentException("Số điện thoại không hợp lệ (10 hoặc 11 số).");
+            }
+
             userToUpdate.setPhonenumber(request.getPhonenumber());
         }
 
@@ -51,9 +59,14 @@ public class UserService {
         if (request.getEmail() != null && !request.getEmail().isEmpty()
                 && !request.getEmail().equals(userToUpdate.getEmail())) {
 
+            if(!request.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+                throw new IllegalArgumentException("Email có định dạng không hợp lệ.");
+            }
+
             if (userRepository.findByEmail(request.getEmail()).isPresent()) {
                 throw new IllegalArgumentException("Email đã được sử dụng bởi tài khoản khác.");
             }
+
             userToUpdate.setEmail(request.getEmail());
         }
 
@@ -62,10 +75,15 @@ public class UserService {
         }
 
         if (request.getBirth() != null) {
+
+            if(Period.between(request.getBirth(), LocalDate.now()).getYears() < 18) {
+                throw new IllegalArgumentException("Bạn chưa đủ 18 tuổi.");
+            }
+
             userToUpdate.setBirth(request.getBirth());
         }
 
-        if (request.getBankAccount() != null) {
+        if (request.getBankAccount() != null ) {
             userToUpdate.setBankaccount(request.getBankAccount());
         }
 
@@ -74,7 +92,10 @@ public class UserService {
         }
 
 
-        if (request.getCccd() != null) {
+        if (request.getCccd() != null ) {
+            if(userRepository.existsByCccd(request.getCccd()) && request.getCccd().length() != 12){ //định danh mức 2 là 12 số
+                throw new IllegalArgumentException("CCCD đã tồn tại hoặc không hợp lệ");
+            }
             userToUpdate.setCccd(request.getCccd());
         }
 
@@ -133,6 +154,11 @@ public class UserService {
         }
 
         if (request.getPhonenumber() != null) {
+
+            if ( !request.getPhonenumber().matches("\\d{10,11}")){
+                throw new IllegalArgumentException("Số điện thoại không hợp lệ (10 hoặc 11 số).");
+            }
+
             userToUpdate.setPhonenumber(request.getPhonenumber());
         }
 
@@ -143,6 +169,10 @@ public class UserService {
 
         if (request.getEmail() != null && !request.getEmail().isEmpty()
                 && !request.getEmail().equals(userToUpdate.getEmail())) {
+
+            if(!request.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+                throw new IllegalArgumentException("Email có định dạng không hợp lệ.");
+            }
 
             if (userRepository.findByEmail(request.getEmail()).isPresent()) {
                 throw new IllegalArgumentException("Email đã được sử dụng bởi tài khoản khác.");
@@ -155,6 +185,11 @@ public class UserService {
         }
 
         if (request.getBirth() != null) {
+
+            if(Period.between(request.getBirth(), LocalDate.now()).getYears() < 18) {
+                throw new IllegalArgumentException("Bạn chưa đủ 18 tuổi.");
+            }
+
             userToUpdate.setBirth(request.getBirth());
         }
 
@@ -167,6 +202,11 @@ public class UserService {
         }
 
         if (request.getCccd() != null) {
+
+            if(userRepository.existsByCccd(request.getCccd()) && request.getCccd().length() != 12){ //định danh mức 2 là 12 số
+                throw new IllegalArgumentException("CCCD đã tồn tại hoặc không hợp lệ");
+            }
+
             userToUpdate.setCccd(request.getCccd());
         }
 

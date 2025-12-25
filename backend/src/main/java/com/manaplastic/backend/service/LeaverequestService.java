@@ -81,6 +81,14 @@ public class LeaverequestService {
             throw new IllegalArgumentException("Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.");
         }
 
+        if(dto.startdate().isBefore(LocalDate.now().minusDays(7))) {
+            throw new IllegalArgumentException("Bạn không thể tạo đơn cho ngày trong quá khứ lố 1 tuần.");
+        }
+
+        if (leaveRequestRepository.existsOverlappingRequest(currentUserId, dto.startdate(), dto.enddate())) {
+            throw new IllegalArgumentException("Bạn đã có đơn nghỉ phép trùng với khoảng thời gian này.");
+        }
+
         // Tìm số dư phép tương ứng (VD: AL của năm 2025)
         LeavebalanceEntityId balanceId = new LeavebalanceEntityId();
         balanceId.setUserID(currentUserId.getId());

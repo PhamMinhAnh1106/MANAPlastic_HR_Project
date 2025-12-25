@@ -3,6 +3,7 @@ package com.manaplastic.backend.service;
 import com.manaplastic.backend.DTO.payroll.ContractCreateDTO;
 import com.manaplastic.backend.DTO.criteria.ContractFilterCriteria;
 import com.manaplastic.backend.DTO.payroll.ContractDTO;
+import com.manaplastic.backend.DTO.payroll.ContractExpiringDTO;
 import com.manaplastic.backend.entity.ContractEntity;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.exportfile.ExcelHelper;
@@ -25,6 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -168,4 +171,25 @@ public class ContractService {
         );
     }
 
+    // Noti cho hdld sắp hết hạn
+    public List<ContractExpiringDTO> getExpiringContracts(int days) {
+        LocalDate today = LocalDate.now();
+        LocalDate thresholdDate = today.plusDays(days);
+
+        List<ContractEntity> contracts = contractRepository.findExpiringContracts(today, thresholdDate);
+
+        return contracts.stream().map(contract -> {
+            ContractExpiringDTO dto = new ContractExpiringDTO();
+            dto.setId(contract.getId());
+            dto.setContractCode(contract.getId() + "-" + contract.getContractname());
+            dto.setEmployeeName(contract.getUserID().getFullname());
+            dto.setEndDate(contract.getEnddate());
+
+            // Tính số ngày còn lại: EndDate - Today
+            long daysLeft = ChronoUnit.DAYS.between(today, contract.getEnddate());
+            dto.setDaysRemaining(daysLeft);
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
 }
