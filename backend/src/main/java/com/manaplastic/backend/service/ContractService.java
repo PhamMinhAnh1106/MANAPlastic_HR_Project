@@ -54,11 +54,30 @@ public class ContractService {
         UserEntity employee = userRepository.findByUsername(request.getUserName())
                 .orElseThrow(() -> new RuntimeException("Nhân viên không tồn tại với Username: " + request.getUserName()));
         // Chỉ check nếu HR đang cố tạo HĐ có thời hạn (FIXED_TERM)
-        if ("FIXED_TERM".equalsIgnoreCase(request.getType())) {
+        if ("FIXED_TERM".equalsIgnoreCase(request.getType())) { // Có thời hạn - luật Việt Nam Bộ luật Lao động 2019 (Điều 20)
             int count = contractRepository.countFixedTermContracts(employee.getId());
             if (count >= 2) {
                 throw new RuntimeException("Nhân viên này đã ký đủ 2 lần HĐ xác định thời hạn. Theo luật, lần này bắt buộc phải ký HĐ Vô thời hạn (INDEFINITE)!");
             }
+
+            if (request.getStartDate() != null && request.getEndDate() != null) {
+                long months = calculateMonths(request.getStartDate(), request.getEndDate());
+
+                if (request.getEndDate().isBefore(request.getStartDate())) {
+                    throw new RuntimeException("Ngày kết thúc hợp đồng không được nhỏ hơn ngày bắt đầu.");
+                }
+                if (months > 36) {
+                    throw new RuntimeException("Theo luật, Hợp đồng xác định thời hạn không được vượt quá 36 tháng.");
+                }
+            } else {
+                throw new RuntimeException("Hợp đồng xác định thời hạn bắt buộc phải có ngày bắt đầu và ngày kết thúc.");
+            }
+        }
+        else {// Vô thời hạn
+            if (request.getStartDate() == null) {
+                throw new RuntimeException("Hợp đồng vô thời hạn phải có ngày bắt đầu.");
+            }
+            request.setEndDate(null);
         }
 
         String fileUrl = null;
@@ -95,6 +114,11 @@ public class ContractService {
         }
         int count = contractRepository.countFixedTermContracts(userId);
         return count < 2;
+    }
+
+    private long calculateMonths(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) return 0;
+        return ChronoUnit.MONTHS.between(startDate, endDate);
     }
 
     //Lưu PDF
