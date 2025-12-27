@@ -46,6 +46,7 @@ public class ContractService {
     private String uploadDir;
 
 
+
     //Tạo hdld
     @Transactional
     public ContractEntity createContract(ContractCreateDTO request) throws IOException {
@@ -128,7 +129,7 @@ public class ContractService {
         String newFileName = UUID.randomUUID().toString() + fileExtension;
 
         // Tạo thư mục nếu chưa có
-        Path uploadPath = Paths.get(uploadDir);
+        Path uploadPath = Paths.get(uploadDir.trim());
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
@@ -137,7 +138,8 @@ public class ContractService {
         Path filePath = uploadPath.resolve(newFileName);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        return "/" + uploadDir + "/" + newFileName;
+//        return "/" + uploadDir + "/" + newFileName;
+        return newFileName;
     }
 
     //Lọc

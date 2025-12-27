@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/login", "/refresh", "/logout").permitAll()
                         .requestMatchers("/uploads/contracts/**").hasAnyAuthority("HR", "Admin")
-                        .requestMatchers("/uploads/attendance/**").permitAll()
+                        .requestMatchers("/uploads/attendance/**","/uploads/proofs/**").permitAll()
                         .requestMatchers("/checkInApp/attendanceLog/**").permitAll() // cho phép cái app chấm công
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/**", "/index.html",

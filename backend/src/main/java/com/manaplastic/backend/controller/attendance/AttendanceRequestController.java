@@ -8,7 +8,9 @@ import com.manaplastic.backend.constant.customAnotation.LogActivity;
 import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
 import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
-import com.manaplastic.backend.filters.AttendanceRequestFilter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import com.manaplastic.backend.service.AttendanceRequestService;
 import com.manaplastic.backend.service.CheckPermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,18 +25,23 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @RestController
 @RequestMapping("/user/attendanceRequests")
-@PreAuthorize("isAuthenticated()")
 public class AttendanceRequestController {
     @Autowired
     private AttendanceRequestService requestService;
-
     @Autowired
     private CheckPermissionService checkPermissionService;
+    @Value("${app.upload.proofs}")
+    private String uploadDir;
 
   //Tạo đơn
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("isAuthenticated()")
     @RequiredPermission(PermissionConst.ATTENDANCE_REQ_CREATE)
     @LogActivity(action = "CREATE_ATTENDANCE_REQ", description = "Gửi yêu cầu bổ sung công")
     public ResponseEntity<String> createRequest(
@@ -50,6 +57,7 @@ public class AttendanceRequestController {
 
     // Xem & Lọc
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Page<AttendanceRequestResponseDTO>> getRequests(
             @ModelAttribute AttendanceRequestFilterCriteria filter,
             @AuthenticationPrincipal UserEntity currentUser,
@@ -74,6 +82,30 @@ public class AttendanceRequestController {
 
         Page<AttendanceRequestResponseDTO> result = requestService.getFilteredRequests(filter, pageable);
         return ResponseEntity.ok(result);
+    }
+
+    // xem file ảnh
+    @GetMapping("/images/{filename:.+}")
+    public ResponseEntity<Resource> getProofImage(@PathVariable String filename) {
+        try {
+            Path filePath = Paths.get(uploadDir).resolve(filename).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+
+                String contentType = Files.probeContentType(filePath);
+                if (contentType == null) {
+                    contentType = "image/jpeg";
+                }
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(contentType))
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
    // Duyệt đơn

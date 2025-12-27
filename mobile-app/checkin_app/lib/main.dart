@@ -56,7 +56,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
 
     // URL trỏ về Spring Boot (IP máy tính chạy Server)
     const String serverUrl =
-        'http://192.168.1.67:8080/checkInApp/attendanceLog/log'; // controller
+        'http://192.168.1.77:8080/checkInApp/attendanceLog/log'; // controller
 
     try {
       String base64Image = base64Encode(imageBytes);

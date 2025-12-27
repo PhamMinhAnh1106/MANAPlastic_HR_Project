@@ -7,10 +7,18 @@ import com.manaplastic.backend.repository.EmployeeOfficialScheduleRepository;
 import com.manaplastic.backend.repository.ShiftRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.*;
+import java.util.Base64;
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Service
@@ -32,25 +40,37 @@ public class AttendanceLogService {
     // Thời gian tối thiểu giữa 2 lần chấm công (15p =  900s)
     private static final long SPAM_COOLDOWN_SECONDS = 900;
     private static final Integer OFFICE_SHIFT_ID = 36;
+    @Value("${app.upload.attendance}")
+    private String uploadDir;
 
     @Transactional
     public AttendancelogEntity processAttendanceLog(AttendancelogEntity log) {
-        AttendancelogEntity savedLog = attendancelogRepository.save(log);
-        UserEntity user = savedLog.getUserID();
-//        LocalDate logDate = savedLog.getTimestamp().atZone(zoneId).toLocalDate();
-        LocalDate logDate = savedLog.getTimestamp().toLocalDate();
+//        AttendancelogEntity savedLog = attendancelogRepository.save(log);
+//        UserEntity user = savedLog.getUserID();
+////        LocalDate logDate = savedLog.getTimestamp().atZone(zoneId).toLocalDate();
+//        LocalDate logDate = savedLog.getTimestamp().toLocalDate();
 
+        UserEntity user = log.getUserID();
+        //KIỂM TRA SPAM (Dùng log chưa lưu để so sánh với log trong DB) ---
         Optional<AttendancelogEntity> lastLogOpt = attendancelogRepository.findTopByUserIDOrderByTimestampDesc(user);
+
         if (lastLogOpt.isPresent()) {
             AttendancelogEntity lastLog = lastLogOpt.get();
-            // Tính khoảng cách thời gian: Log Mới - Log Cũ
+
+            // Tính khoảng cách thời gian
             long secondsDiff = Duration.between(lastLog.getTimestamp(), log.getTimestamp()).abs().getSeconds();
 
             if (secondsDiff < SPAM_COOLDOWN_SECONDS) {
                 System.out.println("Phát hiện Spam log từ User " + user.getId() + ". Bỏ qua xử lý logic.");
-                return attendancelogRepository.save(log); // Lưu log rồi thoát luôn hàm
+
+//                return attendancelogRepository.save(log);
+                throw new RuntimeException("Vui lòng đợi 15 phút giữa các lần chấm công!");
             }
         }
+
+        AttendancelogEntity savedLog = attendancelogRepository.save(log);
+        LocalDate logDate = savedLog.getTimestamp().toLocalDate();
+
         // Kiểm tra xem hôm nay nhân viên này đã có dòng chấm công nào chưa
         var existingAttendance = attendanceRepository.findByUserIDAndDate(user, logDate);
 
@@ -90,6 +110,31 @@ public class AttendanceLogService {
         }
 
         return savedLog;
+    }
+
+    // Hàm phụ trợ để lưu file (Giống file_put_contents của PHP)
+    public String saveImageFromBase64(String base64Str) {
+        try {
+            Path uploadPath = Paths.get(uploadDir.trim());
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            String fileName = UUID.randomUUID().toString() + ".jpg";
+            Path filePath = uploadPath.resolve(fileName);
+
+            // Giải mã Base64 và ghi ra file
+            byte[] imageBytes = Base64.getDecoder().decode(base64Str);
+            try (OutputStream stream = new FileOutputStream(filePath.toFile())) {
+                stream.write(imageBytes);
+            }
+
+            // Trả về đường dẫn để lưu vào DB
+//            return "/uploads/attendance" + fileName;
+            return fileName;
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi lưu ảnh: " + e.getMessage());
+        }
     }
 
     private void assignShiftToAttendance(AttendanceEntity attendance, UserEntity user, LocalDate date) {

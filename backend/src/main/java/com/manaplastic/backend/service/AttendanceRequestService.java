@@ -147,19 +147,31 @@ public class AttendanceRequestService {
     // Hàm hỗ trợ lưu file
     private String saveProofImage(MultipartFile file) {
         try {
-//            String uploadDir = "uploads/proofs/";
-            Path uploadPath = Paths.get(uploadDir);
-
+            Path uploadPath = Paths.get(uploadDir.trim());
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
-            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Path filePath = uploadPath.resolve(fileName);
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename == null) originalFilename = "unknown.jpg";
 
+            String extension = "";
+            int dotIndex = originalFilename.lastIndexOf('.');
+            if (dotIndex >= 0) {
+                extension = originalFilename.substring(dotIndex);
+            }
+
+            String baseName = (dotIndex >= 0) ? originalFilename.substring(0, dotIndex) : originalFilename;
+
+            // Regex: [^a-zA-Z0-9] nghĩa là thay thế tất cả ký tự KHÔNG PHẢI chữ và số thành dấu gạch dưới
+            String cleanBaseName = baseName.replaceAll("[^a-zA-Z0-9]", "_");
+
+            String finalFileName = UUID.randomUUID().toString() + "_" + cleanBaseName + extension;
+
+            Path filePath = uploadPath.resolve(finalFileName);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            return "/" + uploadDir.replace("\\", "/") + "/" + fileName;
+            return finalFileName;
 
         } catch (IOException e) {
             throw new RuntimeException("Lỗi khi lưu ảnh minh chứng: " + e.getMessage());

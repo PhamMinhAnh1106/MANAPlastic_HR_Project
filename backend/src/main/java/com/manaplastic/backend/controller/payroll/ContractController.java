@@ -8,16 +8,25 @@ import com.manaplastic.backend.constant.customAnotation.LogActivity;
 import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
 import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.service.ContractService;
+import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +39,9 @@ public class ContractController {
 
     @Autowired
     private ContractService contractService;
+
+    @Value("${app.upload.contracts}")
+    private String uploadDir;
 
     // Kiểm tra nhân viên này đã ký bao nhiêu HĐ có thời hạn rồi
     @GetMapping("/checkRenewal/{userId}")
@@ -50,6 +62,40 @@ public class ContractController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Lỗi: " + e.getMessage());
+        }
+    }
+
+    // Xem file hdld
+    @GetMapping("/files/{filename:.+}")
+    public ResponseEntity<Resource> getFile(@PathVariable String filename) {
+        try {
+            //Tạo đường dẫn trỏ đến file thực tế
+            Path filePath = Paths.get(uploadDir).resolve(filename).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+
+                String contentType = "application/octet-stream";
+                try {
+                    contentType = Files.probeContentType(filePath);
+                } catch (IOException ex) {
+                    // ignore
+                }
+                if(contentType == null) {
+                    contentType = "application/pdf";
+                }
+
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(contentType))
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (MalformedURLException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 

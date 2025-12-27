@@ -10,17 +10,26 @@ import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.service.AttendanceService;
 import com.manaplastic.backend.service.CheckPermissionService;
 import com.manaplastic.backend.service.UserService;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @RestController
+@RequestMapping("/chamCong")
 public class AttendanceController {
     @Autowired
     private UserService userService;
@@ -29,7 +38,10 @@ public class AttendanceController {
     @Autowired
     private CheckPermissionService checkPermissionService;
 
-    @GetMapping("/chamCong")
+    @Value("${app.upload.attendance}")
+    private String uploadDir;
+
+    @GetMapping
     @PreAuthorize("hasAnyAuthority('HR','Manager','Employee')")
     @RequiredPermission(PermissionConst.ATTENDANCE_VIEW_SELF)
     public ResponseEntity<Page<AttendanceDTO>> getMyAttendance(
@@ -59,7 +71,30 @@ public class AttendanceController {
     }
 
 
-    @DeleteMapping("/chamCong/{attendanceId}")
+    @GetMapping("/images/{filename:.+}")
+    public ResponseEntity<Resource> getAttendanceImage(@PathVariable String filename) {
+        try {
+            Path filePath = Paths.get(uploadDir).resolve(filename).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                // Xác định loại ảnh (jpg, png...)
+                String contentType = Files.probeContentType(filePath);
+                if (contentType == null) {
+                    contentType = "image/jpeg"; // Mặc định nếu không dò được
+                }
+
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(contentType))
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    @DeleteMapping("/{attendanceId}")
     @PreAuthorize("hasAuthority('HR')")
     @LogActivity(action="DELETE_ATTENDANCE",description = "Xóa dữ liệu chấm công",logType = LogType.DANGER)
     @RequiredPermission(PermissionConst.ATTENDANCE_UPDATE)

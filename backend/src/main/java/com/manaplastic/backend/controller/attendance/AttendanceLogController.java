@@ -35,8 +35,7 @@ public class AttendanceLogController {
     //Tên thư mục lưu ảnh
 //    private static final String UPLOAD_DIR = "uploads/"; ==> hard-code
 
-    @Value("${app.upload.attendance}")
-    private String uploadDir;
+
 
     @PostMapping("/log")
     public ResponseEntity<?> receiveAttendanceLog(@RequestBody AttendanceLogRequest request) {
@@ -47,7 +46,7 @@ public class AttendanceLogController {
                     .orElseThrow(() -> new RuntimeException("Nhân viên không tồn tại!"));
 
             // Xử lý lưu ảnh từ Base64
-            String imgPath = saveImageFromBase64(request.getImageBase64());
+            String imgPath = attendanceLogService.saveImageFromBase64(request.getImageBase64());
 
             AttendancelogEntity logEntity = new AttendancelogEntity();
             logEntity.setUserID(user);
@@ -64,27 +63,4 @@ public class AttendanceLogController {
         }
     }
 
-    // Hàm phụ trợ để lưu file (Giống file_put_contents của PHP)
-    private String saveImageFromBase64(String base64Str) {
-        try {
-            Path uploadPath = Paths.get(uploadDir);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            String fileName = UUID.randomUUID().toString() + ".jpg";
-            Path filePath = uploadPath.resolve(fileName);
-
-            // Giải mã Base64 và ghi ra file
-            byte[] imageBytes = Base64.getDecoder().decode(base64Str);
-            try (OutputStream stream = new FileOutputStream(filePath.toFile())) {
-                stream.write(imageBytes);
-            }
-
-            // Trả về đường dẫn để lưu vào DB
-            return "/uploads/attendance" + fileName;
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi lưu ảnh: " + e.getMessage());
-        }
-    }
 }
