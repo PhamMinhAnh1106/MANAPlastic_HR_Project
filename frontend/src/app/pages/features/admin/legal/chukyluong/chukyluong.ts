@@ -4,6 +4,9 @@ import { HttpClient, HttpClientModule, HttpErrorResponse } from '@angular/common
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { catchError, firstValueFrom, throwError } from 'rxjs';
 import { chukiluong, getChukiluong, postChukiluong, putChukiluong } from '../../../../../services/pages/features/admin/legal.service';
+import { Alert } from '../../../../shared/alert/alert';
+import { Comfirm } from '../../../../shared/comfirm/comfirm';
+import { Loading } from '../../../../shared/loading/loading';
 
 // --- INTERFACES & TYPES ---
 export interface ChuKyLuongItem {
@@ -26,11 +29,23 @@ export interface ChuKiLuongForm {
 @Component({
   selector: 'app-chukyluong',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, NgIf, NgFor],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, NgIf, NgFor, Alert, Comfirm, Loading],
   templateUrl: './chukyluong.html',
   styleUrls: ['./chukyluong.scss']
 })
 export class chukyluong implements OnInit {
+  isconfirm: boolean = false;
+  isalert: boolean = false;
+  isloading: boolean = false;
+  confirmMessage = '';
+  alertmessage = '';
+  alertType: boolean = true;
+
+  Onalert(message: string, type: boolean) {
+    this.isalert = true;
+    this.alertmessage = message;
+    this.alertType = type;
+  }
   private fb = inject(FormBuilder);
 
   currentYear: number = new Date().getFullYear();
@@ -139,7 +154,7 @@ export class chukyluong implements OnInit {
 
       // Kiểm tra status trả về từ hàm postChukiluong
       if (res && res.status === 200) {
-        this.showMessage('success', `Đã tạo thành công chu kỳ cho năm ${formValue.year}`);
+        this.Onalert(res.data, true);
         this.closeModals();
 
         if (parseInt(formValue.year || '0') !== this.currentYear) {
@@ -147,7 +162,7 @@ export class chukyluong implements OnInit {
         }
         this.loadData();
       } else {
-        this.showMessage('error', 'Lỗi khi tạo chu kỳ (Status != 200).');
+        this.Onalert(res.data || 'Lỗi khi tạo chu kỳ lương.', false);
       }
     } catch (error) {
       this.showMessage('error', 'Lỗi hệ thống khi tạo chu kỳ lương.');
@@ -168,11 +183,11 @@ export class chukyluong implements OnInit {
       const res: any = await putChukiluong(this.selectedItem.id, formValue);
 
       if (res && res.status === 200) {
-        this.showMessage('success', `Cập nhật thành công tháng ${this.selectedItem.month}`);
+        this.Onalert(res.data, true);
         this.closeModals();
         this.loadData();
       } else {
-        this.showMessage('error', 'Cập nhật thất bại.');
+        this.Onalert(res.data || 'Lỗi khi cập nhật chu kỳ.', false);
       }
     } catch (error) {
       this.showMessage('error', 'Lỗi khi cập nhật.');
@@ -180,7 +195,7 @@ export class chukyluong implements OnInit {
       this.isSubmitting = false;
     }
   }
-
+  async onConfirmResult(event: any) { }
   showMessage(type: 'success' | 'error', text: string) {
     this.message = { type, text };
     if (type === 'success') {

@@ -7,19 +7,40 @@ import {
   LeaveTypeDetail,
   PostLeavePolicy,
   getleavePolicies,
-  postleavePolicies,
-  putleavePolicies,
+  postleavePolicies, // Thường là Create
+  putleavePolicies,  // Thường là Update
   DeleteleavePolicies
 } from '../../../../../services/pages/features/admin/legal.service';
+import { Alert } from '../../../../shared/alert/alert';
+import { Comfirm } from '../../../../shared/comfirm/comfirm';
 
 @Component({
   selector: 'app-leave-policies',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, NgFor, NgIf],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, NgFor, NgIf, Alert, Comfirm],
   templateUrl: './leave-policies.html',
   styleUrls: ['./leave-policies.scss'],
 })
 export class LeavePolicies implements OnInit {
+
+  isconfirm: boolean = false;
+  isalert: boolean = false;
+  confirmMessage = '';
+  alertmessage = '';
+  alertType: boolean = true;
+
+  // Biến để lưu tạm payload và loại hành động chờ xác nhận
+  pendingPayload: PostLeavePolicy | null = null;
+  submittype: 'create' | 'update' | 'delete' | '' = '';
+
+  Onalert(message: string, type: boolean) {
+    this.isalert = true;
+    this.alertmessage = message;
+    this.alertType = type;
+    // Tự động tắt alert sau 3s (tuỳ chọn)
+    setTimeout(() => this.isalert = false, 3000);
+  }
+
   // State Signals
   policies = signal<LeavePolicy[]>([]);
   isLoading = signal<boolean>(false);
@@ -36,7 +57,6 @@ export class LeavePolicies implements OnInit {
   // Dependency Injection
   private fb = inject(FormBuilder);
 
-  // NOTE: List này có thể lấy từ API getLeaveTypes nếu có, hoặc để tĩnh như hiện tại
   staticLeaveTypes: LeaveTypeDetail[] = [
     { id: 53, shiftname: 'AL (Anually Leave)', starttime: '08:00:00', endtime: '17:00:00', durationHours: 8, shiftnameAsEnum: 'ANNUAL' },
     { id: 54, shiftname: 'SL (Sick Leave)', starttime: '00:00:00', endtime: '00:00:00', durationHours: 0, shiftnameAsEnum: 'SICK' },
@@ -55,11 +75,9 @@ export class LeavePolicies implements OnInit {
     });
   }
 
-
   ngOnInit() {
     this.fetchPolicies();
     this.cdr.detectChanges();
-
   }
 
   // --- API INTEGRATION ---
@@ -68,15 +86,10 @@ export class LeavePolicies implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set(null);
     try {
-      // Gọi function từ service thay vì this.http.get
-      // Convert year to string as per your API definition: getleavePolicies(year: string)
       const data = await getleavePolicies();
-
-      // Kiểm tra nếu API trả về lỗi (theo khối try/catch trong định nghĩa hàm của bạn)
       if (data instanceof Error) {
         throw data;
       }
-
       this.policies.set(data as LeavePolicy[]);
     } catch (error: any) {
       console.error('Lỗi khi tải dữ liệu:', error);
@@ -87,20 +100,21 @@ export class LeavePolicies implements OnInit {
     }
   }
 
-  async onSubmit() {
+  // 1. Hàm onSubmit: Chỉ làm nhiệm vụ Validate và mở popup Confirm
+  onSubmit() {
     if (this.policyForm.invalid) {
       this.policyForm.markAllAsTouched();
       return;
     }
 
-    this.isSaving = true;
     this.errorMessage.set(null);
 
     // Mapping Form Data
     const formValue = this.policyForm.value;
     const selectedType = this.staticLeaveTypes.find(t => t.id === +formValue.leaveTypeId);
 
-    const payload: PostLeavePolicy = {
+    // Tạo payload và lưu vào biến toàn cục class
+    this.pendingPayload = {
       description: formValue.description,
       days: formValue.days,
       minYearsService: formValue.minYearsService,
@@ -110,52 +124,94 @@ export class LeavePolicies implements OnInit {
       leaveType: selectedType?.shiftnameAsEnum
     };
 
+    // Xác định loại hành động và mở popup
+    if (this.isEditMode && this.currentPolicyId) {
+      this.submittype = "update";
+      this.confirmMessage = "Bạn có chắc chắn muốn cập nhật chính sách này?"; // Message cho Comfirm component
+    } else {
+      this.submittype = "create";
+      this.confirmMessage = "Bạn có chắc chắn muốn tạo chính sách này?"; // Message cho Comfirm component
+    }
+
+    this.isconfirm = true;
+  }
+  async onConfirmResult(event: any) {
+    // 1. Đóng popup confirm
+    this.isconfirm = false;
+
+    // 2. Kiểm tra điều kiện dừng:
+    // - Nếu người dùng chọn Cancel (event !== true)
+    // - Hoặc: Nếu là Create/Update mà không có payload
+    // - Hoặc: Nếu là Delete mà không có ID
+    if (
+      event !== true ||
+      (this.submittype !== 'delete' && !this.pendingPayload) ||
+      (this.submittype === 'delete' && !this.Idelete)
+    ) {
+      this.pendingPayload = null; // Clear payload nếu hủy
+      this.Idelete = 0;
+      return;
+    }
+
+    this.isSaving = true;
+
     try {
-      let res;
-      if (this.isEditMode && this.currentPolicyId) {
-        // Call Service: PUT
-        res = await putleavePolicies(this.currentPolicyId, payload);
-      } else {
-        // Call Service: POST
-        res = await postleavePolicies(payload);
+      let res: any; // Khai báo res chung
+
+      // 3. Xử lý logic gọi API
+      if (this.submittype === "create") {
+        // Sử dụng non-null assertion (!) vì payload đã được kiểm tra ở bước 2
+        res = await postleavePolicies(this.pendingPayload!);
+      }
+      else if (this.submittype === "update" && this.currentPolicyId) {
+        // Sử dụng non-null assertion (!) vì payload đã được kiểm tra ở bước 2
+        res = await putleavePolicies(this.currentPolicyId, this.pendingPayload!);
+      }
+      else if (this.submittype === "delete") {
+        // Gọi API xóa và gán vào biến res chung
+        // Giả sử API trả về { status: number, data: string }
+        const deleteRes = await DeleteleavePolicies(this.Idelete) as { data: string, status: number };
+
+        // Kiểm tra status riêng của API xóa (nếu cần thiết)
+        if (deleteRes.status !== 200) {
+          throw new Error(deleteRes.data || 'Lỗi khi xóa');
+        }
+        res = deleteRes;
       }
 
-      // Check result (based on your service definition returning {data, status} or error)
       if (res instanceof Error) {
         throw res;
       }
 
-      // Nếu thành công (status 200/201), tải lại dữ liệu
-      await this.fetchPolicies();
-      this.closeModal();
+      // 5. Thành công chung cho cả 3 trường hợp
+      this.Onalert("Thao tác thành công!", true);
+      await this.fetchPolicies(); // Tải lại dữ liệu
+      this.closeModal(); // Đóng Modal form (nếu đang mở)
 
     } catch (error: any) {
-      console.error('Lỗi khi lưu:', error);
-      this.errorMessage.set(`Lỗi khi lưu: ${error.message || 'Backend không phản hồi'}`);
+      console.error(`Lỗi khi thực hiện ${this.submittype}:`, error);
+
+      this.errorMessage.set(`Lỗi: ${error.message || 'Hệ thống đang bận'}`);
+      this.Onalert(error.message || "Đã xảy ra lỗi, vui lòng thử lại.", false);
+
     } finally {
+      // 6. Reset trạng thái
       this.isSaving = false;
+      this.pendingPayload = null;
+      this.Idelete = 0; // Reset ID xóa
+      this.submittype = '';
     }
   }
 
+  Idelete: number = 0;
   async deletePolicy(id: number) {
-    if (!confirm('Bạn có chắc chắn muốn xóa chính sách này?')) return;
+    this.Idelete = id;
+    this.submittype = "delete";
+    this.pendingPayload = null;
 
-    try {
-      // Call Service: DELETE
-      const res = await DeleteleavePolicies(id);
-
-      if (res instanceof Error) {
-        throw res;
-      }
-
-      await this.fetchPolicies();
-    } catch (error: any) {
-      console.error('Lỗi khi xóa:', error);
-      alert(`Không thể xóa: ${error.message || 'Lỗi kết nối'}`);
-    }
+    this.confirmMessage = "Bạn có chắc chắn muốn xóa chính sách này?";
+    this.isconfirm = true;
   }
-
-  // --- UI ACTIONS ---
 
   openModal(policy?: LeavePolicy) {
     this.isModalOpen.set(true);
@@ -168,7 +224,7 @@ export class LeavePolicies implements OnInit {
         days: policy.days,
         minYearsService: policy.minyearsservice,
         maxYearsService: policy.maxyearsservice,
-        leaveTypeId: policy.leavetypeid?.id, // Thêm optional chaining đề phòng null
+        leaveTypeId: policy.leavetypeid?.id,
         genderTarget: policy.gendertarget
       });
     } else {
@@ -184,6 +240,7 @@ export class LeavePolicies implements OnInit {
 
   closeModal() {
     this.isModalOpen.set(false);
+    this.pendingPayload = null; // Reset nếu đóng modal giữa chừng
   }
 
   getBadgeColor(type: string): string {

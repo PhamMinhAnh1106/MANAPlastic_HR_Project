@@ -5,15 +5,16 @@
       <h2>Quản lý Tài khoản</h2>
       <p class="subtitle">Quản lý thông tin nhân viên, tài khoản và phân quyền</p>
     </div>
-    
+
     <!-- Quick Filter Bar -->
     <div class="quick-filter">
-      <button class="btn-primary" (click)="addaccount()">
+      <button *ngIf="role === 'ADMIN'" class="btn-primary" (click)="addaccount()">
         <span class="material-symbols-outlined">add</span> Cấp Tài Khoản
       </button>
       <div class="search-box">
         <span class="material-symbols-outlined icon">search</span>
-        <input type="text" placeholder="Tìm theo Mã NV..." [(ngModel)]="filter.userID" (keyup.enter)="onPageSizeChange()" />
+        <input type="text" placeholder="Tìm theo Mã NV..." [(ngModel)]="filter.userID"
+          (keyup.enter)="onPageSizeChange()" />
       </div>
       <button class="btn-primary" (click)="onPageSizeChange()">
         <span class="material-symbols-outlined">filter_list</span> Lọc
@@ -58,7 +59,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="filter-actions">
       <button class="btn-text" (click)="toggleAdvancedFilter()">Đóng</button>
       <button class="btn-primary" (click)="applyAdvancedFilter()">Áp dụng bộ lọc</button>
@@ -72,17 +73,21 @@
         <thead>
           <tr>
             <th class="sortable" (click)="sort('id')" style="width: 80px;">
-              Mã NV <span class="material-symbols-outlined sort-indicator" [class.rotated]="sortByIdDesc">arrow_drop_down</span>
+              Mã NV <span class="material-symbols-outlined sort-indicator"
+                [class.rotated]="sortByIdDesc">arrow_drop_down</span>
             </th>
             <th class="sortable" (click)="sort('name')">
-              Nhân viên <span class="material-symbols-outlined sort-indicator" [class.rotated]="sortByUsernameDesc">arrow_drop_down</span>
+              Nhân viên <span class="material-symbols-outlined sort-indicator"
+                [class.rotated]="sortByUsernameDesc">arrow_drop_down</span>
             </th>
             <th>Liên hệ</th>
             <th class="sortable" (click)="sort('gender')">
-              Giới tính <span class="material-symbols-outlined sort-indicator" [class.rotated]="sortByGenderDesc">arrow_drop_down</span>
+              Giới tính <span class="material-symbols-outlined sort-indicator"
+                [class.rotated]="sortByGenderDesc">arrow_drop_down</span>
             </th>
             <th class="sortable" (click)="sort('born')">
-              Ngày sinh <span class="material-symbols-outlined sort-indicator" [class.rotated]="sortByBirthdayDesc">arrow_drop_down</span>
+              Ngày sinh <span class="material-symbols-outlined sort-indicator"
+                [class.rotated]="sortByBirthdayDesc">arrow_drop_down</span>
             </th>
             <th>Phòng ban</th>
             <th class="text-center">Thao tác</th>
@@ -92,7 +97,7 @@
         <tbody>
           <tr *ngFor="let emp of employee[0]">
             <td><strong>#{{ emp.username }}</strong></td>
-            
+
             <!-- Cột Nhân viên: Avatar + Tên + Username -->
             <td>
               <div class="user-info">
@@ -123,7 +128,7 @@
             </td>
 
             <td>{{ emp.birth | date:'dd/MM/yyyy' }}</td>
-            
+
             <td>
               <span class="dept-badge">{{ emp.departmentName || 'Chưa phân bổ' }}</span>
             </td>
@@ -147,9 +152,10 @@
         </select>
         <span>dòng / trang</span>
       </div>
-      
+
       <div class="page-info">
-        {{ currentPage * pageSize + 1 }} - {{ (currentPage + 1) * pageSize > totalElements ? totalElements : (currentPage + 1) * pageSize }} 
+        {{ currentPage * pageSize + 1 }} - {{ (currentPage + 1) * pageSize > totalElements ? totalElements :
+        (currentPage + 1) * pageSize }}
         trong tổng số <strong>{{ totalElements }}</strong>
       </div>
 
@@ -190,12 +196,12 @@
       <div class="form-grid">
         <!-- Thông tin cơ bản -->
         <div class="form-section-title">Thông tin cơ bản</div>
-        
+
         <div class="form-group">
           <label>Username</label>
           <input [(ngModel)]="selectedEmployee.username" disabled class="input-disabled" />
         </div>
-        
+
         <div class="form-group">
           <label>Họ và tên</label>
           <input [(ngModel)]="selectedEmployee.fullname" />
@@ -216,7 +222,7 @@
 
         <div class="form-group">
           <label>CCCD</label>
-          <input [(ngModel)]="selectedEmployee.cccd" />
+          <input [(ngModel)]="selectedEmployee.cccd" maxlength="12" />
         </div>
 
         <!-- Liên hệ & Công việc -->
@@ -229,7 +235,7 @@
 
         <div class="form-group">
           <label>SĐT</label>
-          <input [(ngModel)]="selectedEmployee.phonenumber" />
+          <input [(ngModel)]="selectedEmployee.phonenumber" maxlength="10"/>
         </div>
 
         <div class="form-group">
@@ -239,7 +245,7 @@
 
         <div class="form-group">
           <label>Phòng ban</label>
-          <select [(ngModel)]="selectedEmployee.departmentID">
+          <select [(ngModel)]="selectedEmployee.departmentID" [disabled]="role !== 'ADMIN'">
             <option *ngFor="let dept of department" [value]="dept.departmentId">{{ dept.departmentName }}</option>
           </select>
         </div>
@@ -255,32 +261,32 @@
         </div>
 
         <div class="form-group">
-            <label>Trạng thái</label>
-            <div class="radio-group">
-                <label class="radio-label">
-                    <input type="radio" [(ngModel)]="selectedEmployee.status" value="active" />
-                    <span>Hoạt động</span>
-                </label>
-                <label class="radio-label">
-                    <input type="radio" [(ngModel)]="selectedEmployee.status" value="inactive" />
-                    <span>Ngừng hoạt động</span>
-                </label>
-            </div>
+          <label>Trạng thái</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" [(ngModel)]="selectedEmployee.status" value="active" />
+              <span>Hoạt động</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" [(ngModel)]="selectedEmployee.status" value="inactive" />
+              <span>Ngừng hoạt động</span>
+            </label>
+          </div>
         </div>
 
         <!-- Tài chính -->
         <div class="form-section-title full-width">Thông tin tài chính & Địa chỉ</div>
 
         <div class="form-group full-width">
-           <label>Địa chỉ</label>
-           <input [(ngModel)]="selectedEmployee.address" />
+          <label>Địa chỉ</label>
+          <input [(ngModel)]="selectedEmployee.address" />
         </div>
 
         <div class="form-group">
           <label>Tên Ngân hàng</label>
           <input [(ngModel)]="selectedEmployee.bankName" />
         </div>
-        
+
         <div class="form-group">
           <label>Số tài khoản</label>
           <input [(ngModel)]="selectedEmployee.bankAccount" />

@@ -23,6 +23,8 @@ import { Payrollpayslip } from './pages/features/hr/payroll/payrollpayslip/payro
 import { Permissions } from './pages/features/admin/permissions/permissions';
 import { Filterpayslip } from './pages/features/hr/payroll/filterpayslip/filterpayslip';
 import { Main } from './pages/features/admin/legal/main/main';
+import { ActivityLogs } from './pages/features/admin/activity-logs/activity-logs';
+import { DataAttendant } from './pages/features/hr/data-attendant/data-attendant';
 
 
 export const routes: Routes = [
@@ -41,10 +43,13 @@ export const routes: Routes = [
             { path: 'add/account', component: AddAccount },
             { path: 'permission', component: Permissions },
             { path: 'law', component: Main },
+            { path: 'activity-logs', component: ActivityLogs },
 
             //hr
             { path: 'user/account', component: Accounts },
             { path: 'user/attendance', component: Attendant },
+            { path: 'user/attendance/data', component: DataAttendant },
+
             { path: 'payroll', component: Payrollmain },
             { path: 'payroll/rules', component: Payrollrules },
             { path: 'payroll/payslip', component: Payrollpayslip },

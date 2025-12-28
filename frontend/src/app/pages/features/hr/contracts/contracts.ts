@@ -1,11 +1,20 @@
 import { DecimalPipe, DatePipe, NgFor, NgIf, NgClass } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, Injectable } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+
 import { Loading } from '../../../shared/loading/loading';
-import { CheckContractByIdEmployee, ExportFileDataContracts, FillterContract, FillterContractByIdEmployee } from '../../../../services/pages/features/hr/contracts.service';
-import { buildQueryParams } from '../../../../utils/filters.utils';
 import { Alert } from '../../../shared/alert/alert';
+import {
+  CheckContractByIdEmployee,
+  ExportFileDataContracts,
+  FillterContract,
+  FillterContractByIdEmployee,
+
+} from '../../../../services/pages/features/hr/contracts.service';
+import { buildQueryParams } from '../../../../utils/filters.utils';
+import { getImageContracts } from '../../../../utils/getimage.utils';
 
 @Component({
   selector: 'app-contracts',
@@ -42,6 +51,11 @@ export class Contracts implements OnInit {
   popupMode: 'message' | 'list' = 'message';
   listContracts: any[] = [];
 
+  // --- IMAGE PREVIEW PROPS ---
+  showImagePreview = false;
+  previewImageUrl: SafeUrl | null = null;
+  private currentBlobUrl: string | null = null;
+
   // --- PAGINATION PROPS ---
   page: number = 0;
   size: number = 5;
@@ -58,7 +72,11 @@ export class Contracts implements OnInit {
     'HISTORY'
   ];
 
-  constructor(private router: Router, private cdr: ChangeDetectorRef) { }
+  constructor(
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private sanitizer: DomSanitizer
+  ) { }
 
   ngOnInit(): void {
     const savedTab = sessionStorage.getItem('activeTab');
@@ -86,7 +104,47 @@ export class Contracts implements OnInit {
     this.router.navigate(["/home/contracts/add"]);
   }
 
-  // --- LOGIC CHECK (Giữ nguyên) ---
+  // --- LOGIC XEM HÌNH ẢNH (UPDATED) ---
+  async viewContractImage(fileName: string) {
+    if (!fileName) return;
+
+    this.isloading = true;
+    // Reset ảnh cũ để tránh hiện ảnh của lần xem trước trong lúc đang tải
+    this.previewImageUrl = null;
+
+    try {
+      const blobData = await getImageContracts(fileName);
+
+      if (blobData && blobData instanceof Blob) {
+        const objectUrl = URL.createObjectURL(blobData);
+        this.currentBlobUrl = objectUrl;
+        this.previewImageUrl = this.sanitizer.bypassSecurityTrustUrl(objectUrl);
+      } else {
+        // Trường hợp API trả về lỗi hoặc không phải Blob
+        this.previewImageUrl = null;
+      }
+    } catch (error) {
+      console.error(error);
+      this.previewImageUrl = null;
+    } finally {
+      this.isloading = false;
+      // Luôn mở modal dù thành công hay thất bại để hiện thông báo tương ứng
+      this.showImagePreview = true;
+      this.cdr.detectChanges();
+    }
+  }
+
+  closeImagePreview() {
+    this.showImagePreview = false;
+    this.previewImageUrl = null;
+
+    if (this.currentBlobUrl) {
+      URL.revokeObjectURL(this.currentBlobUrl);
+      this.currentBlobUrl = null;
+    }
+  }
+
+  // --- LOGIC CHECK ---
   async checkSignedContract() {
     if (this.employeeId == '') {
       this.showNotification("Vui lòng nhập Mã Nhân Viên", false);
@@ -115,7 +173,6 @@ export class Contracts implements OnInit {
     this.isloading = true;
     try {
       const id = Number(this.employeeId);
-      // API này chưa có phân trang theo yêu cầu cũ, hiển thị list tĩnh
       const res = await FillterContractByIdEmployee(id) as { data: any, status: number };
 
       if (res.status == 200) {
@@ -124,7 +181,6 @@ export class Contracts implements OnInit {
         this.listContracts = [];
       }
       this.popupMode = "list";
-      // Reset phân trang UI để ẩn thanh phân trang hoặc hiển thị full
       this.totalElements = this.listContracts.length;
       this.totalPages = 1;
 
@@ -137,34 +193,24 @@ export class Contracts implements OnInit {
     }
   }
 
-  // --- LOGIC SEARCH (CẬP NHẬT PHÂN TRANG) ---
-
-  // 1. Hàm tìm kiếm khi nhấn nút "Tìm kiếm" (Reset về trang 0)
+  // --- LOGIC SEARCH ---
   async searchContract() {
     this.page = 0;
     await this.fetchContracts();
   }
 
-  // 2. Hàm gọi API thực tế
   async fetchContracts() {
     const query = this.buildQuery(this.filters);
     this.isloading = true;
     try {
-      // Gọi API FillterContract với page và size
       const res = await FillterContract(query, this.page, this.size) as { data: any, status: number };
 
       if (res.status == 200 && res.data) {
-        // Xử lý dữ liệu trả về. 
-        // Giả định res.data có cấu trúc Page (content, totalPages, totalElements)
-        // Nếu API trả về mảng trực tiếp, cần điều chỉnh lại backend hoặc frontend
-
         if (Array.isArray(res.data)) {
-          // Fallback nếu API vẫn trả về Array thay vì Page Object
           this.listContracts = res.data;
           this.totalElements = res.data.length;
           this.totalPages = 1;
         } else {
-          // Cấu trúc chuẩn phân trang
           this.listContracts = res.data.content || [];
           this.totalPages = res.data.totalPages || 0;
           this.totalElements = res.data.totalElements || 0;
@@ -186,7 +232,6 @@ export class Contracts implements OnInit {
     }
   }
 
-  // 3. Sự kiện chuyển trang
   onPageChange(newPage: number) {
     if (newPage >= 0 && newPage < this.totalPages) {
       this.page = newPage;
@@ -194,13 +239,11 @@ export class Contracts implements OnInit {
     }
   }
 
-  // 4. Sự kiện đổi số dòng/trang
   onPageSizeChange() {
     this.page = 0;
     this.fetchContracts();
   }
 
-  // --- UTILS ---
   buildQuery(filters: any): string {
     const params = new URLSearchParams();
     Object.keys(filters).forEach(key => {
@@ -217,17 +260,6 @@ export class Contracts implements OnInit {
     await ExportFileDataContracts(query);
   }
 
-  copyLink(url: string) {
-    navigator.clipboard.writeText(url)
-      .then(() => {
-        this.showNotification('Đã sao chép liên kết!', true);
-      })
-      .catch(err => {
-        console.error('Lỗi copy link:', err);
-      });
-  }
-
-  // Translate Functions
   translateContractStatus(status: string): string {
     switch (status) {
       case 'DRAFT': return 'Bản nháp';

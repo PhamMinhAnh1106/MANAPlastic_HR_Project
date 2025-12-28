@@ -1,260 +1,263 @@
-<div class="profile-container" *ngIf="userInfo; else loadingTpl">
-    
-  <!-- 1. HEADER BANNER SECTION -->
-  <div class="profile-header-card">
-    <div class="banner-bg"></div>
-    <div class="profile-summary">
-      <div class="avatar-container">
-        <div class="avatar">
-          <!-- Lấy chữ cái đầu -->
-          <span>{{ userInfo.fullname ? userInfo.fullname.charAt(0).toUpperCase() : 'U' }}</span>
-        </div>
-      </div>
+<!-- MAIN CONTAINER -->
+    <div class="page-container" *ngIf="userInfo; else loadingTpl">
       
-      <div class="profile-text">
-        <h2 class="name">{{ userInfo.fullname || 'Chưa cập nhật tên' }}</h2>
-        <div class="sub-text">
-          <span class="role">
-            <span class="material-symbols-outlined" style="font-size: 1rem;">work</span> 
-            {{ userInfo.roleName || 'Nhân viên' }}
-          </span>
-          <span class="separator">•</span>
-          <span class="dept">{{ getDepartment(userInfo.departmentID) }}</span>
+      <!-- 1. HEADER BANNER SECTION -->
+      <header class="profile-header">
+        <div class="header-cover"></div>
+        <div class="header-content">
+          <div class="avatar-wrapper">
+            <div class="avatar">
+              {{ userInfo.fullname ? userInfo.fullname.charAt(0).toUpperCase() : 'U' }}
+            </div>
+            <div class="status-indicator online"></div>
+          </div>
+          
+          <div class="user-identity">
+            <div class="d-flex align-items-center gap-2">
+              <h1 class="user-name">{{ userInfo.fullname || 'Chưa cập nhật tên' }}</h1>
+              <span class="badge role-badge">{{ userInfo.roleName || 'Nhân viên' }}</span>
+            </div>
+            <div class="user-meta">
+              <span class="meta-item">
+                <i class="icon"></i> NV-{{ userInfo.userID }}
+              </span>
+              <span class="meta-separator">•</span>
+              <span class="meta-item">
+                <i class="icon"></i> {{ getDepartment(userInfo.departmentID) }}
+              </span>
+              <span class="meta-separator">•</span>
+              <span class="meta-item">
+                <i class="icon"></i> Vào làm: {{ userInfo.hireDate || '---' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="header-actions">
+            <button class="btn btn-primary" (click)="startEdit()">
+              <span class="material-symbols-outlined icon-btn">edit_square</span>
+              Chỉnh sửa hồ sơ
+            </button>
+          </div>
         </div>
+      </header>
+
+      <!-- 2. MAIN CONTENT GRID -->
+      <div class="main-grid">
+        
+        <!-- LEFT COLUMN: CONTACT -->
+        <aside class="left-col">
+          <div class="card summary-card">
+            <h3 class="card-title">Thông tin liên hệ</h3>
+            
+            <div class="info-list">
+              <!-- Email -->
+              <div class="info-item">
+                <div class="icon-box email">
+                  <span class="material-symbols-outlined">mail</span>
+                </div>
+                <div class="info-content">
+                  <span class="label">Email</span>
+                  <span class="value text-truncate" [title]="userInfo.email">{{ userInfo.email || '---' }}</span>
+                </div>
+              </div>
+
+              <!-- Phone -->
+              <div class="info-item">
+                <div class="icon-box phone">
+                  <span class="material-symbols-outlined">call</span>
+                </div>
+                <div class="info-content">
+                  <span class="label">Điện thoại</span>
+                  <span class="value">{{ userInfo.phonenumber || '---' }}</span>
+                </div>
+              </div>
+
+              <!-- Address -->
+              <div class="info-item">
+                <div class="icon-box location">
+                  <span class="material-symbols-outlined">location_on</span>
+                </div>
+                <div class="info-content">
+                  <span class="label">Địa chỉ</span>
+                  <span class="value">{{ userInfo.address || '---' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card note-card mt-4">
+             <h3 class="card-title text-success">
+               <span class="material-symbols-outlined">verified_user</span> Trạng thái
+             </h3>
+             <p class="note-text">Hồ sơ nhân sự đã được xác thực. Vui lòng liên hệ HR nếu có sai sót về thông tin bảo hiểm.</p>
+          </div>
+        </aside>
+
+        <!-- RIGHT COLUMN: DETAILED INFO -->
+        <main class="right-col">
+          <div class="card details-card">
+            <div class="card-header-row">
+              <h3 class="card-title">Thông tin cá nhân</h3>
+              <div class="tabs">
+                <span class="tab active">Tổng quan</span>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="grid-form-view">
+                
+                <!-- Group: Basic Info -->
+                <div class="field-group">
+                  <label>Họ và tên</label>
+                  <div class="static-value">{{ userInfo.fullname }}</div>
+                </div>
+
+                <div class="field-group">
+                  <label>Giới tính</label>
+                  <div class="static-value">
+                    <span class="gender-tag" [ngClass]="userInfo.gender === 'MALE' ? 'male' : 'female'">
+                      {{ userInfo.gender === 'MALE' ? 'Nam' : 'Nữ' }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="field-group">
+                  <label>Ngày sinh</label>
+                  <div class="static-value">{{ userInfo.birth | date:'dd/MM/yyyy' }}</div>
+                </div>
+
+                <div class="field-group">
+                  <label>CCCD / CMND</label>
+                  <div class="static-value font-mono">{{ userInfo.cccd }}</div>
+                </div>
+
+                <!-- Group: Bank Info -->
+                <div class="divider full-width">
+                  <span class="divider-text">Thông tin ngân hàng</span>
+                </div>
+
+                <div class="field-group full-width">
+                  <label>Ngân hàng</label>
+                  <div class="static-value">{{ userInfo.bankName || '---' }}</div>
+                </div>
+
+                <div class="field-group full-width">
+                  <label>Số tài khoản</label>
+                  <div class="static-value font-mono text-primary">{{ userInfo.bankAccount || '---' }}</div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- LOADING TEMPLATE -->
+    <ng-template #loadingTpl>
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Đang tải dữ liệu hồ sơ...</p>
+      </div>
+    </ng-template>
+
+    <!-- DRAWER (SLIDE OVER) EDIT FORM -->
+    <div class="drawer-backdrop" *ngIf="isEditing" (click)="cancelEdit()"></div>
+    <div class="drawer-panel" [class.open]="isEditing">
+      <div class="drawer-header">
+        <h2>Cập nhật thông tin</h2>
+        <button class="close-btn" (click)="cancelEdit()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
 
-      <div class="header-actions">
-        <!-- Click nút này sẽ set isEditing = true -> Mở Modal -->
-        <button class="btn-primary" (click)="startEdit()">
-          <span class="material-symbols-outlined">edit</span>
-          Chỉnh sửa
+      <div class="drawer-body">
+        <form class="edit-form">
+          <!-- Section 1 -->
+          <div class="form-section">
+            <h4 class="section-title">Thông tin cơ bản</h4>
+            
+            <div class="form-control-group">
+              <label>Họ và tên <span class="required">*</span></label>
+              <input type="text" [(ngModel)]="formdata.fullname" name="fullname" placeholder="Nhập họ tên...">
+            </div>
+
+            <div class="row-2">
+              <div class="form-control-group">
+                <label>Giới tính</label>
+                <select [(ngModel)]="formdata.gender" name="gender">
+                  <option value="MALE">Nam</option>
+                  <option value="FEMALE">Nữ</option>
+                </select>
+              </div>
+              <div class="form-control-group">
+                <label>Ngày sinh</label>
+                <input type="date" [(ngModel)]="formdata.birth" name="birth">
+              </div>
+            </div>
+
+            <div class="form-control-group">
+              <label>CCCD/CMND</label>
+              <input type="text" [(ngModel)]="formdata.cccd" name="cccd" maxlength="12">
+            </div>
+          </div>
+
+          <!-- Section 2 -->
+          <div class="form-section">
+            <h4 class="section-title">Liên hệ</h4>
+            <div class="form-control-group">
+              <label>Email</label>
+              <input type="email" [(ngModel)]="formdata.email" name="email" class="bg-locked" readonly title="Không được sửa email">
+              <small class="hint">Liên hệ IT nếu cần đổi Email</small>
+            </div>
+
+            <div class="form-control-group">
+              <label>Số điện thoại</label>
+              <input type="text" [(ngModel)]="formdata.phonenumber" name="phonenumber" maxlength="10">
+            </div>
+
+            <div class="form-control-group">
+              <label>Địa chỉ thường trú</label>
+              <textarea [(ngModel)]="formdata.address" name="address" rows="3"></textarea>
+            </div>
+          </div>
+
+          <!-- Section 3 -->
+          <div class="form-section">
+            <h4 class="section-title">Tài chính</h4>
+            <div class="row-2">
+               <div class="form-control-group">
+                <label>Ngân hàng</label>
+                <input type="text" [(ngModel)]="formdata.bankName" name="bankName">
+              </div>
+              <div class="form-control-group">
+                <label>Số tài khoản</label>
+                <input type="text" [(ngModel)]="formdata.bankAccount" name="bankAccount">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="drawer-footer">
+        <button class="btn btn-outline" (click)="cancelEdit()">Hủy bỏ</button>
+        <!-- Nút này kích hoạt biến isconfirm -> Hiện popup app-comfirm -->
+        <button class="btn btn-primary" (click)="saveChanges()">
+          Lưu thay đổi
         </button>
       </div>
     </div>
 
-    <!-- TABS -->
-    <div class="profile-tabs">
-      <div class="tab-item active">Thông tin cá nhân</div>
-    </div>
-  </div>
+    <!-- CÁC COMPONENT HỆ THỐNG CỦA BẠN (Đã xóa Toast thừa) -->
+    <app-loading *ngIf="isloading"></app-loading>
 
-  <!-- 2. MAIN CONTENT GRID (CHẾ ĐỘ XEM - READ ONLY) -->
-  <div class="content-grid">
-    
-    <!-- LEFT COLUMN -->
-    <div class="col-left">
-      <!-- Card: Liên hệ nhanh -->
-      <div class="info-card">
-        <h3 class="card-title">Liên hệ nhanh</h3>
-        <div class="contact-list">
-          
-          <!-- Email (Hiển thị 1 dòng) -->
-          <div class="contact-item single-line">
-            <span class="icon-box"><span class="material-symbols-outlined">mail</span></span>
-            <div class="contact-detail">
-              <span class="detail-label">Email:</span>
-              <span class="detail-value" title="{{ userInfo.email }}">{{ userInfo.email || 'Chưa có' }}</span>
-            </div>
-          </div>
-          
-          <!-- Phone -->
-          <div class="contact-item">
-            <span class="icon-box"><span class="material-symbols-outlined">call</span></span>
-            <div class="contact-detail-stacked">
-              <label>Số điện thoại</label>
-              <span>{{ userInfo.phonenumber || 'Chưa có' }}</span>
-            </div>
-          </div>
+    <app-comfirm *ngIf="isconfirm"
+      [message]="confirmMessage" 
+      (result)="onConfirmResult($event)">
+    </app-comfirm>
 
-          <!-- Address -->
-          <div class="contact-item">
-            <span class="icon-box"><span class="material-symbols-outlined">location_on</span></span>
-            <div class="contact-detail-stacked">
-              <label>Địa chỉ</label>
-              <span>{{ userInfo.address || 'Chưa có' }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card: Thông tin công việc -->
-      <div class="info-card mt-3">
-        <h3 class="card-title">Thông tin công việc</h3>
-        <div class="job-info-list">
-          <div class="job-row">
-            <span class="job-label">Mã nhân viên</span>
-            <span class="job-value">NV-{{ userInfo.userID }}</span>
-          </div>
-          <div class="job-row">
-            <span class="job-label">Ngày vào làm</span>
-            <span class="job-value">{{ userInfo.hireDate || '---' }}</span>
-          </div>
-          <div class="job-row">
-            <span class="job-label">Phòng ban</span>
-            <span class="job-value highlight">{{ getDepartment(userInfo.departmentID) }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT COLUMN -->
-    <div class="col-right">
-      
-      <!-- Card: Thông tin chi tiết -->
-      <div class="info-card">
-        <h3 class="card-title">Thông tin Chi Tiết</h3>
-        
-        <div class="form-grid">
-          <!-- Họ và tên -->
-          <div class="form-group">
-            <label>HỌ VÀ TÊN</label>
-            <div class="static-field">{{ userInfo.fullname }}</div>
-          </div>
-
-          <!-- CCCD -->
-          <div class="form-group">
-            <label>CCCD/CMND</label>
-            <div class="static-field">{{ userInfo.cccd }}</div>
-          </div>
-
-          <!-- Giới tính -->
-          <!-- Sử dụng $any() để tránh lỗi type checking tạm thời nếu interface chưa kịp sửa -->
-          <div class="form-group">
-            <label>GIỚI TÍNH</label>
-            <div class="static-field">{{ $any(userInfo).gender === 'MALE' ? 'Nam' : 'Nữ' }}</div>
-          </div>
-
-          <!-- Ngày sinh -->
-          <div class="form-group">
-            <label>NGÀY SINH</label>
-            <div class="static-field">{{ userInfo.birth || '---' }}</div>
-          </div>
-        </div>
-
-        <!-- Section con: Ngân hàng -->
-        <h4 class="sub-title"><span class="material-symbols-outlined">credit_card</span> Thông tin ngân hàng</h4>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>SỐ TÀI KHOẢN</label>
-            <div class="static-field">{{ userInfo.bankAccount || '---' }}</div>
-          </div>
-          <div class="form-group">
-            <label>NGÂN HÀNG</label>
-            <div class="static-field">{{ userInfo.bankName || '---' }}</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card: Ghi chú -->
-      <div class="note-card">
-        <div class="note-icon">
-            <span class="material-symbols-outlined">description</span>
-        </div>
-        <div class="note-content">
-          <h4>Ghi chú nhân sự</h4>
-          <p>Thông tin cá nhân được bảo mật. Vui lòng cập nhật chính xác để đảm bảo quyền lợi bảo hiểm và lương thưởng.</p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-</div>
-
-<!-- LOADING TEMPLATE -->
-<ng-template #loadingTpl>
-  <div class="loading-container">
-    <p style="text-align: center; color: #666;">Đang tải dữ liệu...</p>
-  </div>
-</ng-template>
-
-<!-- POPUP (MODAL) CHỈNH SỬA -->
-<div class="modal-backdrop" *ngIf="isEditing">
-  <div class="modal-content animate-pop">
-    <div class="modal-header">
-      <h3>Chỉnh sửa thông tin</h3>
-      <button class="close-btn" (click)="cancelEdit()">
-        <span class="material-symbols-outlined">close</span>
-      </button>
-    </div>
-    
-    <div class="modal-body">
-      <div class="form-grid-modal">
-        <!-- Fullname -->
-        <div class="form-group">
-          <label>Họ và tên</label>
-          <input type="text" [(ngModel)]="formdata.fullname" class="form-control">
-        </div>
-         <!-- Email -->
-         <div class="form-group">
-          <label>Email</label>
-          <input type="email" [(ngModel)]="formdata.email" class="form-control">
-        </div>
-        <!-- Phone -->
-        <div class="form-group">
-          <label>Số điện thoại</label>
-          <input type="text" [(ngModel)]="formdata.phonenumber" class="form-control" maxlength="12">
-        </div>
-        <!-- Address -->
-        <div class="form-group full-width">
-          <label>Địa chỉ</label>
-          <input type="text" [(ngModel)]="formdata.address" class="form-control">
-        </div>
-        
-        <!-- CCCD -->
-        <div class="form-group">
-          <label>CCCD/CMND</label>
-          <input type="text" [(ngModel)]="formdata.cccd" class="form-control">
-        </div>
-        
-         <!-- Gender -->
-         <!-- SỬA LỖI TẠI ĐÂY: Dùng value="" thay vì [ngValue]="" -->
-         <div class="form-group">
-          <label>Giới tính</label>
-          <select [(ngModel)]="formdata.gender" class="form-control">
-              <option value="MALE">Nam</option>
-              <option value="FEMALE">Nữ</option>
-          </select>
-        </div>
-        
-        <!-- Birth -->
-        <div class="form-group">
-          <label>Ngày sinh</label>
-          <input type="date" [(ngModel)]="formdata.birth" class="form-control">
-        </div>
-
-        <!-- Bank Info -->
-        <div class="form-group">
-            <label>Ngân hàng</label>
-            <input type="text" [(ngModel)]="formdata.bankName" class="form-control">
-        </div>
-        <div class="form-group">
-            <label>Số tài khoản</label>
-            <input type="text" [(ngModel)]="formdata.bankAccount" class="form-control">
-        </div>
-
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn-outline" (click)="cancelEdit()">Hủy bỏ</button>
-      <button class="btn-primary" (click)="saveChanges()">
-        <span class="material-symbols-outlined">save</span> Lưu thay đổi
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- CÁC COMPONENT PHỤ TRỢ -->
-<app-loading *ngIf="isloading"></app-loading>
-
-<app-comfirm *ngIf="isconfirm" 
-  [message]="confirmMessage" 
-  (result)="onConfirmResult($event)">
-</app-comfirm>
-
-<app-alert *ngIf="isalert" 
-  [message]="notifyMessage" 
-  [notifyType]="notifyType" 
-  (hidden)="isalert = false">
-</app-alert>
+    <app-alert *ngIf="isalert" 
+      [message]="notifyMessage" 
+      [notifyType]="notifyType" 
+      (hidden)="isalert = false">
+    </app-alert>

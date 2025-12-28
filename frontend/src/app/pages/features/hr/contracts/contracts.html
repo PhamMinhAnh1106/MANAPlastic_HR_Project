@@ -45,7 +45,6 @@
         </div>
       </div>
       
-      <!-- Minh họa hoặc hướng dẫn -->
       <div class="illustration">
         <span class="material-symbols-outlined large-icon">contract</span>
         <p>Nhập mã nhân viên để kiểm tra hợp đồng đang hiệu lực hoặc xem toàn bộ hồ sơ.</p>
@@ -110,7 +109,7 @@
   </div>
 </div>
 
-<!-- ===== MODAL POPUP ===== -->
+<!-- ===== MODAL POPUP (LIST & MESSAGE) ===== -->
 <div class="overlay" *ngIf="showPopup">
   <div class="modal-box" [ngClass]="{'modal-large': popupMode === 'list'}">
     
@@ -166,8 +165,8 @@
                   </span>
                 </td>
                 <td class="text-center">
-                    <button *ngIf="c.fileurl" class="btn-icon" (click)="copyLink(c.fileurl)" title="Copy Link File">
-                        <span class="material-symbols-outlined">link</span>
+                    <button *ngIf="c.fileurl" class="btn-icon" (click)="viewContractImage(c.fileurl)" title="Xem hình ảnh hợp đồng">
+                        <span class="material-symbols-outlined">visibility</span>
                     </button>
                     <span *ngIf="!c.fileurl" class="text-muted">-</span>
                 </td>
@@ -183,7 +182,7 @@
           </ng-template>
         </div>
 
-        <!-- PAGINATION FOOTER (Only show in search/list mode) -->
+        <!-- PAGINATION FOOTER -->
         <div class="pagination-footer" *ngIf="listContracts.length > 0">
           <div class="page-size-selector">
             <span>Hiển thị</span>
@@ -216,6 +215,24 @@
       <button class="btn-success" (click)="ExportExcel()">
         <span class="material-symbols-outlined">download</span> Xuất Excel
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== IMAGE PREVIEW MODAL ===== -->
+<div class="overlay image-overlay" *ngIf="showImagePreview">
+  <div class="modal-box image-modal-box">
+    <div class="modal-header">
+       <h3>Hình ảnh Hợp đồng</h3>
+       <button class="close-btn" (click)="closeImagePreview()">
+         <span class="material-symbols-outlined">close</span>
+       </button>
+    </div>
+    <div class="modal-body image-body">
+        <img *ngIf="previewImageUrl" [src]="previewImageUrl" alt="Contract Preview" class="preview-img">
+        <div *ngIf="!previewImageUrl" class="empty-state">
+          <p>Khong co hinh anh</p>
+        </div>
     </div>
   </div>
 </div>

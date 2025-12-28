@@ -1,77 +1,85 @@
 <div class="permission-page-container">
 
+    <!-- Global Loaders -->
     <app-loading *ngIf="isloading"></app-loading>
     <app-alert *ngIf="isalert" [message]="notifyMessage" [notifyType]="notifyType" (hidden)="isalert = false"></app-alert>
     <app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
 
-    <!-- Header -->
-    <div class="header-background">
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="header-overlay"></div>
         <div class="header-content">
             <h1>Quản Lý Quyền Hạn</h1>
-            <p>Phân quyền và kiểm soát truy cập nhân viên</p>
+            <p>Hệ thống phân quyền tập trung & Kiểm soát truy cập</p>
         </div>
-        <div class="wave-shape"></div>
     </div>
 
-    <div class="main-content container mx-auto px-4">
+    <div class="main-content container mx-auto px-4 -mt-10 relative z-10">
         
-        <!-- Tab Navigation -->
-        <div class="tab-navigation">
+        <!-- Tab Switcher -->
+        <div class="tab-container">
+            <div class="tab-slider" [class.slide-right]="activeTab === 'role'"></div>
             <button class="tab-btn" [class.active]="activeTab === 'user'" (click)="switchTab('user')">
-                <i class="fa fa-user"></i> Theo Nhân Viên
+                <i class="fa fa-user-circle"></i> Theo Nhân Viên
             </button>
             <button class="tab-btn" [class.active]="activeTab === 'role'" (click)="switchTab('role')">
-                <i class="fa fa-users"></i> Theo Chức Vụ
+                <i class="fa fa-users-cog"></i> Theo Chức Vụ
             </button>
         </div>
 
         <!-- ============================================== -->
-        <!-- TAB 1: USER CONTENT -->
+        <!-- TAB 1: USER VIEW -->
         <!-- ============================================== -->
         <div *ngIf="activeTab === 'user'" class="animate-fade-in">
-            <!-- Search Box (User) -->
-            <div class="search-card">
-                <div class="input-group">
-                    <label for="usernameSearch">Tài khoản nhân viên</label>
-                    <div class="input-wrapper">
-                        <input 
-                            id="usernameSearch"
-                            type="text" 
-                            [(ngModel)]="searchUsername" 
-                            (keyup.enter)="searchPermission(true)"
-                            placeholder="Nhập username (VD: admin)..." 
-                        />
-                        <button class="btn-search" (click)="searchPermission(true)">
-                            <i class="fa fa-search"></i> Tìm kiếm
-                        </button>
+            
+            <!-- Search Box -->
+            <div class="glass-card search-area">
+                <div class="search-wrapper">
+                    <div class="icon-box">
+                        <span class="material-symbols-outlined">person_search</span>
+                    </div>
+                    <div class="input-col">
+                        <label>Tìm kiếm nhân viên</label>
+                        <div class="flex gap-2">
+                            <input 
+                                type="text" 
+                                [(ngModel)]="searchUsername" 
+                                (keyup.enter)="searchPermission(true)"
+                                placeholder="Nhập username hệ thống..." 
+                                class="modern-input"
+                            />
+                            <button class="btn-primary" (click)="searchPermission(true)">
+                                Tra cứu
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Filter (User) -->
-            <div class="filter-card animate-fade-in" *ngIf="currentUser">
-                <div class="filter-header">
-                    <span class="material-symbols-outlined">tune</span>
-                    <h3>Bộ lọc nâng cao</h3>
+            <!-- Filters -->
+            <div class="glass-card mt-6" *ngIf="currentUser || permissions.length > 0">
+                <div class="card-header">
+                    <span class="material-symbols-outlined text-primary">filter_list</span>
+                    <h3>Bộ lọc dữ liệu</h3>
                 </div>
                 
                 <div class="filter-grid">
                     <div class="form-group">
-                        <label>Từ khóa</label>
-                        <input type="text" [(ngModel)]="filterKeyword" placeholder="Tìm theo tên..." class="form-control">
+                        <label>Từ khóa mô tả</label>
+                        <input type="text" [(ngModel)]="filterKeyword" placeholder="Nhập từ khóa..." class="modern-input sm">
                     </div>
 
                     <div class="form-group">
                         <label>Mã Quyền</label>
-                        <select [(ngModel)]="filterCode" class="form-control">
+                        <select [(ngModel)]="filterCode" class="modern-select">
                             <option value="">-- Tất cả --</option>
                             <option *ngFor="let code of availableCodes" [value]="code">{{ code }}</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label>ID Quyền</label>
-                        <select [(ngModel)]="filterId" class="form-control">
+                        <label>ID</label>
+                        <select [(ngModel)]="filterId" class="modern-select">
                             <option [ngValue]="null">-- Tất cả --</option>
                             <option *ngFor="let id of availableIds" [value]="id">{{ id }}</option>
                         </select>
@@ -79,172 +87,204 @@
 
                     <div class="form-group">
                         <label>Trạng thái</label>
-                        <select [(ngModel)]="filterStatus" class="form-control">
+                        <select [(ngModel)]="filterStatus" class="modern-select">
                             <option value="all">Tất cả</option>
-                            <option value="1">Đã cấp (Active)</option>
-                            <option value="0">Đã chặn (Inactive)</option>
-                            <option value="null">Mặc định (Default)</option>
+                            <option value="1">Đang cấp (Active)</option>
+                            <option value="0">Đang chặn (Block)</option>
+                            <option value="null">Theo mặc định</option>
                         </select>
                     </div>
 
-                    <div class="form-group checkbox-group">
-                        <label class="checkbox-container">
+                    <div class="form-group flex items-end pb-2">
+                        <label class="custom-checkbox">
                             <input type="checkbox" [(ngModel)]="filterOverride">
                             <span class="checkmark"></span>
-                            <span class="text">Chỉ quyền riêng</span>
+                            Chỉ hiện quyền riêng
                         </label>
                     </div>
 
-                    <div class="form-group action-group">
-                        <button class="btn-filter" (click)="applyFilter()"><i class="fa fa-filter"></i> Áp dụng</button>
-                        <button class="btn-reset" (click)="resetFilter()"><i class="fa fa-refresh"></i></button>
+                    <div class="form-group flex items-end gap-2 justify-end">
+                        <button class="btn-secondary sm" (click)="resetFilter()">
+                            <span class="material-symbols-outlined text-sm">restart_alt</span>
+                        </button>
+                        <button class="btn-primary sm" (click)="applyFilter()">
+                            Áp dụng
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- USER INFO SECTION -->
-            <div *ngIf="currentUser" class="user-info-card animate-fade-in">
-                <div class="user-avatar">
-                    <div class="avatar-circle">{{ currentUser.fullname.charAt(0) }}</div>
+            <!-- User Info Summary -->
+            <div *ngIf="currentUser" class="user-summary-card animate-slide-up">
+                <div class="avatar-section">
+                    {{ currentUser.fullname.charAt(0) }}
                 </div>
-                <div class="user-details">
-                    <div class="detail-item">
-                        <span class="label">User ID:</span>
-                        <span class="value">#{{ currentUser.userID }}</span>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Họ và tên</label>
+                        <span>{{ currentUser.fullname }}</span>
                     </div>
-                    <div class="detail-item">
-                        <span class="label">Tài khoản:</span>
-                        <span class="value font-bold text-blue-600">{{ currentUser.username }}</span>
+                    <div class="info-item">
+                        <label>Tài khoản</label>
+                        <span class="highlight">{{ currentUser.username }}</span>
                     </div>
-                    <div class="detail-item">
-                        <span class="label">Họ và tên:</span>
-                        <span class="value font-bold">{{ currentUser.fullname }}</span>
+                    <div class="info-item">
+                        <label>Chức vụ</label>
+                        <span class="role-tag">{{ currentUser.roleName }}</span>
                     </div>
-                    <div class="detail-item">
-                        <span class="label">Chức vụ:</span>
-                        <span class="value role-badge">{{ currentUser.roleName }}</span>
+                    <div class="info-item">
+                        <label>ID</label>
+                        <span>#{{ currentUser.userID }}</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Permissions Table (User) -->
-            <div class="table-container" *ngIf="permissions && permissions.length > 0">
-                <table class="permission-table">
-                    <thead>
-                        <tr>
-                            <th class="w-16 text-center">ID</th>
-                            <th class="w-32">Mã Quyền</th>
-                            <th>Mô Tả Chi Tiết</th>
-                            <th class="w-32 text-center">Trạng Thái</th>
-                            <th class="w-24 text-center">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let p of permissions">
-                            <td class="text-center font-bold text-gray-500">{{ p.permissionId }}</td>
-                            <td><span class="badge-code">{{ p.permissionCode }}</span></td>
-                            <td>{{ p.description }}</td>
-                            <td class="text-center">
-                                <span *ngIf="p.activePermission === 1" class="badge badge-success">Đã cấp</span>
-                                <span *ngIf="p.activePermission === 0" class="badge badge-danger">Đã chặn</span>
-                                <span *ngIf="p.activePermission === null" class="badge badge-default">Mặc định</span>
-                            </td>
-                            <td class="action-cell">
-                                <button class="btn-icon edit" (click)="openEditModal(p)" title="Chỉnh sửa">
-                                    <span class="material-symbols-outlined">edit</span>
-                                </button>
-                                <button class="btn-icon delete" (click)="onDeleteClick(p)" title="Reset">
-                                   <span class="material-symbols-outlined">delete</span>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="pagination-controls">
-                    <button [disabled]="currentPage === 0" (click)="changePage(-1)"><i class="fa fa-chevron-left"></i> Trước</button>
-                    <span>Trang {{ currentPage + 1 }}</span>
-                    <button [disabled]="isLastPage" (click)="changePage(1)">Sau <i class="fa fa-chevron-right"></i></button>
+            <!-- Data Table -->
+            <div class="table-card mt-6" *ngIf="permissions && permissions.length > 0">
+                <div class="overflow-x-auto">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th class="w-20 text-center">ID</th>
+                                <th class="w-40">Mã Quyền</th>
+                                <th>Mô Tả Chi Tiết</th>
+                                <th class="w-32 text-center">Trạng Thái</th>
+                                <th class="w-32 text-center">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let p of permissions">
+                                <td class="text-center text-gray-400 font-mono">#{{ p.permissionId }}</td>
+                                <td><span class="code-badge">{{ p.permissionCode }}</span></td>
+                                <td class="text-gray-700 font-medium">{{ p.description }}</td>
+                                <td class="text-center">
+                                    <span *ngIf="p.activePermission === 1" class="status-badge success">Được phép</span>
+                                    <span *ngIf="p.activePermission === 0" class="status-badge danger">Bị chặn</span>
+                                    <span *ngIf="p.activePermission === null" class="status-badge default">Mặc định</span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="icon-btn edit" (click)="openEditModal(p)" title="Chỉnh sửa">
+                                            <span class="material-symbols-outlined">edit_square</span>
+                                        </button>
+                                        <button class="icon-btn delete" (click)="onDeleteClick(p)" title="Reset về mặc định">
+                                            <span class="material-symbols-outlined">history</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
+                
+                <!-- Pagination -->
+                <div class="pagination-bar">
+                    <button class="page-btn" [disabled]="currentPage === 0" (click)="changePage(-1)">
+                        <span class="material-symbols-outlined">chevron_left</span> Trước
+                    </button>
+                    <span class="page-info">Trang {{ currentPage + 1 }}</span>
+                    <button class="page-btn" [disabled]="isLastPage" (click)="changePage(1)">
+                        Sau <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+
+            <div *ngIf="permissions.length === 0 && currentUser" class="empty-state">
+                <img src="assets/images/no-data.svg" onerror="this.style.display='none'" alt="">
+                <p>Không tìm thấy dữ liệu quyền hạn nào phù hợp.</p>
             </div>
         </div>
 
         <!-- ============================================== -->
-        <!-- TAB 2: ROLE CONTENT -->
+        <!-- TAB 2: ROLE VIEW -->
         <!-- ============================================== -->
         <div *ngIf="activeTab === 'role'" class="animate-fade-in">
-            <!-- Select Role Card -->
-            <div class="search-card">
-                <div class="input-group">
-                    <label for="roleSelect">Đang xem quyền hạn của chức vụ:</label>
-                    <div class="input-wrapper">
-                        <select id="roleSelect" [(ngModel)]="selectedRoleId" (change)="onRoleSelectChange()" class="role-select">
-                            <option *ngFor="let role of rolesList" [value]="role.id">{{ role.roleName }}</option>
-                        </select>
-                    </div>
+            <div class="glass-card role-selector-area">
+                <label>Chọn chức vụ để cấu hình:</label>
+                <div class="role-list">
+                    <button *ngFor="let role of rolesList" 
+                            class="role-chip" 
+                            [class.active]="selectedRoleId === role.id"
+                            (click)="selectedRoleId = role.id; onRoleSelectChange()">
+                        {{ role.roleName }}
+                    </button>
                 </div>
             </div>
 
-            <!-- Role Permissions Table -->
-            <div class="table-container" *ngIf="rolePermissions && rolePermissions.length > 0">
-                <table class="permission-table">
-                    <thead>
-                        <tr>
-                            <th class="w-16 text-center">ID</th>
-                            <th class="w-32">Mã Quyền</th>
-                            <th>Mô Tả</th>
-                            <th class="w-32 text-center">Đang áp dụng</th>
-                            <th class="w-24 text-center">Bật/Tắt</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let p of rolePermissions">
-                            <td class="text-center font-bold text-gray-500">{{ p.permissionId }}</td>
-                            <td><span class="badge-code">{{ p.permissionCode }}</span></td>
-                            <td>{{ p.description }}</td>
-                            <td class="text-center">
-                                <span *ngIf="p.active" class="badge badge-success">Active</span>
-                                <span *ngIf="!p.active" class="badge badge-default">Inactive</span>
-                            </td>
-                            <td class="action-cell">
-                                <label class="switch">
-                                    <input type="checkbox" [checked]="p.active" (change)="toggleRolePermission(p)">
-                                    <span class="slider round"></span>
-                                </label>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <div class="pagination-controls">
-                    <button [disabled]="rolePage === 0" (click)="changeRolePage(-1)"><i class="fa fa-chevron-left"></i> Trước</button>
-                    <span>Trang {{ rolePage + 1 }}</span>
-                    <button [disabled]="isRoleLastPage" (click)="changeRolePage(1)">Sau <i class="fa fa-chevron-right"></i></button>
+            <div class="table-card mt-6" *ngIf="rolePermissions && rolePermissions.length > 0">
+                <div class="overflow-x-auto">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th class="w-20 text-center">ID</th>
+                                <th class="w-40">Mã Quyền</th>
+                                <th>Mô Tả</th>
+                                <th class="w-32 text-center">Kích hoạt</th>
+                                <th class="w-24 text-center">Bật/Tắt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let p of rolePermissions" [class.inactive-row]="!p.active">
+                                <td class="text-center font-mono text-gray-400">#{{ p.permissionId }}</td>
+                                <td><span class="code-badge">{{ p.permissionCode }}</span></td>
+                                <td>{{ p.description }}</td>
+                                <td class="text-center">
+                                    <span class="status-dot" [class.online]="p.active"></span>
+                                    <span class="text-sm font-medium">{{ p.active ? 'Active' : 'Inactive' }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <label class="modern-switch">
+                                        <input type="checkbox" [checked]="p.active" (change)="toggleRolePermission(p)">
+                                        <span class="slider"></span>
+                                    </label>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
 
-            <div *ngIf="selectedRoleId && (!rolePermissions || rolePermissions.length === 0) && !isloading" class="empty-state">
-                <p>Chưa có dữ liệu quyền cho Role này.</p>
+                <div class="pagination-bar">
+                    <button class="page-btn" [disabled]="rolePage === 0" (click)="changeRolePage(-1)">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    <span class="page-info">Trang {{ rolePage + 1 }}</span>
+                    <button class="page-btn" [disabled]="isRoleLastPage" (click)="changeRolePage(1)">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                </div>
             </div>
         </div>
         
     </div>
 
-    <!-- Edit Modal (User) -->
-    <div class="modal-backdrop" *ngIf="showEditModal">
-        <div class="modal-content">
+    <!-- Edit Modal -->
+    <div class="modal-overlay" *ngIf="showEditModal">
+        <div class="modal-card">
             <div class="modal-header">
-                <h3>Điều chỉnh quyền hạn</h3>
+                <h3>Điều chỉnh quyền riêng</h3>
                 <button class="close-btn" (click)="closeEditModal()">&times;</button>
             </div>
             <div class="modal-body" *ngIf="selectedPermission">
-                <p><strong>Nhân viên:</strong> {{ searchUsername }}</p>
-                <p><strong>Quyền:</strong> {{ selectedPermission.description }}</p>
-                <div class="permission-actions">
-                    <button class="btn-action block" [class.active]="selectedPermission.activePermission === 0" (click)="savePermissionChange(0)">
-                        <i class="fa fa-ban"></i> Chặn Quyền (0)
+                <div class="context-info">
+                    <p>Nhân viên: <strong>{{ searchUsername }}</strong></p>
+                    <p>Quyền: <span class="text-primary">{{ selectedPermission.description }}</span></p>
+                </div>
+                
+                <div class="action-grid">
+                    <button class="choice-btn block" 
+                            [class.selected]="selectedPermission.activePermission === 0" 
+                            (click)="savePermissionChange(0)">
+                        <div class="icon"><span class="material-symbols-outlined">block</span></div>
+                        <div class="label">Chặn Quyền</div>
+                        <div class="desc">Cấm thực hiện hành động này</div>
                     </button>
-                    <button class="btn-action grant" [class.active]="selectedPermission.activePermission === 1" (click)="savePermissionChange(1)">
-                        <i class="fa fa-check-circle"></i> Cấp Quyền (1)
+                    
+                    <button class="choice-btn grant" 
+                            [class.selected]="selectedPermission.activePermission === 1" 
+                            (click)="savePermissionChange(1)">
+                        <div class="icon"><span class="material-symbols-outlined">check_circle</span></div>
+                        <div class="label">Cấp Quyền</div>
+                        <div class="desc">Cho phép thực hiện</div>
                     </button>
                 </div>
             </div>

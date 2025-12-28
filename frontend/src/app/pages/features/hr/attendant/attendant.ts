@@ -1,22 +1,30 @@
 import { CommonModule, NgFor, NgIf, NgClass, DatePipe } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DeleteAttendant, GetAttendants } from '../../../../services/pages/features/hr/attendant.service';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser'; // Import Sanitizer
 import { CookieService } from 'ngx-cookie-service';
+
+// Service Imports
+import { DeleteAttendant, GetAttendants } from '../../../../services/pages/features/hr/attendant.service';
+import { ExportFileDataAttendance } from '../../../../services/pages/features/hr/contracts.service';
+import { AddNewAttendanceRequests } from '../../../../services/pages/features/hr/datacheck.service';
+
+// Components
 import { Loading } from '../../../shared/loading/loading';
 import { Alert } from '../../../shared/alert/alert';
 import { Comfirm } from '../../../shared/comfirm/comfirm';
-import { ExportFileDataAttendance } from '../../../../services/pages/features/hr/contracts.service';
+import { DataAttendant } from '../data-attendant/data-attendant';
+import { getImageChamcong } from '../../../../utils/getimage.utils';
 
 interface attendance {
   attendanceId: number,
   attendanceDate: string,
   userName: string,
-  fullNameUser: string
+  fullNameUser: string,
   checkIn: string,
   checkOut: string,
   checkInImg: string,
-  checkOutImg: string
+  checkOutImg: string,
   shiftId: number,
   shiftName: string,
   status: string
@@ -25,22 +33,30 @@ interface attendance {
 @Component({
   selector: 'app-attendant',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgFor, NgIf, NgClass, Loading, Alert, Comfirm],
+  imports: [CommonModule, FormsModule, NgFor, NgIf, NgClass, Loading, Alert, Comfirm, DataAttendant],
   templateUrl: './attendant.html',
   styleUrl: './attendant.scss',
 })
 export class Attendant implements OnInit {
-  constructor(private cdr: ChangeDetectorRef, private cookie: CookieService) { }
+
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private cookie: CookieService,
+    private sanitizer: DomSanitizer // Inject Sanitizer
+  ) { }
 
   role: string = "";
   id: number = 0;
 
+  // --- TAB STATE ---
+  activeTab: 'list' | 'approval' = 'list';
+
   // Pagination States
-  page: number = 0;       // Trang hiện tại (bắt đầu từ 0)
-  size: number = 10;      // Số dòng mỗi trang
-  totalPages: number = 0; // Tổng số trang
-  totalElements: number = 0; // Tổng số bản ghi
-  pageSizeOptions: number[] = [5, 10, 20, 50]; // Các tùy chọn hiển thị
+  page: number = 0;
+  size: number = 10;
+  totalPages: number = 0;
+  totalElements: number = 0;
+  pageSizeOptions: number[] = [5, 10, 20, 50];
 
   filter = {
     date: '',
@@ -50,7 +66,18 @@ export class Attendant implements OnInit {
     status: ''
   };
 
+  // --- PROOF MODAL STATE (Updated) ---
   selectedProof: any = null;
+
+  // Variables for Proof Images
+  proofCheckInUrl: SafeUrl | null = null;
+  proofCheckOutUrl: SafeUrl | null = null;
+  isLoadingCheckIn: boolean = false;
+  isLoadingCheckOut: boolean = false;
+
+  // Store raw blob urls to revoke later
+  private rawCheckInUrl: string | null = null;
+  private rawCheckOutUrl: string | null = null;
 
   // States UI
   isconfirm: boolean = false;
@@ -62,6 +89,25 @@ export class Attendant implements OnInit {
 
   attendance: attendance[] = [];
   selectedAttendance: any = null;
+
+  // --- VARIABLES CHO FORM BỔ SUNG CÔNG ---
+  isAdding: boolean = false;
+  selectedFile: File | null = null;
+  selectedFileName: string = '';
+
+  shiftsList = [
+    { id: 36, name: 'Hành chính (HC)' },
+    { id: 1, name: 'Ca Sáng (SX)' },
+    { id: 2, name: 'Ca Chiều (SX)' }
+  ];
+
+  newRequest = {
+    date: '',
+    time: '08:00',
+    requestType: 'CHECK_IN',
+    shiftId: 36,
+    reason: ''
+  };
 
   // Data cho Filter
   months = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -75,40 +121,183 @@ export class Attendant implements OnInit {
     { id: 6, name: 'Phòng Ban Chăm Sóc Khách Hàng' },
   ];
 
+  // --- TAB FUNCTION ---
+  switchTab(tab: 'list' | 'approval') {
+    this.activeTab = tab;
+    sessionStorage.setItem('attendantActiveTab', tab);
+    if (tab === 'list') {
+      this.filterAttendance();
+    }
+  }
+
+  // --- LOGIC HIỂN THỊ MINH CHỨNG (NEW API) ---
+  showProof(att: any) {
+    this.selectedProof = att;
+    this.resetProofImages();
+
+    // 1. Load Check-In Image
+    if (att.checkInImg) {
+      this.loadCheckInImage(att.checkInImg);
+    }
+
+    // 2. Load Check-Out Image
+    if (att.checkOutImg) {
+      this.loadCheckOutImage(att.checkOutImg);
+    }
+  }
+
+  async loadCheckInImage(fileName: string) {
+    this.isLoadingCheckIn = true;
+    try {
+      // Gọi API getImageChamcong (giả định cần thêm dấu / nếu API yêu cầu, hoặc name đã có sẵn)
+      // Lưu ý: api path trong prompt là `/chamCong/images${name}`
+      // Nếu name không bắt đầu bằng /, cần xử lý string name cho phù hợp
+      const apiName = fileName.startsWith('/') ? fileName : `/${fileName}`;
+      const blob = await getImageChamcong(apiName);
+
+      if (blob && blob instanceof Blob) {
+        const url = URL.createObjectURL(blob);
+        this.rawCheckInUrl = url;
+        this.proofCheckInUrl = this.sanitizer.bypassSecurityTrustUrl(url);
+      } else {
+        this.proofCheckInUrl = null;
+      }
+    } catch (error) {
+      console.error("Error loading checkin img:", error);
+      this.proofCheckInUrl = null;
+    } finally {
+      this.isLoadingCheckIn = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async loadCheckOutImage(fileName: string) {
+    this.isLoadingCheckOut = true;
+    try {
+      const apiName = fileName.startsWith('/') ? fileName : `/${fileName}`;
+      const blob = await getImageChamcong(apiName);
+
+      if (blob && blob instanceof Blob) {
+        const url = URL.createObjectURL(blob);
+        this.rawCheckOutUrl = url;
+        this.proofCheckOutUrl = this.sanitizer.bypassSecurityTrustUrl(url);
+      } else {
+        this.proofCheckOutUrl = null;
+      }
+    } catch (error) {
+      console.error("Error loading checkout img:", error);
+      this.proofCheckOutUrl = null;
+    } finally {
+      this.isLoadingCheckOut = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  resetProofImages() {
+    this.proofCheckInUrl = null;
+    this.proofCheckOutUrl = null;
+    this.isLoadingCheckIn = false;
+    this.isLoadingCheckOut = false;
+
+    // Revoke old URLs
+    if (this.rawCheckInUrl) URL.revokeObjectURL(this.rawCheckInUrl);
+    if (this.rawCheckOutUrl) URL.revokeObjectURL(this.rawCheckOutUrl);
+
+    this.rawCheckInUrl = null;
+    this.rawCheckOutUrl = null;
+  }
+
+  closeProof() {
+    this.selectedProof = null;
+    this.resetProofImages();
+  }
+
+  // --- LOGIC MODAL BỔ SUNG ---
+  openAddModal() {
+    this.newRequest = {
+      date: new Date().toISOString().split('T')[0],
+      time: '08:00',
+      requestType: 'CHECK_IN',
+      shiftId: 36,
+      reason: ''
+    };
+    this.selectedFile = null;
+    this.selectedFileName = '';
+    this.isAdding = true;
+  }
+
+  closeAddModal() {
+    this.isAdding = false;
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      this.selectedFileName = file.name;
+    }
+  }
+
+  async submitAdd() {
+    if (!this.newRequest.date || !this.newRequest.reason) {
+      this.Onalert("Vui lòng nhập đầy đủ ngày và lý do!", false);
+      return;
+    }
+    if (!this.selectedFile) {
+      this.Onalert("Vui lòng tải lên ảnh minh chứng!", false);
+      return;
+    }
+
+    this.isloading = true;
+    try {
+      const checkInTimeCombined = `${this.newRequest.date}T${this.newRequest.time}:00`;
+      const payload = {
+        date: this.newRequest.date,
+        requestType: this.newRequest.requestType,
+        shiftId: this.newRequest.shiftId,
+        checkInTime: checkInTimeCombined,
+        reason: this.newRequest.reason,
+        file: this.selectedFile
+      };
+
+      const res: any = await AddNewAttendanceRequests(payload);
+
+      if (res) {
+        this.Onalert("Gửi yêu cầu bổ sung thành công!", true);
+        this.closeAddModal();
+        if (this.activeTab === 'list') {
+          this.filterAttendance();
+        }
+      } else {
+        this.Onalert("Gửi thất bại, vui lòng thử lại.", false);
+      }
+    } catch (error) {
+      this.Onalert("Lỗi kết nối server!", false);
+      console.error(error);
+    } finally {
+      this.isloading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // ... (Other helpers: Onalert, filterAttendance, etc. keep same)
   Onalert(message: string, type: boolean) {
     this.isalert = true;
     this.alertmessage = message;
     this.alertType = type;
   }
 
-  showProof(att: any) {
-    this.selectedProof = att;
-  }
-
-  closeProof() {
-    this.selectedProof = null;
-  }
-
-  // --- LOGIC PHÂN TRANG MỚI ---
-
-  // Hàm gọi API lấy dữ liệu (đã cập nhật page/size)
   async filterAttendance() {
     this.isloading = true;
-
     const query = Object.entries(this.filter)
       .filter(([_, value]) => value !== '')
       .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
       .join('&');
 
-    // Gọi API với query param, role, page và size
-    // Lưu ý: page backend thường bắt đầu từ 0
     const res = await GetAttendants(query, this.page, this.size);
-
     this.isloading = false;
 
     if (res) {
-      // Giả định response trả về cấu trúc Page của Spring Boot: { content, totalPages, totalElements, ... }
-      // Nếu API trả về khác, bạn cần map lại cho đúng
       this.attendance = res.content || [];
       this.totalPages = res.totalPages || 0;
       this.totalElements = res.totalElements || 0;
@@ -116,17 +305,14 @@ export class Attendant implements OnInit {
       this.attendance = [];
       this.totalElements = 0;
     }
-
     this.cdr.detectChanges();
   }
 
-  // Khi người dùng bấm nút Lọc -> Reset về trang 0
   onSearch() {
     this.page = 0;
     this.filterAttendance();
   }
 
-  // Khi đổi trang (Prev/Next)
   onPageChange(newPage: number) {
     if (newPage >= 0 && newPage < this.totalPages) {
       this.page = newPage;
@@ -134,24 +320,9 @@ export class Attendant implements OnInit {
     }
   }
 
-  // Khi đổi số lượng dòng hiển thị (5, 10, 20...)
   onPageSizeChange() {
-    this.page = 0; // Reset về trang đầu
+    this.page = 0;
     this.filterAttendance();
-  }
-
-  // -----------------------------
-
-  openEditModal(att: any) {
-    this.selectedAttendance = { ...att };
-  }
-
-  cancelEdit() {
-    this.selectedAttendance = null;
-  }
-
-  saveAttendance(updated: any) {
-    this.selectedAttendance = null;
   }
 
   translateStatus(status: string): string {
@@ -169,7 +340,7 @@ export class Attendant implements OnInit {
   getTime(datetime: string): string {
     if (!datetime) return "-";
     const date = new Date(datetime);
-    return date.toTimeString().split(" ")[0]; // HH:mm:ss
+    return date.toTimeString().split(" ")[0];
   }
 
   async onConfirmResult(event: any) {
@@ -180,7 +351,7 @@ export class Attendant implements OnInit {
         const res = await DeleteAttendant(this.id) as { data: string, status: number };
         if (res.status == 200) {
           this.isloading = false;
-          this.filterAttendance(); // Reload lại trang hiện tại
+          this.filterAttendance();
           this.Onalert("Xóa thành công", true);
           return;
         }
@@ -198,6 +369,11 @@ export class Attendant implements OnInit {
     this.id = id;
   }
 
+  async exportfile() {
+    const query = this.buildQueryParams(this.filter);
+    await ExportFileDataAttendance(query);
+  }
+
   buildQueryParams(filter: any): string {
     const params = [];
     for (const key in filter) {
@@ -208,15 +384,16 @@ export class Attendant implements OnInit {
     return params.join("&");
   }
 
-  async exportfile() {
-    const query = this.buildQueryParams(this.filter);
-    await ExportFileDataAttendance(query);
-  }
-
   ngOnInit(): void {
-    // Kiểm tra role và load dữ liệu lần đầu
     if (this.cookie.get("role")) {
       this.role = this.cookie.get("role").toLowerCase();
+    }
+    const savedTab = sessionStorage.getItem('attendantActiveTab');
+    if (savedTab === 'list' || savedTab === 'approval') {
+      this.activeTab = savedTab;
+    }
+    if (this.activeTab === 'list') {
+      this.filterAttendance();
     }
   }
 }

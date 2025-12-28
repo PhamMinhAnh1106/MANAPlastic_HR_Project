@@ -49,13 +49,13 @@ export class Leaverequestcheck implements OnInit {
   confirmMessage = '';
   alertmessage = '';
   alertType: boolean = true;
-  actionType: 'approve' | 'reject' | '' = '';
 
   Onalert(message: string, type: boolean) {
     this.isalert = true;
     this.alertmessage = message;
     this.alertType = type;
   }
+  actionType: 'approve' | 'reject' | '' = '';
 
   // --- LOGIC FETCH DATA (Bảng dữ liệu) ---
   async filterLeave() {

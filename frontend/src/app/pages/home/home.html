@@ -1,11 +1,9 @@
 <header class="task-bar">
 
-  <!-- NOTIFICATION SECTION REMOVED -->
-
+  <!-- Notification Section -->
   <div class="user-actions">
-    <!-- Nút thêm tài khoản -->
+    <!-- Nút thêm tài khoản (Giữ nguyên) -->
     <div class="add-dropdown" #addDrop>
-
       <div class="dropdown-menu" *ngIf="isAddOpen">
         <div class="feature" *ngFor="let feature of featureAdd">
           <button class="menu-btn" [routerLink]="feature.path">{{ feature.name }}</button>
@@ -13,13 +11,50 @@
       </div>
     </div>
 
+    <!-- Notification Bell -->
+    <div class="notification-wrapper" *ngIf="role[0] =='HR'" #notifiDrop>
+      <div class="notification-icon-box" (click)="toggleNotifiDropdown()">
+        <span class="material-symbols-outlined bell-icon">notifications</span>
+        <span class="badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+      </div>
 
-    <!-- Avatar người dùng -->
+      <!-- Dropdown danh sách thông báo -->
+      <div class="dropdown-menu notification-menu" *ngIf="isNotifiOpen">
+        <div class="notifi-header">
+          <span>Hợp đồng sắp hết hạn</span>
+          <span class="count-tag" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+        </div>
+        <div class="notifi-body">
+          <div *ngIf="notifications.length === 0" class="empty-notifi">
+            Không có thông báo mới
+          </div>
+
+          <div class="notifi-item" *ngFor="let item of notifications">
+            <div class="notifi-icon">
+              <span class="material-symbols-outlined">description</span>
+            </div>
+            <div class="notifi-content">
+              <div class="notifi-title">{{ item.contractCode }}</div>
+              <div class="notifi-subtitle">{{ item.employeeName }}</div>
+              <div class="notifi-time warning">
+                Còn lại: {{ item.daysRemaining }} ngày ({{ item.endDate | date:'dd/MM/yyyy' }})
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Avatar người dùng (Giữ nguyên) -->
     <div class="user-dropdown" #userDrop>
       <img src="assets/avatar.png" alt="User Avatar" class="avatar" (click)="toggleUserDropdown()" />
 
       <div class="dropdown-menu" *ngIf="isUserOpen">
         <button class="menu-btn" (click)="changepass()">Đổi mật khẩu</button>
+        <!--<button class="menu-btn" (click)="openSettings()">
+          <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 8px;">settings</span>
+          Cài đặt
+        </button> --> 
         <button class="logout-btn" (click)="logout()">Đăng xuất</button>
       </div>
     </div>
@@ -27,7 +62,29 @@
 
 </header>
 
-<!-- NOTIFICATION MODAL REMOVED -->
+<!-- SETTINGS MODAL (Giữ nguyên) -->
+<div class="settings-overlay" *ngIf="isSettingsOpen" (click)="closeSettings()">
+  <div class="settings-modal" (click)="$event.stopPropagation()">
+    <div class="settings-header">
+      <h3>Cài đặt</h3>
+      <button class="close-btn" (click)="closeSettings()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="settings-body">
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Chế độ tối</span>
+          <span class="setting-desc">Bật/tắt giao diện tối cho toàn bộ ứng dụng</span>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" [(ngModel)]="isDarkMode" (change)="toggleDarkMode()">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="main-body-container">
   <div class="left_handle">
@@ -61,7 +118,7 @@
       </div>
     </div>
   </div>
-  
+
   <div class="content-outlet">
     <router-outlet></router-outlet>
   </div>

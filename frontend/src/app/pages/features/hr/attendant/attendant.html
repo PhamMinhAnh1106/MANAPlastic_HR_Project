@@ -1,224 +1,316 @@
 <div class="attendance-container">
   <div class="page-header">
-    <div class="header-title">
-      <h2>Quản Lý Chấm Công</h2>
-      <p class="subtitle">Xem và quản lý dữ liệu ra vào của nhân viên</p>
+    <div class="header-content">
+      <div class="header-title">
+        <h2>Quản Lý Chấm Công</h2>
+        <p class="subtitle">Hệ thống quản lý dữ liệu chấm công và duyệt yêu cầu</p>
+      </div>
+      <button class="btn-add" (click)="openAddModal()">
+        <span class="material-symbols-outlined">add_circle</span>
+        Bổ sung công
+      </button>
+    </div>
+    
+    <!-- TAB NAVIGATION -->
+    <div class="tab-navigation">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'list'" 
+        (click)="switchTab('list')">
+        <span class="material-symbols-outlined">table_view</span>
+        Dữ liệu ra vào
+      </button>
+      <button *ngIf="role === 'hr'"
+        class="tab-btn" 
+        [class.active]="activeTab === 'approval'" 
+        (click)="switchTab('approval')">
+        <span class="material-symbols-outlined">fact_check</span>
+        Duyệt bổ sung công
+      </button>
     </div>
   </div>
 
-  <div class="card">
-    <div class="filter-grid">
-      <div class="form-group">
-        <label>Tháng</label>
-        <select [(ngModel)]="filter.month">
-          <option value="">-- Tất cả --</option>
-          <option *ngFor="let m of months" [value]="m">Tháng {{ m }}</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Năm</label>
-        <select [(ngModel)]="filter.year">
-          <option value="">-- Tất cả --</option>
-          <option *ngFor="let y of years" [value]="y">{{ y }}</option>
-        </select>
-      </div>
-
-      <ng-container *ngIf="role === 'hr'">
+  <!-- TAB 1: DANH SÁCH RA VÀO -->
+  <ng-container *ngIf="activeTab === 'list'">
+    <div class="card animate-fade-in">
+      <div class="filter-grid">
         <div class="form-group">
-          <label>Phòng ban</label>
-          <select [(ngModel)]="filter.departmentId">
-            <option value="">-- Tất cả phòng ban --</option>
-            <option *ngFor="let dep of departments" [value]="dep.id">
-              {{ dep.name }}
-            </option>
+          <label>Tháng</label>
+          <select [(ngModel)]="filter.month">
+            <option value="">-- Tất cả --</option>
+            <option *ngFor="let m of months" [value]="m">Tháng {{ m }}</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label>Trạng thái</label>
-          <select [(ngModel)]="filter.status">
-            <option value="">-- Tất cả trạng thái --</option>
-            <option value="PRESENT">Có mặt</option>
-            <option value="MISSING_OUTPUT_DATA">Thiếu Checkout</option>
-            <option value="MISSING_INPUT_DATA">Thiếu Checkin</option>
-            <option value="ABSENT">Vắng mặt</option>
-            <option value="ON_LEAVE">Nghỉ phép</option>
+          <label>Năm</label>
+          <select [(ngModel)]="filter.year">
+            <option value="">-- Tất cả --</option>
+            <option *ngFor="let y of years" [value]="y">{{ y }}</option>
           </select>
         </div>
-      </ng-container>
 
-      <div class="button-group">
-        <!-- Đổi click thành onSearch để reset về trang 0 -->
-        <button class="btn-filter" (click)="onSearch()">
-          <span class="material-symbols-outlined">filter_list</span>
-          Lọc
-        </button>
-        <button class="btn-export" (click)="exportfile()" *ngIf="role === 'hr'">
-          <span class="material-symbols-outlined">download</span>
-          Xuất Excel
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="table-responsive">
-      <table *ngIf="attendance && attendance.length > 0; else noData">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nhân viên</th>
-            <th>Ngày</th>
-            <th>Ca làm</th>
-            <th>Giờ vào</th>
-            <th>Giờ ra</th>
-            <th class="text-center">Trạng thái</th>
-            <th class="text-center">Minh chứng</th>
-            <th *ngIf="role === 'hr'" class="text-center">Thao tác</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr *ngFor="let att of attendance">
-            <td><span class="id-badge">#{{ att.attendanceId }}</span></td>
-            
-            <td>
-              <div class="user-info">
-                <span class="user-name">{{ att.fullNameUser || 'N/A' }}</span>
-                <span class="user-username">{{ att.userName }}</span>
-              </div>
-            </td>
-
-            <td>{{ att.attendanceDate | date: 'dd/MM/yyyy' }}</td>
-            
-            <td>{{ att.shiftName || '-' }}</td>
-
-            <td>
-              <div class="time-info" *ngIf="att.checkIn">
-                <span><span class="dot green"></span>{{ getTime(att.checkIn) }}</span>
-              </div>
-              <span *ngIf="!att.checkIn" class="text-light">-</span>
-            </td>
-
-            <td>
-              <div class="time-info" *ngIf="att.checkOut">
-                <span><span class="dot red"></span>{{ getTime(att.checkOut) }}</span>
-              </div>
-              <span *ngIf="!att.checkOut" class="text-light">-</span>
-            </td>
-
-            <td class="text-center">
-              <span class="status-badge" [ngClass]="att.status.toLowerCase()">
-                {{ translateStatus(att.status) }}
-              </span>
-            </td>
-
-            <td class="text-center">
-              <button class="action-btn" (click)="showProof(att)" title="Xem ảnh">
-                <span class="material-symbols-outlined">visibility</span>
-              </button>
-            </td>
-
-            <td class="text-center" *ngIf="role === 'hr'">
-              <button class="action-btn delete-btn" (click)="deleteAttendance(att.attendanceId)" title="Xóa dữ liệu">
-                <span class="material-symbols-outlined">delete</span>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- PHẦN PHÂN TRANG MỚI THÊM VÀO -->
-    <div class="pagination-footer" *ngIf="attendance && attendance.length > 0">
-      <div class="page-size-selector">
-        <span>Hiển thị</span>
-        <select [(ngModel)]="size" (change)="onPageSizeChange()">
-          <option *ngFor="let s of pageSizeOptions" [value]="s">{{ s }}</option>
-        </select>
-        <span>dòng</span>
-      </div>
-      
-      <div class="page-info">
-        {{ page * size + 1 }} - {{ (page + 1) * size > totalElements ? totalElements : (page + 1) * size }} 
-        trong tổng số <strong>{{ totalElements }}</strong>
-      </div>
-
-      <div class="page-controls">
-        <button class="btn-page" [disabled]="page === 0" (click)="onPageChange(page - 1)">
-          <span class="material-symbols-outlined">chevron_left</span>
-        </button>
-        <span class="current-page">Trang {{ page + 1 }} / {{ totalPages }}</span>
-        <button class="btn-page" [disabled]="page >= totalPages - 1" (click)="onPageChange(page + 1)">
-          <span class="material-symbols-outlined">chevron_right</span>
-        </button>
-      </div>
-    </div>
-
-    <ng-template #noData>
-      <div class="empty-state">
-        <img src="https://cdn-icons-png.flaticon.com/512/7486/7486754.png" alt="No Data" width="64">
-        <p>Không tìm thấy dữ liệu chấm công nào.</p>
-      </div>
-    </ng-template>
-  </div>
-
-  <div class="proof-overlay" *ngIf="selectedProof" (click)="closeProof()">
-    <div class="proof-modal" (click)="$event.stopPropagation()">
-      <div class="proof-header">
-        <h3>Minh chứng chấm công #{{ selectedProof.attendanceId }}</h3>
-        <button class="close-btn" (click)="closeProof()">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </div>
-
-      <div class="proof-body">
-        <div class="proof-item">
-          <span class="img-label">Check-In</span>
-          <div class="img-wrapper">
-            <img 
-              *ngIf="selectedProof.checkInImg; else noInImg" 
-              [src]="selectedProof.checkInImg" 
-              alt="Check-in Proof" 
-            />
-            <ng-template #noInImg>
-              <div class="no-img-placeholder">
-                <span class="material-symbols-outlined">image_not_supported</span>
-                <p>Không có ảnh</p>
-              </div>
-            </ng-template>
+        <ng-container *ngIf="role === 'hr'">
+          <div class="form-group">
+            <label>Phòng ban</label>
+            <select [(ngModel)]="filter.departmentId">
+              <option value="">-- Tất cả phòng ban --</option>
+              <option *ngFor="let dep of departments" [value]="dep.id">
+                {{ dep.name }}
+              </option>
+            </select>
           </div>
-          <div class="time-info" *ngIf="selectedProof.checkIn">
-            <span class="dot green"></span> {{ getTime(selectedProof.checkIn) }}
+
+          <div class="form-group">
+            <label>Trạng thái</label>
+            <select [(ngModel)]="filter.status">
+              <option value="">-- Tất cả trạng thái --</option>
+              <option value="PRESENT">Có mặt</option>
+              <option value="MISSING_OUTPUT_DATA">Thiếu Checkout</option>
+              <option value="MISSING_INPUT_DATA">Thiếu Checkin</option>
+              <option value="ABSENT">Vắng mặt</option>
+              <option value="ON_LEAVE">Nghỉ phép</option>
+            </select>
+          </div>
+        </ng-container>
+
+        <div class="button-group">
+          <button class="btn-filter" (click)="onSearch()">
+            <span class="material-symbols-outlined">filter_list</span>
+            Lọc
+          </button>
+          <button class="btn-export" (click)="exportfile()" *ngIf="role === 'hr'">
+            <span class="material-symbols-outlined">download</span>
+            Xuất Excel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card animate-fade-in">
+      <div class="table-responsive">
+        <table *ngIf="attendance && attendance.length > 0; else noData">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nhân viên</th>
+              <th>Ngày</th>
+              <th>Ca làm</th>
+              <th>Giờ vào</th>
+              <th>Giờ ra</th>
+              <th class="text-center">Trạng thái</th>
+              <th class="text-center">Minh chứng</th>
+              <th *ngIf="role === 'hr'" class="text-center">Thao tác</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let att of attendance">
+              <td><span class="id-badge">#{{ att.attendanceId }}</span></td>
+              
+              <td>
+                <div class="user-info">
+                  <span class="user-name">{{ att.fullNameUser || 'N/A' }}</span>
+                  <span class="user-username">{{ att.userName }}</span>
+                </div>
+              </td>
+
+              <td>{{ att.attendanceDate | date: 'dd/MM/yyyy' }}</td>
+              
+              <td>{{ att.shiftName || '-' }}</td>
+
+              <td>
+                <div class="time-info" *ngIf="att.checkIn">
+                  <span><span class="dot green"></span>{{ getTime(att.checkIn) }}</span>
+                </div>
+                <span *ngIf="!att.checkIn" class="text-light">-</span>
+              </td>
+
+              <td>
+                <div class="time-info" *ngIf="att.checkOut">
+                  <span><span class="dot red"></span>{{ getTime(att.checkOut) }}</span>
+                </div>
+                <span *ngIf="!att.checkOut" class="text-light">-</span>
+              </td>
+
+              <td class="text-center">
+                <span class="status-badge" [ngClass]="att.status.toLowerCase()">
+                  {{ translateStatus(att.status) }}
+                </span>
+              </td>
+
+              <td class="text-center">
+                <button class="action-btn" (click)="showProof(att)" title="Xem ảnh">
+                  <span class="material-symbols-outlined">visibility</span>
+                </button>
+              </td>
+
+              <td class="text-center" *ngIf="role === 'hr'">
+                <button class="action-btn delete-btn" (click)="deleteAttendance(att.attendanceId)" title="Xóa dữ liệu">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination-footer" *ngIf="attendance && attendance.length > 0">
+        <div class="page-size-selector">
+          <span>Hiển thị</span>
+          <select [(ngModel)]="size" (change)="onPageSizeChange()">
+            <option *ngFor="let s of pageSizeOptions" [value]="s">{{ s }}</option>
+          </select>
+          <span>dòng</span>
+        </div>
+        
+        <div class="page-info">
+          {{ page * size + 1 }} - {{ (page + 1) * size > totalElements ? totalElements : (page + 1) * size }} 
+          trong tổng số <strong>{{ totalElements }}</strong>
+        </div>
+
+        <div class="page-controls">
+          <button class="btn-page" [disabled]="page === 0" (click)="onPageChange(page - 1)">
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <span class="current-page">Trang {{ page + 1 }} / {{ totalPages }}</span>
+          <button class="btn-page" [disabled]="page >= totalPages - 1" (click)="onPageChange(page + 1)">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      </div>
+
+      <ng-template #noData>
+        <div class="empty-state">
+          <img src="https://cdn-icons-png.flaticon.com/512/7486/7486754.png" alt="No Data" width="64">
+          <p>Không tìm thấy dữ liệu chấm công nào.</p>
+        </div>
+      </ng-template>
+    </div>
+  </ng-container>
+
+  <!-- TAB 2: DUYỆT BỔ SUNG CÔNG -->
+  <ng-container *ngIf="activeTab === 'approval'">
+      <div class="animate-fade-in">
+          <app-data-attendant></app-data-attendant>
+      </div>
+  </ng-container>
+
+</div>
+
+<!-- Loading & Proof Modal -->
+<app-loading *ngIf="isloading"></app-loading>
+
+<div class="proof-overlay" *ngIf="selectedProof" (click)="closeProof()">
+  <div class="proof-modal" (click)="$event.stopPropagation()">
+    <div class="proof-header">
+      <h3>Minh chứng chấm công #{{ selectedProof.attendanceId }}</h3>
+      <button class="close-btn" (click)="closeProof()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="proof-body">
+      <!-- Item Check In -->
+      <div class="proof-item">
+        <span class="img-label">Check-In</span>
+        
+        <div class="img-wrapper">
+          <!-- Loading Spinner -->
+          <div *ngIf="isLoadingCheckIn" class="spinner-sm"></div>
+          
+          <!-- Image -->
+          <img *ngIf="!isLoadingCheckIn && proofCheckInUrl" [src]="proofCheckInUrl" alt="Check-in Proof" />
+          
+          <!-- No Image / Empty -->
+          <div *ngIf="!isLoadingCheckIn && !proofCheckInUrl" class="no-img-placeholder">
+            <span class="material-symbols-outlined">image_not_supported</span>
+            <p>Khong co hinh anh</p>
           </div>
         </div>
 
-        <div class="proof-item">
-          <span class="img-label">Check-Out</span>
-          <div class="img-wrapper">
-            <img 
-              *ngIf="selectedProof.checkOutImg; else noOutImg" 
-              [src]="selectedProof.checkOutImg" 
-              alt="Check-out Proof" 
-            />
-            <ng-template #noOutImg>
-              <div class="no-img-placeholder">
-                <span class="material-symbols-outlined">image_not_supported</span>
-                <p>Không có ảnh</p>
-              </div>
-            </ng-template>
+        <div class="time-info" *ngIf="selectedProof.checkIn">
+          <span class="dot green"></span> {{ getTime(selectedProof.checkIn) }}
+        </div>
+      </div>
+
+      <!-- Item Check Out -->
+      <div class="proof-item">
+        <span class="img-label">Check-Out</span>
+        
+        <div class="img-wrapper">
+          <!-- Loading Spinner -->
+          <div *ngIf="isLoadingCheckOut" class="spinner-sm"></div>
+          
+          <!-- Image -->
+          <img *ngIf="!isLoadingCheckOut && proofCheckOutUrl" [src]="proofCheckOutUrl" alt="Check-out Proof" />
+          
+          <!-- No Image / Empty -->
+          <div *ngIf="!isLoadingCheckOut && !proofCheckOutUrl" class="no-img-placeholder">
+            <span class="material-symbols-outlined">image_not_supported</span>
+            <p>Khong co hinh anh</p>
           </div>
-           <div class="time-info" *ngIf="selectedProof.checkOut">
-            <span class="dot red"></span> {{ getTime(selectedProof.checkOut) }}
-          </div>
+        </div>
+        
+        <div class="time-info" *ngIf="selectedProof.checkOut">
+          <span class="dot red"></span> {{ getTime(selectedProof.checkOut) }}
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<app-loading *ngIf="isloading"></app-loading>
+<!-- MODAL BỔ SUNG DỮ LIỆU -->
+<div *ngIf="isAdding" class="modal-backdrop" (click)="closeAddModal()">
+   <div class="modal-content" style="max-width: 32rem;" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Bổ sung dữ liệu</h3>
+        </div>
+        <div class="modal-body">
+            <form>
+                <!-- Form Inputs ... (Giữ nguyên như cũ) -->
+                <div class="form-group">
+                    <label class="form-label">Ngày chấm công <span class="text-red">*</span></label>
+                    <input type="date" class="form-input" [(ngModel)]="newRequest.date" name="date">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Giờ thực hiện <span class="text-red">*</span></label>
+                    <input type="time" class="form-input" [(ngModel)]="newRequest.time" name="time">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Ca làm việc</label>
+                    <select class="form-select" [(ngModel)]="newRequest.shiftId" name="shiftId">
+                        <option *ngFor="let s of shiftsList" [value]="s.id">{{ s.name }}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Loại yêu cầu</label>
+                    <select class="form-select" [(ngModel)]="newRequest.requestType" name="requestType">
+                        <option value="CHECK_IN">Check In (Vào)</option>
+                        <option value="CHECK_OUT">Check Out (Ra)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Ảnh minh chứng <span class="text-red">*</span></label>
+                    <input type="file" id="fileUpload" (change)="onFileSelected($event)" style="display: none;" accept="image/*">
+                    <label for="fileUpload" class="upload-area" [class.has-file]="selectedFileName">
+                        <span class="material-symbols-outlined">cloud_upload</span>
+                        <span *ngIf="!selectedFileName">Nhấn để tải ảnh lên</span>
+                        <span *ngIf="selectedFileName" class="file-name">{{ selectedFileName }}</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                      <label class="form-label">Lý do bổ sung <span class="text-red">*</span></label>
+                      <textarea rows="2" class="form-textarea" [(ngModel)]="newRequest.reason" name="reason" placeholder="Nhập lý do..."></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button (click)="submitAdd()" class="btn btn-primary">Gửi yêu cầu</button>
+            <button (click)="closeAddModal()" class="btn btn-secondary">Hủy</button>
+        </div>
+   </div>
+</div>
 
 <app-comfirm
   *ngIf="isconfirm"

@@ -92,3 +92,12 @@ export async function AddNewContract(formData: FormData) {
         return "co loi xay ra " + error;
     }
 }
+
+export async function getNotificationContract() {
+    try {
+        const res = await api.get(`/hr/contracts/expiringNoti`);
+        return res.data;
+    } catch (error) {
+        return "co loi xay ra " + error;
+    }
+}

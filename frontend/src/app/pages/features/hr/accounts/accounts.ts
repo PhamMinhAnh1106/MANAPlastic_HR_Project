@@ -123,11 +123,11 @@ export class Accounts implements OnInit {
   }
   async filterEmployees() {
     // Nếu filter.userID rỗng thì truyền giá trị mặc định là 0
-    if (this.filter.userID == "") {
+    // if (this.filter.userID == "") {
 
-      this.showNotification("Còn thiếu username hoặc id nhân viên", false);
-      return;
-    }
+    //   this.showNotification("Còn thiếu username hoặc id nhân viên", false);
+    //   return;
+    // }
     const keyword = this.filter.userID;
 
 
@@ -164,6 +164,23 @@ export class Accounts implements OnInit {
   async onConfirmResult(event: any) {
     this.isconfirm = false;
     if (event === true) {
+      if (this.emp.cccd.length != 12) {
+        this.showNotification("CCCD phải đúng 12 chữ số", false);
+        return;
+      }
+      if (this.emp.phonenumber.length != 10) {
+
+        if (this.emp.phonenumber.toString().charAt(0) !== '0') {
+          this.showNotification("Số điện thoại phải bắt đầu bằng số 0", false);
+          return;
+        }
+        if (this.emp.phonenumber.length < 10) {
+          console.log("Phone number length:");
+          this.showNotification("Số điện thoại không hợp lệ (phải từ 10 đến 12 số)", false);
+          return;
+
+        }
+      }
       this.isloading = true;
       const res = await UpdateAccounthr(this.emp, this.role) as { data: string, status: number };
 

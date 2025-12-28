@@ -120,9 +120,10 @@ export class Information implements OnInit {
       if (this.formdata.phonenumber) {
         if (this.formdata.phonenumber.toString().charAt(0) !== '0') {
           this.onalert("Số điện thoại phải bắt đầu bằng số 0", false);
-          return; // Thêm return để dừng xử lý
+          return;
         }
-        if (this.formdata.phonenumber.length < 10 || this.formdata.phonenumber.length > 12) {
+        if (this.formdata.phonenumber.length < 10) {
+          console.log("Phone number length:");
           this.onalert("Số điện thoại không hợp lệ (phải từ 10 đến 12 số)", false);
           return;
         }

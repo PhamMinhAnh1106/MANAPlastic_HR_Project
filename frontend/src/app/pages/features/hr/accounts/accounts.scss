@@ -34,6 +34,11 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06
     margin-bottom: 24px;
     flex-wrap: wrap;
     gap: 16px;
+    background: $bg-white;
+    padding: 1.25rem 1.5rem;
+    border-radius: $radius;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border;
 
     h2 {
         margin: 0;

@@ -1,0 +1,117 @@
+<div class="log-page-container">
+
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-title">
+            <h1>Nhật ký hoạt động</h1>
+        </div>
+
+        <div class="search-box">
+            <input type="text" placeholder="Tìm kiếm..." [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
+            <button class="btn-primary" (click)="onSearch()">Tìm kiếm</button>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="data-card">
+
+        <!-- Loading -->
+        <div class="loading-state" *ngIf="isLoading()">
+            <div class="spinner"></div>
+            <p>Đang tải dữ liệu...</p>
+        </div>
+
+        <!-- Empty -->
+        <div class="empty-state" *ngIf="!isLoading() && logs().length === 0">
+            <p>Không có dữ liệu.</p>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive" *ngIf="!isLoading() && logs().length > 0">
+            <table class="log-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">ID</th>
+                        <th style="width: 150px;">Thời gian</th>
+                        <th style="width: 150px;">User</th>
+                        <th style="width: 180px;">Action</th>
+                        <th style="width: 100px;">Type</th>
+                        <th>Details</th>
+                        <th style="width: 80px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let log of logs()">
+                        <td class="col-id">#{{ log.id }}</td>
+                        <td>{{ log.actiontime | date:'dd/MM/yyyy HH:mm' }}</td>
+                        <td>
+                            <div class="user-cell">
+                                <span class="username">{{ log.username }}</span>
+                                <span class="userid" *ngIf="log.userID">(ID: {{ log.userID }})</span>
+                            </div>
+                        </td>
+                        <td class="font-medium">{{ log.action }}</td>
+                        <td>
+                            <span class="status-badge" [ngClass]="'status-' + log.logType">
+                                {{ log.logType }}
+                            </span>
+                        </td>
+                        <td>
+                            <!-- Hiển thị ngắn gọn, cắt bớt text dài -->
+                            <div class="truncate-text" title="{{ log.details }}">
+                                {{ log.details }}
+                            </div>
+                        </td>
+                        <td>
+                            <button class="btn-icon" (click)="openDetailModal(log)" title="Xem chi tiết">
+                                <span class="material-symbols-outlined">
+                                    visibility
+                                </span>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="!isLoading() && logs().length > 0">
+            <span>Trang {{ currentPage() + 1 }} / {{ totalPages() }}</span>
+            <div class="page-controls">
+                <button [disabled]="currentPage() === 0" (click)="changePage(currentPage() - 1)">Trước</button>
+                <button [disabled]="currentPage() >= totalPages() - 1"
+                    (click)="changePage(currentPage() + 1)">Sau</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem chi tiết (Đơn giản hóa) -->
+<div class="modal-overlay" *ngIf="selectedLog()" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Chi tiết Log #{{ selectedLog()?.id }}</h3>
+            <button class="btn-close" (click)="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="detail-row">
+                <strong>Action:</strong> {{ selectedLog()?.action }}
+            </div>
+            <div class="detail-row">
+                <strong>User:</strong> {{ selectedLog()?.username }}
+            </div>
+            <div class="detail-row">
+                <strong>Time:</strong> {{ selectedLog()?.actiontime | date:'medium' }}
+            </div>
+
+            <div class="detail-block">
+                <strong>Nội dung chi tiết (Raw Data):</strong>
+                <!-- Hiển thị nguyên bản text -->
+                <textarea readonly class="raw-detail-box">{{ selectedLog()?.details }}</textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="closeModal()">Đóng</button>
+        </div>
+    </div>
+</div>

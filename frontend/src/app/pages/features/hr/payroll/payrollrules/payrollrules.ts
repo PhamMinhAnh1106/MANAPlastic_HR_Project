@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 // Import API gốc của bạn
 import { auditVariable, deleteRule, deleteVariable, getAuditUsers, getRules, getVariables, saveRule, saveVariable } from '../../../../../services/pages/features/hr/payroll/rules.services';
+import { Alert } from '../../../../shared/alert/alert';
+import { Comfirm } from '../../../../shared/comfirm/comfirm';
 
 declare var CodeMirror: any;
 
@@ -28,12 +30,27 @@ interface Variable {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Alert, Comfirm],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './payrollrules.html',
   styleUrls: ['./payrollrules.scss'],
 })
 export class Payrollrules implements OnInit, AfterViewInit {
+  // --- CONFIRM & ALERT STATE ---
+  isconfirm: boolean = false;
+  confirmMessage: string = '';
+  // Thêm biến này để phân biệt đang xóa cái gì
+  confirmType: 'RULE' | 'VARIABLE' = 'RULE';
+
+  isalert: boolean = false;
+  alertmessage: string = '';
+  alertType: boolean = false;
+
+  Onalert(message: string, type: boolean) {
+    this.isalert = true;
+    this.alertmessage = message;
+    this.alertType = type;
+  }
 
   // --- STATE ---
   activeTab: 'rules' | 'variables' = 'rules';
@@ -262,18 +279,63 @@ export class Payrollrules implements OnInit, AfterViewInit {
       name: this.currentRule.name,
       dsl: JSON.stringify(this.currentRule.dslJson)
     };
-    await saveRule(payload);
-    await this.loadRules();
+    const res = await saveRule(payload);
+    if (res) {
+      this.Onalert(res, true);
+      await this.loadRules();
+      return;
+    }
+    this.Onalert(res, false);
   }
 
+  // --- DELETE RULE ---
   async deleteRule() {
-    if (!this.currentRule.ruleId) return;
-    if (window.confirm('Delete rule?')) {
-      await deleteRule(this.currentRule.ruleId);
-      await this.loadRules();
-      this.resetRuleEditor();
-    }
+    this.confirmType = 'RULE'; // Đánh dấu là đang xóa Rule
+    this.confirmMessage = 'Bạn có chắc chắn muốn xóa rule này không?';
+    this.isconfirm = true;
   }
+
+  // --- DELETE VARIABLE ---
+  async deleteVariable() {
+    this.confirmType = 'VARIABLE'; // Đánh dấu là đang xóa Variable
+    this.confirmMessage = 'Bạn có chắc chắn muốn xóa biến này không?';
+    this.isconfirm = true;
+  }
+
+  async onConfirmResult(event: any) {
+    this.isconfirm = false;
+    if (event !== true) {
+      return;
+    }
+    if (this.confirmType === 'RULE') {
+      if (!this.currentRule.ruleId) return;
+      const res = await deleteRule(this.currentRule.ruleId);
+      if (res) {
+        this.Onalert(res, true);
+        await this.loadRules();
+        this.resetRuleEditor();
+      } else {
+        this.Onalert(res, false);
+      }
+    }
+    else if (this.confirmType === 'VARIABLE') {
+      // Logic xóa Variable
+      const id = this.currentVar.id || this.currentVar.variableId;
+      if (!id) return;
+      const res = await deleteVariable(id);
+      if (res) {
+        this.Onalert(res, true);
+        await this.loadVariables();
+        this.resetVarEditor();
+      } else {
+        this.Onalert(res, false);
+      }
+    }
+
+    this.cdr.detectChanges();
+  }
+
+  // --- CÁC HÀM KHÁC ---
 
   async loadVariables() {
     try {
@@ -386,9 +448,11 @@ export class Payrollrules implements OnInit, AfterViewInit {
     if (!this.isEditingVar) return; // Guard
 
     const payload = { id: this.currentVar.id || this.currentVar.variableId, code: this.currentVar.code, name: this.currentVar.name, description: this.currentVar.description, sqlQuery: this.currentVar.sqlQuery };
-    await saveVariable(payload);
-    await this.loadVariables();
-
+    const res = await saveVariable(payload);
+    if (res) {
+      this.Onalert(res, true);
+      await this.loadVariables();
+    }
     // Sau khi lưu xong -> Về chế độ xem
     this.isEditingVar = false;
     this.originalVarState = null;
@@ -396,15 +460,6 @@ export class Payrollrules implements OnInit, AfterViewInit {
       this.sqlEditorInstance.setOption('readOnly', 'nocursor');
     }
     this.cdr.detectChanges();
-  }
-
-  async deleteVariable() {
-    const id = this.currentVar.id || this.currentVar.variableId;
-    if (id && window.confirm("Delete variable?")) {
-      await deleteVariable(id);
-      await this.loadVariables();
-      this.resetVarEditor();
-    }
   }
 
   async loadEmployees() {

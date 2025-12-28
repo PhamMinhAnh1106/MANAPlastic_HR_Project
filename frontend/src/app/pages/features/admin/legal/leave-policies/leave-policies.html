@@ -1,18 +1,26 @@
 <div class="page-container">
   <!-- Header Section -->
   <div class="header-section">
-    <div>
+    <div class="header-card">
       <h1 class="page-title">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="20" height="14" x="2" y="7" rx="2" ry="2" />
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+        </svg>
         Leave Policies Management
       </h1>
       <p class="page-subtitle">Cấu hình chính sách nghỉ phép</p>
     </div>
-    
+
     <div class="actions-bar">
-      
+
       <button class="btn btn-primary" (click)="openModal()">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14" />
+          <path d="M12 5v14" />
+        </svg>
         Thêm Chính Sách
       </button>
     </div>
@@ -66,13 +74,13 @@
           <td class="text-right action-cell">
             <button class="btn-icon edit" (click)="openModal(policy)" title="Chỉnh sửa">
               <span class="material-symbols-outlined">
-edit
-</span>
+                edit
+              </span>
             </button>
             <button class="btn-icon delete" (click)="deletePolicy(policy.id)" title="Xóa">
-                <span class="material-symbols-outlined">
-delete
-</span>
+              <span class="material-symbols-outlined">
+                delete
+              </span>
             </button>
           </td>
         </tr>
@@ -91,7 +99,11 @@ delete
       <div class="modal-header">
         <h3>{{ isEditMode ? 'Cập nhật Chính Sách' : 'Thêm Mới Chính Sách' }}</h3>
         <button class="btn-close" (click)="closeModal()">
-          <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
         </button>
       </div>
 
@@ -99,9 +111,11 @@ delete
         <div class="modal-body">
           <div class="form-group full-width">
             <label>Mô tả chính sách <span class="required">*</span></label>
-            <input type="text" formControlName="description" class="form-control" placeholder="Ví dụ: Nghỉ phép thâm niên < 3 năm">
-            <div class="error-msg" *ngIf="policyForm.get('description')?.invalid && policyForm.get('description')?.touched">
-               Vui lòng nhập mô tả.
+            <input type="text" formControlName="description" class="form-control"
+              placeholder="Ví dụ: Nghỉ phép thâm niên < 3 năm">
+            <div class="error-msg"
+              *ngIf="policyForm.get('description')?.invalid && policyForm.get('description')?.touched">
+              Vui lòng nhập mô tả.
             </div>
           </div>
 
@@ -128,7 +142,8 @@ delete
             </div>
             <div class="form-group half">
               <label>Thâm niên tối đa (Năm)</label>
-              <input type="number" formControlName="maxYearsService" class="form-control" placeholder="Để trống nếu không giới hạn">
+              <input type="number" formControlName="maxYearsService" class="form-control"
+                placeholder="Để trống nếu không giới hạn">
             </div>
           </div>
 
@@ -154,3 +169,6 @@ delete
     </div>
   </div>
 </div>
+
+<app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
+<app-alert *ngIf="isalert" [message]="alertmessage" [notifyType]="alertType" (hidden)="isalert = false"></app-alert>

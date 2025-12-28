@@ -208,3 +208,7 @@
       </div>
     </div>
 </ng-template>
+
+<app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
+
+<app-alert *ngIf="isalert" [message]="alertmessage" [notifyType]="alertType" (hidden)="isalert = false"></app-alert>

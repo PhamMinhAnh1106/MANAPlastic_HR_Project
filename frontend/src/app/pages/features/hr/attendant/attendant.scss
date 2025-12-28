@@ -19,7 +19,6 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .attendance-container {
-
     padding: 3rem 0.5rem 0.5rem 5rem;
 
     @media (max-width: 768px) {
@@ -29,32 +28,89 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     }
 }
 
-// --- Header ---
+// ... (KEEP EXISTING HEADER & TABS STYLES) ...
+// --- Header & Tabs ---
 .page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 0.5rem;
-    flex-wrap: wrap;
-    gap: 1rem;
+    background: $card-bg;
+    border-radius: $border-radius;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    margin-bottom: 1rem;
+    overflow: hidden;
 
-    .header-title {
-        h2 {
-            font-size: 1.2rem;
-            color: $text-dark;
-            margin: 0;
-            font-weight: 700;
+    .header-content {
+        padding: 1.25rem 1.5rem 0.5rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+
+        .header-title {
+            h2 {
+                font-size: 1.2rem;
+                color: $text-dark;
+                margin: 0;
+                font-weight: 700;
+            }
+
+            .subtitle {
+                color: $text-light;
+                margin: 0.25rem 0 0 0;
+                font-size: 0.85rem;
+            }
         }
+    }
 
-        .subtitle {
+    .tab-navigation {
+        display: flex;
+        padding: 0 1.5rem;
+        gap: 1.5rem;
+        border-bottom: 1px solid #edf2f7;
+        margin-top: 1rem;
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.8rem 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
             color: $text-light;
-            margin: 0.5rem 0 0 0;
-            font-size: 0.85rem;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            .material-symbols-outlined {
+                font-size: 1.2rem;
+            }
+
+            &:hover {
+                color: $primary-color;
+                background-color: transparent;
+            }
+
+            &.active {
+                color: $primary-color;
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -1px;
+                    left: 0;
+                    width: 100%;
+                    height: 3px;
+                    background-color: $primary-color;
+                    border-radius: 3px 3px 0 0;
+                }
+            }
         }
     }
 }
 
-// --- Cards & Layout ---
+// ... (KEEP EXISTING CARDS, FILTERS, BUTTONS, TABLE STYLES) ...
 .card {
     background: $card-bg;
     border-radius: $border-radius;
@@ -64,7 +120,10 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     border: 1px solid rgba(0, 0, 0, 0.02);
 }
 
-// --- Filters ---
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
 .filter-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -91,6 +150,7 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             background-color: #fff;
             transition: border-color 0.2s;
             cursor: pointer;
+            width: 100%;
 
             &:focus {
                 outline: none;
@@ -106,7 +166,6 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     }
 }
 
-// --- Buttons ---
 button {
     display: inline-flex;
     align-items: center;
@@ -143,7 +202,17 @@ button {
     }
 }
 
-// --- Table ---
+.btn-add {
+    background-color: $success-color;
+    color: white;
+    padding: 0.6rem 1.2rem;
+
+    &:hover {
+        background-color: darken($success-color, 10%);
+        transform: translateY(-1px);
+    }
+}
+
 .table-responsive {
     overflow-x: auto;
 }
@@ -190,7 +259,7 @@ table {
     }
 }
 
-// --- NEW PAGINATION FOOTER STYLE ---
+// ... (KEEP PAGINATION, BADGES STYLES) ...
 .pagination-footer {
     display: flex;
     justify-content: space-between;
@@ -276,8 +345,6 @@ table {
     }
 }
 
-
-// --- Table Custom Elements ---
 .id-badge {
     background: #edf2f7;
     padding: 2px 6px;
@@ -324,7 +391,6 @@ table {
     }
 }
 
-// --- Status Badges ---
 .status-badge {
     padding: 4px 10px;
     border-radius: 20px;
@@ -333,6 +399,8 @@ table {
     text-transform: capitalize;
     display: inline-block;
     letter-spacing: 0.3px;
+    background-color: #edf2f7;
+    color: $text-light;
 
     &.present {
         background-color: rgba($success-color, 0.15);
@@ -354,12 +422,8 @@ table {
         background-color: rgba($warning-color, 0.2);
         color: darken($warning-color, 45%);
     }
-
-    background-color: #edf2f7;
-    color: $text-light;
 }
 
-// --- Action Buttons ---
 .action-btn {
     width: 28px;
     height: 28px;
@@ -395,8 +459,9 @@ table {
     }
 }
 
-// --- Modal / Popup ---
-.proof-overlay {
+// --- Modals (Proof & Add Form) ---
+.proof-overlay,
+.modal-backdrop {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.6);
@@ -408,21 +473,27 @@ table {
     animation: fadeIn 0.2s ease;
 }
 
+.modal-content,
 .proof-modal {
     background: white;
-    border-radius: 16px;
+    border-radius: 12px;
     width: 90%;
-    max-width: 800px;
-    overflow: hidden;
+    max-width: 500px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 
+    .modal-header,
     .proof-header {
-        padding: 1.2rem;
+        padding: 0.8rem 1.5rem;
         border-bottom: 1px solid #edf2f7;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        flex-shrink: 0;
 
         h3 {
             margin: 0;
@@ -447,8 +518,119 @@ table {
         }
     }
 
+    .modal-body,
     .proof-body {
-        padding: 1.5rem;
+        padding: 1rem 1.5rem;
+        overflow-y: auto;
+
+        // --- NEW SPINNER FOR IMAGE LOADING ---
+        .spinner-sm {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid $primary-color;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        // --- NEW PLACEHOLDER STYLE ---
+        .no-img-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #adb5bd;
+
+            .material-symbols-outlined {
+                font-size: 2rem;
+                margin-bottom: 4px;
+            }
+
+            p {
+                margin: 0;
+                font-size: 0.8rem;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 0.8rem;
+
+            .form-label {
+                display: block;
+                margin-bottom: 0.3rem;
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: $text-dark;
+
+                .text-red {
+                    color: $danger-color;
+                }
+            }
+
+            .form-input,
+            .form-select,
+            .form-textarea {
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                box-sizing: border-box;
+                font-family: inherit;
+
+                &:focus {
+                    outline: none;
+                    border-color: $primary-color;
+                    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+                }
+            }
+
+            .upload-area {
+                border: 2px dashed #ddd;
+                border-radius: 8px;
+                padding: 0.8rem;
+                text-align: center;
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.3rem;
+                color: $text-light;
+                transition: all 0.2s;
+                background: #fafafa;
+
+                .material-symbols-outlined {
+                    font-size: 1.8rem;
+                    color: #adb5bd;
+                }
+
+                &:hover {
+                    border-color: $primary-color;
+                    background: rgba($primary-color, 0.05);
+
+                    .material-symbols-outlined {
+                        color: $primary-color;
+                    }
+                }
+
+                &.has-file {
+                    border-color: $success-color;
+                    background: rgba($success-color, 0.05);
+
+                    .material-symbols-outlined {
+                        color: $success-color;
+                    }
+
+                    .file-name {
+                        color: $text-dark;
+                        font-weight: 500;
+                    }
+                }
+            }
+        }
+    }
+
+    .proof-body {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 1.5rem;
@@ -463,14 +645,6 @@ table {
             align-items: center;
             gap: 0.8rem;
 
-            .img-label {
-                font-weight: 600;
-                color: $text-light;
-                font-size: 0.85rem;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-            }
-
             .img-wrapper {
                 width: 100%;
                 aspect-ratio: 1/1;
@@ -481,39 +655,44 @@ table {
                 align-items: center;
                 justify-content: center;
                 background: #fafafa;
-                position: relative;
 
                 img {
                     width: 100%;
                     height: 100%;
                     object-fit: contain;
-                    transition: transform 0.3s ease;
-
-                    &:hover {
-                        transform: scale(1.05);
-                    }
                 }
+            }
+        }
+    }
 
-                .no-img-placeholder {
-                    text-align: center;
-                    color: #adb5bd;
+    .modal-footer {
+        padding: 0.8rem 1.5rem;
+        background: #f8f9fa;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        flex-shrink: 0;
 
-                    .material-symbols-outlined {
-                        font-size: 2.5rem;
-                        margin-bottom: 0.5rem;
-                    }
+        .btn-primary {
+            background-color: $primary-color;
+            color: white;
 
-                    p {
-                        margin: 0;
-                        font-size: 0.75rem;
-                    }
-                }
+            &:hover {
+                background-color: darken($primary-color, 10%);
+            }
+        }
+
+        .btn-secondary {
+            background-color: #e9ecef;
+            color: $text-dark;
+
+            &:hover {
+                background-color: darken(#e9ecef, 10%);
             }
         }
     }
 }
 
-// Animations
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -533,5 +712,15 @@ table {
     to {
         transform: scale(1);
         opacity: 1;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
     }
 }

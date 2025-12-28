@@ -1,0 +1,230 @@
+<div class="page-container">
+  <!-- MAIN TABLE CARD -->
+  <div class="card">
+    
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Đang tải dữ liệu...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && data?.content?.length === 0" class="loading-state">
+      <p>Không có dữ liệu chấm công nào.</p>
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="!isLoading && data && data.content.length > 0" class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="col-employee">Mã NV / Tên</th>
+            <th class="col-dept">Phòng ban</th>
+            <th class="col-date">Ngày / Ca</th>
+            <th class="col-type">Loại yêu cầu</th>
+            <th class="col-reason">Lý do</th>
+            
+            <!-- CỘT TRẠNG THÁI CÓ FILTER -->
+            <th class="col-status">
+              <div class="filter-header" (click)="toggleFilter($event)" title="Lọc danh sách">
+                <span>Trạng thái</span>
+                <span class="material-symbols-outlined filter-icon">arrow_drop_down</span>
+              </div>
+              
+              <!-- Dropdown Menu -->
+              <div class="filter-dropdown" *ngIf="isFilterOpen" (click)="$event.stopPropagation()">
+                <div class="filter-option" [class.active]="currentStatusFilter === ''" (click)="filterByStatus('')">
+                  Tất cả
+                </div>
+                <div class="filter-option" [class.active]="currentStatusFilter === 'PENDING'" (click)="filterByStatus('PENDING')">
+                  Chờ duyệt
+                </div>
+                <div class="filter-option" [class.active]="currentStatusFilter === 'APPROVED'" (click)="filterByStatus('APPROVED')">
+                  Đã duyệt
+                </div>
+                <div class="filter-option" [class.active]="currentStatusFilter === 'REJECTED'" (click)="filterByStatus('REJECTED')">
+                  Từ chối
+                </div>
+              </div>
+              
+              <!-- Backdrop -->
+              <div class="filter-backdrop" *ngIf="isFilterOpen" (click)="isFilterOpen = false"></div>
+            </th>
+
+            <th class="col-action" style="text-align: center;">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of data.content">
+            <td>
+              <div class="employee-info">
+                <div class="name">{{ item.employeeName }}</div>
+                <div class="id">ID: {{ item.userId }}</div>
+              </div>
+            </td>
+            <td style="color: #4b5563;">{{ item.departmentName }}</td>
+            <td>
+              <div class="name">{{ item.date | date:'dd/MM/yyyy' }}</div>
+              <div class="id">{{ item.shiftName }}</div>
+            </td>
+            <td>
+              <span class="badge badge-type">{{ item.requestType }}</span>
+            </td>
+            <td class="cell-reason">
+              {{ item.reason }}
+            </td>
+            <td style="text-align: center;">
+              <span class="badge" [ngClass]="getStatusClass(item.status)">
+                {{ item.status === 'APPROVED' ? 'Đã duyệt' : (item.status === 'REJECTED' ? 'Từ chối' : 'Chờ duyệt') }}
+              </span>
+            </td>
+            <td style="text-align: center;">
+              <button class="btn btn-link" (click)="openDetailModal(item)">
+                <span class="material-symbols-outlined">more_horiz</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAGINATION -->
+    <div *ngIf="data && data.totalPages > 0" class="pagination">
+      <div class="pagination-info">
+        Hiển thị <b>{{ data.number * data.size + 1 }}</b> đến <b>{{ Math.min((data.number + 1) * data.size, data.totalElements) }}</b> trong số <b>{{ data.totalElements }}</b> bản ghi
+      </div>
+      
+      <div class="pagination-controls">
+        <button class="btn btn-secondary" [disabled]="data.first" (click)="changePage(data.number - 1)">Trước</button>
+        
+        <ng-container *ngFor="let p of pageNumbers">
+          <button class="page-btn" [class.active]="p === data.number" (click)="changePage(p)">
+            {{ p + 1 }}
+          </button>
+        </ng-container>
+
+        <button class="btn btn-secondary" [disabled]="data.last" (click)="changePage(data.number + 1)">Sau</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CHI TIẾT -->
+<div *ngIf="selectedRequest" class="modal-backdrop">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Chi tiết yêu cầu #{{ selectedRequest.requestId }}</h3>
+      <button (click)="closeDetailModal()" style="border:none; background:none; font-size:1.5rem; cursor:pointer; color:#9ca3af;">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="detail-grid">
+        <!-- Thông tin -->
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="info-group">
+            <span class="info-label">Nhân viên</span>
+            <div class="info-value">{{ selectedRequest.employeeName }} (ID: {{ selectedRequest.userId }})</div>
+            <div class="info-sub">{{ selectedRequest.departmentName }}</div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="info-group">
+                  <span class="info-label">Ngày</span>
+                  <div class="info-value">{{ selectedRequest.date | date:'dd/MM/yyyy' }}</div>
+              </div>
+              <div class="info-group">
+                  <span class="info-label">Ca làm việc</span>
+                  <div class="info-value">{{ selectedRequest.shiftName }}</div>
+              </div>
+          </div>
+
+          <div class="info-group">
+             <span class="info-label">Loại & Thời gian</span>
+             <div style="margin-top: 0.25rem;">
+                 <span class="badge badge-type">{{ selectedRequest.requestType }}</span>
+             </div>
+             <div class="info-value" style="margin-top: 0.5rem; font-size: 0.875rem;">
+                 <div *ngIf="selectedRequest.checkInTime">Vào: {{ selectedRequest.checkInTime | date:'HH:mm:ss' }}</div>
+                 <div *ngIf="selectedRequest.checkOutTime">Ra: {{ selectedRequest.checkOutTime | date:'HH:mm:ss' }}</div>
+             </div>
+          </div>
+
+          <div class="info-group">
+            <span class="info-label">Lý do</span>
+            <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px; border: 1px solid #f3f4f6; font-style: italic;">
+                "{{ selectedRequest.reason }}"
+            </div>
+          </div>
+
+          <div *ngIf="selectedRequest.status !== 'PENDING'" class="info-group">
+              <span class="info-label">Người duyệt/Từ chối</span>
+              <div class="info-value">{{ selectedRequest.approverName || 'N/A' }}</div>
+              <div *ngIf="selectedRequest.comment" class="text-red" style="font-size: 0.875rem; margin-top: 0.25rem;">
+                Ghi chú: {{ selectedRequest.comment }}
+              </div>
+          </div>
+        </div>
+
+        <!-- Ảnh Minh Chứng (Đã cập nhật logic) -->
+        <div>
+          <span class="info-label" style="margin-bottom: 0.5rem;">Ảnh minh chứng</span>
+          <div class="proof-image-container">
+              <!-- Loading -->
+              <div *ngIf="isLoadingImage" style="text-align: center; color: #6b7280; padding: 20px;">
+                <div class="spinner" style="width: 20px; height: 20px; border-width: 2px;"></div>
+                <p style="font-size: 0.8rem; margin-top: 5px;">Đang tải ảnh...</p>
+              </div>
+
+              <!-- Hiển thị Ảnh -->
+              <img *ngIf="!isLoadingImage && proofImageUrl" [src]="proofImageUrl" class="proof-image" alt="Proof">
+              
+              <!-- Không có Ảnh -->
+              <div *ngIf="!isLoadingImage && !proofImageUrl" style="text-align: center; color: #9ca3af; padding: 20px; font-size: 0.9rem;">
+                  Khong co hinh anh
+              </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Từ chối -->
+      <div *ngIf="isRejecting" class="mt-4" style="border-top: 1px solid #e5e7eb; padding-top: 1rem;">
+          <label class="form-label">Lý do từ chối <span class="text-red">*</span></label>
+          <textarea [(ngModel)]="rejectComment" rows="3" class="form-textarea" placeholder="Nhập lý do từ chối..."></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+        <ng-container *ngIf="selectedRequest.status === 'PENDING'; else readonlyActions">
+            
+            <!-- CHECK ROLE: Chỉ HR mới được duyệt -->
+            <ng-container *ngIf="currentUserRole === 'HR'; else noPermission">
+                <ng-container *ngIf="!isRejecting">
+                    <button (click)="approve()" class="btn btn-success">Duyệt yêu cầu</button>
+                    <button (click)="startReject()" class="btn btn-danger">Từ chối</button>
+                </ng-container>
+
+                <ng-container *ngIf="isRejecting">
+                    <button (click)="confirmReject()" [disabled]="!rejectComment" class="btn btn-danger">Xác nhận từ chối</button>
+                    <button (click)="cancelReject()" class="btn btn-secondary">Hủy</button>
+                </ng-container>
+            </ng-container>
+
+            <ng-template #noPermission>
+                  <div class="no-permission">
+                    Bạn không có quyền duyệt yêu cầu này.
+                  </div>
+                  <button (click)="closeDetailModal()" class="btn btn-secondary">Đóng</button>
+            </ng-template>
+            
+        </ng-container>
+
+        <ng-template #readonlyActions>
+            <button (click)="closeDetailModal()" class="btn btn-secondary">Đóng</button>
+        </ng-template>
+    </div>
+  </div>
+</div>
+
+<!-- Shared Components -->
+<app-loading *ngIf="isloading"></app-loading>
+<app-alert *ngIf="isalert" [message]="alertmessage" [notifyType]="alertType" (hidden)="isalert = false"></app-alert>

@@ -1,16 +1,25 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 
 import { DecodeTokenRole } from '../../utils/token.utils';
 import { Loout_service } from '../../services/pages/login.service';
-// Removed Schedule/Notification related imports
+import { getNotificationContract } from '../../services/pages/features/hr/contracts.service';
+
+interface ContractNotification {
+  id: number;
+  contractCode: string;
+  employeeName: string;
+  endDate: string;
+  daysRemaining: number;
+}
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, FormsModule, DatePipe],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -19,7 +28,7 @@ export class Home implements OnInit {
 
   @ViewChild('addDrop') addDrop!: ElementRef;
   @ViewChild('userDrop') userDrop!: ElementRef;
-  // Removed notifiDrop ViewChild
+  @ViewChild('notifiDrop') notifiDrop!: ElementRef; // Thêm viewchild cho thông báo
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent) {
@@ -33,6 +42,11 @@ export class Home implements OnInit {
     // --- USER DROPDOWN ---
     if (this.isUserOpen && this.userDrop && !this.userDrop.nativeElement.contains(target)) {
       this.isUserOpen = false;
+    }
+
+    // --- NOTIFICATION DROPDOWN ---
+    if (this.isNotifiOpen && this.notifiDrop && !this.notifiDrop.nativeElement.contains(target)) {
+      this.isNotifiOpen = false;
     }
   }
 
@@ -51,20 +65,57 @@ export class Home implements OnInit {
   icon_handleBar: any;
   isUserOpen = false;
   isAddOpen = false;
-  // Removed isNotifiOpen
+  isSettingsOpen = false;
+  isDarkMode = false;
+
+  // --- BIẾN CHO THÔNG BÁO ---
+  isNotifiOpen = false;
+  notificationCount = 0;
+  notifications: ContractNotification[] = [];
+
   featureAdd: any = [{ name: "", path: "" }]
 
-  // Removed pendingRequests list
 
   toggleUserDropdown() {
     this.isUserOpen = !this.isUserOpen;
     this.isAddOpen = false;
+    this.isNotifiOpen = false; // Đóng thông báo khi mở user
   }
 
+  toggleNotifiDropdown() {
+    this.isNotifiOpen = !this.isNotifiOpen;
+    this.isUserOpen = false; // Đóng user khi mở thông báo
+    this.isAddOpen = false;
+  }
 
+  openSettings() {
+    this.isSettingsOpen = true;
+    this.isUserOpen = false;
+    // Load dark mode state from sessionStorage
+    const savedDarkMode = sessionStorage.getItem('darkMode');
+    this.isDarkMode = savedDarkMode === 'true';
+    this.applyDarkMode();
+  }
 
-  // Removed toggleNotifiDropdown
-  // Removed closeNotification
+  closeSettings() {
+    this.isSettingsOpen = false;
+  }
+
+  toggleDarkMode() {
+    this.isDarkMode = !this.isDarkMode;
+    sessionStorage.setItem('darkMode', this.isDarkMode.toString());
+    this.applyDarkMode();
+  }
+
+  applyDarkMode() {
+    if (this.isDarkMode) {
+      document.documentElement.classList.add('dark-mode');
+      document.body.classList.add('dark-mode');
+    } else {
+      document.documentElement.classList.remove('dark-mode');
+      document.body.classList.remove('dark-mode');
+    }
+  }
 
   openAddAccount() {
     console.log("Cấp tài khoản");
@@ -99,11 +150,16 @@ export class Home implements OnInit {
           {
             iconName: "paid", // Khác biệt: Quản lý tiền lương
             path: "/home/payroll",
-            task: [{ name: "Tính Lương", path: "/home/payroll" }, { name: "Cấu Hình Lương", path: "/home/payroll/rules" }],
+            task: [{ name: "Cấu Hình Lương", path: "/home/payroll/rules" }],
           }, {
             iconName: "gavel", // Khác biệt: Hợp đồng (document)
             path: "/home/law",
-            task: [{ name: "quản lý cấu hình luật", path: "/home/law" }],
+            task: [{ name: "quản lí cấu hình luật", path: "/home/law" }],
+          },
+          {
+            iconName: "event_note", // Khác biệt: Quản lý hoạt động
+            path: "/home/activity-logs",
+            task: [{ name: "Quản Lí hoạt động", path: "/home/activity-logs" }],
           },
         ];
         icon.push(...icon_admin)
@@ -134,7 +190,7 @@ export class Home implements OnInit {
           }, {
             iconName: "gavel", // Khác biệt: Hợp đồng (document)
             path: "/home/law",
-            task: [{ name: "quản lý cấu hình luật", path: "/home/law" }],
+            task: [{ name: "quản lí cấu hình luật", path: "/home/law" }],
           },
         ];
         icon.push(...icon_hr)
@@ -213,11 +269,28 @@ export class Home implements OnInit {
     }
   }
 
-  // Removed getNotification, onApprove, onReject, countnotifi, query
+  // --- HÀM LOAD THÔNG BÁO ---
+  async loadNotifications() {
+    if (this.role[0] !== 'HR') {
+      return; // Chỉ load thông báo cho HR
+    }
+    const res = await getNotificationContract();
+    if (res && Array.isArray(res)) {
+      this.notifications = res;
+      this.notificationCount = res.length;
+    }
+    this.cdr.detectChanges();
+  }
 
   ngOnInit() {
     this.CheckLogin();
     this.checkrole();
-    // Removed getNotification call
+    // Load dark mode on init from sessionStorage
+    const savedDarkMode = sessionStorage.getItem('darkMode');
+    this.isDarkMode = savedDarkMode === 'true';
+    this.applyDarkMode();
+
+    // Gọi API lấy thông báo
+    this.loadNotifications();
   }
 }

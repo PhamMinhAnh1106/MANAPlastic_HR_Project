@@ -111,7 +111,7 @@
 
             <div class="form-group">
               <label class="form-label">Số ngày công chuẩn mặc định</label>
-              <input type="number" step="1" formControlName="standardWorkDays" class="form-input">
+              <input type="number" step="1" min="24"  max="31" formControlName="standardWorkDays" class="form-input">
             </div>
 
             <div class="form-grid-2">
@@ -172,7 +172,11 @@
             <div class="modal-actions">
               <button type="button" (click)="closeModals()" class="btn-cancel">Hủy bỏ</button>
               <button type="submit" [disabled]="isSubmitting" class="btn-submit btn-primary-dark">
-                <svg *ngIf="isSubmitting" class="spinner-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <svg *ngIf="isSubmitting" class="spinner-sm" xmlns="http://www.w3.org/2000/svg" fill="none" 
+                viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                 stroke-width="4"></circle><path class="opacity-75" fill="currentColor" 
+                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
                 <span>Lưu thay đổi</span>
               </button>
             </div>
@@ -180,4 +184,6 @@
         </div>
       </div>
     </div>
-  
+  <app-loading *ngIf="isloading"></app-loading>
+<app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
+<app-alert *ngIf="isalert" [message]="alertmessage" [notifyType]="alertType" (hidden)="isalert = false"></app-alert>

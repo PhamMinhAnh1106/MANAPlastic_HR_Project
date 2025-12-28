@@ -1,47 +1,43 @@
 <div class="tax-container">
-  
-<header class="page-header">
 
+  <header class="page-header header-card">
     <div class="header-content">
-
       <h1>Quản Lý Thuế</h1>
-
       <p class="subtitle">Cấu hình các loại thuế trong hệ thống</p>
-
     </div>
 
-    <button class="btn btn-primary" (click)="openCreateModal()">
+    <div class="header-actions">
 
-      <span class="icon">+</span> Thêm Mới
-
-    </button>
-
+      <div class="filter-bar">
+        <div class="search-wrapper">
+          <div class="search-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <input type="text" class="search-input" placeholder="Nhập mã thuế ..." [(ngModel)]="searchQuery"
+            (keyup.enter)="onSearch()">
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-search" (click)="onSearch()">
+            Tìm kiếm
+          </button>
+          <button class="btn btn-refresh" (click)="loadData()" title="Tải lại dữ liệu">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn btn-primary" (click)="openCreateModal()">
+        <span class="icon">+</span> Thêm Mới
+      </button>
+    </div>
   </header>
   <!-- Filter & Search Section (UPDATED) -->
-  <div class="filter-bar">
-    <div class="search-wrapper">
-      <div class="search-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      </div>
-      <input 
-        type="text" 
-        class="search-input"
-        placeholder="Nhập mã thuế hoặc từ khóa..." 
-        [(ngModel)]="searchQuery"
-        (keyup.enter)="onSearch()"
-      >
-
-    </div>
-    <div class="action-buttons">
-      <button class="btn btn-search" (click)="onSearch()">
-        Tìm kiếm
-      </button>
-      <button class="btn btn-refresh" (click)="loadData()" title="Tải lại dữ liệu">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
-      </button>
-     
-    </div>
-  </div>
 
   <!-- Loading State -->
   <div *ngIf="isLoading" class="loading-state">
@@ -86,8 +82,8 @@
           <td class="text-right actions">
             <button class="btn-icon edit" (click)="openEditModal(item)" title="Chỉnh sửa">
               <span class="material-symbols-outlined">
-                        edit
-                        </span>   
+                edit
+              </span>
             </button>
           </td>
         </tr>
@@ -111,18 +107,14 @@
       <h2>{{ isEditing ? 'Cập Nhật Thuế' : 'Thêm Thuế Mới' }}</h2>
       <button class="close-btn" (click)="closeModal()">×</button>
     </div>
-    
+
     <form [formGroup]="taxForm" (ngSubmit)="onSubmit()">
       <div class="modal-body">
         <!-- Input: Key -->
         <div class="form-group">
           <label>Mã Cài Đặt (Key) <span class="required">*</span></label>
-          <input 
-            type="text" 
-            formControlName="settingKey" 
-            placeholder="VD: VAT_G" 
-            [class.error]="isFieldInvalid('settingKey')"
-          >
+          <input type="text" formControlName="settingKey" placeholder="VD: VAT_G"
+            [class.error]="isFieldInvalid('settingKey')">
           <div class="error-msg" *ngIf="isFieldInvalid('settingKey')">Vui lòng nhập mã cài đặt.</div>
         </div>
 
@@ -131,34 +123,21 @@
           <div class="form-group half">
             <label>Giá Trị (%) <span class="required">*</span></label>
             <div class="input-suffix-wrapper">
-              <input 
-                type="number" 
-                formControlName="value" 
-                placeholder="0" 
-                [class.error]="isFieldInvalid('value')"
-              >
+              <input type="number" formControlName="value" placeholder="0" [class.error]="isFieldInvalid('value')">
               <span class="suffix">%</span>
             </div>
             <div class="error-msg" *ngIf="isFieldInvalid('value')">Giá trị không hợp lệ.</div>
           </div>
           <div class="form-group half">
             <label>Ngày Hiệu Lực <span class="required">*</span></label>
-            <input 
-              type="date" 
-              formControlName="effectiveDate" 
-              [class.error]="isFieldInvalid('effectiveDate')"
-            >
+            <input type="date" formControlName="effectiveDate" [class.error]="isFieldInvalid('effectiveDate')">
           </div>
         </div>
 
         <!-- Textarea: Description -->
         <div class="form-group">
           <label>Mô Tả</label>
-          <textarea 
-            formControlName="description" 
-            rows="3" 
-            placeholder="Nhập mô tả chi tiết..."
-          ></textarea>
+          <textarea formControlName="description" rows="3" placeholder="Nhập mô tả chi tiết..."></textarea>
         </div>
 
         <!-- Toggle Switch -->

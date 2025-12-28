@@ -7,13 +7,12 @@ import {
   putPermissionRole,
   type putPermissionRole as PutRoleForm
 } from '../../../../services/pages/features/admin/permision.service';
-import { NgFor, NgIf, NgClass } from '@angular/common';
+import { NgFor, NgIf, CommonModule } from '@angular/common';
 import { Alert } from '../../../shared/alert/alert';
 import { Loading } from '../../../shared/loading/loading';
 import { Comfirm } from '../../../shared/comfirm/comfirm';
 import { FormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
-// import { getdataRole } from '../../../../services/pages/getPageRole.service'; // Không cần gọi API lấy list role nữa
 import { GetOneAccountInfo } from '../../../../services/pages/features/hr/accountManager.service';
 
 interface UserInfo {
@@ -34,7 +33,7 @@ interface ChangePer {
 @Component({
   selector: 'app-permissions',
   standalone: true,
-  imports: [NgIf, NgFor, NgClass, Alert, Loading, Comfirm, FormsModule],
+  imports: [CommonModule, Alert, Loading, Comfirm, FormsModule],
   templateUrl: './permissions.html',
   styleUrl: './permissions.scss',
 })
@@ -60,7 +59,6 @@ export class Permissions implements OnInit {
   isLastPage: boolean = false;
 
   // --- ROLE TAB VARIABLES ---
-  // CẤU HÌNH CỐ ĐỊNH DANH SÁCH ROLE THEO YÊU CẦU
   rolesList: any[] = [
     { id: 1, roleName: 'Admin' },
     { id: 2, roleName: 'HR' },
@@ -89,7 +87,6 @@ export class Permissions implements OnInit {
   constructor(private cookie: CookieService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    // Khởi tạo tab Role với dữ liệu mặc định
     this.initRoles();
   }
 
@@ -97,12 +94,16 @@ export class Permissions implements OnInit {
     this.notifyMessage = message;
     this.notifyType = type;
     this.isalert = true;
-    setTimeout(() => (this.isalert = false), 3000);
+    this.cdr.detectChanges(); // Cập nhật UI để hiện thông báo ngay
+    setTimeout(() => {
+      this.isalert = false;
+      this.cdr.detectChanges(); // Cập nhật UI khi ẩn thông báo
+    }, 3000);
   }
 
-  // --- TAB HANDLING ---
   switchTab(tab: 'user' | 'role') {
     this.activeTab = tab;
+    this.cdr.detectChanges();
   }
 
   // ==========================================
@@ -111,7 +112,7 @@ export class Permissions implements OnInit {
 
   private buildQueryString(): string {
     let query = '';
-    if (this.filterKeyword && this.filterKeyword.trim()) query += `&keyword=${encodeURIComponent(this.filterKeyword.trim())}`;
+    if (this.filterKeyword?.trim()) query += `&keyword=${encodeURIComponent(this.filterKeyword.trim())}`;
     if (this.filterCode) query += `&permissionCode=${encodeURIComponent(this.filterCode)}`;
     if (this.filterId) query += `&permissionId=${this.filterId}`;
     if (this.filterStatus !== 'all') {
@@ -124,6 +125,7 @@ export class Permissions implements OnInit {
 
   applyFilter() {
     this.currentPage = 0;
+    this.permissions = [];
     this.searchPermission(false);
   }
 
@@ -134,6 +136,7 @@ export class Permissions implements OnInit {
     this.filterStatus = 'all';
     this.filterOverride = false;
     this.applyFilter();
+    this.cdr.detectChanges();
   }
 
   async searchPermission(isNewUserSearch: boolean = false) {
@@ -147,14 +150,10 @@ export class Permissions implements OnInit {
       this.isLastPage = false;
       this.permissions = [];
       this.currentUser = null;
-      this.filterKeyword = '';
-      this.filterCode = '';
-      this.filterId = null;
-      this.filterStatus = 'all';
-      this.filterOverride = false;
     }
 
     this.isloading = true;
+    this.cdr.detectChanges(); // Trigger loading state
 
     try {
       const role = this.cookie.get('role').toLowerCase();
@@ -173,47 +172,59 @@ export class Permissions implements OnInit {
       const userRes = isNewUserSearch ? results[1] : null;
 
       if (isNewUserSearch) {
-        if (userRes && userRes.content) {
-          this.currentUser = userRes.content[0] || userRes;
+        if (userRes && (userRes.content || userRes.fullname)) {
+          this.currentUser = Array.isArray(userRes.content) ? userRes.content[0] : userRes;
         } else {
-          this.showNotification("Không tìm thấy thông tin nhân viên này", false);
+          this.showNotification("Không tìm thấy thông tin nhân viên (HR)", false);
         }
       }
 
-      if (permRes && Array.isArray(permRes)) {
-        this.isLastPage = permRes.length < this.pageSize;
-        this.permissions = permRes.filter((p: any) => p.enabledByRole === true);
+      if (Array.isArray(permRes)) {
+        if (permRes.length === 0 && this.currentPage > 0) {
+          this.currentPage--;
+          this.isLastPage = true;
+          this.showNotification("Đã hiển thị hết dữ liệu.", true);
+        } else {
+          this.permissions = permRes.filter((p: any) => p.enabledByRole === true);
+          this.isLastPage = permRes.length < this.pageSize;
 
-        // Populate filters options based on data
+          if (this.permissions.length === 0 && this.currentPage === 0) {
+            this.isLastPage = true;
+          }
+        }
+
         if (this.permissions.length > 0) {
           const codes = new Set(this.permissions.map((p: any) => p.permissionCode));
           const ids = new Set(this.permissions.map((p: any) => p.permissionId));
-          this.availableCodes = Array.from(codes) as string[];
-          this.availableIds = Array.from(ids) as number[];
-          this.availableIds.sort((a, b) => a - b);
-          this.availableCodes.sort();
-        } else if (isNewUserSearch) {
-          this.availableCodes = [];
-          this.availableIds = [];
+          if (this.availableCodes.length === 0) {
+            this.availableCodes = Array.from(codes) as string[];
+            this.availableCodes.sort();
+          }
+          if (this.availableIds.length === 0) {
+            this.availableIds = Array.from(ids) as number[];
+            this.availableIds.sort((a, b) => a - b);
+          }
         }
       } else {
         this.permissions = [];
         this.isLastPage = true;
       }
+
     } catch (error) {
       console.error(error);
-      this.showNotification("Lỗi hệ thống hoặc không tìm thấy dữ liệu", false);
-      if (isNewUserSearch) this.currentUser = null;
-      this.permissions = [];
+      this.showNotification("Lỗi hệ thống hoặc không kết nối được server", false);
+      if (isNewUserSearch) this.permissions = [];
     } finally {
       this.isloading = false;
-      this.cdr.detectChanges();
+      this.cdr.detectChanges(); // Trigger update UI after loading
     }
   }
 
   changePage(delta: number) {
     const newPage = this.currentPage + delta;
-    if (newPage < 0 || (delta > 0 && this.isLastPage)) return;
+    if (delta > 0 && this.isLastPage) return;
+    if (newPage < 0) return;
+
     this.currentPage = newPage;
     this.searchPermission(false);
   }
@@ -232,6 +243,7 @@ export class Permissions implements OnInit {
     if (!this.selectedPermission || !this.searchUsername) return;
     this.showEditModal = false;
     this.isloading = true;
+    this.cdr.detectChanges(); // Update UI loading start
 
     const form: ChangePer = {
       username: this.searchUsername,
@@ -239,37 +251,51 @@ export class Permissions implements OnInit {
       activePermission: value
     };
 
-    const res = await Changepermission(form);
-    this.isloading = false;
-
-    if (res) {
-      this.showNotification(`Cập nhật thành công!`, true);
-      this.searchPermission(false);
-    } else {
-      this.showNotification("Cập nhật thất bại", false);
+    try {
+      const res = await Changepermission(form);
+      if (res) {
+        this.showNotification(`Cập nhật thành công!`, true);
+        this.searchPermission(false);
+      } else {
+        this.showNotification("Cập nhật thất bại", false);
+      }
+    } catch (e) {
+      this.showNotification("Lỗi kết nối", false);
+    } finally {
+      this.isloading = false;
+      this.cdr.detectChanges(); // Update UI loading end
     }
   }
 
   onDeleteClick(permission: any) {
     this.itemToDelete = permission;
-    this.confirmMessage = `Bạn có chắc muốn xóa thiết lập quyền "${permission.description}" (Reset về mặc định)?`;
+    this.confirmMessage = `Reset quyền "${permission.description}" về mặc định?`;
     this.isconfirm = true;
   }
 
   async onConfirmResult(confirmed: boolean) {
     this.isconfirm = false;
+    this.cdr.detectChanges(); // Ẩn confirm modal ngay
+
     if (confirmed && this.itemToDelete) {
       this.isloading = true;
-      const res = await Deletepermission(this.itemToDelete.permissionId, this.searchUsername);
-      this.isloading = false;
+      this.cdr.detectChanges();
 
-      if (res) {
-        this.showNotification("Đã reset quyền thành công!", true);
-        this.searchPermission(false);
-      } else {
-        this.showNotification("Lỗi khi xóa", false);
+      try {
+        const res = await Deletepermission(this.itemToDelete.permissionId, this.searchUsername);
+        if (res) {
+          this.showNotification("Đã reset quyền thành công!", true);
+          this.searchPermission(false);
+        } else {
+          this.showNotification("Lỗi khi xóa", false);
+        }
+      } catch (e) {
+        this.showNotification("Lỗi kết nối", false);
+      } finally {
+        this.isloading = false;
+        this.itemToDelete = null;
+        this.cdr.detectChanges(); // Update UI
       }
-      this.itemToDelete = null;
     }
   }
 
@@ -278,10 +304,6 @@ export class Permissions implements OnInit {
   // ==========================================
 
   initRoles() {
-    // Không gọi API getdataRole nữa, dùng danh sách tĩnh đã khai báo ở trên
-    // rolesList = [{id:1, roleName:'Admin'}, ...]
-
-    // Tự động chọn Role đầu tiên (Admin)
     if (this.rolesList.length > 0) {
       this.selectedRoleId = this.rolesList[0].id;
       this.getRolePermissions();
@@ -294,25 +316,40 @@ export class Permissions implements OnInit {
       this.getRolePermissions();
     } else {
       this.rolePermissions = [];
+      this.cdr.detectChanges();
     }
   }
 
   async getRolePermissions() {
     if (!this.selectedRoleId) return;
     this.isloading = true;
+    this.cdr.detectChanges();
+
     try {
       const res = await GetpermissionRole(this.selectedRoleId, this.rolePage, this.roleSize);
 
-      // Xử lý response API
       if (res && res.content) {
-        this.rolePermissions = res.content;
-        this.isRoleLastPage = res.last;
-        if (typeof res.number === 'number') {
-          this.rolePage = res.number;
+        const newData = res.content;
+
+        if (newData.length === 0 && this.rolePage > 0) {
+          this.rolePage--;
+          this.isRoleLastPage = true;
+          this.showNotification("Hết danh sách quyền.", true);
+        } else {
+          this.rolePermissions = newData;
+          this.isRoleLastPage = res.last !== undefined ? res.last : (newData.length < this.roleSize);
+          if (typeof res.number === 'number') {
+            this.rolePage = res.number;
+          }
         }
       } else if (Array.isArray(res)) {
-        this.rolePermissions = res;
-        this.isRoleLastPage = res.length < this.roleSize;
+        if (res.length === 0 && this.rolePage > 0) {
+          this.rolePage--;
+          this.isRoleLastPage = true;
+        } else {
+          this.rolePermissions = res;
+          this.isRoleLastPage = res.length < this.roleSize;
+        }
       } else {
         this.rolePermissions = [];
         this.isRoleLastPage = true;
@@ -323,13 +360,15 @@ export class Permissions implements OnInit {
       this.rolePermissions = [];
     } finally {
       this.isloading = false;
-      this.cdr.detectChanges();
+      this.cdr.detectChanges(); // Update UI sau khi load xong
     }
   }
 
   changeRolePage(delta: number) {
     const newPage = this.rolePage + delta;
-    if (newPage < 0 || (delta > 0 && this.isRoleLastPage)) return;
+    if (newPage < 0) return;
+    if (delta > 0 && this.isRoleLastPage) return;
+
     this.rolePage = newPage;
     this.getRolePermissions();
   }
@@ -337,29 +376,29 @@ export class Permissions implements OnInit {
   async toggleRolePermission(permission: any) {
     if (!this.selectedRoleId) return;
 
-    const newActiveState = !permission.active;
     const previousState = permission.active;
-
-    // Cập nhật UI ngay lập tức
-    permission.active = newActiveState;
+    permission.active = !previousState;
+    this.cdr.detectChanges(); // Update UI switch ngay lập tức (Optimistic)
 
     const form: PutRoleForm = {
       roleId: this.selectedRoleId,
       permissionId: permission.permissionId,
-      active: newActiveState
+      active: permission.active
     };
 
     try {
-      const res = await putPermissionRole(form) as { data: string, status: number };
-      if (res && (res.status === 200 || res.data)) {
-        this.showNotification("Cập nhật quyền Role thành công", true);
+      const res: any = await putPermissionRole(form);
+      const isSuccess = (res && res.status === 200) || (res && res.data) || res === true;
+
+      if (isSuccess) {
+        this.showNotification("Đã cập nhật cấu hình Role", true);
       } else {
-        permission.active = previousState;
-        this.showNotification("Cập nhật thất bại", false);
+        throw new Error("Failed");
       }
     } catch (error) {
-      permission.active = previousState;
-      this.showNotification("Lỗi hệ thống", false);
+      permission.active = previousState; // Revert nếu lỗi
+      this.showNotification("Lỗi cập nhật server", false);
+      this.cdr.detectChanges(); // Update lại UI sau khi revert
     }
   }
 }
