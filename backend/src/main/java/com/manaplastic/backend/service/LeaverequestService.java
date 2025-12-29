@@ -472,7 +472,8 @@ public class LeaverequestService {
         return 0;
     }
 
-    @Scheduled(cron = "0 5 0 1 1 *") // 5 phút sáng 1/1
+    @Scheduled(cron = "0 5 0 1 1 *") // 00:05 phút sáng 1/1 hàng năm
+    @Transactional
     public void generateLeaveBalanceForNewYear() {
         int newYear = LocalDate.now().getYear();
         List<UserEntity> users = userRepository.findAllActiveUsers();
@@ -518,11 +519,14 @@ public class LeaverequestService {
                     balanceRecord.setUserID(user);
                     balanceRecord.setLeaveType(leaveType);
                     balanceRecord.setDaysUsed(0);
+
+
                 }
 
                 //Các số dư phép cho năm mới chỉ được giữ lại là phép năm - AL
                 balanceRecord.setTotalGranted(daysToGrant);
                 if (leaveType.getShiftname().startsWith("AL")) {
+                    balanceRecord.setTotalGranted(0); // lam toi tháng nào thì nhận thêm AL tháng đó
                     balanceRecord.setCarriedOver(phepTon);
                 } else {
                     balanceRecord.setCarriedOver(0);
@@ -530,6 +534,61 @@ public class LeaverequestService {
 
                 leaveBalanceRepository.save(balanceRecord);
             }
+        }
+    }
+
+    // Chạy vào 00:30 ngày 1 hàng tháng (Chạy sau job năm mới một chút để tránh conflict ngày 1/1)
+    @Scheduled(cron = "0 30 0 1 * *")
+    @Transactional
+    public void accrueMonthlyLeave() { // hàm +1 AL vào mỗi tháng
+        LocalDate today = LocalDate.now();
+        int currentYear = today.getYear();
+
+        ShiftEntity alShift = shiftRepository.findByShiftname("AL (Anually Leave)")
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy loại phép AL"));
+
+        List<UserEntity> users = userRepository.findAllActiveUsers();
+
+        for (UserEntity user : users) {
+
+            if (user.getHiredate().isAfter(today)) continue; // Kiểm tra ngày vào làm vd: ngày 15 vào thì tháng sau mới +1 AL
+
+            // Tính số ngày được cộng trong 1 tháng
+            int thamNien = currentYear - user.getHiredate().getYear();
+            int daysPerYear = 12; // Mặc định
+
+            // Tìm policy chuẩn
+            Optional<LeavepolicyEntity> policyOpt = leavePolicyRepository.findPolicyMatches(
+                    LeavepolicyEntity.LeaveType.ANNUAL,
+                    thamNien,
+                    user.getJobtype(),
+                    user.getGender()
+            ).stream().findFirst();
+
+            if (policyOpt.isPresent()) {
+                daysPerYear = policyOpt.get().getDays();
+            }
+
+            int monthlyAccrual = daysPerYear / 12;
+
+            LeavebalanceEntityId id = new LeavebalanceEntityId(user.getId(), alShift.getId(), currentYear);
+
+            // Tìm bản ghi balance (Đã được tạo ở bước 1 hoặc tạo mới nếu user mới vào)
+            LeavebalanceEntity balance = leaveBalanceRepository.findById(id).orElseGet(() -> {
+                LeavebalanceEntity newB = new LeavebalanceEntity();
+                newB.setId(id);
+                newB.setUserID(user);
+                newB.setLeaveType(alShift);
+                newB.setDaysUsed(0);
+                newB.setCarriedOver(0);
+                newB.setTotalGranted(0);
+                return newB;
+            });
+
+            // CỘNG DỒN
+            balance.setTotalGranted(balance.getTotalGranted() + monthlyAccrual);
+
+            leaveBalanceRepository.save(balance);
         }
     }
 

@@ -114,7 +114,12 @@ public class AdminService {
             newBalance.setId(id);
             newBalance.setUserID(user);
             newBalance.setLeaveType(leaveType);
-            newBalance.setTotalGranted(daysToGrant);
+//            newBalance.setTotalGranted(daysToGrant);
+            if (leaveType.getShiftname().startsWith("AL")) {
+                newBalance.setTotalGranted(0); // Chưa làm tháng nào thì chưa tích dc AL
+            } else {
+                newBalance.setTotalGranted(daysToGrant);
+            }
             newBalance.setCarriedOver(0); // Mới vào chưa có phép tồn
             newBalance.setDaysUsed(0);    // Mới vào chưa dùng phép
             newBalance.setLastUpdated(Instant.now());

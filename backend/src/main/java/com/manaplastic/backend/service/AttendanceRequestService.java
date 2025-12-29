@@ -152,6 +152,15 @@ public class AttendanceRequestService {
                 Files.createDirectories(uploadPath);
             }
 
+            String contentType = file.getContentType();
+            if (contentType == null || (!contentType.equals("image/jpeg") && !contentType.equals("image/png"))) {
+                throw new IllegalArgumentException("Chỉ chấp nhận file ảnh định dạng JPG, JPEG hoặc PNG.");
+            }
+
+            if (file.isEmpty()) {
+                throw new RuntimeException("File không được để trống.");
+            }
+
             String originalFilename = file.getOriginalFilename();
             if (originalFilename == null) originalFilename = "unknown.jpg";
 

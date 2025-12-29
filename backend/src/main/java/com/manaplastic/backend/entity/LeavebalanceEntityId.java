@@ -2,7 +2,9 @@ package com.manaplastic.backend.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.OnDelete;
@@ -14,6 +16,8 @@ import java.util.Objects;
 @Getter
 @Setter
 @Embeddable
+@AllArgsConstructor
+@NoArgsConstructor
 public class LeavebalanceEntityId implements Serializable {
     private static final long serialVersionUID = -2689799086420403665L;
     @NotNull

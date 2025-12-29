@@ -16,42 +16,40 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "rewardpunishmentdecisions")
 public class RewardpunishmentdecisionEntity {
+
+    public enum RewardType { REWARD, PUNISHMENT }
+    public enum DecisionStatus { PENDING, APPROVED, PROCESSED, CANCELLED }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "DecisionID", nullable = false)
+    @Column(name = "DecisionID")
     private Integer id;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "UserID", nullable = false)
-    private UserEntity userID;
+    @Column(name = "UserID", nullable = false)
+    private Integer userID;
 
-    @NotNull
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "Type", nullable = false)
-    private String type;
+    private RewardType type;
 
-    @NotNull
-    @Lob
-    @Column(name = "Reason", nullable = false)
+    @Column(name = "Reason", nullable = false, columnDefinition = "TEXT")
     private String reason;
 
-    @NotNull
     @Column(name = "DecisionDate", nullable = false)
     private LocalDate decisionDate;
 
-    @ColumnDefault("0.00")
     @Column(name = "Amount", precision = 15, scale = 2)
     private BigDecimal amount;
 
-    @ColumnDefault("0")
     @Column(name = "IsTaxExempt")
-    private Boolean isTaxExempt;
+    private Boolean isTaxExempt; // 1 = Miễn thuế, 0 = Chịu thuế
 
-    @ColumnDefault("'PENDING'")
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "Status")
-    private String status;
+    private DecisionStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UserID", insertable = false, updatable = false)
+    private UserEntity user;
 
 }
