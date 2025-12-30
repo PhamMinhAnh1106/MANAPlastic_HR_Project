@@ -22,7 +22,7 @@ export async function UpdateAccount(formdata: updateaccount, role: string) {
             status: res.status
         };
     } catch (e) {
-        return `loi he thong ` + e;
+        return e;
     }
 }
 

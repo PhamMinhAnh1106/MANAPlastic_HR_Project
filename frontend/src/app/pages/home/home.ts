@@ -143,23 +143,23 @@ export class Home implements OnInit {
       case "Admin":
         const icon_admin = [
           {
-            iconName: "manage_accounts", // Khác biệt: Quản lý user
+            iconName: "manage_accounts",
             path: "/home/user/account",
-            task: [{ name: "Quản Lý Tài Khoản", path: "/home/user/account" }, { name: "Cấp quyền hạn", path: "/home/permission" }]
+            task: [{ name: "Quản Lý Tài Khoản", path: "/home/user/account" }, { name: "Cấp Quyền Hạn", path: "/home/permission" }]
           },
           {
-            iconName: "paid", // Khác biệt: Quản lý tiền lương
+            iconName: "paid",
             path: "/home/payroll",
             task: [{ name: "Cấu Hình Lương", path: "/home/payroll/rules" }, { name: "Tính Lương", path: "/home/payroll" },],
           }, {
-            iconName: "gavel", // Khác biệt: Hợp đồng (document)
+            iconName: "gavel",
             path: "/home/law",
-            task: [{ name: "Quản Lý cấu hình luật", path: "/home/law" }],
+            task: [{ name: "Quản Lý Cấu Hình Luật", path: "/home/law" }],
           },
           {
-            iconName: "event_note", // Khác biệt: Quản lý hoạt động
+            iconName: "event_note",
             path: "/home/activity-logs",
-            task: [{ name: "Quản Lý hoạt động", path: "/home/activity-logs" }],
+            task: [{ name: "Quản Lý Hoạt Động", path: "/home/activity-logs" }],
           },
         ];
         icon.push(...icon_admin)
@@ -169,33 +169,33 @@ export class Home implements OnInit {
       case "HR":
         const icon_hr = [
           {
-            iconName: "manage_accounts", // Quản lý nhân sự
+            iconName: "manage_accounts",
             path: "/home/user/account",
-            task: [{ name: "Quản Lí Nhân sự", path: "/home/user/account" }],
+            task: [{ name: "Quản Lý Nhân Sự", path: "/home/user/account" }],
           },
           {
-            iconName: "event_available", // Khác biệt: Chấm công/Phép
+            iconName: "event_available",
             path: "/home/user/attendance",
-            task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" }, { name: "Quản lí phép", path: "/home/leaverequest/manage" }]
+            task: [{ name: "Quản Lý Chấm Công", path: "/home/user/attendance" }, { name: "Quản Lý Phép", path: "/home/leaverequest/manage" }]
           },
           {
-            iconName: "article", // Khác biệt: Hợp đồng (document)
+            iconName: "article",
             path: "/home/contracts",
-            task: [{ name: "Quản Lí hợp đồng", path: "/home/contracts" }],
+            task: [{ name: "Quản Lý Hợp Đồng", path: "/home/contracts" }],
           },
           {
-            iconName: "currency_exchange", // Khác biệt: Tiền tệ/Lương
+            iconName: "currency_exchange",
             path: "/home/payroll",
             task: [{ name: "Tính Lương", path: "/home/payroll" },
             { name: "Cấu Hình Lương", path: "/home/payroll/rules" },
-            { name: "Xem lương", path: "/home/payroll/payslip" },
+            { name: "Xem Lương", path: "/home/payroll/payslip" },
             { name: "Lọc DS Lương", path: "/home/payroll/payslip/filter" },
-            { name: "Quản lý thưởng/phạt", path: "/home/user/reward-punish" }
+            { name: "Quản Lý Thưởng/Phạt", path: "/home/user/reward-punish" }
             ],
           }, {
-            iconName: "gavel", // Khác biệt: Hợp đồng (document)
+            iconName: "gavel",
             path: "/home/law",
-            task: [{ name: "quản lí cấu hình luật", path: "/home/law" }],
+            task: [{ name: "Quản Lý Cấu Hình Luật", path: "/home/law" }],
           },
         ];
         icon.push(...icon_hr)
@@ -205,19 +205,19 @@ export class Home implements OnInit {
       case "Manager":
         const icon_manager = [
           {
-            iconName: "edit_calendar", // Khác biệt: Quản lý lịch
+            iconName: "edit_calendar",
             path: "/home/user/attendance",
-            task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" }, { name: "Lịch làm việc", path: "/home/schedule" }]
+            task: [{ name: "Quản Lý Chấm Công", path: "/home/user/attendance" }, { name: "Lịch Làm Việc", path: "/home/schedule" }]
           },
           {
-            iconName: "flight_takeoff", // Khác biệt: Nghỉ phép
+            iconName: "flight_takeoff",
             path: "/home/leaverequest",
-            task: [{ name: "Nghỉ Phép", path: "/home/leaverequest" }, { name: "Quản lí phép", path: "/home/leaverequest/manage" }]
+            task: [{ name: "Nghỉ Phép", path: "/home/leaverequest" }, { name: "Quản Lý Phép", path: "/home/leaverequest/manage" }]
           },
           {
-            iconName: "receipt_long", // Khác biệt: Hóa đơn/Phiếu lương
+            iconName: "receipt_long",
             path: "/home/payroll/payslip",
-            task: [{ name: "Xem lương", path: "/home/payroll/payslip" },],
+            task: [{ name: "Xem Lương", path: "/home/payroll/payslip" },],
           },
 
         ];
@@ -228,19 +228,19 @@ export class Home implements OnInit {
       case "Employee":
         const icon_employee = [
           {
-            iconName: "calendar_month", // Lịch cơ bản
+            iconName: "calendar_month",
             path: "/home/user/attendance",
-            task: [{ name: "Quản Lí chấm công", path: "/home/user/attendance" }, { name: "Lịch làm việc", path: "/home/schedule" }]
+            task: [{ name: "Quản Lý Chấm Công", path: "/home/user/attendance" }, { name: "Lịch Làm Việc", path: "/home/schedule" }]
           },
           {
-            iconName: "beach_access", // Khác biệt: Nghỉ mát/Phép
+            iconName: "beach_access",
             path: "/home/leaverequest",
             task: [{ name: "Nghỉ Phép", path: "/home/leaverequest" }]
           },
           {
-            iconName: "payments", // Thanh toán/Lương
+            iconName: "payments",
             path: "/home/payroll/payslip",
-            task: [{ name: "Xem lương", path: "/home/payroll/payslip" }],
+            task: [{ name: "Xem Lương", path: "/home/payroll/payslip" }],
           },
         ];
         icon.push(...icon_employee)

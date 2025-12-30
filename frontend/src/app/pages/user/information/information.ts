@@ -49,6 +49,7 @@ export class Information implements OnInit {
     birth: "",
     address: "",
     bankAccount: "",
+    status: "",
     bankName: "",
     hireDate: "",
     roleName: "",
@@ -89,12 +90,15 @@ export class Information implements OnInit {
       birth: res.birth,
       address: res.address,
       bankAccount: res.bankAccount,
+      status: res.status,
       bankName: res.bankName,
       hireDate: res.hireDate,
       roleName: res.roleName,
       departmentID: res.departmentID
     }
     sessionStorage.setItem("departmentId", String(this.userInfo.departmentID));
+    sessionStorage.setItem("userId", String(this.userInfo.userID));
+
     this.cdr.detectChanges();
   }
 
@@ -129,10 +133,9 @@ export class Information implements OnInit {
         }
       }
 
-      console.log("Saving data:", this.formdata);
 
       try {
-        const res = await UpdateAccount(this.formdata, this.role) as { data: any; status: number };
+        const res = await UpdateAccount(this.formdata, this.role) as any;
         if (res.status == 200) {
           this.onalert(res.data, true);
           this.isloading = false;
@@ -141,10 +144,14 @@ export class Information implements OnInit {
           this.getInformation(); // Load lại dữ liệu mới
           this.cdr.detectChanges();
         } else {
-          this.onalert(res.data, false);
+          this.onalert(res.response.data.message, false);
+          console.log("Error response:", res);
         }
       } catch (error) {
         this.onalert("Lỗi kết nối server", false);
+      } finally {
+        this.isloading = false;
+        this.isconfirm = false;
       }
 
     } else {

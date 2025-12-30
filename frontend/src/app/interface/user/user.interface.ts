@@ -12,6 +12,7 @@ export interface information {
     bankAccount: string,
     bankName: string,
     hireDate: string,
+    status: string,
     roleName: string,
     departmentID: number
 }

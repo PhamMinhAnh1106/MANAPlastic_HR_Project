@@ -2,7 +2,7 @@ import { NgFor, NgIf, DatePipe, CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
-import { scheduleList } from '../../../utils/listSchedule.utils';
+import { getAllSchedules, scheduleList } from '../../../utils/listSchedule.utils';
 import { Loading } from '../loading/loading';
 import { Alert } from '../alert/alert';
 import { Comfirm } from '../comfirm/comfirm';
@@ -11,9 +11,16 @@ import {
   getReschedule,
   ApproveReschedule,
   RejectReschedule,
-  RescheduleAPI
+  RescheduleAPI,
+  NewEmployeeInterface,
+  AddNewEmployee
 } from '../../../services/pages/features/employee/shedule.services';
 import { ShiftChangeRequest } from '../../../interface/schedule.interface';
+
+// --- MOCK API & INTERFACE (Theo yêu cầu) ---
+// Giả lập biến api nếu chưa có (trong thực tế bạn import từ cấu hình axios của dự án)
+declare const api: any;
+
 
 // --- ĐỊNH NGHĨA TẠM THỜI (Giữ nguyên) ---
 export interface userSchedule { employeeId: number; employeeFullName: string; drafts?: any[]; }
@@ -66,6 +73,15 @@ export class Tablemonth implements OnInit, OnChanges {
 
   // Dữ liệu đã lọc và gom nhóm để hiển thị
   displayGroupedRequests: GroupedRequest[] = [];
+
+  // --- State cho chức năng Thêm Mới ---
+  showAddEmployeePopup: boolean = false;
+  shiftListForAdd: any[] = [];
+  newEmployeeForm: NewEmployeeInterface = {
+    username: '',
+    startDate: '',
+    shiftId: 0
+  };
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -212,7 +228,7 @@ export class Tablemonth implements OnInit, OnChanges {
   dayShiftMap: { [date: string]: any[] } = {};
   statusSchedule: string | null = '';
 
-  ngOnInit() {
+  async ngOnInit() {
     this.role = this.cookie.get("role")?.toLowerCase() || 'manager';
     this.cdr.detectChanges();
     this.prepareDayShiftMap();
@@ -221,6 +237,9 @@ export class Tablemonth implements OnInit, OnChanges {
     if (this.role === 'manager' || this.role === 'employee') {
       this.getNotification();
     }
+
+    // Load danh sách ca cho chức năng thêm mới
+    this.shiftListForAdd = getAllSchedules();
   }
   ngOnChanges() {
     this.prepareDayShiftMap();
@@ -307,10 +326,26 @@ export class Tablemonth implements OnInit, OnChanges {
 
   reason: string = '';
   changeType(hours: number) { scheduleList(hours, this.list); }
+
   async onConfirmResult(event: any) {
     if (!this.shiftId) return this.Onalert("Bạn chưa chọn ca!", false);
     this.isconfirm = false;
     if (event == true) {
+      // --- LOGIC MỚI: Check quyền Manager ---
+      if (this.role === 'manager') {
+        const storedUserId = sessionStorage.getItem("userId");
+        const currentUserId = storedUserId ? Number(storedUserId) : null;
+        const targetEmployeeId = this.selectedShiftData.employeeId;
+
+        // Nếu userId không khớp với employeeId của ca làm việc, chặn lại
+        if (currentUserId && currentUserId !== targetEmployeeId) {
+          this.Onalert("Bạn chỉ có thể chỉnh sửa lịch làm việc của chính mình!", false);
+          this.selectedShiftData = null; // Đóng popup
+          return;
+        }
+      }
+      // --------------------------------------
+
       this.statusSchedule = sessionStorage.getItem("statusSchedule");
       this.isloading = true;
       const payload = { employeeId: this.selectedShiftData.employeeId, date: this.selectedShiftData.date, shiftId: this.shiftId, isDayOff: this.shiftId >= 53 };
@@ -330,4 +365,47 @@ export class Tablemonth implements OnInit, OnChanges {
     }
   }
   saveShift() { this.isconfirm = true; this.confirmMessage = "Bạn có chắc muốn thay đổi thông tin ca làm này ?"; }
+
+  // --- LOGIC MỚI: Thêm Nhân Viên ---
+  openAddEmployeePopup() {
+    this.showAddEmployeePopup = true;
+    // Reset form
+    this.newEmployeeForm = {
+      username: '',
+      startDate: '',
+      shiftId: 0
+    };
+  }
+
+  closeAddEmployeePopup() {
+    this.showAddEmployeePopup = false;
+  }
+
+  async submitNewEmployee() {
+    if (!this.newEmployeeForm.username || !this.newEmployeeForm.startDate || !this.newEmployeeForm.shiftId) {
+      this.Onalert("Vui lòng điền đầy đủ thông tin!", false);
+      return;
+    }
+
+    this.isloading = true;
+    try {
+      const res = await AddNewEmployee(this.newEmployeeForm) as any;
+      // Kiểm tra kết quả trả về từ API (tùy thuộc vào cấu trúc response thực tế)
+      if (res.status === 200) {
+        this.Onalert(res.data, true);
+        this.closeAddEmployeePopup();
+        this.schedule.loadData(); // Tải lại lịch
+        this.cdr.detectChanges();
+
+      } else {
+        this.Onalert(res.response.data.message, false);
+        console.error('Lỗi khi thêm nhân viên mới:', res);
+      }
+    } catch (e) {
+      this.Onalert("Lỗi kết nối!", false);
+    } finally {
+      this.isloading = false;
+      this.cdr.detectChanges();
+    }
+  }
 }

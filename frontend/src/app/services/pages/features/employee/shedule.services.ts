@@ -151,3 +151,24 @@ export async function RejectReschedule(id: number) {
         return error;
     }
 }
+
+
+
+export interface NewEmployeeInterface {
+    username: string,
+    startDate: string,
+    shiftId: number
+}
+export async function AddNewEmployee(form: NewEmployeeInterface) {
+    try {
+        const res = await api.post("/manager/shiftSchedule/newEmployee", form);
+        return {
+            data: res.data,
+            status: res.status
+        };
+
+    } catch (error) {
+        return error;
+    }
+}
+

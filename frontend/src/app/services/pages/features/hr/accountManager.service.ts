@@ -31,6 +31,7 @@ export async function UpdateAccounthr(formdata: information, role: string) {
             address: formdata.address,
             bankAccount: formdata.bankAccount,
             bankName: formdata.bankName,
+            status: formdata.status,
             hireDate: formdata.hireDate,
             roleName: formdata.roleName,
             departmentID: formdata.departmentID

@@ -176,7 +176,6 @@ export class Accounts implements OnInit {
           return;
         }
         if (this.emp.phonenumber.length < 10) {
-          console.log("Phone number length:");
           this.showNotification("Số điện thoại không hợp lệ (phải từ 10 đến 12 số)", false);
           return;
 

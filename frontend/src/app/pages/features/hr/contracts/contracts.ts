@@ -2,20 +2,12 @@ import { DecimalPipe, DatePipe, NgFor, NgIf, NgClass } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-// [UPDATE] Thêm SafeResourceUrl để xử lý PDF trong iframe
 import { DomSanitizer, SafeUrl, SafeResourceUrl } from '@angular/platform-browser';
-
 import { Loading } from '../../../shared/loading/loading';
 import { Alert } from '../../../shared/alert/alert';
-import {
-  CheckContractByIdEmployee,
-  ExportFileDataContracts,
-  FillterContract,
-  FillterContractByIdEmployee,
-
-} from '../../../../services/pages/features/hr/contracts.service';
-import { buildQueryParams } from '../../../../utils/filters.utils';
+import { CheckContractByIdEmployee, EditContract, EditContractInterface, ExportFileDataContracts, FillterContract, FillterContractByIdEmployee } from '../../../../services/pages/features/hr/contracts.service';
 import { getContractFile } from '../../../../utils/getimage.utils';
+import { buildQueryParams } from '../../../../utils/filters.utils';
 
 @Component({
   selector: 'app-contracts',
@@ -52,9 +44,30 @@ export class Contracts implements OnInit {
   popupMode: 'message' | 'list' = 'message';
   listContracts: any[] = [];
 
-  // --- [UPDATE] FILE PREVIEW PROPS ---
+  // --- EDIT POPUP PROPS ---
+  showEditPopup: boolean = false;
+
+  // [UPDATE] Cập nhật form theo Interface mới
+  editForm: EditContractInterface = {
+    id: 0,
+    username: '',
+    contractName: '',
+    type: 'FIXED_TERM',
+    baseSalary: 0,
+    insuranceSalary: 0,
+    allowanceToxicType: 'NONE',
+    signDate: '',
+    startDate: '',
+    endDate: '',
+    status: 'ACTIVE',
+    file: null
+  };
+
+  // Biến hiển thị tên file đã chọn
+  selectedFileName: string = '';
+
+  // --- FILE PREVIEW PROPS ---
   showImagePreview = false;
-  // Dùng Union Type để chứa cả URL ảnh và URL iframe
   previewContentUrl: SafeUrl | SafeResourceUrl | null = null;
   fileType: 'image' | 'pdf' | null = null;
   private currentBlobUrl: string | null = null;
@@ -67,12 +80,19 @@ export class Contracts implements OnInit {
   pageSizeOptions: number[] = [5, 10, 20, 50];
 
   statusContract = [
-    'DRAFT',
-    'ACTIVE',
-    'EXPIRING_SOON',
-    'EXPIRED',
-    'TERMINATED',
-    'HISTORY'
+    'ACTIVE', 'HISTORY', 'TERMINATED'
+  ];
+
+  contractTypes = [
+    { value: 'INDEFINITE', label: 'Không xác định thời hạn' },
+    { value: 'FIXED_TERM', label: 'Có thời hạn' },
+    { value: 'PROBATION', label: 'Thử việc' }
+  ];
+
+  allowanceToxicTypes = [
+    { value: 'NONE', label: 'Không áp dụng' },
+    { value: 'CASH', label: 'Tiền mặt' },
+    { value: 'IN_KIND', label: 'Hiện vật' }
   ];
 
   constructor(
@@ -107,14 +127,108 @@ export class Contracts implements OnInit {
     this.router.navigate(["/home/contracts/add"]);
   }
 
-  // --- [UPDATE] LOGIC XEM FILE (PDF & ẢNH) ---
+  // --- [UPDATE] LOGIC SỬA HỢP ĐỒNG ---
+  openEditContract(contract: any) {
+    // Map dữ liệu từ row (thường là snake_case hoặc lowercase từ DB) sang CamelCase của Interface
+    this.editForm = {
+      id: contract.id,
+      username: contract.username || '',
+      contractName: contract.contractname || '',
+      type: contract.type || 'FIXED_TERM',
+      baseSalary: contract.basesalary || 0,
+      // Kiểm tra xem API trả về tên trường là gì, ở đây giả định là insurancesalary
+      insuranceSalary: contract.insurancesalary || 0,
+      allowanceToxicType: contract.allowancetoxictype || 'NONE',
+      signDate: this.formatDateForInput(contract.signdate),
+      startDate: this.formatDateForInput(contract.startdate),
+      endDate: this.formatDateForInput(contract.enddate),
+      status: contract.status || 'ACTIVE',
+      file: null // Reset file
+    };
+
+    this.selectedFileName = ''; // Reset tên file hiển thị
+    this.showEditPopup = true;
+  }
+
+  closeEditPopup() {
+    this.showEditPopup = false;
+  }
+
+  // Xử lý khi người dùng chọn file
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+      if (!validTypes.includes(file.type)) {
+        this.showNotification("Chỉ chấp nhận file PDF hoặc Ảnh (JPG, PNG)", false);
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        this.showNotification("File không được quá 5MB", false);
+        return;
+      }
+      this.editForm.file = file;
+      this.selectedFileName = file.name;
+    }
+  }
+
+  async submitEditContract() {
+    // Validate các trường bắt buộc mới
+    if (!this.editForm.contractName || !this.editForm.signDate || !this.editForm.startDate || !this.editForm.type || !this.editForm.status) {
+      this.showNotification("Vui lòng điền các thông tin bắt buộc (*)", false);
+      return;
+    }
+
+    if (this.editForm.baseSalary < 0 || this.editForm.insuranceSalary < 0) {
+      this.showNotification("Lương không được âm", false);
+      return;
+    }
+
+    this.isloading = true;
+    try {
+      const res: any = await EditContract(this.editForm);
+
+      if (res && res.status === 200) {
+        this.showNotification("Cập nhật hợp đồng thành công!", true);
+        this.closeEditPopup();
+
+        // Refresh lại list
+        if (this.popupMode === 'list') {
+          if (this.employeeId) {
+            this.viewEmployeeContracts();
+          } else {
+            this.searchContract();
+          }
+        }
+      } else {
+        this.showNotification("Cập nhật thất bại: " + (res?.data?.message || "Lỗi không xác định"), false);
+      }
+    } catch (e) {
+      this.showNotification("Lỗi kết nối server", false);
+    } finally {
+      this.isloading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  formatDateForInput(dateStr: string | Date): string {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '';
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
+  }
+
+
+  // --- LOGIC XEM FILE ---
   async viewContractImage(fileName: string) {
     if (!fileName) return;
 
     this.isloading = true;
-    this.showImagePreview = true; // Mở modal hiện loading ngay
+    this.showImagePreview = true;
 
-    // 1. Dọn dẹp URL cũ để tránh Memory Leak
     if (this.currentBlobUrl) {
       URL.revokeObjectURL(this.currentBlobUrl);
       this.currentBlobUrl = null;
@@ -129,13 +243,10 @@ export class Contracts implements OnInit {
         this.currentBlobUrl = URL.createObjectURL(blobData);
         const mimeType = blobData.type;
 
-        // 2. Kiểm tra loại file dựa trên MIME type
         if (mimeType.includes('pdf')) {
           this.fileType = 'pdf';
-          // PDF cần dùng ResourceUrl để chạy trong iframe an toàn
           this.previewContentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.currentBlobUrl);
         } else {
-          // Mặc định coi là ảnh (image/jpeg, image/png...)
           this.fileType = 'image';
           this.previewContentUrl = this.sanitizer.bypassSecurityTrustUrl(this.currentBlobUrl);
         }
@@ -155,15 +266,13 @@ export class Contracts implements OnInit {
     this.showImagePreview = false;
     this.previewContentUrl = null;
     this.fileType = null;
-
-    // Dọn dẹp khi đóng modal
     if (this.currentBlobUrl) {
       URL.revokeObjectURL(this.currentBlobUrl);
       this.currentBlobUrl = null;
     }
   }
 
-  // --- LOGIC CHECK ---
+  // --- LOGIC CHECK & SEARCH ---
   async checkSignedContract() {
     if (this.employeeId == '') {
       this.showNotification("Vui lòng nhập Mã Nhân Viên", false);
@@ -212,7 +321,6 @@ export class Contracts implements OnInit {
     }
   }
 
-  // --- LOGIC SEARCH ---
   async searchContract() {
     this.page = 0;
     await this.fetchContracts();
@@ -297,15 +405,6 @@ export class Contracts implements OnInit {
       case 'INDEFINITE': return 'Không thời hạn';
       case 'FIXED_TERM': return 'Có thời hạn';
       case 'PROBATION': return 'Thử việc';
-      default: return type;
-    }
-  }
-
-  translateAllowanceType(type: string): string {
-    switch (type) {
-      case 'NONE': return 'Không';
-      case 'CASH': return 'Tiền mặt';
-      case 'IN_KIND': return 'Hiện vật';
       default: return type;
     }
   }

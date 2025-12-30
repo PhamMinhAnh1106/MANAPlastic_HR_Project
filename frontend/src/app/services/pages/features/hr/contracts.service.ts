@@ -101,3 +101,50 @@ export async function getNotificationContract() {
         return "co loi xay ra " + error;
     }
 }
+export interface EditContractInterface {
+    id: number;
+    username: string;
+    contractName: string;
+    type: string;
+    baseSalary: number;
+    insuranceSalary: number;
+    allowanceToxicType: string;
+    signDate: string;
+    startDate: string;
+    endDate: string;
+    status: string;
+    file?: File | null;
+}
+
+// [UPDATE] Hàm gọi API dùng FormData
+export async function EditContract(form: EditContractInterface) {
+    try {
+        const formData = new FormData();
+        formData.append('id', form.id.toString());
+        formData.append('username', form.username);
+        formData.append('contractName', form.contractName);
+        formData.append('type', form.type);
+        formData.append('baseSalary', form.baseSalary.toString());
+        formData.append('insuranceSalary', form.insuranceSalary.toString());
+        formData.append('allowanceToxicType', form.allowanceToxicType);
+        formData.append('signDate', form.signDate);
+        formData.append('startDate', form.startDate);
+        if (form.endDate) formData.append('endDate', form.endDate);
+        formData.append('status', form.status);
+
+        // Chỉ append file nếu có chọn file mới
+        if (form.file) {
+            formData.append('file', form.file);
+        }
+
+        const res = await api.put(`/hr/contracts/${form.id}`, formData);
+
+        return {
+            data: res.data,
+            status: res.status
+        };
+
+    } catch (error) {
+        return error;
+    }
+}

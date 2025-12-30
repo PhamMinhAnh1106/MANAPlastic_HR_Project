@@ -164,11 +164,15 @@
                     {{ translateContractStatus(c.status) }}
                   </span>
                 </td>
-                <td class="text-center">
+                <td class="text-center action-col">
+                    <!-- Nút Xem File -->
                     <button *ngIf="c.fileurl" class="btn-icon" (click)="viewContractImage(c.fileurl)" title="Xem file hợp đồng">
                         <span class="material-symbols-outlined">visibility</span>
                     </button>
-                    <span *ngIf="!c.fileurl" class="text-muted">-</span>
+                    <!-- Nút Sửa (Mới) -->
+                    <button class="btn-icon btn-edit" (click)="openEditContract(c)" title="Sửa hợp đồng">
+                        <span class="material-symbols-outlined">edit_square</span>
+                    </button>
                 </td>
               </tr>
             </tbody>
@@ -217,6 +221,102 @@
       </button>
     </div>
   </div>
+</div>
+
+<!-- ===== [UPDATED] EDIT CONTRACT MODAL ===== -->
+<div class="overlay" *ngIf="showEditPopup">
+    <div class="modal-box edit-modal-box">
+        <div class="modal-header">
+            <h3>Điều chỉnh Hợp đồng #{{editForm.id}}</h3>
+            <button class="close-btn" (click)="closeEditPopup()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <!-- Row 1: Username & Contract Name -->
+            <div class="form-row">
+                <div class="form-group-lg half">
+                    <label>Người sở hữu (Read-only)</label>
+                    <input type="text" [value]="editForm.username" class="custom-input-lg" disabled style="background-color: #f1f5f9;">
+                </div>
+                <div class="form-group-lg half">
+                    <label>Tên hợp đồng *</label>
+                    <input type="text" [(ngModel)]="editForm.contractName" class="custom-input-lg" placeholder="Nhập tên HĐ...">
+                </div>
+            </div>
+
+            <!-- Row 2: Type & Status -->
+            <div class="form-row">
+                <div class="form-group-lg half">
+                    <label>Loại hợp đồng *</label>
+                    <select [(ngModel)]="editForm.type" class="custom-input-lg">
+                        <option *ngFor="let t of contractTypes" [value]="t.value">{{ t.label }}</option>
+                    </select>
+                </div>
+                <div class="form-group-lg half">
+                    <label>Trạng thái *</label>
+                    <select [(ngModel)]="editForm.status" class="custom-input-lg">
+                         <option *ngFor="let s of statusContract" [value]="s">{{ translateContractStatus(s) }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Row 3: Dates -->
+            <div class="form-row">
+                <div class="form-group-lg half">
+                    <label>Ngày ký *</label>
+                    <input type="date" [(ngModel)]="editForm.signDate" class="custom-input-lg">
+                </div>
+                <div class="form-group-lg half">
+                    <label>Ngày hiệu lực *</label>
+                    <input type="date" [(ngModel)]="editForm.startDate" class="custom-input-lg">
+                </div>
+            </div>
+             <div class="form-group-lg">
+                <label>Ngày hết hạn</label>
+                <input type="date" [(ngModel)]="editForm.endDate" class="custom-input-lg">
+            </div>
+
+            <!-- Row 4: Salaries -->
+            <div class="form-row">
+                <div class="form-group-lg half">
+                    <label>Lương cơ bản (VNĐ) *</label>
+                    <input type="number" [(ngModel)]="editForm.baseSalary" class="custom-input-lg">
+                </div>
+                <div class="form-group-lg half">
+                    <label>Lương đóng BH (VNĐ)</label>
+                    <input type="number" [(ngModel)]="editForm.insuranceSalary" class="custom-input-lg">
+                </div>
+            </div>
+
+            <!-- Row 5: Allowance Toxic -->
+            <div class="form-group-lg">
+                <label>Phụ cấp độc hại</label>
+                <select [(ngModel)]="editForm.allowanceToxicType" class="custom-input-lg">
+                    <option *ngFor="let a of allowanceToxicTypes" [value]="a.value">{{ a.label }}</option>
+                </select>
+            </div>
+
+            <!-- Row 6: File Upload -->
+            <div class="form-group-lg">
+                <label>File đính kèm (PDF, Ảnh)</label>
+                <div class="file-upload-wrapper">
+                    <input type="file" id="editFile" (change)="onFileSelected($event)" accept=".pdf, .jpg, .jpeg, .png" class="hidden-input">
+                    <label for="editFile" class="file-label">
+                        <span class="material-symbols-outlined">cloud_upload</span>
+                        <span>{{ selectedFileName || 'Chọn file mới (Để trống nếu không thay đổi)' }}</span>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="closeEditPopup()">Hủy</button>
+            <button class="btn-primary" (click)="submitEditContract()">Cập nhật</button>
+        </div>
+    </div>
 </div>
 
 <!-- ===== PREVIEW FILE MODAL (PDF & IMAGE) ===== -->

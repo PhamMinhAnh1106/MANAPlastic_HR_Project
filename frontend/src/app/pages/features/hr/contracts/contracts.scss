@@ -266,6 +266,13 @@ button {
             background: #e0e7ff;
             color: $primary;
         }
+
+        &.btn-edit {
+            &:hover {
+                color: #f59e0b; // Màu cam khi hover nút sửa
+                background: #fef3c7;
+            }
+        }
     }
 }
 
@@ -333,8 +340,82 @@ button {
         justify-content: flex-end;
         background: #f8fafc;
         border-radius: 0 0 16px 16px;
+        gap: 10px;
     }
 }
+
+// STYLE MỚI CHO EDIT MODAL
+.modal-box.edit-modal-box {
+    max-width: 500px; // Nhỏ gọn hơn danh sách
+
+    .form-group-lg {
+        margin-bottom: 16px;
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .custom-input-lg {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid $border;
+            border-radius: 8px;
+            outline: none;
+            box-sizing: border-box;
+
+            &:focus {
+                border-color: $primary;
+            }
+        }
+
+        // [NEW] FILE UPLOAD STYLE
+        .file-upload-wrapper {
+            position: relative;
+
+            .hidden-input {
+                display: none;
+            }
+
+            .file-label {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px;
+                border: 1px dashed $primary;
+                border-radius: 8px;
+                background: #f0f9ff;
+                color: $primary;
+                cursor: pointer;
+                transition: all 0.2s;
+
+                &:hover {
+                    background: #e0f2fe;
+                }
+
+                span {
+                    font-size: 0.85rem;
+                    font-weight: 500;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+
+    .form-row {
+        display: flex;
+        gap: 16px;
+
+        .half {
+            flex: 1;
+        }
+    }
+}
+
 
 // Message Mode Style
 .message-content {
@@ -382,6 +463,13 @@ button {
         vertical-align: middle;
         color: $text-main;
         font-size: 0.9rem;
+    }
+
+    .action-col {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
     }
 
     tr:last-child td {

@@ -34,13 +34,18 @@
         <button *ngIf="role=='manager'" class="btn-primary" (click)="emitAutoSchedule()">
             Xếp lịch tự động
         </button>
+
+        <!-- NÚT THÊM LỊCH MỚI -->
+        <button *ngIf="role=='manager'" class="btn-warning-add" (click)="openAddEmployeePopup()">
+            <span class="material-symbols-outlined">add_circle</span> Thêm Lịch
+        </button>
   
        <span *ngIf="role == 'employee'" class="add-1icon" (click)="emitRegister()">
-    <!-- Icon nằm riêng trong thẻ này -->
-    <span class="material-symbols-outlined">add</span>
-    <!-- Chữ nằm bên cạnh -->
-    <span>Đăng Ký Ca</span>
-</span>
+            <!-- Icon nằm riêng trong thẻ này -->
+            <span class="material-symbols-outlined">add</span>
+            <!-- Chữ nằm bên cạnh -->
+            <span>Đăng Ký Ca</span>
+        </span>
       </div>
     </div>
     
@@ -196,20 +201,31 @@
     <div class="modal-content fade-in">
         <div class="modal-header">
             <h3>Điều chỉnh ca làm việc</h3>
-            <button class="close-icon" (click)="selectedShiftData = null">&times;</button>
+            <button class="close-icon" (click)="selectedShiftData = null">
+                <span class="material-symbols-outlined">close</span>
+            </button>
         </div>
         <div class="modal-body">
             <div class="info-row">
                 <div class="info-item"><label>Nhân viên</label><span>{{ selectedShiftData.employeeFullName }}</span></div>
                 <div class="info-item"><label>Ngày</label><span>{{ selectedShiftData.date }}</span></div>
             </div>
+            
             <div class="form-group">
                 <label>Loại ca</label>
+                <!-- Radio group dạng thẻ mới -->
                 <div class="radio-group">
-                    <label class="radio-btn"><input type="radio" name="type" (change)="changeType(8)" value="8" /><span>Ca 8H</span></label>
-                    <label class="radio-btn"><input type="radio" name="type" (change)="changeType(6)" value="6" /><span>Ca 6H</span></label>
+                    <label class="radio-btn">
+                        <input type="radio" name="type" (change)="changeType(8)" value="8" />
+                        <span>Ca 8H</span>
+                    </label>
+                    <label class="radio-btn">
+                        <input type="radio" name="type" (change)="changeType(6)" value="6" />
+                        <span>Ca 6H</span>
+                    </label>
                 </div>
             </div>
+            
             <div class="form-group">
                 <label>Chọn ca mới</label>
                 <select [(ngModel)]="shiftId" class="custom-select">
@@ -226,7 +242,7 @@
             </div>
             <div class="form-group">
                 <label>Lý Do</label>
-                <textarea [(ngModel)]="reason"></textarea>
+                <textarea [(ngModel)]="reason" placeholder="Nhập lý do thay đổi..."></textarea>
             </div>
         </div>
         <div class="modal-footer">
@@ -236,12 +252,52 @@
     </div>
   </div>
 
-  <!-- 3. DAY DETAILS POPUP -->
+  <!-- 3. ADD NEW EMPLOYEE SCHEDULE POPUP (MỚI) -->
+  <div class="modal-backdrop" *ngIf="showAddEmployeePopup">
+    <div class="modal-content add-employee-modal fade-in">
+        <div class="modal-header">
+            <h3>Thêm lịch làm việc cho nhân viên mới</h3>
+            <button class="close-icon" (click)="closeAddEmployeePopup()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group-lg">
+                <label>Tên nhân viên (Username)</label>
+                <input type="text" [(ngModel)]="newEmployeeForm.username" placeholder="Nhập tên nhân viên..." class="custom-input-lg">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group-lg half">
+                    <label>Ngày bắt đầu</label>
+                    <input type="date" [(ngModel)]="newEmployeeForm.startDate" class="custom-input-lg">
+                </div>
+                <div class="form-group-lg half">
+                    <label>Ca làm việc</label>
+                    <select [(ngModel)]="newEmployeeForm.shiftId" class="custom-select-lg">
+                        <option [value]="0" disabled selected>-- Chọn ca --</option>
+                        <option *ngFor="let s of shiftListForAdd" [value]="s.shift_id">
+                            {{ s.shift_name }} ({{ s.start_time }} - {{ s.end_time }})
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary-lg" (click)="closeAddEmployeePopup()">Đóng</button>
+            <button class="btn btn-primary-lg" (click)="submitNewEmployee()">Thêm mới</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- 4. DAY DETAILS POPUP -->
   <div class="modal-backdrop" *ngIf="showDayDetailsPopup">
     <div class="modal-content day-details fade-in">
         <div class="modal-header">
             <h3>Chi tiết ngày {{ selectedDayForDetails?.dateStr }}</h3>
-            <button class="close-icon" (click)="closeDayDetailsPopup()">&times;</button>
+            <button class="close-icon" (click)="closeDayDetailsPopup()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
         </div>
         <div class="modal-body scrollable">
             <div class="details-list">
