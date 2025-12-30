@@ -7,6 +7,7 @@ import java.time.LocalDate;
 
 @Data
 public class RewardPunishmentDTO {
+    private Integer rewaid;
     private Integer userID;
     private String userName;
     private String type; // "REWARD" hoặc "PUNISHMENT"

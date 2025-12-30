@@ -2,7 +2,10 @@ package com.manaplastic.backend.service;
 
 import com.manaplastic.backend.DTO.account.ActivityLogDTO;
 import com.manaplastic.backend.entity.ActivitylogEntity;
+import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.repository.ActivityLogRepository;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,15 +30,16 @@ public class ActivityLogService {
 
         Specification<ActivitylogEntity> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-
+            Join<ActivitylogEntity, UserEntity> userJoin = root.join("userID", JoinType.LEFT);
             if (StringUtils.hasText(keyword)) {
                 // Chỉ cần lower keyword đầu vào
                 String likePattern = "%" + keyword.toLowerCase() + "%";
                 Predicate hasAction = cb.like(cb.lower(root.get("action")), likePattern);
                 Predicate hasDetails = cb.like(root.get("details"), likePattern);
                 Predicate hasUsername = cb.like(cb.lower(root.get("username")), likePattern);
+                Predicate hasFullName = cb.like(cb.lower(userJoin.get("fullname")), likePattern);
 
-                predicates.add(cb.or(hasAction, hasDetails, hasUsername));
+                predicates.add(cb.or(hasAction, hasDetails, hasUsername, hasFullName));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));

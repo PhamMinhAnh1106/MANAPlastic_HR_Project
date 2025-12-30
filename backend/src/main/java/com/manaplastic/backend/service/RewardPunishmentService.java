@@ -93,6 +93,7 @@ public class RewardPunishmentService {
     private RewardPunishmentDTO convertToDTO(RewardpunishmentdecisionEntity entity) {
         RewardPunishmentDTO dto = new RewardPunishmentDTO();
 
+        dto.setRewaid(entity.getId());
         dto.setUserID(entity.getUserID());
 
         if (entity.getUser() != null) {

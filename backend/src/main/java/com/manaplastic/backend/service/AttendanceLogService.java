@@ -142,6 +142,7 @@ public class AttendanceLogService {
         if (user.getDepartmentID() != null && Boolean.TRUE.equals(user.getDepartmentID().getIsoffice())) {
             isOfficeUser = true;
         }
+
         if (isOfficeUser) {
             Optional<ShiftEntity> officeShift = shiftRepository.findById(OFFICE_SHIFT_ID);
             if (officeShift.isPresent()) {
@@ -170,6 +171,7 @@ public class AttendanceLogService {
         LocalTime shiftStart = shift.getStarttime();
         LocalTime shiftEnd = shift.getEndtime();
         LocalDate workDate = attendance.getDate();
+
 
         // Ghép ngày làm việc với giờ bắt đầu ca
         LocalDateTime expectedStartTime = LocalDateTime.of(workDate, shiftStart);

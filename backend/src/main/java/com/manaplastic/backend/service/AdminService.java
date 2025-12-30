@@ -31,7 +31,7 @@ public class AdminService {
     public UserEntity createUser(UserEntity newUser) {
         String password = String.valueOf(newUser.getCccd()); // lấy số cccd làm pass
 
-        if (password == null && password.trim().length() != 12 && userRepository.existsByCccd(newUser.getCccd())) {
+        if (password == null || password.trim().length() != 12 || userRepository.existsByCccd(newUser.getCccd())) {
             throw new IllegalArgumentException("Trường 'cccd' không hợp lệ hoặc đã tồn tại");
         }
 
