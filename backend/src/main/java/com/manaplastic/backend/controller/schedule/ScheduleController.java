@@ -1,9 +1,6 @@
 package com.manaplastic.backend.controller.schedule;
 
-import com.manaplastic.backend.DTO.schedule.DraftRegistrationDTO;
-import com.manaplastic.backend.DTO.schedule.EmployeeDraftSummaryDTO;
-import com.manaplastic.backend.DTO.schedule.FinalizeScheduleDTO;
-import com.manaplastic.backend.DTO.schedule.ManagerDraftUpdateDTO;
+import com.manaplastic.backend.DTO.schedule.*;
 import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
 import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
@@ -119,6 +116,17 @@ public class ScheduleController {
 //    }
     // muốn sửa lịch thì phải duyệt hoặc từ chối đơn xin đổi ca
 
+    // Thêm lịch cho nv mới
+    @PostMapping("/manager/shiftSchedule/newEmployee")
+    @PreAuthorize("hasAuthority('Manager')")
+    @RequiredPermission(PermissionConst.SHIFT_ASSIGN)
+    public ResponseEntity<?> initializeNewEmployeeSchedule(
+            @AuthenticationPrincipal UserEntity manager,
+            @RequestBody NewEmployeeScheduleDTO dto
+    ) {
 
+        scheduleService.initializeScheduleForNewEmployee(manager.getId(), dto);
+        return ResponseEntity.ok("Đã tạo lịch thành công cho nhân viên mới!");
+    }
 
 }

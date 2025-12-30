@@ -1,9 +1,6 @@
 package com.manaplastic.backend.service;
 
-import com.manaplastic.backend.DTO.schedule.DraftRegistrationDTO;
-import com.manaplastic.backend.DTO.schedule.EmployeeDraftSummaryDTO;
-import com.manaplastic.backend.DTO.schedule.ManagerDraftUpdateDTO;
-import com.manaplastic.backend.DTO.schedule.ManagerOfficialUpdateDTO;
+import com.manaplastic.backend.DTO.schedule.*;
 import com.manaplastic.backend.entity.*;
 import com.manaplastic.backend.repository.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -288,6 +285,67 @@ public class ScheduleService {
                 officialSchedule.setPublishedDate(Instant.now());
                 schedulesToSave.add(officialSchedule);
             }
+        }
+
+        if (!schedulesToSave.isEmpty()) {
+            officialRepository.saveAll(schedulesToSave);
+        }
+    }
+
+    //Lịch xếp cho nhân viên mới
+    @Transactional
+    public void initializeScheduleForNewEmployee(Integer managerId, NewEmployeeScheduleDTO dto) {
+
+        UserEntity manager = getUserOrThrow(managerId);
+        Integer departmentId = manager.getDepartmentID().getId();
+
+
+        UserEntity employee = userRepository.findByUsername(dto.getUsername())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên với username: " + dto.getUsername()));
+
+        // Manager và Employee phải cùng phòng ban
+        if (employee.getDepartmentID() == null || !employee.getDepartmentID().getId().equals(departmentId)) {
+            throw new SecurityException("Manager không có quyền xếp lịch cho nhân viên: " + employee.getFullname());
+        }
+
+        ShiftEntity selectedShift = shiftRepository.findById(dto.getShiftId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy ca làm việc với ID: " + dto.getShiftId()));
+
+        // Xác định khoảng thời gian (Từ startDate đến hết tháng)
+        java.time.LocalDate startDate = dto.getStartDate();
+        java.time.YearMonth yearMonth = java.time.YearMonth.from(startDate);
+        java.time.LocalDate endOfMonth = yearMonth.atEndOfMonth();
+        String monthYearStr = startDate.format(MONTH_YEAR_FORMATTER);
+
+        List<EmployeeofficialscheduleEntity> schedulesToSave = new ArrayList<>();
+
+        for (java.time.LocalDate date = startDate; !date.isAfter(endOfMonth); date = date.plusDays(1)) {
+
+            // Check trùng lặp: Nếu ngày đó đã có lịch rồi thì bỏ qua
+            Optional<EmployeeofficialscheduleEntity> existing = officialRepository.findByEmployeeIDAndDate(employee, date);
+            if (existing.isPresent()) continue;
+
+            EmployeeofficialscheduleEntity official = new EmployeeofficialscheduleEntity();
+            official.setEmployeeID(employee);
+            official.setDate(date);
+            official.setMonthYear(monthYearStr);
+            official.setApprovedByManagerid(manager);
+            official.setPublishedDate(Instant.now());
+
+            //Cứ 7 ngày thì có 1 ngày Off
+            long daysDiff = java.time.temporal.ChronoUnit.DAYS.between(startDate, date);
+
+            boolean isCycleDayOff = (daysDiff + 1) % 7 == 0;
+
+            if (isCycleDayOff) {
+                official.setShiftID(null);
+                official.setIsDayOff(true);
+            } else {
+                official.setShiftID(selectedShift);
+                official.setIsDayOff(false);
+            }
+
+            schedulesToSave.add(official);
         }
 
         if (!schedulesToSave.isEmpty()) {
