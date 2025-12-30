@@ -4,9 +4,12 @@ import com.manaplastic.backend.DTO.payroll.ContractCreateDTO;
 import com.manaplastic.backend.DTO.criteria.ContractFilterCriteria;
 import com.manaplastic.backend.DTO.payroll.ContractDTO;
 import com.manaplastic.backend.DTO.payroll.ContractExpiringDTO;
+import com.manaplastic.backend.DTO.payroll.ContractUpdateDTO;
+import com.manaplastic.backend.constant.LogType;
 import com.manaplastic.backend.constant.customAnotation.LogActivity;
 import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
 import com.manaplastic.backend.constant.permission.PermissionConst;
+import com.manaplastic.backend.entity.ContractEntity;
 import com.manaplastic.backend.service.ContractService;
 import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +84,7 @@ public class ContractController {
                 } catch (IOException ex) {
                     // ignore
                 }
-                if(contentType == null) {
+                if (contentType == null) {
                     contentType = "application/pdf";
                 }
 
@@ -101,7 +104,7 @@ public class ContractController {
 
     // Tạo hợp đồng mới (Kèm upload file)
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @LogActivity(action = "CREATE_CONTRACT",description = "Tạo mới hợp đồng lao động")
+    @LogActivity(action = "CREATE_CONTRACT", description = "Tạo mới hợp đồng lao động")
     @RequiredPermission(PermissionConst.CONTRACT_CREATE)
     public ResponseEntity<?> createContract(@ModelAttribute ContractCreateDTO contractDTO) {
         try {
@@ -130,12 +133,11 @@ public class ContractController {
     /// /            List<ContractFilterResponse> contracts = contractService.searchContracts(filter);
 //            return ResponseEntity.ok(contractService.searchContracts(filter));
 //    }
-
     @GetMapping("/contractFilter")
     @RequiredPermission(PermissionConst.CONTRACT_VIEW)
     public ResponseEntity<Page<ContractDTO>> getContracts(
             @ModelAttribute ContractFilterCriteria filter,
-            @PageableDefault(page = 0,size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<ContractDTO> result = contractService.searchContracts(filter, pageable);
         return ResponseEntity.ok(result);
     }
@@ -154,5 +156,20 @@ public class ContractController {
         // Mặc định quét trước 30 ngày
         List<ContractExpiringDTO> list = contractService.getExpiringContracts(30);
         return ResponseEntity.ok(list);
+    }
+
+    //Sửa
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequiredPermission(PermissionConst.CONTRACT_UPDATE)
+    @LogActivity(action = "UPDATE_CONTRACT", description = "Cập nhật hợp đồng", logType = LogType.WARNING)
+    public ResponseEntity<?> updateContract(
+            @PathVariable int id,
+            @ModelAttribute ContractUpdateDTO request) {
+        try {
+            contractService.updateContractFull(id, request);
+            return ResponseEntity.ok("Đã cập nhật thành công");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

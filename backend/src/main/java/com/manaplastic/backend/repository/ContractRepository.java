@@ -34,6 +34,7 @@ public interface ContractRepository extends JpaRepository<ContractEntity, Intege
     @Query("SELECT c FROM ContractEntity c WHERE c.enddate BETWEEN :today AND :thresholdDate AND c.status = 'ACTIVE' ORDER BY c.enddate ASC")
     List<ContractEntity> findExpiringContracts(@Param("today") LocalDate today, @Param("thresholdDate") LocalDate thresholdDate);
 
+    boolean existsByUserID_IdAndStatusAndIdNot(int userId, String status, int contractId);
     // KIẾN THỨC LƯU Ý về Spring để tránh truy vấn db nhiều lần cho 1 tác vụ nhỏ
 //    Khi nào truyền Entity? Khi ta đã có sẵn đối tượng User đầy đủ trong tay (ví dụ lúc save contract mới).
 //    Khi nào truyền ID (@Param)? Khi ta chỉ muốn viết câu truy vấn nhanh, kiểm tra đếm số lượng, hoặc khi tên biến trong Entity dễ gây hiểu nhầm cho Spring.

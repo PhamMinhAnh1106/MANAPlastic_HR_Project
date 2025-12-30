@@ -60,4 +60,5 @@ public class ContractEntity {
     @Column(name = "Status")
     private String status;
 
+
 }

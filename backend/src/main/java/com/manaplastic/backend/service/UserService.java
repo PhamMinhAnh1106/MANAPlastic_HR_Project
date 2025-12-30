@@ -238,6 +238,10 @@ public class UserService {
             userToUpdate.setSkillGrade(request.getSkillGrade());
         }
 
+        if (request.getHireDate() != null && (isAdmin || isHR)) {
+            userToUpdate.setHiredate(request.getHireDate());
+        }
+
         if (request.getJobType() != null && (isAdmin || isHR)) {
             userToUpdate.setJobtype(request.getJobType());
         }
@@ -278,6 +282,7 @@ public class UserService {
                 .bankName(entity.getBankname())
                 .status(entity.getStatus())
                 .skillGrade(entity.getSkillGrade())
+                .hireDate(entity.getHiredate())
                 .jobType(entity.getJobtype())
                 .build();
     }

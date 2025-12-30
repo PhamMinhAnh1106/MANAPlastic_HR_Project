@@ -4,6 +4,7 @@ import com.manaplastic.backend.DTO.payroll.ContractCreateDTO;
 import com.manaplastic.backend.DTO.criteria.ContractFilterCriteria;
 import com.manaplastic.backend.DTO.payroll.ContractDTO;
 import com.manaplastic.backend.DTO.payroll.ContractExpiringDTO;
+import com.manaplastic.backend.DTO.payroll.ContractUpdateDTO;
 import com.manaplastic.backend.entity.ContractEntity;
 import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.exportfile.ExcelHelper;
@@ -28,9 +29,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -86,12 +85,23 @@ public class ContractService {
             fileUrl = storeFile(request.getFile());
         }
 
-        // Xử lý Hợp đồng cũ (Nếu có cái đang ACTIVE thì phải đóng lại)
-        contractRepository.findByUserIdAndStatus(employee.getId(), "ACTIVE")
-                .ifPresent(oldContract -> {
-                    oldContract.setStatus("HISTORY");
-                    contractRepository.save(oldContract);
-                });
+        Optional<ContractEntity> activeContractOpt = contractRepository.findByUserIdAndStatus(employee.getId(), "ACTIVE");
+
+        if (activeContractOpt.isPresent()) {
+            ContractEntity oldContract = activeContractOpt.get();
+
+            if (request.getStartDate().isBefore(oldContract.getEnddate()) || request.getStartDate().isEqual(oldContract.getEnddate())) {
+                throw new RuntimeException("Hợp đồng cũ vẫn còn hiệu lực đến ngày " + oldContract.getEnddate() +
+                        ". Ngày bắt đầu hợp đồng mới phải sau ngày này.");
+            }
+
+            oldContract.setStatus("HISTORY");
+            contractRepository.save(oldContract);
+        }
+
+//        // Xử lý Hợp đồng cũ (Nếu có cái đang ACTIVE thì phải đóng lại)
+//        contractRepository.findByUserIdAndStatus(employee.getId(), "ACTIVE")
+//                .ifPresent(oldContract -> {oldContract.setStatus("HISTORY"); contractRepository.save(oldContract); });
 
         ContractEntity newContract = new ContractEntity();
         newContract.setUserID(employee);
@@ -217,5 +227,81 @@ public class ContractService {
 
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public ContractEntity updateContractFull(int contractId, ContractUpdateDTO request) throws IOException {
+        // Tìm hợp đồng cũ
+        ContractEntity contract = contractRepository.findById(contractId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hợp đồng với ID: " + contractId));
+
+        // Cập nhật các thông tin cơ bản
+        if (request.getContractName() != null) contract.setContractname(request.getContractName());
+
+        if (request.getBaseSalary() != null) contract.setBasesalary(request.getBaseSalary());
+
+        if (request.getInsuranceSalary() != null) contract.setInsuranceSalary(request.getInsuranceSalary());
+
+        if (request.getAllowanceToxicType() != null) contract.setAllowanceToxicType(request.getAllowanceToxicType());
+
+        if (request.getSignDate() != null) contract.setSigndate(request.getSignDate());
+
+        String type = (request.getType() != null) ? request.getType() : contract.getType();
+        LocalDate start = (request.getStartDate() != null) ? request.getStartDate() : contract.getStartdate();
+        LocalDate end = request.getEndDate();
+
+        if ("FIXED_TERM".equalsIgnoreCase(type)) {
+            // Nếu là Có thời hạn -> Bắt buộc phải có ngày kết thúc
+            if (end == null && contract.getEnddate() != null) {
+                end = contract.getEnddate(); // Giữ ngày cũ nếu không gửi lên
+            }
+
+            if (start != null && end != null) {
+                if (end.isBefore(start)) {
+                    throw new RuntimeException("Ngày kết thúc không được nhỏ hơn ngày bắt đầu.");
+                }
+                long months = calculateMonths(start, end);
+                if (months > 36) {
+                    throw new RuntimeException("Hợp đồng xác định thời hạn không được vượt quá 36 tháng.");
+                }
+            } else {
+                throw new RuntimeException("Hợp đồng xác định thời hạn phải có đầy đủ ngày bắt đầu và kết thúc.");
+            }
+            contract.setEnddate(end);
+        } else {
+            // Nếu là Vô thời hạn (INDEFINITE) -> Xóa ngày kết thúc
+            contract.setEnddate(null);
+        }
+        contract.setType(type);
+        contract.setStartdate(start);
+
+        // Xử lý Trạng thái (Status)
+        if (request.getStatus() != null) {
+            String newStatus = request.getStatus().toUpperCase();
+            List<String> validStatuses = Arrays.asList("ACTIVE", "TERMINATED", "EXPIRED", "CANCELLED", "HISTORY");
+
+            if (!validStatuses.contains(newStatus)) {
+                throw new IllegalArgumentException("Trạng thái không hợp lệ: " + validStatuses);
+            }
+
+            // Nếu muốn chuyển thành ACTIVE -> Phải check trùng
+            if ("ACTIVE".equals(newStatus) && !"ACTIVE".equals(contract.getStatus())) {
+                boolean hasActive = contractRepository.existsByUserID_IdAndStatusAndIdNot(
+                        contract.getUserID().getId(), "ACTIVE", contractId
+                );
+                if (hasActive) {
+                    throw new RuntimeException("Nhân viên này đang có HĐ khác Active. Không thể chuyển HĐ này sang Active.");
+                }
+            }
+
+            contract.setStatus(newStatus);
+        }
+
+        if (request.getFile() != null && !request.getFile().isEmpty()) {
+            String newFileUrl = storeFile(request.getFile());
+            contract.setFileurl(newFileUrl);
+        }
+
+        return contractRepository.save(contract);
     }
 }
