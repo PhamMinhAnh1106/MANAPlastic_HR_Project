@@ -2,7 +2,8 @@ import { DecimalPipe, DatePipe, NgFor, NgIf, NgClass } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+// [UPDATE] Thêm SafeResourceUrl để xử lý PDF trong iframe
+import { DomSanitizer, SafeUrl, SafeResourceUrl } from '@angular/platform-browser';
 
 import { Loading } from '../../../shared/loading/loading';
 import { Alert } from '../../../shared/alert/alert';
@@ -14,7 +15,7 @@ import {
 
 } from '../../../../services/pages/features/hr/contracts.service';
 import { buildQueryParams } from '../../../../utils/filters.utils';
-import { getImageContracts } from '../../../../utils/getimage.utils';
+import { getContractFile } from '../../../../utils/getimage.utils';
 
 @Component({
   selector: 'app-contracts',
@@ -51,9 +52,11 @@ export class Contracts implements OnInit {
   popupMode: 'message' | 'list' = 'message';
   listContracts: any[] = [];
 
-  // --- IMAGE PREVIEW PROPS ---
+  // --- [UPDATE] FILE PREVIEW PROPS ---
   showImagePreview = false;
-  previewImageUrl: SafeUrl | null = null;
+  // Dùng Union Type để chứa cả URL ảnh và URL iframe
+  previewContentUrl: SafeUrl | SafeResourceUrl | null = null;
+  fileType: 'image' | 'pdf' | null = null;
   private currentBlobUrl: string | null = null;
 
   // --- PAGINATION PROPS ---
@@ -104,40 +107,56 @@ export class Contracts implements OnInit {
     this.router.navigate(["/home/contracts/add"]);
   }
 
-  // --- LOGIC XEM HÌNH ẢNH (UPDATED) ---
+  // --- [UPDATE] LOGIC XEM FILE (PDF & ẢNH) ---
   async viewContractImage(fileName: string) {
     if (!fileName) return;
 
     this.isloading = true;
-    // Reset ảnh cũ để tránh hiện ảnh của lần xem trước trong lúc đang tải
-    this.previewImageUrl = null;
+    this.showImagePreview = true; // Mở modal hiện loading ngay
+
+    // 1. Dọn dẹp URL cũ để tránh Memory Leak
+    if (this.currentBlobUrl) {
+      URL.revokeObjectURL(this.currentBlobUrl);
+      this.currentBlobUrl = null;
+    }
+    this.previewContentUrl = null;
+    this.fileType = null;
 
     try {
-      const blobData = await getImageContracts(fileName);
+      const blobData = await getContractFile(fileName);
 
       if (blobData && blobData instanceof Blob) {
-        const objectUrl = URL.createObjectURL(blobData);
-        this.currentBlobUrl = objectUrl;
-        this.previewImageUrl = this.sanitizer.bypassSecurityTrustUrl(objectUrl);
+        this.currentBlobUrl = URL.createObjectURL(blobData);
+        const mimeType = blobData.type;
+
+        // 2. Kiểm tra loại file dựa trên MIME type
+        if (mimeType.includes('pdf')) {
+          this.fileType = 'pdf';
+          // PDF cần dùng ResourceUrl để chạy trong iframe an toàn
+          this.previewContentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.currentBlobUrl);
+        } else {
+          // Mặc định coi là ảnh (image/jpeg, image/png...)
+          this.fileType = 'image';
+          this.previewContentUrl = this.sanitizer.bypassSecurityTrustUrl(this.currentBlobUrl);
+        }
       } else {
-        // Trường hợp API trả về lỗi hoặc không phải Blob
-        this.previewImageUrl = null;
+        this.previewContentUrl = null;
       }
     } catch (error) {
       console.error(error);
-      this.previewImageUrl = null;
+      this.previewContentUrl = null;
     } finally {
       this.isloading = false;
-      // Luôn mở modal dù thành công hay thất bại để hiện thông báo tương ứng
-      this.showImagePreview = true;
       this.cdr.detectChanges();
     }
   }
 
   closeImagePreview() {
     this.showImagePreview = false;
-    this.previewImageUrl = null;
+    this.previewContentUrl = null;
+    this.fileType = null;
 
+    // Dọn dẹp khi đóng modal
     if (this.currentBlobUrl) {
       URL.revokeObjectURL(this.currentBlobUrl);
       this.currentBlobUrl = null;
@@ -258,6 +277,7 @@ export class Contracts implements OnInit {
   async ExportExcel() {
     const query = buildQueryParams(this.filters);
     await ExportFileDataContracts(query);
+    this.cdr.detectChanges();
   }
 
   translateContractStatus(status: string): string {

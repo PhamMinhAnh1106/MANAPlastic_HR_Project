@@ -4,6 +4,9 @@ $bg-white: #ffffff;
 $primary-blue: #4f46e5;
 $primary-hover: #4338ca;
 $btn-green: #10b981;
+$btn-orange: #f97316;
+/* Màu cho nút chốt lương */
+$btn-orange-hover: #ea580c;
 $text-dark: #1f2937;
 $text-gray: #6b7280;
 $border-light: #e5e7eb;
@@ -143,6 +146,7 @@ $row-hover: #f9fafb;
         }
     }
 
+    // Nút Tính Lương (Cũ)
     .btn-run-batch {
         width: 100%;
         background: $primary-blue;
@@ -159,9 +163,39 @@ $row-hover: #f9fafb;
         justify-content: center;
         gap: 8px;
         box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        margin-bottom: 12px;
+        /* Thêm margin để cách nút chốt lương */
 
         &:hover {
             background: $primary-hover;
+            transform: translateY(-1px);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+
+    // Nút Chốt Lương (Mới)
+    .btn-finalize {
+        width: 100%;
+        background: $btn-orange;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.2);
+
+        &:hover {
+            background: $btn-orange-hover;
             transform: translateY(-1px);
         }
 
@@ -444,7 +478,6 @@ $row-hover: #f9fafb;
         padding: 24px;
         overflow-y: auto;
         background: #f8fafc;
-        /* Light gray background for code area */
     }
 
     .modal-footer {

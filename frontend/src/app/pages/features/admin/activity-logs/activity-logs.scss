@@ -50,7 +50,7 @@ $bg: #f8fafc;
     cursor: pointer;
 
     &:hover {
-        background: darken($primary, 10%);
+        filter: brightness(90%);
     }
 }
 
@@ -106,9 +106,9 @@ $bg: #f8fafc;
     flex-direction: column;
     font-size: 13px;
 
-    .userid {
-        color: #94a3b8;
-        font-size: 12px;
+    .username {
+        font-weight: 500;
+        color: #334155;
     }
 }
 
@@ -116,30 +116,37 @@ $bg: #f8fafc;
     font-weight: 500;
 }
 
-// Status Colors
+// --- Status Colors (UPDATED) ---
 .status-badge {
     padding: 4px 8px;
     border-radius: 4px;
-    font-size: 12px;
-    font-weight: bold;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 
     &.status-INFO {
         background: #dbeafe;
+        /* Xanh dương nhạt */
         color: #1e40af;
+        /* Xanh dương đậm */
     }
 
-    &.status-WARN {
+    &.status-WARNING {
         background: #fef9c3;
+        /* Vàng nhạt */
         color: #854d0e;
+        /* Vàng nâu */
     }
 
-    &.status-ERROR {
+    &.status-DANGER {
         background: #fee2e2;
+        /* Đỏ nhạt */
         color: #991b1b;
+        /* Đỏ đậm */
     }
 }
 
-// Truncate Details Text
 .truncate-text {
     max-width: 300px;
     white-space: nowrap;
@@ -152,15 +159,16 @@ $bg: #f8fafc;
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 16px;
-    opacity: 0.6;
+    padding: 4px;
+    color: #64748b;
+    border-radius: 4px;
 
     &:hover {
-        opacity: 1;
+        background: #f1f5f9;
+        color: $primary;
     }
 }
 
-// Pagination
 .pagination {
     padding: 15px;
     border-top: 1px solid $border;
@@ -172,6 +180,13 @@ $bg: #f8fafc;
         margin-left: 5px;
         padding: 5px 10px;
         cursor: pointer;
+        border: 1px solid $border;
+        background: white;
+        border-radius: 4px;
+
+        &:hover:not(:disabled) {
+            background: #f1f5f9;
+        }
 
         &:disabled {
             opacity: 0.5;
@@ -199,6 +214,19 @@ $bg: #f8fafc;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
+    animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .modal-header {
@@ -216,9 +244,10 @@ $bg: #f8fafc;
     .btn-close {
         background: none;
         border: none;
-        font-size: 20px;
+        font-size: 24px;
         cursor: pointer;
         color: #94a3b8;
+        line-height: 1;
     }
 }
 
@@ -229,11 +258,12 @@ $bg: #f8fafc;
 .detail-row {
     margin-bottom: 10px;
     font-size: 14px;
+    border-bottom: 1px dashed #f1f5f9;
+    padding-bottom: 8px;
 }
 
 .detail-block {
     margin-top: 15px;
-    max-width: 22rem;
 }
 
 .raw-detail-box {
@@ -248,6 +278,7 @@ $bg: #f8fafc;
     font-size: 13px;
     color: #334155;
     resize: vertical;
+    outline: none;
 }
 
 .modal-footer {
@@ -257,12 +288,16 @@ $bg: #f8fafc;
 }
 
 .btn-secondary {
-    background: #64748b;
-    color: white;
-    border: none;
+    background: white;
+    color: #64748b;
+    border: 1px solid $border;
     padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
+
+    &:hover {
+        background: #f1f5f9;
+    }
 }
 
 .loading-state,

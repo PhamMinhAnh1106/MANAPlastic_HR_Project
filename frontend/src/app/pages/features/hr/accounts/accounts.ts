@@ -63,7 +63,8 @@ export class Accounts implements OnInit {
 
   ngOnInit(): void {
     this.role = this.cookie.get("role");
-    // Đã xóa hàm this.filterEmployees() ở đây để không tự động load dữ liệu
+    // Gọi hàm load dữ liệu ngay khi khởi tạo
+    this.filterEmployees();
   }
 
   showNotification(message: string, type: boolean) {
@@ -121,23 +122,23 @@ export class Accounts implements OnInit {
   openEditModal(emp: any) {
     this.selectedEmployee = { ...emp };
   }
+
   async filterEmployees() {
-    // Nếu filter.userID rỗng thì truyền giá trị mặc định là 0
-    // if (this.filter.userID == "") {
-
-    //   this.showNotification("Còn thiếu username hoặc id nhân viên", false);
-    //   return;
-    // }
-    const keyword = this.filter.userID;
-
-
     this.isloading = true;
 
     // Reset mảng dữ liệu hiển thị
     if (this.employee.length > 0) this.employee = [];
-    // Gọi API mới với page và size
 
-    const res = await GetOneAccountInfo(keyword, this.role);
+    const keyword = this.filter.userID;
+    let res: any;
+
+    // LOGIC PHÂN TRANG & TÌM KIẾM ĐƯỢC CẬP NHẬT
+    // Nếu có keyword -> Dùng API Tìm kiếm (GetOneAccountInfo)
+    if (keyword && keyword.trim() !== '') {
+      res = await GetOneAccountInfo(keyword, this.role);
+    }
+    // Nếu không có keyword -> Dùng API Lấy danh sách phân trang (GetAccountInfo)
+
 
     this.isloading = false;
 

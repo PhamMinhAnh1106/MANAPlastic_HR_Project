@@ -393,12 +393,12 @@ button {
     }
 }
 
-// --- NEW PAGINATION FOOTER STYLE ---
+// --- PAGINATION FOOTER STYLE ---
 .pagination-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 0; // Padding bên trong modal body
+    padding: 16px 0;
     border-top: 1px solid $border;
     margin-top: 16px;
     flex-wrap: wrap;
@@ -580,12 +580,14 @@ button {
     animation: fadeIn 0.3s ease;
 }
 
+// [UPDATE] PREVIEW MODAL STYLES (Responsive PDF/IMAGE)
 .image-modal-box {
     width: auto;
-    min-width: 300px;
-    max-width: 90vw;
+    min-width: 400px; // Tăng min-width để PDF dễ đọc hơn
+    max-width: 95vw;
     height: auto;
-    max-height: 90vh;
+    max-height: 95vh;
+    overflow: hidden; // Tránh scroll ngoài ý muốn
 
     .image-body {
         display: flex;
@@ -593,13 +595,57 @@ button {
         align-items: center;
         background: #f1f5f9;
         padding: 10px;
+        min-height: 300px; // Chiều cao tối thiểu
+        overflow: auto; // Cho phép scroll nội dung nếu quá lớn
 
+        // Style cho Ảnh
         .preview-img {
             max-width: 100%;
-            max-height: 70vh;
+            max-height: 80vh;
             object-fit: contain;
             border-radius: 4px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
+
+        // Style cho PDF Container
+        .pdf-container {
+            width: 80vw; // Chiếm 80% chiều rộng màn hình
+            height: 80vh; // Chiếm 80% chiều cao màn hình
+            max-width: 1000px;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+            iframe {
+                width: 100%;
+                height: 100%;
+                border: none;
+                border-radius: 4px;
+            }
+        }
+    }
+}
+
+// Loading state trong modal
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+
+    .spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid #e2e8f0;
+        border-top-color: $primary;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
     }
 }

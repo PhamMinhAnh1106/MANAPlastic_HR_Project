@@ -40,7 +40,9 @@
                 <button [class.active]="uiMode === 'json'" (click)="setRuleMode('json')">Raw</button>
               </div>
               <button *ngIf="currentRule.ruleId" class="btn-xs btn-danger-ghost" (click)="deleteRule()">Xóa</button>
-              <button class="btn-xs btn-primary" (click)="saveRule()">Lưu</button>
+              
+              <!-- CẬP NHẬT: Gọi hàm preSaveRule thay vì saveRule -->
+              <button class="btn-xs btn-primary" (click)="preSaveRule()">Lưu</button>
             </div>
           </div>
 
@@ -66,7 +68,6 @@
                 <ng-container *ngTemplateOutlet="nodeTemplate; context:{$implicit: currentRule.dslJson}"></ng-container>
               </div>
 
-              <!-- FIX: Thêm class full-height-editor để JSON box full chiều cao -->
               <div class="editor-box full-height-editor" *ngIf="uiMode === 'json'">
                 <div class="box-header"><label>Raw JSON DSL</label></div>
                 <textarea [(ngModel)]="jsonInput" class="textarea-json"></textarea>
@@ -134,14 +135,12 @@
             </div>
             <div class="form-group">
                 <label>Tên hiển thị</label>
-                <!-- Tương tự Code, Tên hiển thị cũng khóa khi sửa biến cũ (theo yêu cầu) -->
                 <input type="text" [(ngModel)]="currentVar.name" 
                        [disabled]="!isEditingVar || (currentVar.id !== undefined && currentVar.id !== null)">
             </div>
           </div>
           <div class="form-group full-width" style="margin-bottom: 24px;">
               <label>Mô tả</label>
-              <!-- Mô tả được phép sửa khi bật chế độ Edit -->
               <input type="text" [(ngModel)]="currentVar.description" placeholder="Nhập mô tả biến..." 
                      [disabled]="!isEditingVar">
           </div>
@@ -157,12 +156,10 @@
 
           <div class="sql-panel" [class.hidden]="varMode !== 'sql'">
             <label>Câu lệnh SQL (Native Query)</label>
-            <!-- CodeMirror wrapper (việc enable/disable readonly được xử lý trong TS) -->
             <div class="codemirror-wrapper"><textarea *ngIf="wizResultSql" [disabled]="!isEditingVar">{{wizResultSql}}</textarea></div>
             <p class="hint"><i class="fa-solid fa-info-circle"></i> Tham số hỗ trợ: :userId, :startDate, :endDate, :month, :year</p>
           </div>
 
-          <!-- Audit section always active for testing -->
           <div class="audit-section">
             <h4><i class="fa-solid fa-microscope"></i> Kiểm Tra Dữ Liệu (Audit)</h4>
             <div class="audit-controls">
@@ -192,13 +189,25 @@
       </div>
       <div class="rb-body">
         <ng-container *ngIf="node.type === 'CONSTANT'"><input type="number" [(ngModel)]="node.value" class="rb-input"></ng-container>
-        <ng-container *ngIf="node.type === 'VARIABLE' || node.type === 'REFERENCE'">
+        
+        <!-- CẬP NHẬT: TÁCH RIÊNG LOGIC CHỌN BIẾN VÀ CHỌN RULE (REFERENCE) -->
+        <ng-container *ngIf="node.type === 'VARIABLE'">
           <select [(ngModel)]="node.name" class="rb-select-var">
             <option value="">-- Chọn biến --</option>
             <option *ngIf="node.name" [value]="node.name" hidden>{{node.name}}</option>
             <option *ngFor="let v of variables" [value]="v.code">{{v.code}} - {{v.name}}</option>
           </select>
         </ng-container>
+
+        <ng-container *ngIf="node.type === 'REFERENCE'">
+            <select [(ngModel)]="node.name" class="rb-select-var" style="border-color: #f59e0b; background-color: #fffbeb;">
+              <option value="">-- Chọn Rule tham chiếu --</option>
+              <option *ngIf="node.name" [value]="node.name" hidden>{{node.name}}</option>
+              <!-- Lấy từ danh sách rules thay vì variables -->
+              <option *ngFor="let r of rules" [value]="r.ruleCode">{{r.ruleCode}} - {{r.name}}</option>
+            </select>
+          </ng-container>
+        
         <ng-container *ngIf="RULE_TYPES[node.type]?.args">
           <ng-container *ngFor="let arg of RULE_TYPES[node.type].args">
             <span class="rb-label">{{arg}}</span>

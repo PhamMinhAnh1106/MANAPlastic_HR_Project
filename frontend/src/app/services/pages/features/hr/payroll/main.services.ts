@@ -17,3 +17,11 @@ export async function RulesPayroll(empId: number, month: string, year: string) {
         return error;
     }
 }
+export async function Payrollsfinalize(month: string, year: string) {
+    try {
+        const res = await api.get(`/payroll/finalize?month=${month}&year=${year}`);
+        return res.data;
+    } catch (error) {
+        return error;
+    }
+}

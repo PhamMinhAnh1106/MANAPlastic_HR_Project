@@ -8,7 +8,7 @@
 
     <!-- Quick Filter Bar -->
     <div class="quick-filter">
-      <button *ngIf="role === 'ADMIN'" class="btn-primary" (click)="addaccount()">
+      <button *ngIf="role === 'Admin'" class="btn-primary" (click)="addaccount()">
         <span class="material-symbols-outlined">add</span> Cấp Tài Khoản
       </button>
       <div class="search-box">
@@ -182,122 +182,153 @@
 <!-- Modal Edit -->
 <div class="overlay" *ngIf="selectedEmployee">
   <div class="modal-box">
-    <div class="modal-header">
-      <div class="header-content">
-        <h3>Chỉnh sửa thông tin</h3>
-        <p>Cập nhật hồ sơ cho nhân viên #{{ selectedEmployee.userID }}</p>
+    <!-- Sử dụng ngForm để validation hoạt động -->
+    <form #editForm="ngForm">
+      <div class="modal-header">
+        <div class="header-content">
+          <h3>Chỉnh sửa thông tin</h3>
+          <p>Cập nhật hồ sơ cho nhân viên #{{ selectedEmployee.userID }}</p>
+        </div>
+        <span class="close-btn" (click)="cancelEdit()">
+          <span class="material-symbols-outlined">close</span>
+        </span>
       </div>
-      <span class="close-btn" (click)="cancelEdit()">
-        <span class="material-symbols-outlined">close</span>
-      </span>
-    </div>
 
-    <div class="modal-body">
-      <div class="form-grid">
-        <!-- Thông tin cơ bản -->
-        <div class="form-section-title">Thông tin cơ bản</div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <!-- Thông tin cơ bản -->
+          <div class="form-section-title">Thông tin cơ bản</div>
 
-        <div class="form-group">
-          <label>Username</label>
-          <input [(ngModel)]="selectedEmployee.username" disabled class="input-disabled" />
-        </div>
+          <div class="form-group">
+            <label>Username <span class="text-danger">*</span></label>
+            <input [(ngModel)]="selectedEmployee.username" name="username" disabled class="input-disabled" required />
+          </div>
 
-        <div class="form-group">
-          <label>Họ và tên</label>
-          <input [(ngModel)]="selectedEmployee.fullname" />
-        </div>
+          <div class="form-group">
+            <label>Họ và tên <span class="text-danger">*</span></label>
+            <input [(ngModel)]="selectedEmployee.fullname" name="fullname" required #fullname="ngModel"
+                   [class.invalid]="fullname.invalid && (fullname.dirty || fullname.touched)"/>
+            <div *ngIf="fullname.invalid && (fullname.dirty || fullname.touched)" class="error-msg">
+              Vui lòng nhập họ tên.
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label>Giới tính</label>
-          <select [(ngModel)]="selectedEmployee.gender">
-            <option [ngValue]="'MALE'">Nam</option>
-            <option [ngValue]="'FEMALE'">Nữ</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label>Giới tính <span class="text-danger">*</span></label>
+            <select [(ngModel)]="selectedEmployee.gender" name="gender" required #gender="ngModel"
+                    [class.invalid]="gender.invalid && (gender.dirty || gender.touched)">
+              <option [ngValue]="'MALE'">Nam</option>
+              <option [ngValue]="'FEMALE'">Nữ</option>
+            </select>
+          </div>
 
-        <div class="form-group">
-          <label>Ngày sinh</label>
-          <input [(ngModel)]="selectedEmployee.birth" type="date" />
-        </div>
+          <div class="form-group">
+            <label>Ngày sinh <span class="text-danger">*</span></label>
+            <input [(ngModel)]="selectedEmployee.birth" name="birth" type="date" required #birth="ngModel"
+                   [class.invalid]="birth.invalid && (birth.dirty || birth.touched)" />
+          </div>
 
-        <div class="form-group">
-          <label>CCCD</label>
-          <input [(ngModel)]="selectedEmployee.cccd" maxlength="12" />
-        </div>
+          <div class="form-group">
+            <label>CCCD <span class="text-danger">*</span></label>
+            <input [(ngModel)]="selectedEmployee.cccd" name="cccd" maxlength="12" required #cccd="ngModel"
+                   [class.invalid]="cccd.invalid && (cccd.dirty || cccd.touched)" />
+          </div>
 
-        <!-- Liên hệ & Công việc -->
-        <div class="form-section-title full-width">Liên hệ & Công việc</div>
+          <!-- Liên hệ & Công việc -->
+          <div class="form-section-title full-width">Liên hệ & Công việc</div>
 
-        <div class="form-group">
-          <label>Email</label>
-          <input [(ngModel)]="selectedEmployee.email" />
-        </div>
+          <div class="form-group">
+            <label>Email <span class="text-danger">*</span></label>
+            <input [(ngModel)]="selectedEmployee.email" name="email" type="email" required #email="ngModel"
+                   [class.invalid]="email.invalid && (email.dirty || email.touched)" />
+          </div>
 
-        <div class="form-group">
-          <label>SĐT</label>
-          <input [(ngModel)]="selectedEmployee.phonenumber" maxlength="10"/>
-        </div>
+          <div class="form-group">
+            <label>SĐT <span class="text-danger">*</span></label>
+            <input [(ngModel)]="selectedEmployee.phonenumber" name="phonenumber" maxlength="10" required #phone="ngModel"
+                   [class.invalid]="phone.invalid && (phone.dirty || phone.touched)"/>
+          </div>
 
-        <div class="form-group">
-          <label>Ngày vào làm</label>
-          <input [(ngModel)]="selectedEmployee.hireDate" type="date" />
-        </div>
+          <div class="form-group">
+            <label>Ngày vào làm <span class="text-danger">*</span></label>
+            <input [(ngModel)]="selectedEmployee.hireDate" name="hireDate" type="date" required #hireDate="ngModel"
+                   [class.invalid]="hireDate.invalid && (hireDate.dirty || hireDate.touched)" />
+          </div>
 
-        <div class="form-group">
-          <label>Phòng ban</label>
-          <select [(ngModel)]="selectedEmployee.departmentID" [disabled]="role !== 'ADMIN'">
-            <option *ngFor="let dept of department" [value]="dept.departmentId">{{ dept.departmentName }}</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label>Phòng ban <span class="text-danger">*</span></label>
+            <select [(ngModel)]="selectedEmployee.departmentID" name="departmentID" required #dept="ngModel"
+                    [class.invalid]="dept.invalid && (dept.dirty || dept.touched)">
+              <option *ngFor="let dept of department" [value]="dept.departmentId">{{ dept.departmentName }}</option>
+            </select>
+          </div>
 
-        <div class="form-group">
-          <label>Chức vụ (Role)</label>
-          <select [(ngModel)]="selectedEmployee.roleName">
-            <option value="Admin">Admin</option>
-            <option value="HR">HR</option>
-            <option value="Manager">Manager</option>
-            <option value="Employee">Employee</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label>Chức vụ (Role) <span class="text-danger">*</span></label>
+            <select [(ngModel)]="selectedEmployee.roleName" name="roleName" [disabled]="role !== 'ADMIN'" required>
+              <option value="Admin">Admin</option>
+              <option value="HR">HR</option>
+              <option value="Manager">Manager</option>
+              <option value="Employee">Employee</option>
+            </select>
+          </div>
 
-        <div class="form-group">
-          <label>Trạng thái</label>
-          <div class="radio-group">
-            <label class="radio-label">
-              <input type="radio" [(ngModel)]="selectedEmployee.status" value="active" />
-              <span>Hoạt động</span>
-            </label>
-            <label class="radio-label">
-              <input type="radio" [(ngModel)]="selectedEmployee.status" value="inactive" />
-              <span>Ngừng hoạt động</span>
-            </label>
+          <div class="form-group">
+            <label>Trạng thái <span class="text-danger">*</span></label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" [(ngModel)]="selectedEmployee.status" name="status" value="active" required />
+                <span>Hoạt động</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" [(ngModel)]="selectedEmployee.status" name="status" value="inactive" required />
+                <span>Ngừng hoạt động</span>
+              </label>
+            </div>
+            <!-- Validation cho radio group hơi đặc biệt, chỉ hiển thị nếu form đã submit mà chưa chọn -->
+            <div *ngIf="editForm.submitted && !selectedEmployee.status" class="error-msg">
+              Vui lòng chọn trạng thái.
+            </div>
+          </div>
+
+          <!-- Tài chính -->
+          <div class="form-section-title full-width">Thông tin tài chính & Địa chỉ</div>
+
+          <div class="form-group full-width">
+            <label>Địa chỉ <span class="text-danger">*</span></label>
+            <input [(ngModel)]="selectedEmployee.address" name="address" required #address="ngModel"
+                   [class.invalid]="address.invalid && (address.dirty || address.touched)"/>
+            <div *ngIf="address.invalid && (address.dirty || address.touched)" class="error-msg">
+              Vui lòng nhập địa chỉ.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Tên Ngân hàng <span class="text-danger">*</span></label>
+            <input [(ngModel)]="selectedEmployee.bankName" name="bankName" required #bankName="ngModel"
+                   [class.invalid]="bankName.invalid && (bankName.dirty || bankName.touched)"/>
+            <div *ngIf="bankName.invalid && (bankName.dirty || bankName.touched)" class="error-msg">
+               Vui lòng nhập tên ngân hàng.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Số tài khoản <span class="text-danger">*</span></label>
+            <input [(ngModel)]="selectedEmployee.bankAccount" name="bankAccount" required #bankAccount="ngModel"
+                   [class.invalid]="bankAccount.invalid && (bankAccount.dirty || bankAccount.touched)"/>
+             <div *ngIf="bankAccount.invalid && (bankAccount.dirty || bankAccount.touched)" class="error-msg">
+               Vui lòng nhập số tài khoản.
+             </div>
           </div>
         </div>
-
-        <!-- Tài chính -->
-        <div class="form-section-title full-width">Thông tin tài chính & Địa chỉ</div>
-
-        <div class="form-group full-width">
-          <label>Địa chỉ</label>
-          <input [(ngModel)]="selectedEmployee.address" />
-        </div>
-
-        <div class="form-group">
-          <label>Tên Ngân hàng</label>
-          <input [(ngModel)]="selectedEmployee.bankName" />
-        </div>
-
-        <div class="form-group">
-          <label>Số tài khoản</label>
-          <input [(ngModel)]="selectedEmployee.bankAccount" />
-        </div>
       </div>
-    </div>
 
-    <div class="modal-footer">
-      <button class="btn-text" (click)="cancelEdit()">Hủy bỏ</button>
-      <button class="btn-primary" (click)="saveEmployee(selectedEmployee)">Lưu thay đổi</button>
-    </div>
+      <div class="modal-footer">
+        <button class="btn-text" (click)="cancelEdit()">Hủy bỏ</button>
+        <!-- Disable nút Lưu nếu form chưa hợp lệ -->
+        <button class="btn-primary" [disabled]="editForm.invalid" (click)="saveEmployee(selectedEmployee)">Lưu thay đổi</button>
+      </div>
+    </form>
   </div>
 </div>
 

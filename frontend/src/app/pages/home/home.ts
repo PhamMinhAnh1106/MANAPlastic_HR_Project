@@ -145,7 +145,7 @@ export class Home implements OnInit {
           {
             iconName: "manage_accounts", // Khác biệt: Quản lý user
             path: "/home/user/account",
-            task: [{ name: "Quản Lí Tài Khoản", path: "/home/user/account" }, { name: "Cấp quyền hạn", path: "/home/permission" }]
+            task: [{ name: "Quản Lý Tài Khoản", path: "/home/user/account" }, { name: "Cấp quyền hạn", path: "/home/permission" }]
           },
           {
             iconName: "paid", // Khác biệt: Quản lý tiền lương
@@ -154,12 +154,12 @@ export class Home implements OnInit {
           }, {
             iconName: "gavel", // Khác biệt: Hợp đồng (document)
             path: "/home/law",
-            task: [{ name: "quản lí cấu hình luật", path: "/home/law" }],
+            task: [{ name: "Quản Lý cấu hình luật", path: "/home/law" }],
           },
           {
             iconName: "event_note", // Khác biệt: Quản lý hoạt động
             path: "/home/activity-logs",
-            task: [{ name: "Quản Lí hoạt động", path: "/home/activity-logs" }],
+            task: [{ name: "Quản Lý hoạt động", path: "/home/activity-logs" }],
           },
         ];
         icon.push(...icon_admin)

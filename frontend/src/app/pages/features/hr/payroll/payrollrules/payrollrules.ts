@@ -39,8 +39,7 @@ export class Payrollrules implements OnInit, AfterViewInit {
   // --- CONFIRM & ALERT STATE ---
   isconfirm: boolean = false;
   confirmMessage: string = '';
-  // Thêm biến này để phân biệt đang xóa cái gì
-  confirmType: 'RULE' | 'VARIABLE' = 'RULE';
+  confirmType: 'RULE' | 'VARIABLE' | 'RULE_SAVE' = 'RULE';
 
   isalert: boolean = false;
   alertmessage: string = '';
@@ -50,6 +49,7 @@ export class Payrollrules implements OnInit, AfterViewInit {
     this.isalert = true;
     this.alertmessage = message;
     this.alertType = type;
+    this.cdr.detectChanges();
   }
 
   // --- STATE ---
@@ -57,9 +57,8 @@ export class Payrollrules implements OnInit, AfterViewInit {
   uiMode: 'formula' | 'visual' | 'json' = 'formula';
   varMode: 'wizard' | 'sql' = 'wizard';
 
-  // State quản lý việc sửa biến
   isEditingVar: boolean = false;
-  originalVarState: Variable | null = null; // Lưu trạng thái gốc để hoàn tác
+  originalVarState: Variable | null = null;
 
   rules: Rule[] = [];
   variables: Variable[] = [];
@@ -95,7 +94,7 @@ export class Payrollrules implements OnInit, AfterViewInit {
     'LTE': { label: '<= Nhỏ hơn bằng', group: 'comp', args: ['left', 'right'], op: '<=' },
     'IF_ELSE': { label: '❓ Nếu...Thì... (IF)', group: 'logic', args: ['condition', 'true_case', 'false_case'] },
     'VARIABLE': { label: '📦 Biến số (Var)', group: 'data', args: [] },
-    'REFERENCE': { label: '🔗 Tham chiếu (Ref)', group: 'data', args: [] },
+    'REFERENCE': { label: '🔗 Tham chiếu (Rule)', group: 'data', args: [] },
     'CONSTANT': { label: '#️⃣ Số cố định', group: 'const', args: [] }
   };
 
@@ -122,10 +121,9 @@ export class Payrollrules implements OnInit, AfterViewInit {
       if (this.sqlTextarea && typeof CodeMirror !== 'undefined') {
         this.sqlEditorInstance = CodeMirror.fromTextArea(this.sqlTextarea.nativeElement, {
           mode: 'text/x-sql', theme: 'default', lineNumbers: true, matchBrackets: true,
-          readOnly: 'nocursor' // Mặc định Read-only
+          readOnly: 'nocursor'
         });
         this.sqlEditorInstance.on('change', (cm: any) => {
-          // Chỉ cập nhật giá trị nếu đang ở chế độ sửa
           if (this.isEditingVar) {
             const value = cm.getValue();
             this.currentVar.sqlQuery = value;
@@ -138,7 +136,8 @@ export class Payrollrules implements OnInit, AfterViewInit {
     }, 100);
   }
 
-  // --- LOGIC ---
+  // --- LOGIC CONVERT AST <-> STRING ---
+
   convertAstToString(node: any): string {
     if (!node) return '';
     if (node.type === 'VARIABLE' || node.type === 'REFERENCE') return node.name || 'UNKNOWN_VAR';
@@ -158,6 +157,90 @@ export class Payrollrules implements OnInit, AfterViewInit {
     if (node.type === 'RAW_FORMULA') return node.expression || '';
     return '';
   }
+
+  // --- NEW: PARSER LOGIC (Text -> Tree) ---
+
+  /**
+   * Phân tích chuỗi công thức thành JSON Tree (AST)
+   * Hỗ trợ: +, -, *, /, (), Biến, Số
+   */
+  parseFormulaToAst(expression: string): any {
+    if (!expression || !expression.trim()) return { type: 'CONSTANT', value: 0 };
+
+    // 1. Tokenize: Tách chuỗi thành các token
+    // Regex bắt: Số, Tên biến (chữ cái bắt đầu), hoặc toán tử
+    const tokens = expression.match(/([a-zA-Z_]\w*|\d+(\.\d+)?|[+\-*/()])/g);
+    if (!tokens) return { type: 'CONSTANT', value: 0 };
+
+    const outputQueue: any[] = [];
+    const operatorStack: string[] = [];
+
+    const precedence: any = {
+      '*': 3, '/': 3,
+      '+': 2, '-': 2,
+      '(': 1
+    };
+
+    // 2. Shunting Yard Algorithm (Infix to Postfix)
+    for (const token of tokens) {
+      if (!isNaN(Number(token))) {
+        // Là số
+        outputQueue.push({ type: 'CONSTANT', value: Number(token) });
+      } else if (/^[a-zA-Z_]/.test(token)) {
+        // Là Biến hoặc Rule Reference
+        // Kiểm tra xem nó là Rule hay Variable để gán type đúng
+        const isRule = this.rules.some(r => r.ruleCode === token);
+        outputQueue.push({
+          type: isRule ? 'REFERENCE' : 'VARIABLE',
+          name: token
+        });
+      } else if (token === '(') {
+        operatorStack.push(token);
+      } else if (token === ')') {
+        while (operatorStack.length > 0 && operatorStack[operatorStack.length - 1] !== '(') {
+          this.processOperator(operatorStack.pop()!, outputQueue);
+        }
+        operatorStack.pop(); // Pop '('
+      } else if (['+', '-', '*', '/'].includes(token)) {
+        while (
+          operatorStack.length > 0 &&
+          precedence[operatorStack[operatorStack.length - 1]] >= precedence[token]
+        ) {
+          this.processOperator(operatorStack.pop()!, outputQueue);
+        }
+        operatorStack.push(token);
+      }
+    }
+
+    while (operatorStack.length > 0) {
+      this.processOperator(operatorStack.pop()!, outputQueue);
+    }
+
+    // 3. Result is the root of the tree
+    if (outputQueue.length === 0) return { type: 'CONSTANT', value: 0 };
+    return outputQueue[0];
+  }
+
+  processOperator(op: string, stack: any[]) {
+    // Lấy 2 phần tử cuối làm left, right
+    // Lưu ý: Stack là LIFO, nên phần tử lấy ra đầu tiên là Right
+    const right = stack.pop() || { type: 'CONSTANT', value: 0 };
+    const left = stack.pop() || { type: 'CONSTANT', value: 0 };
+
+    let type = 'ADD';
+    if (op === '+') type = 'ADD';
+    if (op === '-') type = 'SUB';
+    if (op === '*') type = 'MUL';
+    if (op === '/') type = 'DIV';
+
+    stack.push({
+      type: type,
+      left: left,
+      right: right
+    });
+  }
+
+  // --- END PARSER LOGIC ---
 
   get formattedFormula(): SafeHtml {
     return this.highlightFormula(this.formulaInput);
@@ -192,11 +275,27 @@ export class Payrollrules implements OnInit, AfterViewInit {
   }
 
   setRuleMode(mode: 'formula' | 'visual' | 'json') {
+    // 1. Chuyển từ JSON -> Visual
     if (this.uiMode === 'json' && mode === 'visual') {
       try { this.currentRule.dslJson = JSON.parse(this.jsonInput); } catch (e) { return; }
-    } else if (mode === 'json') {
+    }
+    // 2. Chuyển từ Formula -> Visual/Json (Tự động Parse)
+    else if (this.uiMode === 'formula' && (mode === 'visual' || mode === 'json')) {
+      try {
+        // Thử parse công thức hiện tại sang Tree
+        const ast = this.parseFormulaToAst(this.formulaInput);
+        this.currentRule.dslJson = ast;
+        this.jsonInput = JSON.stringify(ast, null, 2);
+      } catch (e) {
+        console.warn("Không thể parse công thức", e);
+        // Nếu lỗi thì giữ nguyên hoặc về mặc định
+      }
+    }
+    // 3. Chuyển sang JSON để hiển thị
+    else if (mode === 'json') {
       this.jsonInput = JSON.stringify(this.currentRule.dslJson, null, 2);
     }
+
     this.uiMode = mode;
     this.cdr.detectChanges();
   }
@@ -258,19 +357,50 @@ export class Payrollrules implements OnInit, AfterViewInit {
   insertVariable(code: string) {
     if (this.activeTab === 'rules' && this.uiMode === 'formula') this.formulaInput += code;
     else {
-      // Copy to clipboard fallback
       const el = document.createElement('textarea');
       el.value = code;
       document.body.appendChild(el);
       el.select();
       document.execCommand('copy');
       document.body.removeChild(el);
+      this.Onalert(`Đã copy mã biến ${code}`, true);
     }
   }
 
-  async saveRule() {
-    if (this.uiMode === 'formula') this.currentRule.dslJson = { type: 'RAW_FORMULA', expression: this.formulaInput };
-    else if (this.uiMode === 'json') try { this.currentRule.dslJson = JSON.parse(this.jsonInput); } catch (e) { return; }
+  // --- SAVE RULE FLOW ---
+
+  preSaveRule() {
+    this.confirmType = 'RULE_SAVE';
+    this.confirmMessage = 'Bạn có chắc chắn muốn lưu cấu hình Rule này không?';
+    this.isconfirm = true;
+    this.cdr.detectChanges();
+  }
+
+  async executeSaveRule() {
+    // --- PARSER INTEGRATION ---
+    // Nếu đang ở chế độ Text (Formula), ta thử Parse nó sang Tree trước khi lưu
+    // Thay vì lưu RAW_FORMULA, ta lưu Tree chuẩn.
+    if (this.uiMode === 'formula') {
+      try {
+        const parsedAst = this.parseFormulaToAst(this.formulaInput);
+        this.currentRule.dslJson = parsedAst;
+        console.log('Parsed AST:', parsedAst); // Debug
+      } catch (e) {
+        // Nếu parse lỗi (ví dụ IF ELSE phức tạp chưa support parser), fallback về RAW
+        console.warn('Parser failed, falling back to RAW_FORMULA');
+        this.currentRule.dslJson = { type: 'RAW_FORMULA', expression: this.formulaInput };
+      }
+    }
+    else if (this.uiMode === 'json') {
+      try {
+        this.currentRule.dslJson = JSON.parse(this.jsonInput);
+      } catch (e) {
+        this.Onalert("JSON không hợp lệ!", false);
+        return;
+      }
+    } else if (this.uiMode === 'visual') {
+      if (!this.currentRule.dslJson) this.currentRule.dslJson = { type: 'CONSTANT', value: 0 };
+    }
 
     const payload = {
       ruleId: this.currentRule.ruleId,
@@ -279,87 +409,71 @@ export class Payrollrules implements OnInit, AfterViewInit {
       name: this.currentRule.name,
       dsl: JSON.stringify(this.currentRule.dslJson)
     };
-    const res = await saveRule(payload);
-    if (res) {
-      this.Onalert(res, true);
-      await this.loadRules();
-      return;
+
+    try {
+      const res = await saveRule(payload);
+      if (res) {
+        this.Onalert("Lưu Rule thành công!", true);
+        await this.loadRules();
+      } else {
+        this.Onalert("Lưu thất bại! Kiểm tra lại mã lỗi.", false);
+      }
+    } catch (err: any) {
+      this.Onalert("Lỗi hệ thống: " + err.message, false);
     }
-    this.Onalert(res, false);
   }
 
-  // --- DELETE RULE ---
+  // --- ACTIONS: DELETE ---
   async deleteRule() {
-    this.confirmType = 'RULE'; // Đánh dấu là đang xóa Rule
+    this.confirmType = 'RULE';
     this.confirmMessage = 'Bạn có chắc chắn muốn xóa rule này không?';
     this.isconfirm = true;
   }
 
-  // --- DELETE VARIABLE ---
   async deleteVariable() {
-    this.confirmType = 'VARIABLE'; // Đánh dấu là đang xóa Variable
+    this.confirmType = 'VARIABLE';
     this.confirmMessage = 'Bạn có chắc chắn muốn xóa biến này không?';
     this.isconfirm = true;
   }
 
   async onConfirmResult(event: any) {
     this.isconfirm = false;
-    if (event !== true) {
-      return;
-    }
+    if (event !== true) return;
+
     if (this.confirmType === 'RULE') {
       if (!this.currentRule.ruleId) return;
       const res = await deleteRule(this.currentRule.ruleId);
-      if (res) {
-        this.Onalert(res, true);
-        await this.loadRules();
-        this.resetRuleEditor();
-      } else {
-        this.Onalert(res, false);
-      }
+      if (res) { this.Onalert(res, true); await this.loadRules(); this.resetRuleEditor(); }
+      else { this.Onalert(res, false); }
     }
     else if (this.confirmType === 'VARIABLE') {
-      // Logic xóa Variable
       const id = this.currentVar.id || this.currentVar.variableId;
       if (!id) return;
       const res = await deleteVariable(id);
-      if (res) {
-        this.Onalert(res, true);
-        await this.loadVariables();
-        this.resetVarEditor();
-      } else {
-        this.Onalert(res, false);
-      }
+      if (res) { this.Onalert(res, true); await this.loadVariables(); this.resetVarEditor(); }
+      else { this.Onalert(res, false); }
     }
-
+    else if (this.confirmType === 'RULE_SAVE') {
+      await this.executeSaveRule();
+    }
     this.cdr.detectChanges();
   }
-
-  // --- CÁC HÀM KHÁC ---
 
   async loadVariables() {
     try {
       const data = await getVariables();
-      if (data && Array.isArray(data)) {
-        this.variables = data;
-        this.cdr.detectChanges();
-      }
+      if (data && Array.isArray(data)) { this.variables = data; this.cdr.detectChanges(); }
     } catch (e) { console.error(e); }
   }
 
-  // --- LOGIC SỬA BIẾN (NEW) ---
-
   resetVarEditor() {
-    // Chế độ tạo mới: Cho phép sửa tất cả
     this.currentVar = { code: '', name: '', sqlQuery: '', variableId: undefined, description: '' };
     this.wizSource = ''; this.wizResultSql = '';
-
-    this.isEditingVar = true; // Bật chế độ sửa
-    this.originalVarState = null; // Không có state gốc để revert
-
+    this.isEditingVar = true;
+    this.originalVarState = null;
     if (this.sqlEditorInstance) {
       this.sqlEditorInstance.setValue('');
-      this.sqlEditorInstance.setOption('readOnly', false); // Mở khóa editor
+      this.sqlEditorInstance.setOption('readOnly', false);
     }
     this.setVarMode('wizard');
     this.cdr.detectChanges();
@@ -377,14 +491,11 @@ export class Payrollrules implements OnInit, AfterViewInit {
     };
     this.wizSource = v.code;
     this.wizResultSql = query;
-
-    // Chế độ xem: Khóa tất cả
     this.isEditingVar = false;
     this.originalVarState = null;
-
     if (this.sqlEditorInstance) {
       this.sqlEditorInstance.setValue(query);
-      this.sqlEditorInstance.setOption('readOnly', 'nocursor'); // Khóa editor
+      this.sqlEditorInstance.setOption('readOnly', 'nocursor');
       setTimeout(() => this.sqlEditorInstance.refresh(), 50);
     }
     this.setVarMode('wizard');
@@ -392,44 +503,28 @@ export class Payrollrules implements OnInit, AfterViewInit {
   }
 
   startEditVar() {
-    // Lưu trạng thái gốc
     this.originalVarState = { ...this.currentVar };
     this.isEditingVar = true;
-    // Mở khóa Editor
-    if (this.sqlEditorInstance) {
-      this.sqlEditorInstance.setOption('readOnly', false);
-    }
+    if (this.sqlEditorInstance) { this.sqlEditorInstance.setOption('readOnly', false); }
     this.cdr.detectChanges();
   }
 
   cancelEditVar() {
-    // Revert lại dữ liệu cũ
     if (this.originalVarState) {
       this.currentVar = { ...this.originalVarState };
       this.wizResultSql = this.currentVar.sqlQuery || '';
-      if (this.sqlEditorInstance) {
-        this.sqlEditorInstance.setValue(this.currentVar.sqlQuery || '');
-      }
-    } else {
-      // Nếu đang tạo mới mà hủy -> Về rỗng hoặc list (ở đây ta chỉ clear form và set readonly)
-      this.isEditingVar = false;
-    }
-
-    // Nếu là biến có sẵn -> về chế độ Read-only
+      if (this.sqlEditorInstance) this.sqlEditorInstance.setValue(this.currentVar.sqlQuery || '');
+    } else { this.isEditingVar = false; }
     if (this.currentVar.id || this.currentVar.variableId) {
       this.isEditingVar = false;
       this.originalVarState = null;
-      if (this.sqlEditorInstance) {
-        this.sqlEditorInstance.setOption('readOnly', 'nocursor');
-      }
+      if (this.sqlEditorInstance) this.sqlEditorInstance.setOption('readOnly', 'nocursor');
     }
     this.cdr.detectChanges();
   }
 
   onWizSourceChange() {
-    // Chỉ cho phép chọn template khi đang ở chế độ sửa
     if (!this.isEditingVar) return;
-
     const selectedVar = this.variables.find(v => v.code === this.wizSource);
     if (selectedVar) {
       const sql = selectedVar.sqlQuery || selectedVar.sQLQuery || '';
@@ -445,20 +540,13 @@ export class Payrollrules implements OnInit, AfterViewInit {
   }
 
   async saveVariable() {
-    if (!this.isEditingVar) return; // Guard
-
+    if (!this.isEditingVar) return;
     const payload = { id: this.currentVar.id || this.currentVar.variableId, code: this.currentVar.code, name: this.currentVar.name, description: this.currentVar.description, sqlQuery: this.currentVar.sqlQuery };
     const res = await saveVariable(payload);
-    if (res) {
-      this.Onalert(res, true);
-      await this.loadVariables();
-    }
-    // Sau khi lưu xong -> Về chế độ xem
+    if (res) { this.Onalert(res, true); await this.loadVariables(); }
     this.isEditingVar = false;
     this.originalVarState = null;
-    if (this.sqlEditorInstance) {
-      this.sqlEditorInstance.setOption('readOnly', 'nocursor');
-    }
+    if (this.sqlEditorInstance) { this.sqlEditorInstance.setOption('readOnly', 'nocursor'); }
     this.cdr.detectChanges();
   }
 

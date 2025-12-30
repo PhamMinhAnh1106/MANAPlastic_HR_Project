@@ -2,13 +2,18 @@ import { Component, inject, CUSTOM_ELEMENTS_SCHEMA, ChangeDetectorRef } from '@a
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { calculatePayroll, RulesPayroll } from '../../../../../services/pages/features/hr/payroll/main.services';
+// Import gốc từ service của bạn + Thêm Payrollsfinalize
+import { calculatePayroll, RulesPayroll, Payrollsfinalize } from '../../../../../services/pages/features/hr/payroll/main.services';
+import { Comfirm } from '../../../../shared/comfirm/comfirm';
+import { Alert } from '../../../../shared/alert/alert';
+import { Loading } from '../../../../shared/loading/loading';
 
 // Interface cho cấu trúc dữ liệu
 interface DebugRecord {
   code: string;
   name?: string;
-  value: number;
+  value: string;
+  evaluated_at?: string;
   formula_dsl?: any;
   input_desc?: string;
   input_sql?: string;
@@ -21,7 +26,7 @@ interface DebugRecord {
 @Component({
   selector: 'app-payrollmain',
   standalone: true,
-  imports: [CommonModule, FormsModule], // Ensure shared components are imported if needed
+  imports: [CommonModule, FormsModule, Comfirm, Alert, Loading],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './payrollmain.html',
   styleUrls: ['./payrollmain.scss'],
@@ -46,6 +51,8 @@ export class Payrollmain {
   // Confirm Dialog State
   isconfirm = false;
   confirmMessage = '';
+  // Thêm biến để xác định hành động đang confirm
+  confirmAction: 'NONE' | 'FINALIZE' = 'NONE';
 
   // Alert Dialog State
   isalert = false;
@@ -74,14 +81,51 @@ export class Payrollmain {
     this.isalert = true;
   }
 
+  // --- CONFIRM HANDLER ---
   onConfirmResult(result: any) {
     this.isconfirm = false;
     if (result) {
-      console.log('Confirmed!');
+      // Nếu đồng ý và hành động là Chốt lương
+      if (this.confirmAction === 'FINALIZE') {
+        this.executeFinalize();
+      }
+    }
+    // Reset action sau khi xử lý xong
+    this.confirmAction = 'NONE';
+  }
+
+
+  onFinalizeClick() {
+    this.confirmMessage = `Bạn có chắc chắn muốn chốt lương tháng ${this.month}/${this.year} không? Hành động này không thể hoàn tác.`;
+    this.confirmAction = 'FINALIZE';
+    this.isconfirm = true;
+  }
+
+  // 2. Hàm thực thi gọi API Chốt lương
+  async executeFinalize() {
+    this.isloading = true;
+    const m = String(this.month);
+    const y = String(this.year);
+
+    try {
+      const res = await Payrollsfinalize(m, y);
+
+      // Kiểm tra phản hồi (giả định trả về object hoặc string thông báo)
+      if (res && typeof res === 'object' && res.error) {
+        this.showAlert(`Lỗi khi chốt lương: ${res.error}`, false);
+      } else {
+        // Thành công
+        this.showAlert(`Đã chốt lương tháng ${m}/${y} thành công!`, true);
+      }
+    } catch (error: any) {
+      this.showAlert(`Lỗi hệ thống: ${error.message || error}`, false);
+    } finally {
+      this.isloading = false;
+      this.cdr.detectChanges();
     }
   }
 
-  // --- BUSINESS LOGIC ---
+  // --- BUSINESS LOGIC (OLD) ---
   async runCalculation() {
     this.isloading = true;
     this.runStatus = '';
@@ -145,9 +189,18 @@ export class Payrollmain {
     }
   }
 
-  // --- HELPER: Process Row Data ---
   processRow(row: DebugRecord): DebugRecord {
     row.cssClass = "row-hover";
+    let rawVal: any = row.value;
+
+    if (rawVal === undefined || rawVal === null) {
+      row.value = '';
+    } else {
+      if (Array.isArray(rawVal) || (rawVal.buffer && rawVal.length !== undefined)) {
+        rawVal = rawVal.length > 0 ? rawVal[0] : 0;
+      }
+      row.value = String(rawVal);
+    }
 
     if (row.code === 'NET_SALARY') {
       row.cssClass = "row-highlight-success";
@@ -164,7 +217,7 @@ export class Payrollmain {
     if (row.formula_dsl) {
       row.typeBadge = this.sanitizer.bypassSecurityTrustHtml(`<span class="badge badge-rule">Rule</span>`);
       const parsedDSL = this.parseDSL(row.formula_dsl);
-      htmlContent = `${parsedDSL}`; // Direct DSL content
+      htmlContent = `${parsedDSL}`;
     } else {
       row.typeBadge = this.sanitizer.bypassSecurityTrustHtml(`<span class="badge badge-input">Input</span>`);
       const sqlTooltip = row.input_sql ?
@@ -183,7 +236,6 @@ export class Payrollmain {
     return row;
   }
 
-  // --- CORE: PARSER JSON DSL ---
   parseDSL(jsonStr: any): string {
     if (!jsonStr) return 'null';
     try {
@@ -202,7 +254,6 @@ export class Payrollmain {
     if (!node) return '<span style="color:#cbd5e1">null</span>';
     const type = node.type;
 
-    // 1. Math Ops
     if (['ADD', 'SUB', 'MUL', 'DIV'].includes(type)) {
       let op = '', opClass = '';
       if (type === 'ADD') { op = '+'; opClass = 'op-add'; }
@@ -213,19 +264,18 @@ export class Payrollmain {
       return `<span style="font-family:monospace">(${this.recursiveParse(node.left)} <b class="math-op ${opClass}">${op}</b> ${this.recursiveParse(node.right)})</span>`;
     }
 
-    // 2. Variables
     if (type === 'VARIABLE' || type === 'REFERENCE') {
       return `<span style="background:#eff6ff; color:#1d4ed8; padding:2px 4px; border-radius:4px; font-weight:bold; border:1px solid #dbeafe; font-size:0.8em;">${node.name}</span>`;
     }
 
-    // 3. Constants
     if (type === 'CONSTANT') {
       let valDisplay = node.value;
-      if (typeof node.value === 'number') valDisplay = new Intl.NumberFormat('en-US').format(node.value);
+      if (typeof node.value === 'number') {
+        valDisplay = new Intl.NumberFormat('en-US', { maximumFractionDigits: 4 }).format(node.value);
+      }
       return `<span style="color:#059669; font-weight:bold; font-family:monospace;">${valDisplay}</span>`;
     }
 
-    // 4. Logic (IF/ELSE)
     if (type === 'IF_ELSE') {
       return `
         <div class="logic-tree">
@@ -242,7 +292,6 @@ export class Payrollmain {
       `;
     }
 
-    // 5. Comparisons
     if (['GT', 'LT', 'GTE', 'LTE', 'EQ'].includes(type)) {
       let op = type;
       if (type === 'GT') op = '>';

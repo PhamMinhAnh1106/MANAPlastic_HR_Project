@@ -28,7 +28,7 @@
         <div class="form-row">
           <div class="form-group">
             <label>Tháng</label>
-            <input type="number" [(ngModel)]="month" class="form-control" placeholder="11">
+            <input type="number" [(ngModel)]="month" class="form-control" placeholder="12" max="12">
           </div>
           <div class="form-group">
             <label>Năm</label>
@@ -36,9 +36,16 @@
           </div>
         </div>
 
+        <!-- Nút Tính Lương -->
         <button class="btn btn-run-batch" (click)="runCalculation()">
           <span class="material-symbols-outlined">play_arrow</span>Tính Lương (Batch)
         </button>
+
+        <!-- Nút Chốt Lương (Mới) -->
+        <button class="btn btn-finalize" (click)="onFinalizeClick()">
+          <span class="material-symbols-outlined">lock_person</span>Chốt Lương
+        </button>
+
       </div>
 
       <!-- Card 2: Cache Inspect -->
@@ -102,7 +109,8 @@
 
                 <!-- Col 2: Value -->
                 <td class="col-value">
-                  {{ row.value | number:'1.0-0' }} <span class="currency-unit">₫</span>
+                  <!-- Pipe number hoạt động tốt vì row.value giờ đã là number -->
+                  {{ row.value }} <span class="currency-unit">₫</span>
                 </td>
 
                 <!-- Col 3: Formula Button (NEW) -->
@@ -137,9 +145,11 @@
 
   <!-- Alerts/Confirms -->
   <app-alert *ngIf="isalert" [message]="alertmessage" [notifyType]="alertType" (hidden)="isalert = false"></app-alert>
+  
+  <!-- Chuyển sự kiện confirm sang onConfirmResult -->
   <app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
 
-  <!-- FORMULA DETAIL MODAL (NEW) -->
+  <!-- FORMULA DETAIL MODAL -->
   <div class="modal-backdrop" *ngIf="isFormulaModalOpen" (click)="closeFormulaModal()">
     <div class="modal-panel" (click)="$event.stopPropagation()">
       <div class="modal-header">
@@ -153,13 +163,12 @@
       </div>
       
       <div class="modal-body">
-        <!-- Render DSL/SQL here -->
         <div class="dsl-container large-view" [innerHTML]="selectedRow?.safeHtmlDisplay"></div>
       </div>
       
       <div class="modal-footer">
         <div class="footer-info">
-             <span *ngIf="selectedRow?.value !== undefined">Giá trị hiện tại: <strong>{{ selectedRow?.value | number:'1.0-0' }} ₫</strong></span>
+             <span *ngIf="selectedRow?.value !== undefined">Giá trị hiện tại: <strong>{{ selectedRow?.value  }} ₫</strong></span>
         </div>
         <button class="btn btn-primary" (click)="closeFormulaModal()">Đóng</button>
       </div>

@@ -3,18 +3,17 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
-// Import service logic (nhưng ta sẽ tự định nghĩa Interface ở dưới để tránh lỗi)
+// Import service từ đường dẫn gốc của bạn
 import { ActivityLogsService } from '../../../../services/pages/features/admin/activityLogs.service';
 
-// --- QUAN TRỌNG: Định nghĩa Interface ngay tại đây để Template hiểu ---
+// Interface đã cập nhật theo cấu trúc data mới
 export interface ActivityLogs {
-  id: number;
+  logID: number;
   action: string;
-  actiontime: string; // ISO datetime
-  userID: number | null;
-  logType: 'INFO' | 'WARN' | 'ERROR' | string;
+  actionTime: string; // ISO datetime string
+  logType: 'INFO' | 'WARNING' | 'DANGER' | string;
   details: string;
-  username: string;
+  executorName: string;
 }
 
 @Component({
@@ -44,18 +43,23 @@ export class ActivityLogs implements OnInit {
   async fetchLogs() {
     this.isLoading.set(true);
     try {
-      const queryParam = this.searchQuery ? `query=${this.searchQuery}` : '';
+      const queryParam = this.searchQuery ? `keyword=${this.searchQuery}` : '';
 
-      // Gọi service
-      // Lưu ý: Đảm bảo ActivityLogsService trong api.service.ts trả về đúng dữ liệu
+      // Gọi service thực tế thay vì mock data
+      // Giả định ActivityLogsService là một hàm async trả về dữ liệu
       const data: any = await ActivityLogsService(this.currentPage(), this.pageSize, queryParam);
 
       if (data) {
+        // Xử lý dữ liệu trả về tùy theo cấu trúc response của API
         if (Array.isArray(data)) {
           this.logs.set(data);
         } else if (data.content) {
+          // Trường hợp trả về dạng Pageable (content, totalPages,...)
           this.logs.set(data.content);
-          this.totalPages.set(data.totalPages);
+          // Cập nhật totalPages nếu có
+          if (data.totalPages) {
+            this.totalPages.set(data.totalPages);
+          }
         }
       }
     } catch (error) {

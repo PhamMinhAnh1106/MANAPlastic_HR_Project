@@ -280,7 +280,7 @@
                 <div class="form-group">
                     <label class="form-label">Ca làm việc</label>
                     <select class="form-select" [(ngModel)]="newRequest.shiftId" name="shiftId">
-                        <option *ngFor="let s of shiftsList" [value]="s.id">{{ s.name }}</option>
+                        <option *ngFor="let s of shiftsList" [value]="s.shift_id">{{ s.shift_name }}</option>
                     </select>
                 </div>
                 <div class="form-group">

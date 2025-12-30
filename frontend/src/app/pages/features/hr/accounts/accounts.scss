@@ -10,6 +10,7 @@ $border: #e2e8f0;
 $radius: 12px;
 $shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$danger: #ef4444; // Red for errors
 
 // --- GLOBAL LAYOUT ---
 :host {
@@ -106,6 +107,11 @@ button {
 
         &:hover {
             background: $primary-hover;
+        }
+
+        &:disabled {
+            background: lighten($primary, 20%);
+            cursor: not-allowed;
         }
     }
 
@@ -484,6 +490,9 @@ button {
     display: flex;
     flex-direction: column;
     animation: zoomIn 0.3s ease;
+
+    // Thêm overflow hidden để bo góc không bị đè
+    overflow: hidden;
 }
 
 .modal-header {
@@ -492,6 +501,7 @@ button {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    background: #fff; // Ensure white bg
 
     h3 {
         margin: 0;
@@ -514,7 +524,7 @@ button {
 
         &:hover {
             background: #f1f5f9;
-            color: red;
+            color: $danger;
         }
     }
 }
@@ -523,14 +533,22 @@ button {
     padding: 24px;
     overflow-y: auto;
 
+    // Đảm bảo body có thể scroll mượt
+    flex: 1;
+
     .form-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 20px;
+
+        // Responsive cho màn hình nhỏ
+        @media (max-width: 640px) {
+            grid-template-columns: 1fr;
+        }
     }
 
     .form-section-title {
-        grid-column: span 2;
+        grid-column: 1 / -1; // Span all columns
         font-size: 0.9rem;
         font-weight: 700;
         color: $text-main;
@@ -542,9 +560,10 @@ button {
     }
 
     .full-width {
-        grid-column: span 2;
+        grid-column: 1 / -1; // Span all columns
     }
 
+    // --- FORM GROUP ---
     .form-group {
         display: flex;
         flex-direction: column;
@@ -554,15 +573,24 @@ button {
             font-size: 0.85rem;
             font-weight: 600;
             color: $text-main;
+
+            .text-danger {
+                color: $danger;
+                margin-left: 4px;
+            }
         }
 
-        input,
+        // --- FIX CRITICAL: Chỉ style cho input text/select, TRÁNH radio/checkbox ---
+        input:not([type="radio"]):not([type="checkbox"]),
         select {
+            width: 100%; // Đảm bảo full width container
             padding: 10px;
             border: 1px solid $border;
             border-radius: 8px;
             outline: none;
             font-size: 0.9rem;
+            transition: all 0.2s;
+            box-sizing: border-box; // Quan trọng để padding không làm vỡ layout
 
             &:focus {
                 border-color: $primary;
@@ -574,13 +602,35 @@ button {
                 color: $text-light;
                 cursor: not-allowed;
             }
+
+            // Style khi input không hợp lệ
+            &.invalid {
+                border-color: $danger;
+                background-color: #fef2f2; // Red tint
+
+                &:focus {
+                    box-shadow: 0 0 0 3px rgba($danger, 0.1);
+                    border-color: $danger;
+                }
+            }
+        }
+
+        // Thông báo lỗi
+        .error-msg {
+            font-size: 0.75rem;
+            color: $danger;
+            margin-top: -2px;
+            font-weight: 500;
         }
     }
 
+    // --- RADIO GROUP STYLE (FIXED) ---
     .radio-group {
         display: flex;
         gap: 20px;
         padding-top: 5px;
+        align-items: center;
+        min-height: 42px; // Chiều cao tương đương input text để căn hàng đẹp
 
         .radio-label {
             display: flex;
@@ -588,12 +638,26 @@ button {
             gap: 8px;
             cursor: pointer;
             font-size: 0.9rem;
+            user-select: none;
 
-            input {
-                width: auto;
+            input[type="radio"] {
+                width: 18px;
+                height: 18px;
                 margin: 0;
                 cursor: pointer;
+                accent-color: $primary;
+                // Reset style nếu có bị dính
+                padding: 0;
+                border: none;
+                box-shadow: none;
             }
+        }
+
+        // Error message inside radio group container
+        +.error-msg {
+            font-size: 0.75rem;
+            color: $danger;
+            font-weight: 500;
         }
     }
 }
@@ -605,7 +669,7 @@ button {
     justify-content: flex-end;
     gap: 12px;
     background: #f8fafc;
-    border-radius: 0 0 16px 16px;
+    // border-radius: 0 0 16px 16px; // Không cần thiết vì modal-box đã overflow hidden
 }
 
 // Animations

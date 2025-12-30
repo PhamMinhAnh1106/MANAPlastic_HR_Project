@@ -15,6 +15,7 @@ import { Alert } from '../../../shared/alert/alert';
 import { Comfirm } from '../../../shared/comfirm/comfirm';
 import { DataAttendant } from '../data-attendant/data-attendant';
 import { getImageChamcong } from '../../../../utils/getimage.utils';
+import { getAllSchedules } from '../../../../utils/listSchedule.utils';
 
 interface attendance {
   attendanceId: number,
@@ -95,11 +96,7 @@ export class Attendant implements OnInit {
   selectedFile: File | null = null;
   selectedFileName: string = '';
 
-  shiftsList = [
-    { id: 36, name: 'Hành chính (HC)' },
-    { id: 1, name: 'Ca Sáng (SX)' },
-    { id: 2, name: 'Ca Chiều (SX)' }
-  ];
+  shiftsList: any[] = [];
 
   newRequest = {
     date: '',
@@ -385,6 +382,8 @@ export class Attendant implements OnInit {
   }
 
   ngOnInit(): void {
+    this.shiftsList = getAllSchedules();
+    console.log(this.shiftsList);
     if (this.cookie.get("role")) {
       this.role = this.cookie.get("role").toLowerCase();
     }

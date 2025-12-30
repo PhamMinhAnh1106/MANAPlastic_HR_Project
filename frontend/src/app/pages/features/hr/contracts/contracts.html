@@ -165,7 +165,7 @@
                   </span>
                 </td>
                 <td class="text-center">
-                    <button *ngIf="c.fileurl" class="btn-icon" (click)="viewContractImage(c.fileurl)" title="Xem hình ảnh hợp đồng">
+                    <button *ngIf="c.fileurl" class="btn-icon" (click)="viewContractImage(c.fileurl)" title="Xem file hợp đồng">
                         <span class="material-symbols-outlined">visibility</span>
                     </button>
                     <span *ngIf="!c.fileurl" class="text-muted">-</span>
@@ -219,24 +219,46 @@
   </div>
 </div>
 
-<!-- ===== IMAGE PREVIEW MODAL ===== -->
+<!-- ===== PREVIEW FILE MODAL (PDF & IMAGE) ===== -->
 <div class="overlay image-overlay" *ngIf="showImagePreview">
   <div class="modal-box image-modal-box">
+    
     <div class="modal-header">
-       <h3>Hình ảnh Hợp đồng</h3>
+       <h3>Chi tiết Hợp đồng</h3>
        <button class="close-btn" (click)="closeImagePreview()">
          <span class="material-symbols-outlined">close</span>
        </button>
     </div>
+    
     <div class="modal-body image-body">
-        <img *ngIf="previewImageUrl" [src]="previewImageUrl" alt="Contract Preview" class="preview-img">
-        <div *ngIf="!previewImageUrl" class="empty-state">
-          <p>Khong co hinh anh</p>
+        
+        <!-- Case 1: PDF (Dùng Iframe) -->
+        <div *ngIf="!isloading && previewContentUrl && fileType === 'pdf'" class="pdf-container">
+            <iframe [src]="previewContentUrl" frameborder="0"></iframe>
         </div>
+
+        <!-- Case 2: Image (Dùng Img) -->
+        <img *ngIf="!isloading && previewContentUrl && fileType === 'image'" 
+             [src]="previewContentUrl" 
+             alt="Contract Preview" 
+             class="preview-img">
+
+        <!-- Case 3: Empty/Error -->
+        <div *ngIf="!isloading && !previewContentUrl" class="empty-state">
+          <span class="material-symbols-outlined icon">broken_image</span>
+          <p>Không thể hiển thị tài liệu này.</p>
+        </div>
+
+        <!-- Case 4: Loading -->
+        <div *ngIf="isloading" class="loading-state">
+          <div class="spinner"></div>
+          <p style="margin-top: 10px; color: #64748b;">Đang tải tài liệu...</p>
+        </div>
+
     </div>
   </div>
 </div>
 
 <!-- Shared Components -->
-<app-loading *ngIf="isloading"></app-loading>
+<app-loading *ngIf="isloading && !showImagePreview"></app-loading>
 <app-alert *ngIf="isalert" [message]="notifyMessage" [notifyType]="notifyType" (hidden)="isalert = false"></app-alert>
