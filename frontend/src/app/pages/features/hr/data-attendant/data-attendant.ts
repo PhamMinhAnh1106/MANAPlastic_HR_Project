@@ -20,7 +20,7 @@ import { getImageAttendance } from '../../../../utils/getimage.utils';
 @Component({
   selector: 'app-data-attendant',
   standalone: true, // Thêm standalone: true nếu bạn đang dùng Angular Standalone Component
-  imports: [CommonModule, FormsModule, Loading, Alert, Comfirm],
+  imports: [CommonModule, FormsModule, Loading, Alert],
   templateUrl: './data-attendant.html',
   styleUrl: './data-attendant.scss',
 })

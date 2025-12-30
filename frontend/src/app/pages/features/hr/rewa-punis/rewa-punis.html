@@ -1,0 +1,197 @@
+<app-loading *ngIf="isloading"></app-loading>
+<app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
+<app-alert *ngIf="isalert" [message]="alertmessage" [notifyType]="alertType" (hidden)="isalert = false"></app-alert>
+
+<div class="salary-cycle-container">
+  <div class="main-wrapper">
+    
+    <!-- HEADER CARD -->
+    <div class="header-card">
+      <div class="header-info">
+        <h1 class="page-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-primary"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          Quản Lý Thưởng Phạt
+        </h1>
+        <p class="page-subtitle">Hệ thống ghi nhận khen thưởng và kỷ luật nhân sự</p>
+      </div>
+
+      <div class="actions-group">
+        <button (click)="openModal()" class="btn-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Thêm phiếu mới
+        </button>
+      </div>
+    </div>
+
+    <!-- FILTERS CARD -->
+    <div class="filter-card">
+      <div class="search-group">
+        <input type="text" [(ngModel)]="searchParams.keyword" (keyup.enter)="onSearch()" 
+               placeholder="Tìm kiếm theo tên hoặc ID nhân viên..." class="form-input">
+      </div>
+      
+      <div class="filter-group">
+        <select [(ngModel)]="searchParams.type" (change)="onSearch()" class="form-input">
+          <option value="">-- Tất cả loại --</option>
+          <option value="REWARD">Khen thưởng (Reward)</option>
+          <option value="PUNISHMENT">Kỷ luật (Punishment)</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <select [(ngModel)]="searchParams.status" (change)="onSearch()" class="form-input">
+          <option value="">-- Tất cả trạng thái --</option>
+            <option value="PENDING">Chờ duyệt</option>
+                    <option value="APPROVED">Đã duyệt</option>
+                    <option value="CANCELLED">Từ chối</option>
+                    <option value="PROCESSED">Đã xử lý</option>
+        </select>
+      </div>
+
+      <button (click)="onSearch()" class="btn-search">Tìm kiếm</button>
+    </div>
+
+    <!-- MAIN TABLE CONTENT -->
+    <div class="table-container">
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nhân viên</th>
+              <th>Loại phiếu</th>
+              <th>Lý do</th>
+              <th class="text-right">Số tiền</th>
+              <th>Ngày QĐ</th>
+              <th class="text-center">Miễn thuế</th>
+              <th>Trạng thái</th>
+              <th class="text-center">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of dataList" class="table-row">
+              <td class="col-user">
+                #{{item.userID}} 
+                <span class="user-name" *ngIf="item.userName">{{item.userName}}</span>
+              </td>
+              <td>
+                <span class="badge-type" [ngClass]="item.type === 'REWARD' ? 'REWARD' : 'PUNISHMENT'">
+                  {{item.type === 'REWARD' ? 'Thưởng' : 'Phạt'}}
+                </span>
+              </td>
+              <td class="truncate" title="{{item.reason}}">{{item.reason}}</td>
+              <td class="text-right">
+                <span class="amount-text" [ngClass]="item.type === 'REWARD' ? 'plus' : 'minus'">
+                  {{item.amount | number:'1.0-0'}} đ
+                </span>
+              </td>
+              <td>{{item.decisionDate | date:'dd/MM/yyyy'}}</td>
+              <td class="text-center">
+                 <svg *ngIf="item.isTaxExempt" class="text-green-600" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #166534"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </td>
+              <td>
+                <span class="badge-status" [ngClass]="item.status.toLowerCase()">
+                  {{item.status}}
+                </span>
+              </td>
+              <td class="text-center">
+                <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                    <button (click)="openModal(item)" class="btn-icon edit" title="Sửa">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
+                    <button (click)="onDelete(item)" class="btn-icon delete" title="Xóa">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                </div>
+              </td>
+            </tr>
+            
+            <tr *ngIf="!isloading && dataList.length === 0">
+                <td colspan="8">
+                    <div class="empty-state">
+                        Chưa có dữ liệu hiển thị.
+                    </div>
+                </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+         <span class="page-info">Trang {{page + 1}}</span>
+         <div style="display: flex; gap: 0.5rem;">
+            <button (click)="changePage(-1)" [disabled]="page === 0" class="btn-page">Trước</button>
+            <button (click)="changePage(1)" class="btn-page">Sau</button>
+         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div *ngIf="showModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          {{ isEditMode ? 'Cập Nhật Phiếu' : 'Tạo Phiếu Mới' }}
+        </h3>
+        <button (click)="closeModal()" class="close-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-grid-2">
+            <div class="form-group">
+                <label class="form-label">Mã Nhân Viên <span style="color:red">*</span></label>
+                <input type="number" [(ngModel)]="currentItem.userID" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Ngày Quyết Định</label>
+                <input type="date" [(ngModel)]="currentItem.decisionDate" class="form-input">
+            </div>
+        </div>
+
+        <div class="form-grid-2">
+            <div class="form-group">
+                <label class="form-label">Loại Phiếu <span style="color:red">*</span></label>
+                <select [(ngModel)]="currentItem.type" class="form-input">
+                    <option value="REWARD">Thưởng (Reward)</option>
+                    <option value="PUNISHMENT">Phạt (Punishment)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Số Tiền <span style="color:red">*</span></label>
+                <input type="number" [(ngModel)]="currentItem.amount" class="form-input">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Lý do / Mô tả</label>
+            <textarea [(ngModel)]="currentItem.reason" rows="3" class="form-input"></textarea>
+        </div>
+
+        <div class="form-grid-2">
+             <div class="form-group">
+                <label class="form-label">Trạng Thái</label>
+                <select [(ngModel)]="currentItem.status" class="form-input">
+                      <option value="PENDING">Chờ duyệt</option>
+                    <option value="APPROVED">Đã duyệt</option>
+                    <option value="CANCELLED">Từ chối</option>
+                    <option value="PROCESSED">Đã xử lý</option>
+                </select>
+             </div>
+             <div class="form-group" style="display: flex; align-items: center; padding-top: 1.5rem;">
+                <input type="checkbox" id="taxExempt" [(ngModel)]="currentItem.isTaxExempt" style="width: 1.2rem; height: 1.2rem; margin-right: 0.5rem;">
+                <label for="taxExempt" style="margin: 0; cursor: pointer;">Miễn thuế TNCN</label>
+             </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button (click)="closeModal()" class="btn-cancel">Hủy bỏ</button>
+        <button (click)="saveData()" [disabled]="isloading" class="btn-submit">
+            {{ isloading ? 'Đang xử lý...' : (isEditMode ? 'Lưu thay đổi' : 'Tạo mới') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

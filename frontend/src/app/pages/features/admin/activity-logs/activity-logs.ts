@@ -14,6 +14,7 @@ export interface ActivityLogs {
   logType: 'INFO' | 'WARNING' | 'DANGER' | string;
   details: string;
   executorName: string;
+  performedBy: string;
 }
 
 @Component({
@@ -57,6 +58,7 @@ export class ActivityLogs implements OnInit {
           // Trường hợp trả về dạng Pageable (content, totalPages,...)
           this.logs.set(data.content);
           // Cập nhật totalPages nếu có
+
           if (data.totalPages) {
             this.totalPages.set(data.totalPages);
           }

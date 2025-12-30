@@ -1,4 +1,4 @@
-import { Component, inject, CUSTOM_ELEMENTS_SCHEMA, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, CUSTOM_ELEMENTS_SCHEMA, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -7,6 +7,7 @@ import { calculatePayroll, RulesPayroll, Payrollsfinalize } from '../../../../..
 import { Comfirm } from '../../../../shared/comfirm/comfirm';
 import { Alert } from '../../../../shared/alert/alert';
 import { Loading } from '../../../../shared/loading/loading';
+import { CookieService } from 'ngx-cookie-service';
 
 // Interface cho cấu trúc dữ liệu
 interface DebugRecord {
@@ -31,9 +32,9 @@ interface DebugRecord {
   templateUrl: './payrollmain.html',
   styleUrls: ['./payrollmain.scss'],
 })
-export class Payrollmain {
+export class Payrollmain implements OnInit {
   private sanitizer = inject(DomSanitizer);
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(private cdr: ChangeDetectorRef, private cookie: CookieService) { }
 
   // App State
   usernameDisplay = 'Admin';
@@ -303,5 +304,12 @@ export class Payrollmain {
     }
 
     return `<span style="color:gray">Unknown(${type})</span>`;
+  }
+
+
+
+  role: string = "";
+  ngOnInit(): void {
+    this.role = this.cookie.get('role').toLowerCase();
   }
 }

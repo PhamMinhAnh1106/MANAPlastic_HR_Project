@@ -1,19 +1,33 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule, DatePipe, NgFor, NgIf } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, NgModel } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { getTaxAll, getTaxQuery, postTax, putTax, SystemSetting } from '../../../../../services/pages/features/admin/legal.service';
+
+// Import Shared Components
+import { Alert } from '../../../../shared/alert/alert';
+import { Comfirm } from '../../../../shared/comfirm/comfirm';
+import { Loading } from '../../../../shared/loading/loading';
 
 @Component({
   selector: 'app-tax',
-  imports: [ReactiveFormsModule, DatePipe, FormsModule, NgIf, NgFor],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, NgIf, NgFor, DatePipe, Alert, Comfirm, Loading],
   templateUrl: './tax.html',
-  styleUrl: './tax.scss',
+  styleUrls: ['./tax.scss'],
 })
 export class Tax implements OnInit {
+  // --- UI STATE ---
+  isconfirm: boolean = false;
+  isalert: boolean = false;
+  isloading: boolean = false;
+
+  confirmMessage = '';
+  alertmessage = '';
+  alertType: boolean = true; // true = success, false = error
+
+  // --- DATA STATE ---
   taxList: SystemSetting[] = [];
-  isLoading = false;
-  isSubmitting = false;
-  errorMessage = '';
+  isSubmitting = false; // Local loading for modal button
 
   // Modal State
   showModal = false;
@@ -38,26 +52,35 @@ export class Tax implements OnInit {
     this.loadData();
   }
 
+  // --- SHARED UI HANDLERS ---
+  Onalert(message: string, type: boolean) {
+    this.isalert = true;
+    this.alertmessage = message;
+    this.alertType = type;
+    setTimeout(() => this.isalert = false, 3000);
+  }
+
+  onConfirmResult(event: boolean) {
+    this.isconfirm = false;
+    // Hiện tại trang này chưa có chức năng xóa cần confirm, 
+    // nhưng giữ handler này để mở rộng sau này hoặc nếu thêm chức năng xóa.
+  }
+
   // --- LOGIC GỌI API ---
 
   async loadData() {
-    this.isLoading = true;
-    this.errorMessage = '';
-
+    this.isloading = true;
     try {
       if (this.searchQuery.trim()) {
         this.taxList = await getTaxQuery(this.searchQuery);
-        this.cdr.detectChanges();
       } else {
         this.taxList = await getTaxAll();
-        this.cdr.detectChanges();
-
       }
     } catch (error: any) {
       console.error('Lỗi tải dữ liệu:', error);
-      this.errorMessage = 'Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại.';
+      this.Onalert('Có lỗi xảy ra khi tải dữ liệu.', false);
     } finally {
-      this.isLoading = false;
+      this.isloading = false;
       this.cdr.detectChanges();
     }
   }
@@ -73,36 +96,34 @@ export class Tax implements OnInit {
     }
 
     this.isSubmitting = true;
-    this.errorMessage = '';
     const formValue = this.taxForm.value;
 
     try {
-      let res;
+      let res: any;
       if (this.isEditing && this.currentId) {
-        // Gọi hàm putTax
-        res = await putTax(this.currentId, formValue) as { data: string, status: number };
+        res = await putTax(this.currentId, formValue);
       } else {
-        // Gọi hàm postTax
-        res = await postTax(formValue) as { data: string, status: number };
+        res = await postTax(formValue);
       }
 
-      // Kiểm tra kết quả trả về
+      // Kiểm tra kết quả trả về (giả định cấu trúc trả về tương tự các trang kia)
       if (res && (res.status === 200 || res.status === 201 || res.data)) {
+        this.Onalert(this.isEditing ? 'Cập nhật thành công!' : 'Thêm mới thành công!', true);
         this.closeModal();
-        this.loadData(); // Tải lại danh sách
+        this.loadData();
       } else {
         throw new Error('Lưu thất bại');
       }
     } catch (error: any) {
       console.error('Lỗi lưu dữ liệu:', error);
-      this.errorMessage = 'Lỗi khi lưu: ' + (error.message || 'Không xác định');
+      this.Onalert('Lỗi khi lưu: ' + (error.message || 'Không xác định'), false);
     } finally {
       this.isSubmitting = false;
       this.cdr.detectChanges();
     }
   }
 
-  // --- UI HELPERS ---
+  // --- MODAL & FORM HELPERS ---
 
   openCreateModal() {
     this.isEditing = false;
@@ -115,7 +136,6 @@ export class Tax implements OnInit {
       isActive: true
     });
     this.showModal = true;
-    this.errorMessage = '';
   }
 
   openEditModal(item: SystemSetting) {
@@ -133,7 +153,6 @@ export class Tax implements OnInit {
       isActive: item.isActive
     });
     this.showModal = true;
-    this.errorMessage = '';
   }
 
   closeModal() {

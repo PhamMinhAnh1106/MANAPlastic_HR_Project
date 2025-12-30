@@ -1,168 +1,194 @@
+<div class="salary-cycle-container">
+    <div class="main-wrapper">
+        
+        <!-- HEADER -->
+        <div class="header-card">
+            <div class="header-info">
+                <h1 class="page-title">
+                    <span class="material-symbols-outlined icon-primary">schedule</span>
+                    Quản Lý Loại Làm Thêm Giờ
+                </h1>
+                <p class="page-subtitle">Thiết lập các loại OT, hệ số nhân và quy tắc tính thuế</p>
+            </div>
 
-    <!-- Link Font & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-
-    <div class="container">
-      <!-- Header -->
-      <div class="header header-card">
-        <div class="header-title">
-          <span class="material-symbols-outlined icon-header">schedule</span>
-          <h1>Quản Lý Loại Làm Thêm Giờ</h1>
-        </div>
-        <div class="actions">
-          <button class="btn btn-primary" (click)="openModal()">
-            <span class="material-symbols-outlined">add</span>
-            Thêm mới
-          </button>
-        </div>
-      </div>
-
-      <!-- Data Table -->
-      <div class="table-container">
-        <div *ngIf="loading" class="loading-state">
-          <div class="spinner"></div>
-          <p>Đang tải dữ liệu...</p>
-        </div>
-
-        <table *ngIf="!loading">
-          <thead>
-            <tr>
-              <th>Mã OT</th>
-              <th>Tên Loại</th>
-              <th>Tỷ lệ</th>
-              <th>Cách tính</th>
-              <th>Miễn thuế</th>
-              <th>Mô tả</th>
-              <th style="width: 120px; text-align: center;">Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of overtimeList">
-              <td><span class="code-badge">{{ item.otCode }}</span></td>
-              <td style="font-weight: 500;">{{ item.otName }}</td>
-              <td>{{ item.rate }}</td>
-              <td>
-                <span class="calc-type" [ngClass]="item.calculationType">
-                  <span *ngIf="item.calculationType === 'MULTIPLIER'">Hệ số nhân</span>
-                  <span *ngIf="item.calculationType === 'FIXED'">Cố định</span>
-                  <span *ngIf="item.calculationType === 'EXCESS_ONLY'">Chỉ tính phần dư</span>
-                </span>
-              </td>
-              <td>
-                <span class="badge" [ngClass]="item.isTaxExemptPart ? 'badge-success' : 'badge-secondary'">
-                  {{ item.isTaxExemptPart ? 'Có' : 'Không' }}
-                </span>
-              </td>
-              <td class="desc-cell">{{ item.description }}</td>
-              <td>
-                <div class="action-buttons">
-                  <button class="btn-icon edit" (click)="openModal(item)" title="Chỉnh sửa">
-                    <span class="material-symbols-outlined">edit</span>
-                  </button>
-                  <button class="btn-icon delete" (click)="deleteItem(item.id)" title="Xóa">
-                    <span class="material-symbols-outlined">delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr *ngIf="overtimeList.length === 0">
-              <td colspan="7" class="empty-state">
-                <span class="material-symbols-outlined">inbox</span>
-                <p>Không có dữ liệu</p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Modal Form -->
-      <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
-        <div class="modal-content" (click)="$event.stopPropagation()">
-          <div class="modal-header">
-            <h2>{{ isEditing ? 'Cập nhật Loại OT' : 'Thêm mới Loại OT' }}</h2>
-            <button class="btn-icon close-modal" (click)="closeModal()">
-              <span class="material-symbols-outlined">close</span>
-            </button>
-          </div>
-
-          <div class="modal-body">
-            <form [formGroup]="otForm" (ngSubmit)="onSubmit()">
-
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>Mã OT <span class="required">*</span></label>
-                  <input type="text" formControlName="otCode" placeholder="Ví dụ: OT1.5">
-                  <div class="error-msg" *ngIf="otForm.get('otCode')?.invalid && otForm.get('otCode')?.touched">
-                    Mã OT là bắt buộc
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label>Tên loại làm thêm <span class="required">*</span></label>
-                  <input type="text" formControlName="otName" placeholder="Nhập tên loại OT">
-                  <div class="error-msg" *ngIf="otForm.get('otName')?.invalid && otForm.get('otName')?.touched">
-                    Tên là bắt buộc
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-grid-3">
-                <div class="form-group">
-                  <label>Tỷ lệ (Rate) <span class="required">*</span></label>
-                  <input type="number" formControlName="rate" step="0.1">
-                </div>
-
-                <div class="form-group span-2">
-                  <label>Cách tính</label>
-                  <select formControlName="calculationType">
-                    <option value="MULTIPLIER">Hệ số nhân (Multiplier)</option>
-                    <option value="FIXED">Số tiền cố định (Fixed)</option>
-                    <option value="EXCESS_ONLY">Chỉ phần dư</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-group checkbox-group">
-                <label class="custom-checkbox">
-                  <input type="checkbox" formControlName="isTaxExemptPart">
-                  <span class="checkmark"></span>
-                  <span class="label-text">Có được miễn thuế không?</span>
-                </label>
-              </div>
-
-              <div class="form-grid" *ngIf="otForm.get('isTaxExemptPart')?.value">
-                <div class="form-group">
-                  <label>Công thức miễn thuế</label>
-                  <select formControlName="taxExemptFormula">
-                    <option value="NONE">Không áp dụng</option>
-                    <option value="EXCESS_ONLY">Chỉ miễn phần vượt</option>
-                    <option value="FULL">Miễn toàn bộ</option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label>Phần trăm miễn (%)</label>
-                  <input type="number" formControlName="taxExemptPercentage">
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label>Mô tả</label>
-                <textarea formControlName="description" rows="3" placeholder="Nhập mô tả thêm..."></textarea>
-              </div>
-
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" (click)="closeModal()">Hủy bỏ</button>
-                <button type="submit" class="btn btn-primary" [disabled]="otForm.invalid || submitting">
-                  <span *ngIf="submitting" class="spinner-small"></span>
-                  {{ submitting ? 'Đang lưu...' : 'Lưu lại' }}
+            <div class="header-actions">
+                <button class="btn-primary" (click)="openModal()">
+                    <span class="material-symbols-outlined">add</span>
+                    Thêm mới
                 </button>
-              </div>
+            </div>
+        </div>
+
+        <!-- MAIN TABLE CONTENT -->
+        <div class="table-container">
+            <div *ngIf="overtimeList.length === 0 && !isloading" class="empty-state">
+                <span class="material-symbols-outlined" style="font-size: 48px; color: #d1d5db;">inbox</span>
+                <p>Chưa có dữ liệu loại làm thêm giờ.</p>
+            </div>
+
+            <div *ngIf="overtimeList.length > 0" class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 200px;">Mã OT</th>
+                            <th style="width: 180px;">Tên Loại</th>
+                            <th style="width: 50px;">Tỷ lệ</th>
+                            <th style="width: 140px;">Cách tính</th>
+                            <th style="width: 120px;" class="text-center">Miễn thuế</th>
+                            <th>Mô tả</th>
+                            <th style="width: 100px;" class="text-right">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of overtimeList" class="table-row">
+                            <td title="{{ item.otCode }}">
+                                <span class="code-badge">{{ item.otCode }}</span>
+                            </td>
+                            <td style="font-weight: 500;" title="{{ item.otName }}">{{ item.otName }}</td>
+                            <td>
+                                <span class="rate-badge">{{ item.rate }}x</span>
+                            </td>
+                            <td>
+                                <span class="type-badge" [ngClass]="{
+                                    'blue': item.calculationType === 'MULTIPLIER',
+                                    'gray': item.calculationType === 'FIXED',
+                                    'purple': item.calculationType === 'EXCESS_ONLY'
+                                }">
+                                    <span *ngIf="item.calculationType === 'MULTIPLIER'">Hệ số nhân</span>
+                                    <span *ngIf="item.calculationType === 'FIXED'">Cố định</span>
+                                    <span *ngIf="item.calculationType === 'EXCESS_ONLY'">Chỉ phần dư</span>
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="status-badge" [ngClass]="item.isTaxExemptPart ? 'status-success' : 'status-default'">
+                                    <span class="dot"></span>
+                                    {{ item.isTaxExemptPart ? 'Có' : 'Không' }}
+                                </span>
+                            </td>
+                            <td class="truncate-cell" title="{{ item.description }}">
+                                {{ item.description || '-' }}
+                            </td>
+                            <td class="text-right">
+                                <div class="action-buttons">
+                                    <button class="btn-icon edit" (click)="openModal(item)" title="Chỉnh sửa">
+                                        <span class="material-symbols-outlined">edit</span>
+                                    </button>
+                                    <button class="btn-icon delete" (click)="deleteItem(item.id)" title="Xóa">
+                                        <span class="material-symbols-outlined">delete</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FORM -->
+    <div *ngIf="showModal" class="modal-backdrop" (click)="closeModal()">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <span class="material-symbols-outlined icon-primary">
+                        {{ isEditing ? 'edit_note' : 'add_circle' }}
+                    </span>
+                    {{ isEditing ? 'Cập nhật Loại OT' : 'Thêm mới Loại OT' }}
+                </h3>
+                <button class="close-btn" (click)="closeModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <form [formGroup]="otForm" (ngSubmit)="onSubmit()" class="modal-body">
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Mã OT <span class="required">*</span></label>
+                        <input type="text" formControlName="otCode" class="form-input" placeholder="VD: OT1.5">
+                        <div class="error-msg" *ngIf="otForm.get('otCode')?.invalid && otForm.get('otCode')?.touched">
+                            Mã OT là bắt buộc
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tên loại <span class="required">*</span></label>
+                        <input type="text" formControlName="otName" class="form-input" placeholder="VD: OT Ngày thường">
+                        <div class="error-msg" *ngIf="otForm.get('otName')?.invalid && otForm.get('otName')?.touched">
+                            Tên là bắt buộc
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Tỷ lệ (Rate) <span class="required">*</span></label>
+                        <div class="input-suffix-wrapper">
+                            <input type="number" formControlName="rate" step="0.1" class="form-input">
+                            <span class="suffix">x</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Cách tính</label>
+                        <select formControlName="calculationType" class="form-input">
+                            <option value="MULTIPLIER">Hệ số nhân (Multiplier)</option>
+                            <option value="FIXED">Số tiền cố định (Fixed)</option>
+                            <option value="EXCESS_ONLY">Chỉ phần dư</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Custom Checkbox -->
+                <div class="form-group">
+                    <label class="toggle-switch">
+                        <div class="relative">
+                            <input type="checkbox" formControlName="isTaxExemptPart" class="visually-hidden">
+                            <div class="toggle-bg"></div>
+                        </div>
+                        <span class="toggle-label">Có được miễn thuế không?</span>
+                    </label>
+                </div>
+
+                <!-- Conditional Fields -->
+                <div class="info-box" *ngIf="otForm.get('isTaxExemptPart')?.value">
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Công thức miễn</label>
+                            <select formControlName="taxExemptFormula" class="form-input">
+                                <option value="NONE">Không áp dụng</option>
+                                <option value="EXCESS_ONLY">Chỉ miễn phần vượt</option>
+                                <option value="FULL">Miễn toàn bộ</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">% Miễn</label>
+                            <div class="input-suffix-wrapper">
+                                <input type="number" formControlName="taxExemptPercentage" class="form-input">
+                                <span class="suffix">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Mô tả</label>
+                    <textarea formControlName="description" rows="3" class="form-input" placeholder="Nhập mô tả thêm..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" (click)="closeModal()">Hủy bỏ</button>
+                    <button type="submit" class="btn-submit" [disabled]="otForm.invalid || submitting">
+                        <span *ngIf="submitting" class="spinner-sm"></span>
+                        {{ submitting ? 'Đang lưu...' : 'Lưu lại' }}
+                    </button>
+                </div>
 
             </form>
-          </div>
         </div>
-      </div>
     </div>
-  
+</div>
+
+<!-- SHARED COMPONENTS -->
+<app-loading *ngIf="isloading"></app-loading>
+<app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
+<app-alert *ngIf="isalert" [message]="alertmessage" [notifyType]="alertType" (hidden)="isalert = false"></app-alert>

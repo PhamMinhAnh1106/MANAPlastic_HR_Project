@@ -71,7 +71,7 @@ export class AutoSchedule {
   rulesDatalength = 0;
   shiftName = getAllSchedules();
 
-  month: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  month: string[] = ['01', '02', '03', '04', '05', '06', '07', '08', '04', '05', '06', '07', '08', '06', '07', '08', '09', '10', '11', '12'];
   year: number[] = [2024, 2025, 2026, 2027];
   savemonth = '';
   saveyear = '';

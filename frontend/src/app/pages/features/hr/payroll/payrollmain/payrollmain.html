@@ -42,7 +42,7 @@
         </button>
 
         <!-- Nút Chốt Lương (Mới) -->
-        <button class="btn btn-finalize" (click)="onFinalizeClick()">
+        <button class="btn btn-finalize" (click)="onFinalizeClick()" *ngIf="role === 'hr'">
           <span class="material-symbols-outlined">lock_person</span>Chốt Lương
         </button>
 

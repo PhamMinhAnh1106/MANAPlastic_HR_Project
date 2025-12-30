@@ -1,4 +1,4 @@
-// --- UNIFIED VARIABLES (Based on chukyluong) ---
+// 1. VARIABLES (Giữ nguyên)
 $primary-color: #2563eb;
 $primary-hover: #1d4ed8;
 $indigo-color: #4f46e5;
@@ -8,6 +8,8 @@ $success-bg: #dcfce7;
 $success-text: #166534;
 $error-bg: #fee2e2;
 $error-text: #991b1b;
+$warning-bg: #fef3c7;
+$warning-text: #92400e;
 
 $gray-50: #f9fafb;
 $gray-100: #f3f4f6;
@@ -30,35 +32,68 @@ $radius-xl: 0.75rem;
 // FONT SIZES
 $font-xs: 0.7rem;
 $font-sm: 0.75rem;
-$font-base: 0.8rem;
-$font-lg: 0.9rem;
-$font-xl: 1rem;
+$font-base: 0.7rem;
+$font-lg: 0.825rem;
+$font-xl: 0.95rem;
 $font-2xl: 1.2rem;
 
-// --- LAYOUT ---
+// 2. GENERAL LAYOUT
 .salary-cycle-container {
     min-height: 100vh;
     background-color: $gray-50;
     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    padding: 1.5rem;
+    padding: 3rem 0.5rem 0.5rem 5rem;
+
+}
+
+.btn-icon {
+    padding: 6px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    &.edit {
+        color: $primary-color;
+
+        &:hover {
+            background: rgba($primary-color, 0.1);
+        }
+    }
+
+    &.delete {
+        color: $danger-color;
+
+        &:hover {
+            background: rgba($danger-color, 0.1);
+        }
+    }
 }
 
 .main-wrapper {
     max-width: 72rem;
-    width: 54rem;
+    width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-// --- HEADER ---
-.header-card {
+// 3. HEADER CARD & FILTER CARD
+.header-card,
+.filter-card {
     background-color: white;
     border-radius: $radius-xl;
     padding: 1.5rem;
     box-shadow: $shadow-sm;
     border: 1px solid $gray-200;
+}
+
+.header-card {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -93,62 +128,68 @@ $font-2xl: 1.2rem;
     }
 }
 
-// --- ACTIONS & BUTTONS ---
-.actions-group {
+.filter-card {
     display: flex;
     flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem 1.5rem;
+
+    .search-group {
+        flex: 2;
+        min-width: 200px;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 150px;
+    }
+
+    .btn-search {
+        padding: 0.5rem 1rem;
+        background-color: $gray-100;
+        color: $gray-700;
+        border: 1px solid $gray-200;
+        border-radius: $radius-lg;
+        font-size: $font-sm;
+        cursor: pointer;
+        font-weight: 500;
+
+        &:hover {
+            background-color: $gray-200;
+        }
+    }
+}
+
+// 4. ACTIONS GROUP
+.actions-group {
+    display: flex;
     align-items: center;
     gap: 0.75rem;
-}
 
-.btn-primary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    background-color: $primary-color;
-    border: none;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: $radius-lg;
-    font-weight: 500;
-    font-size: $font-base;
-    box-shadow: $shadow-sm;
-    cursor: pointer;
-    transition: background-color 0.2s;
-
-    &:hover {
-        background-color: $primary-hover;
-    }
-}
-
-.btn-icon {
-    padding: 6px;
-    border-radius: 6px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    transition: background 0.2s;
-    display: inline-flex;
-
-    &.edit {
-        color: $primary-color;
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background-color: $primary-color;
+        border: none;
+        color: white;
+        padding: 0.625rem 1.25rem;
+        border-radius: $radius-lg;
+        font-weight: 500;
+        font-size: $font-base;
+        box-shadow: $shadow-sm;
+        cursor: pointer;
+        transition: background-color 0.2s;
 
         &:hover {
-            background: rgba($primary-color, 0.1);
-        }
-    }
-
-    &.delete {
-        color: $danger-color;
-
-        &:hover {
-            background: rgba($danger-color, 0.1);
+            background-color: $primary-hover;
         }
     }
 }
 
-// --- TABLE ---
+// 6. TABLE STYLES
 .table-container {
     background-color: white;
     border-radius: $radius-xl;
@@ -156,11 +197,19 @@ $font-2xl: 1.2rem;
     border: 1px solid $gray-200;
     overflow: hidden;
 
+    .loading-state,
     .empty-state {
         padding: 4rem 1rem;
         text-align: center;
         color: $gray-500;
         font-size: $font-base;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
     }
 
     .data-table {
@@ -201,67 +250,79 @@ $font-2xl: 1.2rem;
                 padding: 1rem 1.5rem;
                 vertical-align: middle;
             }
+
+            .col-user {
+                font-weight: 500;
+                color: $gray-900;
+
+                .user-name {
+                    display: block;
+                    font-size: $font-xs;
+                    color: $gray-500;
+                    font-weight: 400;
+                }
+            }
+        }
+    }
+
+    // Custom Badges - CẬP NHẬT TẠI ĐÂY
+    .badge-type {
+        display: inline-flex;
+        padding: 0.2rem 0.6rem;
+        border-radius: 9999px;
+        font-weight: 600;
+        font-size: $font-xs;
+
+        &.REWARD {
+            background-color: $success-bg;
+            color: $success-text;
+        }
+
+        &.PUNISHMENT {
+            background-color: $error-bg;
+            color: $error-text;
+        }
+    }
+
+    .badge-status {
+        display: inline-flex;
+        padding: 0.2rem 0.6rem;
+        border-radius: $radius-md;
+        font-size: $font-xs;
+        font-weight: 500;
+
+        &.approved {
+            background-color: $success-bg;
+            color: $success-text;
+        }
+
+        &.rejected {
+            background-color: $error-bg;
+            color: $error-text;
+        }
+
+        &.pending {
+            background-color: $warning-bg;
+            color: $warning-text;
+        }
+    }
+
+    .amount-text {
+        font-family: monospace;
+        font-weight: 600;
+        font-size: $font-base;
+
+        &.plus {
+            color: $success-text;
+        }
+
+        &.minus {
+            color: $error-text;
         }
     }
 }
 
-// --- BADGES ---
-.leave-type-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: $font-xs;
-    font-weight: 700;
-
-    &.annual {
-        background: #dbeafe;
-        color: #1e40af;
-    }
-
-    &.sick {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-
-    &.maternity {
-        background: #fce7f3;
-        color: #9d174d;
-    }
-
-    &.default {
-        background: $gray-100;
-        color: $gray-700;
-    }
-}
-
-.workday-badge {
-    display: inline-flex;
-    padding: 0.2rem 0.6rem;
-    border-radius: 9999px;
-    background-color: $gray-100;
-    color: $gray-700;
-    font-weight: 500;
-    font-size: $font-sm;
-}
-
-.gender-badge {
-    font-size: $font-xs;
-    font-weight: 600;
-
-    &.male {
-        color: #2563eb;
-    }
-
-    &.female {
-        color: #db2777;
-    }
-
-    &.all {
-        color: $gray-500;
-    }
-}
-
-// --- MODAL ---
+// 7. MODALS
 .modal-backdrop {
     position: fixed;
     top: 0;
@@ -282,7 +343,7 @@ $font-2xl: 1.2rem;
     border-radius: $radius-xl;
     box-shadow: $shadow-lg;
     width: 100%;
-    max-width: 34rem;
+    max-width: 32rem;
     overflow: hidden;
     animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
@@ -300,27 +361,17 @@ $font-2xl: 1.2rem;
             font-size: $font-lg;
             font-weight: 600;
             color: $gray-900;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
             margin: 0;
-
-            .icon-primary {
-                color: $primary-color;
-            }
         }
 
         .close-btn {
             color: $gray-400;
-            padding: 0.25rem;
-            border-radius: $radius-md;
             background: none;
             border: none;
             cursor: pointer;
 
             &:hover {
                 color: $gray-500;
-                background-color: rgba(0, 0, 0, 0.05);
             }
         }
     }
@@ -336,9 +387,9 @@ $font-2xl: 1.2rem;
         display: flex;
         justify-content: flex-end;
         gap: 0.75rem;
-        padding-top: 1rem;
-        margin-top: 0.5rem;
+        padding: 1rem 1.5rem;
         border-top: 1px solid $gray-100;
+        background-color: $gray-50;
 
         button {
             padding: 0.5rem 1rem;
@@ -362,9 +413,6 @@ $font-2xl: 1.2rem;
         .btn-submit {
             background-color: $primary-color;
             color: white;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
 
             &:hover {
                 background-color: $primary-hover;
@@ -378,50 +426,93 @@ $font-2xl: 1.2rem;
     }
 }
 
-// --- FORMS ---
+// 8. FORMS
+.form-group {
+    display: block;
+}
+
 .form-grid-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
 }
 
-.form-group {
+.form-label {
+    display: block;
+    font-size: $font-sm;
+    font-weight: 500;
+    color: $gray-700;
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border-radius: $radius-lg;
+    border: 1px solid $gray-300;
+    background-color: white;
+    color: $gray-900;
+    box-shadow: $shadow-sm;
+    font-size: $font-base;
+    box-sizing: border-box;
+
+    &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+    }
+}
+
+textarea.form-input {
+    resize: vertical;
+}
+
+// Pagination
+.pagination {
     display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid $gray-200;
+    font-size: $font-sm;
+    color: $gray-600;
 
-    .form-label {
-        font-size: $font-sm;
-        font-weight: 500;
-        color: $gray-700;
-
-        .required {
-            color: $danger-color;
-        }
-    }
-
-    .form-input {
-        width: 100%;
-        padding: 0.5rem 0.75rem;
-        border-radius: $radius-lg;
+    .btn-page {
+        padding: 0.25rem 0.75rem;
         border: 1px solid $gray-300;
-        background-color: white;
-        color: $gray-900;
-        font-size: $font-base;
-        box-sizing: border-box;
-        transition: border-color 0.2s, box-shadow 0.2s;
+        background: white;
+        border-radius: $radius-md;
+        cursor: pointer;
 
-        &:focus {
-            outline: none;
-            border-color: $primary-color;
-            box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+        &:hover {
+            background: $gray-50;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: default;
         }
     }
 
-    .error-msg {
-        color: $danger-color;
-        font-size: $font-xs;
+    .page-info {
+        font-weight: 500;
     }
+}
+
+// Utilities
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.truncate {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 @keyframes modalPop {

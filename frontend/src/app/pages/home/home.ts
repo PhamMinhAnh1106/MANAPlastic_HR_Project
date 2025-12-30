@@ -150,7 +150,7 @@ export class Home implements OnInit {
           {
             iconName: "paid", // Khác biệt: Quản lý tiền lương
             path: "/home/payroll",
-            task: [{ name: "Cấu Hình Lương", path: "/home/payroll/rules" }],
+            task: [{ name: "Cấu Hình Lương", path: "/home/payroll/rules" }, { name: "Tính Lương", path: "/home/payroll" },],
           }, {
             iconName: "gavel", // Khác biệt: Hợp đồng (document)
             path: "/home/law",
@@ -186,7 +186,12 @@ export class Home implements OnInit {
           {
             iconName: "currency_exchange", // Khác biệt: Tiền tệ/Lương
             path: "/home/payroll",
-            task: [{ name: "Tính Lương", path: "/home/payroll" }, { name: "Cấu Hình Lương", path: "/home/payroll/rules" }, { name: "Xem lương", path: "/home/payroll/payslip" }, { name: "Lọc DS Lương", path: "/home/payroll/payslip/filter" }],
+            task: [{ name: "Tính Lương", path: "/home/payroll" },
+            { name: "Cấu Hình Lương", path: "/home/payroll/rules" },
+            { name: "Xem lương", path: "/home/payroll/payslip" },
+            { name: "Lọc DS Lương", path: "/home/payroll/payslip/filter" },
+            { name: "Quản lý thưởng/phạt", path: "/home/user/reward-punish" }
+            ],
           }, {
             iconName: "gavel", // Khác biệt: Hợp đồng (document)
             path: "/home/law",

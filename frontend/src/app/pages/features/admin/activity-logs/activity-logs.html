@@ -44,7 +44,7 @@
           <!-- Sử dụng trackBy log.logID -->
           @for (log of logs(); track log.logID) {
             <tr>
-              <td class="col-id">#{{ log.logID }}</td>
+              <td class="col-id" >#{{ log.logID }} <br>{{ log.performedBy }}</td>
               
               <!-- Action Time -->
               <td>{{ log.actionTime | date:'dd/MM/yyyy HH:mm' }}</td>

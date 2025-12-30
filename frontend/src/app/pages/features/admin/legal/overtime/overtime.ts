@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, signal } from '@angular/core';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 
@@ -11,30 +11,42 @@ import {
   OvertimeCreateRequest
 } from '../../../../../services/pages/features/admin/legal.service';
 
+// Import shared components
+import { Alert } from '../../../../shared/alert/alert';
+import { Comfirm } from '../../../../shared/comfirm/comfirm';
+import { Loading } from '../../../../shared/loading/loading';
 
 @Component({
   selector: 'app-overtime',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, NgIf, NgFor],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, NgIf, NgFor, Alert, Comfirm, Loading],
   templateUrl: './overtime.html',
   styleUrls: ['./overtime.scss']
 })
 export class Overtime implements OnInit {
+  // --- UI STATE SIGNALS & VARIABLES ---
+  isconfirm: boolean = false;
+  isalert: boolean = false;
+  isloading: boolean = false;
+
+  confirmMessage = '';
+  alertmessage = '';
+  alertType: boolean = true; // true = success, false = error
+
+  // --- DATA STATE ---
   overtimeList: OvertimeType[] = [];
-  years: number[] = [];
-  loading: boolean = false;
   submitting: boolean = false;
   showModal: boolean = false;
   isEditing: boolean = false;
   editingId: number | null = null;
 
+  // Biến tạm để xử lý confirm
+  pendingAction: 'delete' | null = null;
+  pendingId: number | null = null;
+
   otForm: FormGroup;
 
   constructor(private fb: FormBuilder, private cdr: ChangeDetectorRef) {
-    // Khởi tạo năm hiện tại và list năm
-
-
-    // Init Form
     this.otForm = this.fb.group({
       otCode: ['', Validators.required],
       otName: ['', Validators.required],
@@ -49,65 +61,71 @@ export class Overtime implements OnInit {
 
   ngOnInit() {
     this.loadData();
-    this.cdr.detectChanges();
-
   }
 
+  // --- SHARED UI HANDLERS ---
+  Onalert(message: string, type: boolean) {
+    this.isalert = true;
+    this.alertmessage = message;
+    this.alertType = type;
+    setTimeout(() => this.isalert = false, 3000); // Auto hide
+  }
+
+  async onConfirmResult(event: boolean) {
+    this.isconfirm = false;
+    if (event && this.pendingAction === 'delete' && this.pendingId) {
+      await this.confirmDelete(this.pendingId);
+    }
+    // Reset pending state
+    this.pendingAction = null;
+    this.pendingId = null;
+  }
+
+  // --- DATA LOADING ---
   async loadData() {
-    this.loading = true;
+    this.isloading = true;
     try {
-      // Gọi API thực tế
       const res = await getOvertime();
-
-      // Kiểm tra nếu API trả về lỗi (theo cấu trúc try-catch của bạn trả về error object)
-      if (res instanceof Error || (res && res.status && res.status !== 200)) {
-        console.error(res);
+      if (res instanceof Error || (res && (res as any).status && (res as any).status !== 200)) {
         this.overtimeList = [];
-        this.cdr.detectChanges();
-
       } else {
-        // Giả định res là mảng data trực tiếp theo hàm getOvertime bạn cung cấp
         this.overtimeList = Array.isArray(res) ? res : [];
-        this.cdr.detectChanges();
-
       }
     } catch (error) {
-      console.error(error);
-      alert('Lỗi tải dữ liệu');
+      this.Onalert('Lỗi tải dữ liệu', false);
     } finally {
-      this.loading = false;
+      this.isloading = false;
       this.cdr.detectChanges();
-
     }
   }
 
-  async deleteItem(id: number) {
-    if (!confirm('Bạn có chắc chắn muốn xóa loại OT này không?')) return;
+  // --- DELETE LOGIC ---
+  deleteItem(id: number) {
+    this.pendingAction = 'delete';
+    this.pendingId = id;
+    this.confirmMessage = 'Bạn có chắc chắn muốn xóa loại làm thêm giờ này không?';
+    this.isconfirm = true;
+  }
 
+  async confirmDelete(id: number) {
+    this.isloading = true;
     try {
       const res: any = await DeleteOvertime(id);
-
       if (res.status === 200 || res.status === 204) {
-        alert('Xóa thành công!');
-        this.loadData();
-
-        // Reload lại data hoặc filter mảng local để tránh gọi API lại
+        this.Onalert('Xóa thành công!', true);
         this.overtimeList = this.overtimeList.filter(x => x.id !== id);
-        this.cdr.detectChanges();
-
       } else {
-        alert('Xóa thất bại');
+        this.Onalert('Xóa thất bại', false);
       }
     } catch (error) {
-      console.error(error);
-      alert('Đã xảy ra lỗi khi xóa');
+      this.Onalert('Đã xảy ra lỗi khi xóa', false);
+    } finally {
+      this.isloading = false;
       this.cdr.detectChanges();
-
     }
   }
 
-  // --- FORM HANDLING ---
-
+  // --- MODAL & FORM LOGIC ---
   openModal(item?: OvertimeType) {
     this.showModal = true;
     if (item) {
@@ -142,35 +160,34 @@ export class Overtime implements OnInit {
   }
 
   async onSubmit() {
-    if (this.otForm.invalid) return;
+    if (this.otForm.invalid) {
+      this.otForm.markAllAsTouched();
+      return;
+    }
 
     this.submitting = true;
     const formValue: OvertimeCreateRequest = this.otForm.value;
 
     try {
       let res: any;
-
       if (this.isEditing && this.editingId) {
-        // Gọi API Update
         res = await putOvertime(this.editingId, formValue);
       } else {
-        // Gọi API Create
         res = await postOvertime(formValue);
       }
 
       if (res && (res.status === 200 || res.status === 201)) {
-        alert(this.isEditing ? 'Cập nhật thành công!' : 'Thêm mới thành công!');
+        this.Onalert(this.isEditing ? 'Cập nhật thành công!' : 'Thêm mới thành công!', true);
         this.closeModal();
-        this.loadData(); // Reload data từ server
+        await this.loadData();
       } else {
-        alert('Lưu thất bại: ' + (res?.message || 'Lỗi không xác định'));
+        this.Onalert(res?.message || 'Lưu thất bại', false);
       }
-
     } catch (error) {
-      console.error(error);
-      alert('Có lỗi xảy ra khi lưu');
+      this.Onalert('Có lỗi xảy ra khi lưu', false);
     } finally {
       this.submitting = false;
+      this.cdr.detectChanges();
     }
   }
 }

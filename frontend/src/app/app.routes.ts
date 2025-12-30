@@ -25,6 +25,7 @@ import { Filterpayslip } from './pages/features/hr/payroll/filterpayslip/filterp
 import { Main } from './pages/features/admin/legal/main/main';
 import { ActivityLogs } from './pages/features/admin/activity-logs/activity-logs';
 import { DataAttendant } from './pages/features/hr/data-attendant/data-attendant';
+import { RewaPunisComponent } from './pages/features/hr/rewa-punis/rewa-punis';
 
 
 export const routes: Routes = [
@@ -54,6 +55,7 @@ export const routes: Routes = [
             { path: 'payroll/rules', component: Payrollrules },
             { path: 'payroll/payslip', component: Payrollpayslip },
             { path: 'payroll/payslip/filter', component: Filterpayslip },
+            { path: 'user/reward-punish', component: RewaPunisComponent },
             //manager 
             { path: 'leaverequest/manage', component: Leaverequestcheck },
             { path: 'contracts', component: Contracts },

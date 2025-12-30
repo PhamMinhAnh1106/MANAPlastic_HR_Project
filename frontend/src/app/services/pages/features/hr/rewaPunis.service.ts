@@ -1,6 +1,7 @@
 import { api } from "../../../api.service";
 
 export interface RewaPunis {
+    rewaid: number
     userID: number;
     userName?: string;
     type: string;
@@ -43,6 +44,17 @@ export async function AddRewaPunis(data: RewaPunis) {
 export async function UpdateRewaPunis(param: number, data: RewaPunis) {
     try {
         const res = await api.put(`/hr/rewaPunis/${param}`, data);
+        return {
+            data: res.data,
+            status: res.status
+        };
+    } catch (error) {
+        return "co loi xay ra " + error;
+    }
+}
+export async function DeleteRewaPunis(param: number) {
+    try {
+        const res = await api.delete(`/hr/rewaPunis/${param}`);
         return {
             data: res.data,
             status: res.status

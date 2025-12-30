@@ -132,7 +132,7 @@ export class Schedule implements OnInit {
   }
   async onConfirmResult(event: any) {
     this.isloading = true;
-    const year_month = `${this.year}-${this.month}`;
+    const year_month = `${this.year}-0${this.month}`;
     if (event == true) {
       this.isconfirm = false;
       const res = await UpSchedule(year_month) as { data: string, status: number };
