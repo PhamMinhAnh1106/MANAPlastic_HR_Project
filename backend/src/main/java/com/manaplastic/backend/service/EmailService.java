@@ -5,12 +5,14 @@ import com.manaplastic.backend.entity.UserEntity;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -147,4 +149,62 @@ public class EmailService {
             System.err.println("Lỗi khi gửi email lương cho " + userEmail + ": " + e.getMessage());
         }
     }
+
+    //Luồng gửi pass và username
+    public void sendAccountInfo(String toEmail, String username, String rawPassword) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper =
+                    new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom("noreply@manaplastic.com");
+            helper.setTo(toEmail);
+            helper.setSubject("Thông tin tài khoản MANAPlastic");
+
+            String htmlContent = """
+            <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                <div style="text-align: center;">
+                    <img src='cid:companyLogo' width='180' />
+                </div>
+
+                <h3>Chào mừng bạn gia nhập MANAPlastic</h3>
+
+                <p>
+                    Bên dưới là thông tin tài khoản của bạn để đăng nhập vào
+                    hệ thống quản lý nhân sự của công ty <b>MANAPlastic</b>.
+                </p>
+
+                <p style="color: red; font-weight: bold;">
+                    ⚠ TUYỆT ĐỐI KHÔNG CHIA SẺ THÔNG TIN NÀY
+                </p>
+
+                <p>
+                    <b>Username:</b> %s <br/>
+                    <b>Password:</b> %s
+                </p>
+
+                <p>
+                    Vui lòng đổi mật khẩu sau khi đăng nhập.
+                </p>
+
+                <hr/>
+                <small>MANAPlastic HR System</small>
+            </div>
+            """.formatted(username, rawPassword);
+
+            helper.setText(htmlContent, true);
+
+            FileSystemResource logo =
+                    new FileSystemResource(new File("src/main/resources/static/assets/logo.png"));
+
+            helper.addInline("companyLogo", logo);
+
+            mailSender.send(message);
+            System.out.println("Email đã gửi tới: " + toEmail);
+
+        } catch (Exception e) {
+            System.err.println("Lỗi gửi email: " + e.getMessage());
+        }
+    }
+
 }

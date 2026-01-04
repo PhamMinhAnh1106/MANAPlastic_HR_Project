@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface ContractAllowancesRepository extends JpaRepository<ContractallowanceEntity, Integer> {
     List<ContractallowanceEntity> findByContractID(ContractEntity contractID);
+
+    void deleteByContractID(ContractEntity contract);
 }

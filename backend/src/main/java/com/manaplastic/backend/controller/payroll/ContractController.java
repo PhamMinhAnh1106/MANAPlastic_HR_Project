@@ -102,29 +102,59 @@ public class ContractController {
         }
     }
 
-    // Tạo hợp đồng mới (Kèm upload file)
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping("/create")
     @LogActivity(action = "CREATE_CONTRACT", description = "Tạo mới hợp đồng lao động")
     @RequiredPermission(PermissionConst.CONTRACT_CREATE)
-    public ResponseEntity<?> createContract(@ModelAttribute ContractCreateDTO contractDTO) {
+    public ResponseEntity<?> createContract(@RequestBody ContractCreateDTO request) {
+
+        ContractEntity newContract = contractService.createContractDraft(request);
+
+        // Trả về ID cho Frontend dùng
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Tạo nháp thành công!");
+        response.put("contractId", newContract.getId());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/print")
+    public ResponseEntity<byte[]> printContract(@PathVariable Integer id) {
         try {
-            if (contractDTO.getFile() == null || contractDTO.getFile().isEmpty()) {
-                return ResponseEntity.badRequest().body("Vui lòng đính kèm file scan hợp đồng! (file PDF)");
-            }
+            byte[] pdfContent = contractService.generateContractPdf(id);
 
-            contractService.createContract(contractDTO);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=hop_dong_" + id + ".pdf")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(pdfContent);
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Tạo hợp đồng mới thành công!");
-            return ResponseEntity.ok(response);
-
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body("Lỗi nghiệp vụ: " + e.getMessage()); // Bắt lỗi neeus HR cố tình thêm hdld CÓ THOỜI HẠN quá 2 lần
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Lỗi hệ thống: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
+//    // Tạo hợp đồng mới (Kèm upload file)
+//    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    @LogActivity(action = "CREATE_CONTRACT", description = "Tạo mới hợp đồng lao động")
+//    @RequiredPermission(PermissionConst.CONTRACT_CREATE)
+//    public ResponseEntity<?> createContract(@ModelAttribute ContractCreateDTO contractDTO) {
+//        try {
+//            if (contractDTO.getFile() == null || contractDTO.getFile().isEmpty()) {
+//                return ResponseEntity.badRequest().body("Vui lòng đính kèm file scan hợp đồng! (file PDF)");
+//            }
+//
+//            contractService.createContract(contractDTO);
+//
+//            Map<String, Object> response = new HashMap<>();
+//            response.put("message", "Tạo hợp đồng mới thành công!");
+//            return ResponseEntity.ok(response);
+//
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.badRequest().body("Lỗi nghiệp vụ: " + e.getMessage()); // Bắt lỗi neeus HR cố tình thêm hdld CÓ THOỜI HẠN quá 2 lần
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.internalServerError().body("Lỗi hệ thống: " + e.getMessage());
+//        }
+//    }
 
     // Lọc
 //    @GetMapping("/contractFilter")
@@ -159,17 +189,15 @@ public class ContractController {
     }
 
     //Sửa
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{id}")
     @RequiredPermission(PermissionConst.CONTRACT_UPDATE)
-    @LogActivity(action = "UPDATE_CONTRACT", description = "Cập nhật hợp đồng", logType = LogType.WARNING)
+    @LogActivity(action = "UPDATE_CONTRACT", description = "Cập nhật thông tin hợp đồng nháp")
     public ResponseEntity<?> updateContract(
             @PathVariable int id,
-            @ModelAttribute ContractUpdateDTO request) {
-        try {
-            contractService.updateContractFull(id, request);
-            return ResponseEntity.ok("Đã cập nhật thành công");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+            @RequestBody ContractUpdateDTO request) throws IOException {
+
+        contractService.updateContractFull(id, request);
+        return ResponseEntity.ok("Đã cập nhật dữ liệu thành công!");
+
     }
 }

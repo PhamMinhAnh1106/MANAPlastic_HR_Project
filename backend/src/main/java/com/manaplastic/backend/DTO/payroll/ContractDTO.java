@@ -2,6 +2,7 @@ package com.manaplastic.backend.DTO.payroll;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 
 public record ContractDTO(
@@ -16,6 +17,7 @@ public record ContractDTO(
         LocalDate startdate,
         LocalDate enddate,
         String status,
-        String username) {
+        String username,
+        List<ContractsAllowanceDTO> allowances) {
 
 }

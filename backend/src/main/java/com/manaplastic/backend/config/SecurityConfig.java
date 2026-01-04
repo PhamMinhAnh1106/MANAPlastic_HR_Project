@@ -41,7 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/**", "/index.html",
                                 "/*.js", "/*.css", "/*.ico",
                                 "/*.png", "/*.jpg", "/assets/**",
-                                "/browser/**").permitAll()
+                                "/browser/**","/ckeditor.js").permitAll()
                         .requestMatchers(SWAGGER_UI_PATHS).permitAll() // swagger API doc
                         .anyRequest().authenticated()
                 )

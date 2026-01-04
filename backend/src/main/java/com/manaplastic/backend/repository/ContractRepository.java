@@ -19,10 +19,6 @@ public interface ContractRepository extends JpaRepository<ContractEntity, Intege
     @Query("SELECT COUNT(c) FROM ContractEntity c WHERE c.userID.id = :userId AND c.type = 'FIXED_TERM' AND c.status != 'DRAFT' AND c.status != 'TERMINATED'")
     int countFixedTermContracts(@Param("userId") Integer userId);
 
-    // Sử dụng @Query để tránh lỗi tự động map tên hàm
-    @Query("SELECT c FROM ContractEntity c WHERE c.userID.id = :userId AND c.status = :status")
-    Optional<ContractEntity> findByUserIdAndStatus(@Param("userId") Integer userId, @Param("status") String status);
-
     List<ContractEntity> findAll(Specification<ContractEntity> spec);
 
     @Query("SELECT c FROM ContractEntity c WHERE c.userID.id = :userId ORDER BY c.startdate DESC")
@@ -34,7 +30,19 @@ public interface ContractRepository extends JpaRepository<ContractEntity, Intege
     @Query("SELECT c FROM ContractEntity c WHERE c.enddate BETWEEN :today AND :thresholdDate AND c.status = 'ACTIVE' ORDER BY c.enddate ASC")
     List<ContractEntity> findExpiringContracts(@Param("today") LocalDate today, @Param("thresholdDate") LocalDate thresholdDate);
 
-    boolean existsByUserID_IdAndStatusAndIdNot(int userId, String status, int contractId);
+    boolean existsByContractCode(String finalCode);
+    List<ContractEntity> findByStatusAndEnddateBefore(String status, LocalDate date);
+
+    // Tìm các HĐ đang "CHỜ KÍCH HOẠT" (SIGNED) mà ngày bắt đầu là hôm nay (để chuyển lên ACTIVE)
+    List<ContractEntity> findByStatusAndStartdateLessThanEqual(String status, LocalDate date);
+
+    // Hàm check trùng thời gian (Để đảm bảo HĐ mới không đè lên HĐ cũ đang chạy)
+    @Query("SELECT COUNT(c) FROM ContractEntity c WHERE c.userID.id = :userId " +
+            "AND c.status = 'ACTIVE' " +
+            "AND c.id <> :excludeContractId " + // Tránh đếm chính nó khi update
+            "AND (:startDate <= c.enddate OR c.enddate IS NULL)")
+    int countOverlappingActiveContracts(Integer userId, LocalDate startDate, Integer excludeContractId);
+
     // KIẾN THỨC LƯU Ý về Spring để tránh truy vấn db nhiều lần cho 1 tác vụ nhỏ
 //    Khi nào truyền Entity? Khi ta đã có sẵn đối tượng User đầy đủ trong tay (ví dụ lúc save contract mới).
 //    Khi nào truyền ID (@Param)? Khi ta chỉ muốn viết câu truy vấn nhanh, kiểm tra đếm số lượng, hoặc khi tên biến trong Entity dễ gây hiểu nhầm cho Spring.

@@ -1,6 +1,8 @@
 package com.manaplastic.backend.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -32,7 +34,7 @@ public class ContractEntity {
     @Column(name = "fileurl")
     private String fileurl;
 
-    @Column(name = "signdate", nullable = false)
+    @Column(name = "signdate")
     private LocalDate signdate;
 
     @Column(name = "startdate", nullable = false)
@@ -61,4 +63,29 @@ public class ContractEntity {
     private String status;
 
 
+    @Size(max = 50)
+    @NotNull
+    @Column(name = "contractCode", nullable = false, length = 50)
+    private String contractCode;
+
+    @ColumnDefault("'FULLTIME'")
+    @Lob
+    @Column(name = "WorkType")
+    private String workType;
+
+    @ManyToOne
+    @JoinColumn(name = "departmentID") // Trùng tên cột vừa tạo trong DB
+    private DepartmentEntity department;
+
+    @ManyToOne
+    @JoinColumn(name = "roleID")      // Trùng tên cột vừa tạo trong DB
+    private RoleEntity role;
+
+    @ColumnDefault("100.00")
+    @Column(name = "insurancePercent", precision = 5, scale = 4)
+    private BigDecimal insurancePercent;
+
+    @ManyToOne
+    @JoinColumn(name = "template_id")
+    private ContractTemplateEntity contractTemplate;
 }

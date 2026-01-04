@@ -19,15 +19,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/admin")
-@PreAuthorize("hasAuthority('Admin')")
+@PreAuthorize("hasAnyAuthority('Admin', 'HR')")
 public class AdminController {
 
     @Autowired
@@ -65,13 +69,22 @@ public class AdminController {
     }
 
     //Cấp tk
-    @PostMapping("/addAccount")
+    @PostMapping(value = "/addAccount/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @LogActivity(action = "CREATE_ACCOUNT", description = "Cấp tài khoản")
     @RequiredPermission(PermissionConst.ACCOUNT_CREATE)
-    public ResponseEntity<String> addAccount(@RequestBody UserEntity newUser) {
-        UserEntity createdUser = adminService.createUser(newUser);
-        String responseMessage = "Tài khoản đã được cấp thành công. Username: " + createdUser.getUsername();
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
+    public ResponseEntity<String> addAccount(@PathVariable Integer id,
+                                             @RequestParam("file") MultipartFile file) {
+        try {
+            adminService.activateContractAndAccount(id, file);
+            return ResponseEntity.ok().body("Kích hoạt hợp đồng và tài khoản thành công! Email đã được gửi.");
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().body("Lỗi lưu file: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+//        UserEntity createdUser = adminService.createUser(newUser);
+//        String responseMessage = "Tài khoản đã được cấp thành công. Username: " + createdUser.getUsername();
+//        return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
     }
 
     //sửa thông tin cá nhân
@@ -79,9 +92,9 @@ public class AdminController {
     @RequiredPermission(PermissionConst.PROFILE_UPDATE)
     public ResponseEntity<String> updateMyProfile(@AuthenticationPrincipal UserEntity currentUser, @RequestBody UpdateSelfIn4DTO updateRequest) {
 //        try {
-            userService.updateUserProfile(currentUser.getId(), updateRequest);
-            String responseMessage = "Tài khoản đã được cập nhật thành công.";
-            return ResponseEntity.ok(responseMessage);
+        userService.updateUserProfile(currentUser.getId(), updateRequest);
+        String responseMessage = "Tài khoản đã được cập nhật thành công.";
+        return ResponseEntity.ok(responseMessage);
 //        } catch (IllegalArgumentException e) {
 //            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 //        }
@@ -90,8 +103,8 @@ public class AdminController {
     @PutMapping("/changePass")
     public ResponseEntity<String> changePassword(@AuthenticationPrincipal UserEntity currentUser, @RequestBody ChangePasswordDTO request) {
 //        try {
-            userService.changeUserPassword(currentUser, request.getOldPassword(), request.getNewPassword());
-            return ResponseEntity.ok("Đổi mật khẩu thành công.");
+        userService.changeUserPassword(currentUser, request.getOldPassword(), request.getNewPassword());
+        return ResponseEntity.ok("Đổi mật khẩu thành công.");
 //        } catch (IllegalArgumentException e) {
 //            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 //        }
