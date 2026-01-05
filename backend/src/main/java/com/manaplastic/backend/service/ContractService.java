@@ -204,8 +204,18 @@ public class ContractService {
         contract.setUserID(employee);
 
         contract.setType(request.getContractType()); // xác định time hay không
-        contract.setWorkType(request.getWorkType() != null ? request.getWorkType() : "FULLTIME"); //Full hay Part
+//        contract.setWorkType(request.getWorkType() != null ? request.getWorkType() : "FULLTIME"); //Full hay Part
 
+        if (request.getWorkType() == null || request.getWorkType().trim().isEmpty()) {
+            throw new RuntimeException("Loại hình làm việc là bắt buộc, không được để trống.");
+        }
+
+        String normalizedWorkType = request.getWorkType().toUpperCase();
+        if (!"FULLTIME".equals(normalizedWorkType) && !"PART_TIME".equals(normalizedWorkType)) {
+            throw new RuntimeException("Loại hình làm việc không hợp lệ. Chỉ chấp nhận 'FULLTIME' hoặc 'PART_TIME'.");
+        }
+
+        contract.setWorkType(normalizedWorkType);
         contract.setStartdate(request.getStartDate());
         if ("INDEFINITE".equalsIgnoreCase(request.getContractType())) {
             contract.setEnddate(null);
@@ -214,7 +224,17 @@ public class ContractService {
         }
 
         contract.setBasesalary(request.getBaseSalary());
-        Double insurancePercent = request.getInsurancePercent() != null ? request.getInsurancePercent() : 100.0; // %lương
+//        Double insurancePercent = request.getInsurancePercent() != null ? request.getInsurancePercent() : 100.0; // %lương
+        Double insurancePercent;
+        if (request.getInsurancePercent() != null) {
+            insurancePercent = request.getInsurancePercent();
+        } else {
+            if ("PART_TIME".equalsIgnoreCase(request.getWorkType())) {
+                insurancePercent = 0.0; //%
+            } else {
+                insurancePercent = 100.0; //%
+            }
+        }
         contract.setInsurancePercent(BigDecimal.valueOf(insurancePercent));
 
         // Tính InsuranceSalary = BaseSalary * Percent / 100
@@ -236,7 +256,7 @@ public class ContractService {
             contract.setRole(roleRepository.findById(request.getRoleId().intValue()).orElse(null));
 
         contract.setStatus("DRAFT");
-        contract.setContractCode(generateContractCode(request.getContractType(),employee.getId()));
+        contract.setContractCode(generateContractCode(request.getContractType(), employee.getId()));
 
         if (request.getTemplateId() != null) {
             // Nếu người dùng chọn mẫu cụ thể
@@ -581,10 +601,10 @@ public class ContractService {
 //        Path filePath = uploadPath.resolve(newFileName);
 //        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 //
-////        return "/" + uploadDir + "/" + newFileName;
+
+    /// /        return "/" + uploadDir + "/" + newFileName;
 //        return newFileName;
 //    }
-
     @Transactional(rollbackFor = Exception.class)
     public ContractEntity updateContractFull(int contractId, ContractUpdateDTO request) throws IOException {
         // Tìm hợp đồng cũ
@@ -599,8 +619,17 @@ public class ContractService {
         if (request.getContractName() != null) contract.setContractname(request.getContractName());
         if (request.getAllowanceToxicType() != null) contract.setAllowanceToxicType(request.getAllowanceToxicType());
         if (request.getSignDate() != null) contract.setSigndate(request.getSignDate());
-        if (request.getWorkType() != null) contract.setWorkType(request.getWorkType());
-
+//        if (request.getWorkType() != null) contract.setWorkType(request.getWorkType());
+        if (request.getWorkType() != null) {
+            if (request.getWorkType().trim().isEmpty()) {
+                throw new IllegalArgumentException("Loại hình làm việc không được để trống khi cập nhật.");
+            }
+            String normalizedType = request.getWorkType().toUpperCase();
+            if (!"FULLTIME".equals(normalizedType) && !"PART_TIME".equals(normalizedType)) {
+                throw new IllegalArgumentException("Loại hình làm việc cập nhật không hợp lệ (Chỉ nhận FULLTIME/PART_TIME).");
+            }
+            contract.setWorkType(normalizedType);
+        }
         // Cập nhật Template (Mẫu hợp đồng)
         if (request.getTemplateId() != null) {
             ContractTemplateEntity tpl = templateRepository.findById(request.getTemplateId())
@@ -657,13 +686,34 @@ public class ContractService {
         UserEntity employee = contract.getUserID();
         if (employee != null) {
             boolean isUserChanged = false;
-            if (request.getFullname() != null) { employee.setFullname(request.getFullname()); isUserChanged = true; }
-            if (request.getCccd() != null) { employee.setCccd(request.getCccd()); isUserChanged = true; }
-            if (request.getEmail() != null) { employee.setEmail(request.getEmail()); isUserChanged = true; }
-            if (request.getPhone() != null) { employee.setPhonenumber(request.getPhone()); isUserChanged = true; }
-            if (request.getAddress() != null) { employee.setAddress(request.getAddress()); isUserChanged = true; }
-            if (request.getDob() != null) { employee.setBirth(request.getDob()); isUserChanged = true; }
-            if (request.getGender() != null) { employee.setGender(request.getGender()); isUserChanged = true; }
+            if (request.getFullname() != null) {
+                employee.setFullname(request.getFullname());
+                isUserChanged = true;
+            }
+            if (request.getCccd() != null) {
+                employee.setCccd(request.getCccd());
+                isUserChanged = true;
+            }
+            if (request.getEmail() != null) {
+                employee.setEmail(request.getEmail());
+                isUserChanged = true;
+            }
+            if (request.getPhone() != null) {
+                employee.setPhonenumber(request.getPhone());
+                isUserChanged = true;
+            }
+            if (request.getAddress() != null) {
+                employee.setAddress(request.getAddress());
+                isUserChanged = true;
+            }
+            if (request.getDob() != null) {
+                employee.setBirth(request.getDob());
+                isUserChanged = true;
+            }
+            if (request.getGender() != null) {
+                employee.setGender(request.getGender());
+                isUserChanged = true;
+            }
 
             // Cập nhật Phòng ban & Chức vụ
             if (request.getDepartmentId() != null) {

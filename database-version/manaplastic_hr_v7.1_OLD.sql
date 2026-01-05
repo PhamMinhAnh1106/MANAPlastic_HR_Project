@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th1 05, 2026 lúc 12:29 PM
+-- Thời gian đã tạo: Th1 04, 2026 lúc 12:34 PM
 -- Phiên bản máy phục vụ: 8.2.0
 -- Phiên bản PHP: 8.2.13
 
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `activitylogs` (
   `userID` int DEFAULT NULL,
   PRIMARY KEY (`logID`),
   KEY `userID` (`userID`)
-) ENGINE=InnoDB AUTO_INCREMENT=91 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `activitylogs`
@@ -132,9 +132,7 @@ INSERT INTO `activitylogs` (`logID`, `action`, `logType`, `details`, `actiontime
 (85, 'CREATE_ACCOUNT', 'INFO', 'Desc: Cấp tài khoản | Data: {\"headers\":{},\"body\":\"Kích hoạt hợp đồng và tài khoản thành công! Email đã được gửi.\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-04 15:26:40', 'hr_manager', 3),
 (86, 'CREATE_CONTRACT', 'INFO', 'Desc: Tạo mới hợp đồng lao động | Data: {\"headers\":{},\"body\":{\"contractId\":30,\"message\":\"Tạo nháp thành công!\"},\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-04 19:21:28', 'hr_manager', 3),
 (87, 'UPDATE_CONTRACT', 'INFO', 'Desc: Cập nhật thông tin hợp đồng nháp | Data: {\"headers\":{},\"body\":\"Đã cập nhật dữ liệu thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-04 19:27:43', 'hr_manager', 3),
-(88, 'CREATE_ACCOUNT', 'INFO', 'Desc: Cấp tài khoản | Data: {\"headers\":{},\"body\":\"Kích hoạt hợp đồng và tài khoản thành công! Email đã được gửi.\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-04 19:29:33', 'hr_manager', 3),
-(89, 'UPLOAD_DOCUMENT', 'INFO', 'Desc: Đăng tải tài liệu, hồ sơ | Data: {\"headers\":{},\"body\":{\"documentID\":1,\"employeeName\":\"Phạm Minh Tài (Đã sửa tên)\",\"type\":\"OTHER\",\"name\":\"CV Nhân viên\",\"status\":\"PENDING\",\"fileUrl\":\"31b59d76-cf6c-41d1-b82e-f53327b785bb.pdf\",\"expiryDate\":null},\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-05 18:10:10', 'hr_manager', 3),
-(90, 'APPROVED_DOCUMENT', 'INFO', 'Desc: Duyệt/ Từ chối tài liệu, hồ sơ | Data: {\"headers\":{},\"body\":{\"documentID\":1,\"employeeName\":\"Phạm Minh Tài (Đã sửa tên)\",\"type\":\"OTHER\",\"name\":\"CV Nhân viên\",\"status\":\"APPROVED\",\"fileUrl\":\"31b59d76-cf6c-41d1-b82e-f53327b785bb.pdf\",\"expiryDate\":null},\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-05 18:14:24', 'hr_manager', 3);
+(88, 'CREATE_ACCOUNT', 'INFO', 'Desc: Cấp tài khoản | Data: {\"headers\":{},\"body\":\"Kích hoạt hợp đồng và tài khoản thành công! Email đã được gửi.\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-04 19:29:33', 'hr_manager', 3);
 
 -- --------------------------------------------------------
 
@@ -1223,37 +1221,6 @@ INSERT INTO `employeeofficialschedule` (`officialID`, `employeeID`, `date`, `shi
 (575, 28, '2026-01-30', 36, 0, '2026-01', 9, '2025-12-30 11:35:38'),
 (576, 28, '2026-01-31', 36, 0, '2026-01', 9, '2025-12-30 11:35:38'),
 (577, 29, '2025-12-31', 36, 0, '2025-12', 9, '2025-12-31 03:00:15');
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `employee_documents`
---
-
-DROP TABLE IF EXISTS `employee_documents`;
-CREATE TABLE IF NOT EXISTS `employee_documents` (
-  `documentID` int NOT NULL AUTO_INCREMENT,
-  `userID` int NOT NULL COMMENT 'Liên kết với nhân viên',
-  `documentType` enum('DEGREE','CERTIFICATE','MEDICAL_PREGNANCY','MEDICAL_DISABILITY','IDENTIFICATION','OTHER') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Phân loại giấy tờ để xử lý logic lương/công',
-  `documentName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Tên giấy tờ (VD: Bằng ĐH, Giấy chứng nhận nghỉ thai sản)',
-  `issuingAuthority` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Nơi cấp (Bệnh viện A, Trường B...)',
-  `issueDate` date DEFAULT NULL COMMENT 'Ngày cấp/Ngày bắt đầu hiệu lực',
-  `expiryDate` date DEFAULT NULL COMMENT 'Ngày hết hạn (Quan trọng cho chứng chỉ có thời hạn)',
-  `fileUrl` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Đường dẫn file scan (PDF/IMG)',
-  `status` enum('PENDING','APPROVED','REJECTED') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'PENDING' COMMENT 'Trạng thái duyệt của HR',
-  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'Ghi chú thêm',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`documentID`),
-  KEY `FK_Docs_User` (`userID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Lưu trữ hồ sơ, bằng cấp, giấy tờ minh chứng của nhân viên';
-
---
--- Đang đổ dữ liệu cho bảng `employee_documents`
---
-
-INSERT INTO `employee_documents` (`documentID`, `userID`, `documentType`, `documentName`, `issuingAuthority`, `issueDate`, `expiryDate`, `fileUrl`, `status`, `note`, `created_at`, `updated_at`) VALUES
-(1, 36, 'OTHER', 'CV Nhân viên', 'Bản thân', '2026-01-01', NULL, '31b59d76-cf6c-41d1-b82e-f53327b785bb.pdf', 'APPROVED', 'Đã xác thực bản gốc', '2026-01-05 18:10:10', '2026-01-05 18:14:24');
 
 -- --------------------------------------------------------
 
@@ -4402,21 +4369,21 @@ INSERT INTO `users` (`userID`, `username`, `password`, `fullname`, `cccd`, `emai
 --
 DROP VIEW IF EXISTS `v_employee_profile_flat`;
 CREATE TABLE IF NOT EXISTS `v_employee_profile_flat` (
-`userID` int
-,`GENDER` enum('MALE','FEMALE')
-,`JOB_TYPE` varchar(100)
-,`SKILL_GRADE` int
-,`AGE` bigint
-,`SENIORITY_DAYS` int
-,`SENIORITY_MONTHS` bigint
+`AGE` bigint
 ,`BASE_SALARY` decimal(15,2)
 ,`CONTRACT_TYPE` varchar(100)
-,`TOXIC_TYPE` enum('NONE','CASH','IN_KIND')
-,`INSURANCE_BASE` decimal(15,2)
-,`DEPT_NAME` varchar(255)
-,`IS_OFFICE` bit(1)
-,`ROLE_NAME` varchar(100)
 ,`DEPENDENT_COUNT` bigint
+,`DEPT_NAME` varchar(255)
+,`GENDER` enum('MALE','FEMALE')
+,`INSURANCE_BASE` decimal(15,2)
+,`IS_OFFICE` bit(1)
+,`JOB_TYPE` varchar(100)
+,`ROLE_NAME` varchar(100)
+,`SENIORITY_DAYS` int
+,`SENIORITY_MONTHS` bigint
+,`SKILL_GRADE` int
+,`TOXIC_TYPE` enum('NONE','CASH','IN_KIND')
+,`userID` int
 );
 
 -- --------------------------------------------------------
@@ -4503,12 +4470,6 @@ ALTER TABLE `employeeofficialschedule`
   ADD CONSTRAINT `FK_schedule_manager` FOREIGN KEY (`approvedbymanagerID`) REFERENCES `users` (`userID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_schedule_shift` FOREIGN KEY (`shiftID`) REFERENCES `shifts` (`shiftID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_schedule_user` FOREIGN KEY (`employeeID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Các ràng buộc cho bảng `employee_documents`
---
-ALTER TABLE `employee_documents`
-  ADD CONSTRAINT `FK_Docs_User` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `leavebalance`
