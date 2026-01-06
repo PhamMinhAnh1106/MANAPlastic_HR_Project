@@ -169,7 +169,11 @@
                     <button *ngIf="c.fileurl" class="btn-icon" (click)="viewContractImage(c.fileurl)" title="Xem file hợp đồng">
                         <span class="material-symbols-outlined">visibility</span>
                     </button>
-                    <!-- Nút Sửa (Mới) -->
+                    <!-- Nút Active/Upload (Mới) -->
+                    <button class="btn-icon btn-active" (click)="openActivePopup(c)" title="Active Hợp đồng">
+                        <span class="material-symbols-outlined">check_circle</span>
+                    </button>
+                    <!-- Nút Sửa -->
                     <button class="btn-icon btn-edit" (click)="openEditContract(c)" title="Sửa hợp đồng">
                         <span class="material-symbols-outlined">edit_square</span>
                     </button>
@@ -315,6 +319,45 @@
         <div class="modal-footer">
             <button class="btn-secondary" (click)="closeEditPopup()">Hủy</button>
             <button class="btn-primary" (click)="submitEditContract()">Cập nhật</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== ACTIVE CONTRACT MODAL (NEW) ===== -->
+<div class="overlay" *ngIf="showActivePopup">
+    <div class="modal-box edit-modal-box">
+        <div class="modal-header">
+            <h3>Active Hợp đồng #{{selectedActiveContractId}}</h3>
+            <button class="close-btn" (click)="closeActivePopup()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="message-content" style="padding-bottom: 0;">
+                <p style="font-size: 0.9rem; margin-bottom: 15px;">
+                    Vui lòng tải lên file hợp đồng (PDF) để kích hoạt tài khoản/hợp đồng này.
+                </p>
+            </div>
+
+            <div class="form-group-lg">
+                <label>File Hợp đồng (Chỉ nhận PDF) *</label>
+                <div class="file-upload-wrapper">
+                    <!-- Chỉ nhận file PDF -->
+                    <input type="file" id="activeFile" (change)="onActiveFileSelected($event)" accept=".pdf" class="hidden-input">
+                    <label for="activeFile" class="file-label" [class.has-file]="activeFileName">
+                        <span class="material-symbols-outlined">picture_as_pdf</span>
+                        <span>{{ activeFileName || 'Chọn file PDF...' }}</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="closeActivePopup()">Hủy</button>
+            <button class="btn-primary" (click)="submitActiveContract()">
+                <span class="material-symbols-outlined" style="font-size: 18px;">check_circle</span> Active
+            </button>
         </div>
     </div>
 </div>

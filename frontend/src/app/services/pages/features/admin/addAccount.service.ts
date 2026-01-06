@@ -32,3 +32,19 @@ export async function addAccount(formdata: addaccount) {
         return "co loi xay ra " + e;
     }
 }
+
+export async function ActiveaddAccount(pdfFile: File) {
+    try {
+        const formData = new FormData();
+
+        formData.append("file", pdfFile);
+        // Gửi request
+        const res = await api.post("/admin/addAccount", formData);
+        return {
+            data: res.data,
+            status: res.status
+        }
+    } catch (e) {
+        return "co loi xay ra " + e;
+    }
+}

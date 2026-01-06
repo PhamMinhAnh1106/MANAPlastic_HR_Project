@@ -272,6 +272,14 @@ button {
                 background: #fef3c7;
             }
         }
+
+        // [NEW] STYLE CHO NÚT ACTIVE
+        &.btn-active {
+            &:hover {
+                color: $success;
+                background: #dcfce7;
+            }
+        }
     }
 }
 
@@ -392,6 +400,12 @@ button {
 
                 &:hover {
                     background: #e0f2fe;
+                }
+
+                &.has-file {
+                    background: #dcfce7;
+                    border-color: $success;
+                    color: #047857;
                 }
 
                 span {

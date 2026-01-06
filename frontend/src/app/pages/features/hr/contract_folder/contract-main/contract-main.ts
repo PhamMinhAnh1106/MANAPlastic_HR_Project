@@ -72,35 +72,36 @@ export class ContractManager implements OnInit, AfterViewInit, OnDestroy {
     {
       title: 'Thông tin chung',
       items: [
-        { code: '((contract_code))' },
-        { code: '((day))' },
-        { code: '((month))' },
-        { code: '((year))' }
+        { code: '{{contract_code}}' },
+        { code: '{{day}}' },
+        { code: '{{month}}' },
+        { code: '{{year}}' }
       ]
     },
     {
       title: 'Thông tin nhân sự',
       items: [
-        { code: '((employee_name))' },
-        { code: '((cccd))' },
-        { code: '((address))' }
+        { code: '{{employee_name}}' },
+        { code: '{{cccd}}' },
+        { code: '{{address}}' }
       ]
     },
     {
       title: 'Vị trí & Lương',
       items: [
-        { code: '((position))' },
-        { code: '((base_salary))' }
+        { code: '{{position}}' },
+        { code: '{{base_salary}}' }
       ]
     },
     {
       title: 'Bảng dữ liệu',
       isTable: true,
       items: [
-        { code: '((allowances_table))' }
+        { code: '{{allowances_table}}' }
       ]
     }
   ];
+
 
   constructor(private cdr: ChangeDetectorRef) {
     this.loadExternalScripts();

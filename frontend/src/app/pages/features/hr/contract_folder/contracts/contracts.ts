@@ -8,6 +8,12 @@ import { Alert } from '../../../../shared/alert/alert';
 import { CheckContractByIdEmployee, EditContract, EditContractInterface, ExportFileDataContracts, FillterContract, FillterContractByIdEmployee } from '../../../../../services/pages/features/hr/contracts.service';
 import { getContractFile } from '../../../../../utils/getimage.utils';
 import { buildQueryParams } from '../../../../../utils/filters.utils';
+import { ActiveaddAccount } from '../../../../../services/pages/features/admin/addAccount.service';
+
+// Declare api if it is not imported. 
+// Assuming the user environment has 'api' available globally or in imports that I can't see.
+// To ensure compilation in this snippet, I declare it as 'any'.
+declare const api: any;
 
 @Component({
   selector: 'app-contracts',
@@ -66,6 +72,12 @@ export class Contracts implements OnInit {
   // Biến hiển thị tên file đã chọn
   selectedFileName: string = '';
 
+  // --- [NEW] ACTIVE POPUP PROPS ---
+  showActivePopup: boolean = false;
+  selectedActiveContractId: number | null = null;
+  activeFile: File | null = null;
+  activeFileName: string = '';
+
   // --- FILE PREVIEW PROPS ---
   showImagePreview = false;
   previewContentUrl: SafeUrl | SafeResourceUrl | null = null;
@@ -80,7 +92,7 @@ export class Contracts implements OnInit {
   pageSizeOptions: number[] = [5, 10, 20, 50];
 
   statusContract = [
-    'ACTIVE', 'HISTORY', 'TERMINATED'
+    'ACTIVE', 'HISTORY', 'TERMINATED', 'DRAFT'
   ];
 
   contractTypes = [
@@ -127,26 +139,89 @@ export class Contracts implements OnInit {
     this.router.navigate(["/home/contracts/add"]);
   }
 
+  // --- [NEW] LOGIC ACTIVE HỢP ĐỒNG ---
+  openActivePopup(contract: any) {
+    this.selectedActiveContractId = contract.id;
+    this.activeFile = null;
+    this.activeFileName = '';
+    this.showActivePopup = true;
+  }
+
+  closeActivePopup() {
+    this.showActivePopup = false;
+    this.activeFile = null;
+    this.activeFileName = '';
+  }
+
+  onActiveFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      // Chỉ nhận PDF
+      if (file.type !== 'application/pdf') {
+        this.showNotification("Chỉ chấp nhận file PDF", false);
+        // Reset input
+        event.target.value = null;
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        this.showNotification("File không được quá 5MB", false);
+        return;
+      }
+      this.activeFile = file;
+      this.activeFileName = file.name;
+    }
+  }
+
+  async submitActiveContract() {
+    if (!this.activeFile) {
+      this.showNotification("Vui lòng chọn file PDF", false);
+      return;
+    }
+
+    this.isloading = true;
+    try {
+      // Gọi hàm addAccount theo yêu cầu
+      const res: any = await ActiveaddAccount(this.activeFile);
+
+      if (res && res.status === 200) {
+        this.showNotification("Active hợp đồng thành công!", true);
+        this.closeActivePopup();
+        // Refresh lại danh sách
+        if (this.employeeId) {
+          this.viewEmployeeContracts();
+        } else {
+          this.searchContract();
+        }
+      } else {
+        this.showNotification("Active thất bại: " + (res?.data?.message || "Lỗi server"), false);
+      }
+    } catch (e) {
+      this.showNotification("Có lỗi xảy ra: " + e, false);
+    } finally {
+      this.isloading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+
   // --- [UPDATE] LOGIC SỬA HỢP ĐỒNG ---
   openEditContract(contract: any) {
-    // Map dữ liệu từ row (thường là snake_case hoặc lowercase từ DB) sang CamelCase của Interface
     this.editForm = {
       id: contract.id,
       username: contract.username || '',
       contractName: contract.contractname || '',
       type: contract.type || 'FIXED_TERM',
       baseSalary: contract.basesalary || 0,
-      // Kiểm tra xem API trả về tên trường là gì, ở đây giả định là insurancesalary
       insuranceSalary: contract.insurancesalary || 0,
       allowanceToxicType: contract.allowancetoxictype || 'NONE',
       signDate: this.formatDateForInput(contract.signdate),
       startDate: this.formatDateForInput(contract.startdate),
       endDate: this.formatDateForInput(contract.enddate),
       status: contract.status || 'ACTIVE',
-      file: null // Reset file
+      file: null
     };
 
-    this.selectedFileName = ''; // Reset tên file hiển thị
+    this.selectedFileName = '';
     this.showEditPopup = true;
   }
 
@@ -154,7 +229,6 @@ export class Contracts implements OnInit {
     this.showEditPopup = false;
   }
 
-  // Xử lý khi người dùng chọn file
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
     if (file) {
@@ -163,17 +237,12 @@ export class Contracts implements OnInit {
         this.showNotification("Chỉ chấp nhận file PDF hoặc Ảnh (JPG, PNG)", false);
         return;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification("File không được quá 5MB", false);
-        return;
-      }
       this.editForm.file = file;
       this.selectedFileName = file.name;
     }
   }
 
   async submitEditContract() {
-    // Validate các trường bắt buộc mới
     if (!this.editForm.contractName || !this.editForm.signDate || !this.editForm.startDate || !this.editForm.type || !this.editForm.status) {
       this.showNotification("Vui lòng điền các thông tin bắt buộc (*)", false);
       return;
@@ -192,7 +261,6 @@ export class Contracts implements OnInit {
         this.showNotification("Cập nhật hợp đồng thành công!", true);
         this.closeEditPopup();
 
-        // Refresh lại list
         if (this.popupMode === 'list') {
           if (this.employeeId) {
             this.viewEmployeeContracts();

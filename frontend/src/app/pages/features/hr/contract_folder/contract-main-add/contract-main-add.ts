@@ -267,8 +267,7 @@ export class ContractCreate implements OnInit {
         this.currentContractId = result.data.contractId || result.data.id;
         this.showPreview(this.currentContractId as number);
         this.sections.config = false;
-        this.showNotification(result.data, true);
-        console.log(result.data.message);
+        this.showNotification(result.data.message, true);
       } else {
         this.showNotification(result.response.data.message, false);
       }
