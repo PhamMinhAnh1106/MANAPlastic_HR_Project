@@ -1,8 +1,16 @@
+<!-- Overlay để đóng sidebar khi click ra ngoài trên mobile -->
+<div class="sidebar-overlay" *ngIf="isSidebarOpen" (click)="closeSidebar()"></div>
+
 <header class="task-bar">
+
+  <!-- Mobile Menu Button -->
+  <button class="mobile-menu-btn" (click)="toggleSidebar()">
+    <span class="material-symbols-outlined">menu</span>
+  </button>
 
   <!-- Notification Section -->
   <div class="user-actions">
-    <!-- Nút thêm tài khoản (Giữ nguyên) -->
+    <!-- Nút thêm tài khoản -->
     <div class="add-dropdown" #addDrop>
       <div class="dropdown-menu" *ngIf="isAddOpen">
         <div class="feature" *ngFor="let feature of featureAdd">
@@ -45,16 +53,12 @@
       </div>
     </div>
 
-    <!-- Avatar người dùng (Giữ nguyên) -->
+    <!-- Avatar người dùng -->
     <div class="user-dropdown" #userDrop>
       <img src="assets/avatar.png" alt="User Avatar" class="avatar" (click)="toggleUserDropdown()" />
 
       <div class="dropdown-menu" *ngIf="isUserOpen">
         <button class="menu-btn" (click)="changepass()">Đổi mật khẩu</button>
-        <!--<button class="menu-btn" (click)="openSettings()">
-          <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 8px;">settings</span>
-          Cài đặt
-        </button> --> 
         <button class="logout-btn" (click)="logout()">Đăng xuất</button>
       </div>
     </div>
@@ -62,7 +66,7 @@
 
 </header>
 
-<!-- SETTINGS MODAL (Giữ nguyên) -->
+<!-- SETTINGS MODAL -->
 <div class="settings-overlay" *ngIf="isSettingsOpen" (click)="closeSettings()">
   <div class="settings-modal" (click)="$event.stopPropagation()">
     <div class="settings-header">
@@ -87,10 +91,11 @@
 </div>
 
 <div class="main-body-container">
-  <div class="left_handle">
+  <!-- Thêm class .open dựa trên biến isSidebarOpen -->
+  <div class="left_handle" [class.open]="isSidebarOpen">
     <!-- Logo section -->
     <nav class="nav-links">
-      <a [routerLink]="['/home', 'info']" routerLinkActive="active" class="nav-item">
+      <a [routerLink]="['/home', 'info']" routerLinkActive="active" class="nav-item" (click)="closeSidebar()">
         <img src="assets/logo.png" alt="Logo">
         <span class="namelogo">ManaPlastic</span>
       </a>
@@ -110,7 +115,7 @@
       <!-- Danh sách task con -->
       <div class="submenu" *ngIf="activeIndex === i">
         <a *ngFor="let taskname of item.task" [routerLink]="taskname.path" routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }" class="submenu-link">
+          [routerLinkActiveOptions]="{ exact: true }" class="submenu-link" (click)="closeSidebar()">
           <span class="link-text">
             <span class="material-symbols-outlined sub-icon">circle</span>
             {{ taskname.name }}</span>

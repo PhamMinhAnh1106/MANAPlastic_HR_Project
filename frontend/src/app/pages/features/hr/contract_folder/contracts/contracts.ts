@@ -3,11 +3,11 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeUrl, SafeResourceUrl } from '@angular/platform-browser';
-import { Loading } from '../../../shared/loading/loading';
-import { Alert } from '../../../shared/alert/alert';
-import { CheckContractByIdEmployee, EditContract, EditContractInterface, ExportFileDataContracts, FillterContract, FillterContractByIdEmployee } from '../../../../services/pages/features/hr/contracts.service';
-import { getContractFile } from '../../../../utils/getimage.utils';
-import { buildQueryParams } from '../../../../utils/filters.utils';
+import { Loading } from '../../../../shared/loading/loading';
+import { Alert } from '../../../../shared/alert/alert';
+import { CheckContractByIdEmployee, EditContract, EditContractInterface, ExportFileDataContracts, FillterContract, FillterContractByIdEmployee } from '../../../../../services/pages/features/hr/contracts.service';
+import { getContractFile } from '../../../../../utils/getimage.utils';
+import { buildQueryParams } from '../../../../../utils/filters.utils';
 
 @Component({
   selector: 'app-contracts',

@@ -1,12 +1,14 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { contracts, statusContract, TypeContract } from '../../../../interface/contract.interface';
+
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgFor, NgIf, NgClass } from '@angular/common'; // Thêm NgClass
-import { AddNewContract } from '../../../../services/pages/features/hr/contracts.service';
-import { Loading } from '../../../shared/loading/loading';
-import { Alert } from '../../../shared/alert/alert';
-import { Comfirm } from '../../../shared/comfirm/comfirm';
+import { Loading } from '../../../../shared/loading/loading';
+import { Alert } from '../../../../shared/alert/alert';
+import { Comfirm } from '../../../../shared/comfirm/comfirm';
+import { AddNewContract } from '../../../../../services/pages/features/hr/contracts.service';
+import { contracts, TypeContract } from '../../../../../interface/contract.interface';
+
 
 @Component({
   selector: 'app-contracts-add',

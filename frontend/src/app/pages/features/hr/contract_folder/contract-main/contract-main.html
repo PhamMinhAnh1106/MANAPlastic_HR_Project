@@ -1,0 +1,169 @@
+<!-- [FIX] Gom các component chung vào wrapper có z-index cao nhất để không bị che -->
+<div class="shared-components-overlay">
+  <app-loading *ngIf="isloading"></app-loading>
+  <app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
+  <app-alert *ngIf="isalert" [message]="notifyMessage" [notifyType]="notifyType" (hidden)="isalert = false"></app-alert>
+</div>
+
+<div class="app-container">
+  
+  <!-- OVERLAY (Chỉ dùng cho Sidebar Mobile) -->
+  <div class="app-overlay" 
+       [class.show]="isSidebarOpen" 
+       (click)="isSidebarOpen = false">
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    
+    <!-- HEADER / TOOLBAR -->
+    <header class="top-bar" [class.z-elevate]="isToolsOpen">
+      <div class="bar-left">
+        <button class="btn-menu-toggle" (click)="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="select-wrapper">
+          <label><i class="fas fa-file-contract"></i> <span class="hide-on-tablet">Mẫu HĐ:</span></label>
+          <select 
+            [(ngModel)]="selectedTemplateId" 
+            (change)="onTemplateChange()"
+            class="template-select"
+          >
+            <option [ngValue]="0" disabled selected>
+                {{ isEditMode ? '-- Chọn mẫu hợp đồng --' : '-- Đang tạo mới (Chưa lưu) --' }}
+            </option>
+            <option *ngFor="let tpl of templates" [ngValue]="tpl.id">
+              {{ tpl.name }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bar-right">
+        <!-- Input File ẩn -->
+        <input 
+          type="file" 
+          #fileInput 
+          (change)="onFileSelected($event)" 
+          style="display: none" 
+          accept=".html,.txt,.docx"
+        >
+        
+        <div class="toolbar-actions">
+          
+          <!-- Nút Công Cụ -->
+          <div class="tools-dropdown-wrapper">
+            <button class="btn-action btn-tools" (click)="toggleTools()" [class.active]="isToolsOpen">
+              <i class="fas fa-toolbox"></i> 
+              <span class="btn-text">Công cụ</span>
+              <i class="fas fa-chevron-down ms-1" style="font-size: 0.7em;"></i>
+            </button>
+
+            <!-- Popup Menu -->
+            <div class="tools-popup" [class.show]="isToolsOpen">
+              <div class="popup-arrow"></div>
+              
+              <div class="popup-item" (click)="startCreateNew()">
+                <div class="icon-box create"><i class="fas fa-file-medical"></i></div>
+                <div class="item-content">
+                  <span class="title">Tạo trắng</span>
+                  <span class="desc">Làm mới để soạn thảo từ đầu</span>
+                </div>
+              </div>
+              
+              <div class="popup-item" (click)="fileInput.click()">
+                <div class="icon-box import"><i class="fas fa-file-word"></i></div>
+                <div class="item-content">
+                  <span class="title">Nhập từ File</span>
+                  <span class="desc">Word (.docx), HTML</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nút Lưu -->
+          <button 
+            class="btn-action" 
+            [ngClass]="isEditMode ? 'btn-update' : 'btn-save-new'"
+            (click)="handleSave()" 
+            [title]="isEditMode ? 'Cập nhật nội dung cho mẫu hiện tại' : 'Lưu thành một mẫu hợp đồng mới'"
+          >
+            <i class="fas" [class.fa-save]="isEditMode" [class.fa-plus-circle]="!isEditMode"></i> 
+            <span class="btn-text">{{ isEditMode ? 'Cập nhật' : 'Lưu Mẫu Mới' }}</span>
+          </button>
+
+        </div>
+      </div>
+    </header>
+
+    <!-- EDITOR AREA -->
+    <div class="editor-scroll-container">
+      <div class="document-workspace" (click)="isToolsOpen = false">
+        
+        <!-- Document Meta Info -->
+        <div class="doc-meta-panel" [class.is-new-mode]="!isEditMode">
+          
+          <div class="meta-header-badge" *ngIf="!isEditMode">
+            <i class="fas fa-info-circle"></i> Đang soạn thảo mẫu mới
+          </div>
+
+          <div class="meta-fields">
+            <div class="meta-item name-item">
+              <label>Tên mẫu hợp đồng <span class="text-danger">*</span></label>
+              <div class="input-with-icon">
+                <i class="fas fa-heading"></i>
+                <input type="text" [(ngModel)]="currentTemplate.name" placeholder="Ví dụ: Hợp đồng thử việc 2024...">
+              </div>
+            </div>
+            <div class="meta-item type-item">
+              <label>Mã loại (Type)</label>
+              <div class="input-with-icon">
+                <i class="fas fa-tag"></i>
+                <input type="text" [(ngModel)]="currentTemplate.type" placeholder="VD: FIXED_TERM">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CKEditor Box -->
+        <div class="editor-paper-shadow">
+          <div #editorElement id="editor"></div>
+        </div>
+        
+        <div class="doc-footer-spacer"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" [class.open]="isSidebarOpen">
+    <div class="sidebar-header">
+      <h3><i class="fas fa-layer-group"></i> Biến Dữ Liệu</h3>
+      <button class="btn-close-sidebar" (click)="toggleSidebar()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="sidebar-content">
+      <div *ngFor="let group of variableGroups" class="variable-group">
+        <div class="group-label" [class.is-table-label]="group.isTable">
+          {{ group.title }}
+        </div>
+        
+        <div 
+          *ngFor="let item of group.items" 
+          class="variable-item" 
+          [class.is-table-item]="group.isTable"
+          (click)="insertVariable(item.code)"
+          title="Chèn biến này vào vị trí con trỏ"
+        >
+          <span class="code">{{ item.code }}</span>
+          <i [class]="group.isTable ? 'fas fa-table' : 'fas fa-plus-circle'"></i>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>

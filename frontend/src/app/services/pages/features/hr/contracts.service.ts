@@ -1,5 +1,3 @@
-
-import { contracts, StatusContract, statusContract } from "../../../../interface/contract.interface";
 import { api } from "../../../api.service";
 interface checkcontract {
     allowFixedTerm: boolean,
@@ -146,5 +144,135 @@ export async function EditContract(form: EditContractInterface) {
 
     } catch (error) {
         return error;
+    }
+}
+// phần hợp đồng mới
+export interface contracttemplate {
+    id: number;
+    templateID: number;
+    name: string;
+    type: string;
+    content: string;
+}
+export async function getcontracttemplate() {
+    try {
+        const res = await api.get(`/hr/contract/templates`);
+        return res.data;
+    } catch (error) {
+        return "co loi xay ra " + error;
+    }
+}
+
+//Lấy chi tiết một mẫu hợp đồng
+export async function getcontracttemplatebyid(id: number) {
+    try {
+        const res = await api.get(`/hr/contract/templates/${id}`);
+        return res.data;
+    } catch (error) {
+        return "co loi xay ra " + error;
+    }
+}
+//Cập nhật mẫu hợp đồng
+
+export interface contracttemplateupdate {
+    templateID: number;
+    name: string;
+    type: string;
+    content: string;
+}
+
+export async function updatecontracttemplate(id: number, template: contracttemplateupdate) {
+    try {
+        const res = await api.put(`/hr/contract/templates/${id}`, template);
+        return {
+            data: res.data,
+            status: res.status
+        }
+    } catch (error) {
+        return "co loi xay ra " + error;
+    }
+}
+
+//Tạo mới mẫu hợp đồng
+
+export interface contracttemplatecreate {
+    name: string;
+    type: string;
+    content: string;
+}
+export async function createcontracttemplate(template: contracttemplatecreate) {
+    try {
+        const res = await api.post(`/hr/contract/templates`, template);
+        return {
+            data: res.data,
+            status: res.status
+        }
+    } catch (error) {
+        return "co loi xay ra " + error;
+    }
+}
+////// trang hợp đồng lao động 
+
+export interface Allowance {
+    allowanceName: string;
+    allowanceType: string;
+    amount: number;
+    isTaxable: boolean;
+    isInsuranceBase: boolean;
+    taxFreeAmount: number;
+}
+export interface CreateContractPayload {
+    userId: number | null;
+    departmentId: number;
+    roleId: number;
+    fullname: string;
+    cccd: string;
+    email: string;
+    phone: string;
+    address: string;
+    dob: string
+    gender: string;
+    contractType: string;
+    workType: string;
+    templateId: number;
+    startDate: string;
+    endDate: string | null
+    baseSalary: number;
+    insurancePercent: number;
+    allowanceToxicType: string;
+    allowances: Allowance[];
+}
+
+export async function createContract(payload: CreateContractPayload) {
+    try {
+        const res = await api.post(`/hr/contracts/create`, payload);
+        return {
+            data: res.data,
+            status: res.status
+        }
+    } catch (error) {
+        return error;
+    }
+}
+
+export async function getContractPdfUrl(contractId: number): Promise<string> {
+    try {
+        // QUAN TRỌNG: Thêm responseType: 'blob' để axios hiểu đây là file binary
+        const response = await api.get(`/hr/contracts/${contractId}/print`, { // Dùng endpoint /print như postman log của bạn
+            responseType: 'blob'
+        });
+
+        // Tạo một URL tạm thời từ Blob dữ liệu (PDF)
+        const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        return pdfUrl; // Trả về blob:http://localhost... để gán vào iframe src
+    } catch (error: any) {
+        console.error("Lỗi tải PDF:", error);
+        // Kiểm tra xem lỗi là do Auth hay do server
+        if (error.response && error.response.status === 401) {
+            return "co loi xay ra: Hết phiên đăng nhập";
+        }
+        return "co loi xay ra " + (error.message || error);
     }
 }

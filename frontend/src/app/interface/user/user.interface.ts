@@ -28,3 +28,14 @@ export const Department: department[] = [
     { departmentId: 5, departmentName: "Phòng Ban In Ấn" },
     { departmentId: 6, departmentName: "Phòng Ban Chăm Sóc Khách Hàng" }
 ]
+
+export interface role {
+    roleId: number,
+    roleName: string
+}
+export const Role: role[] = [
+    { roleId: 1, roleName: "Admin" },
+    { roleId: 2, roleName: "HR" },
+    { roleId: 3, roleName: "Manager" },
+    { roleId: 4, roleName: "Employee" },
+]

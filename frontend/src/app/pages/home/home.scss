@@ -23,9 +23,30 @@ body {
     padding: 0 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between; // Thay đổi để chứa nút menu bên trái
     align-items: center;
-    z-index: 100;
+    z-index: 101; // Tăng z-index để nằm trên sidebar khi sidebar chưa mở hoặc overlay
+    transition: all 0.3s;
+}
+
+// Mobile Menu Button
+.mobile-menu-btn {
+    display: none; // Ẩn trên desktop
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    span {
+        font-size: 28px;
+    }
 }
 
 // User Actions
@@ -33,8 +54,8 @@ body {
     display: flex;
     align-items: center;
     gap: 1.5rem;
+    margin-left: auto; // Đẩy về bên phải
 
-    // --- NOTIFICATION STYLES ---
     .notification-wrapper {
         position: relative;
 
@@ -77,7 +98,7 @@ body {
         .notification-menu {
             position: absolute;
             top: 130%;
-            right: -60px; // Căn chỉnh để không bị lệch quá avatar
+            right: -60px;
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
@@ -153,10 +174,6 @@ body {
                             font-weight: 600;
                             color: #2d3436;
                             margin-bottom: 2px;
-                            display: -webkit-box;
-                            -webkit-line-clamp: 2;
-                            -webkit-box-orient: vertical;
-                            overflow: hidden;
                         }
 
                         .notifi-subtitle {
@@ -165,13 +182,10 @@ body {
                             margin-bottom: 4px;
                         }
 
-                        .notifi-time {
+                        .notifi-time.warning {
+                            color: #d63031;
+                            font-weight: 500;
                             font-size: 0.8rem;
-
-                            &.warning {
-                                color: #d63031;
-                                font-weight: 500;
-                            }
                         }
                     }
                 }
@@ -179,24 +193,9 @@ body {
         }
     }
 
-    // --- EXISTING USER DROPDOWN ---
     .add-dropdown,
     .user-dropdown {
         position: relative;
-
-        .add-icon {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.2s;
-
-            &:hover {
-                transform: scale(1.1);
-                background: rgba(255, 255, 255, 0.2);
-            }
-        }
 
         .avatar {
             width: 40px;
@@ -277,8 +276,8 @@ body {
     max-width: 500px;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    animation: slideUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
     overflow: hidden;
+    animation: slideUp 0.3s;
 
     .settings-header {
         padding: 20px 25px;
@@ -302,9 +301,6 @@ body {
             color: #adb5bd;
             padding: 8px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            transition: 0.2s;
 
             &:hover {
                 background-color: #f1f3f5;
@@ -319,152 +315,6 @@ body {
 
     .settings-body {
         padding: 25px;
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #f1f2f6;
-
-            &:last-child {
-                border-bottom: none;
-            }
-
-            .setting-info {
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-                flex: 1;
-
-                .setting-label {
-                    font-size: 1rem;
-                    font-weight: 600;
-                    color: #2c3e50;
-                }
-
-                .setting-desc {
-                    font-size: 0.85rem;
-                    color: #7f8c8d;
-                }
-            }
-        }
-    }
-}
-
-// Toggle Switch
-.toggle-switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 26px;
-
-    input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-
-        &:checked+.slider {
-            background-color: #4f46e5;
-
-            &:before {
-                transform: translateX(24px);
-            }
-        }
-    }
-
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: 0.3s;
-        border-radius: 26px;
-
-        &:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
-        }
-    }
-}
-
-// Dark Mode Styles - Apply to entire web
-:root.dark-mode,
-:root.dark-mode * {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-:root.dark-mode {
-    background-color: #1a1a1a;
-    color: #e0e0e0;
-}
-
-:root.dark-mode body {
-    background-color: #1a1a1a !important;
-    color: #e0e0e0 !important;
-}
-
-:root.dark-mode .main-body-container {
-    background-color: #1a1a1a !important;
-}
-
-:root.dark-mode .task-bar {
-    background-color: #0f1419 !important;
-
-    .notification-wrapper .notification-icon-box .badge {
-        border-color: #0f1419 !important;
-    }
-}
-
-:root.dark-mode .left_handle {
-    background-color: #0f1419 !important;
-}
-
-// Dark mode for dropdowns and notifications
-:root.dark-mode .dropdown-menu,
-:root.dark-mode .notification-menu {
-    background-color: #2d2d2d !important;
-    border-color: #404040 !important;
-    color: #e0e0e0 !important;
-
-    .notifi-header {
-        background-color: #353535 !important;
-        border-bottom-color: #404040 !important;
-        color: #e0e0e0 !important;
-    }
-
-    .notifi-item {
-        border-bottom-color: #404040 !important;
-
-        &:hover {
-            background-color: #353535 !important;
-        }
-
-        .notifi-title {
-            color: #e0e0e0 !important;
-        }
-
-        .notifi-subtitle {
-            color: #b2bec3 !important;
-        }
-    }
-
-    .menu-btn {
-        color: #e0e0e0 !important;
-
-        &:hover {
-            background-color: #353535 !important;
-        }
     }
 }
 
@@ -478,9 +328,9 @@ body {
     background-color: #1c2655;
     display: flex;
     flex-direction: column;
-    z-index: 100;
-    padding-top: 1rem;
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100; // Thấp hơn header một chút hoặc ngang bằng, nhưng cần xử lý mobile
+    padding-top: 60px; // Thêm padding top để tránh bị header che mất nội dung bên trong
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow-x: hidden;
     white-space: nowrap;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
@@ -497,14 +347,12 @@ body {
             align-items: center;
         }
 
-        // Hiện logo và text khi hover
         .namelogo {
             display: block;
             opacity: 1;
             transform: translateX(0);
         }
 
-        // --- KHÔI PHỤC LOGIC HIỂN THỊ MENU CON KHI HOVER ---
         .menu-item {
             .menu-icon.active+.submenu {
                 display: block;
@@ -517,7 +365,7 @@ body {
     .nav-links {
         height: 4rem;
         width: 100%;
-        margin-bottom: 2rem;
+        /* margin-bottom: 2rem; */
         padding: 0;
 
         .nav-item {
@@ -608,7 +456,7 @@ body {
 
         .submenu {
             width: 100%;
-            display: none; // Mặc định ẩn, chỉ hiện khi hover sidebar (xử lý ở trên)
+            display: none;
             background-color: rgba(0, 0, 0, 0.2);
 
             .submenu-link {
@@ -650,68 +498,88 @@ body {
     }
 }
 
-// --- ANIMATIONS ---
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
 
-    to {
-        opacity: 1;
-    }
-}
+// --- 4. MAIN CONTENT AREA ---
+.main-body-container {
+    padding-top: 60px;
+    padding-left: 4rem;
+    transition: padding-left 0.3s ease;
+    width: 100%;
 
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    .content-outlet {
+        width: 100%;
+        position: relative;
     }
 }
 
-@keyframes popIn {
-    0% {
-        transform: scale(0);
-    }
-
-    80% {
-        transform: scale(1.2);
-    }
-
-    100% {
-        transform: scale(1);
-    }
+// --- OVERLAY ---
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 100; // Dưới sidebar mobile (nếu sidebar là 101+)
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.3s;
 }
 
-@keyframes slideDownSubmenu {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-// --- 4. RESPONSIVE ---
+// --- 5. RESPONSIVE ---
 @media (max-width: 768px) {
-    .task-bar {
-        padding-left: 15px;
-        justify-content: space-between;
+    .mobile-menu-btn {
+        display: block; // Hiện nút menu
+    }
+
+    .sidebar-overlay {
+        display: block; // Hiện overlay khi cần (kết hợp với *ngIf trong HTML)
+        z-index: 110;
     }
 
     .left_handle {
         transform: translateX(-100%);
-        width: 16rem;
+        width: 16rem; // Full width khi mở
+        z-index: 120; // Cao hơn overlay
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+
+        &.open {
+            transform: translateX(0);
+
+            // Khi mở trên mobile, hiển thị đầy đủ text và logo như khi hover desktop
+            .link-text {
+                opacity: 1;
+                visibility: visible;
+                transform: translateX(0);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .namelogo {
+                display: block;
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            // Cho phép menu con hiển thị
+            .menu-item {
+                .menu-icon.active+.submenu {
+                    display: block;
+                }
+            }
+        }
     }
 
-    // Mobile Notification adjustments
+    .main-body-container {
+        padding-left: 0;
+    }
+
+    .task-bar {
+        padding-left: 15px;
+        // z-index: 115; // Giữ header luôn nổi
+    }
+
     .user-actions {
         gap: 10px;
 
@@ -725,5 +593,40 @@ body {
             right: auto;
             transform: none;
         }
+    }
+}
+
+// --- ANIMATIONS ---
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideDownSubmenu {
+    from {
+        transform: translateY(-5px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
     }
 }

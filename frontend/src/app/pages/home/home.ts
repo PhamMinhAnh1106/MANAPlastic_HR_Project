@@ -28,7 +28,7 @@ export class Home implements OnInit {
 
   @ViewChild('addDrop') addDrop!: ElementRef;
   @ViewChild('userDrop') userDrop!: ElementRef;
-  @ViewChild('notifiDrop') notifiDrop!: ElementRef; // Thêm viewchild cho thông báo
+  @ViewChild('notifiDrop') notifiDrop!: ElementRef;
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent) {
@@ -50,14 +50,15 @@ export class Home implements OnInit {
     }
   }
 
-  isMenuOpen: boolean = false;
+  // --- QUẢN LÝ SIDEBAR MOBILE ---
+  isSidebarOpen: boolean = false;
 
-  toggleMenu() {
-    this.isMenuOpen = !this.isMenuOpen;
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
   }
 
-  closeMenu() {
-    this.isMenuOpen = false;
+  closeSidebar() {
+    this.isSidebarOpen = false;
   }
 
   token: string = "";
@@ -75,23 +76,21 @@ export class Home implements OnInit {
 
   featureAdd: any = [{ name: "", path: "" }]
 
-
   toggleUserDropdown() {
     this.isUserOpen = !this.isUserOpen;
     this.isAddOpen = false;
-    this.isNotifiOpen = false; // Đóng thông báo khi mở user
+    this.isNotifiOpen = false;
   }
 
   toggleNotifiDropdown() {
     this.isNotifiOpen = !this.isNotifiOpen;
-    this.isUserOpen = false; // Đóng user khi mở thông báo
+    this.isUserOpen = false;
     this.isAddOpen = false;
   }
 
   openSettings() {
     this.isSettingsOpen = true;
     this.isUserOpen = false;
-    // Load dark mode state from sessionStorage
     const savedDarkMode = sessionStorage.getItem('darkMode');
     this.isDarkMode = savedDarkMode === 'true';
     this.applyDarkMode();
@@ -136,7 +135,6 @@ export class Home implements OnInit {
     if (this.role.length > 0)
       this.cookieService.set("role", this.role[0], { path: "/" });
 
-    // Check role again safely
     const currentRole = this.role[0] || '';
 
     switch (currentRole) {
@@ -181,7 +179,9 @@ export class Home implements OnInit {
           {
             iconName: "article",
             path: "/home/contracts",
-            task: [{ name: "Quản Lý Hợp Đồng", path: "/home/contracts" }],
+            task: [{ name: "Quản Lý Hợp Đồng", path: "/home/contracts/edit" }, { name: "kiểm tra Hợp Đồng", path: "/home/contracts" }
+              , { name: "Thêm Hợp Đồng", path: "/home/contracts/edit/add" }
+            ],
           },
           {
             iconName: "currency_exchange",
@@ -274,10 +274,9 @@ export class Home implements OnInit {
     }
   }
 
-  // --- HÀM LOAD THÔNG BÁO ---
   async loadNotifications() {
     if (this.role[0] !== 'HR') {
-      return; // Chỉ load thông báo cho HR
+      return;
     }
     const res = await getNotificationContract();
     if (res && Array.isArray(res)) {
@@ -290,12 +289,10 @@ export class Home implements OnInit {
   ngOnInit() {
     this.CheckLogin();
     this.checkrole();
-    // Load dark mode on init from sessionStorage
     const savedDarkMode = sessionStorage.getItem('darkMode');
     this.isDarkMode = savedDarkMode === 'true';
     this.applyDarkMode();
 
-    // Gọi API lấy thông báo
     this.loadNotifications();
   }
 }

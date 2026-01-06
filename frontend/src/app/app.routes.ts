@@ -14,8 +14,7 @@ import { Leaverequests } from './pages/features/employee/leaverequests/leaverequ
 import { ADdleaverequest } from './pages/features/employee/addleaverequest/addleaverequest';
 import { Leaverequestcheck } from './pages/features/hr/leaverequestcheck/leaverequestcheck';
 import { ForgetPassword } from './pages/forget-password/forget-password';
-import { Contracts } from './pages/features/hr/contracts/contracts';
-import { ContractsAdd } from './pages/features/hr/contracts-add/contracts-add';
+
 import { AutoSchedule } from './pages/features/manager/auto-schedule/auto-schedule';
 import { Payrollmain } from './pages/features/hr/payroll/payrollmain/payrollmain';
 import { Payrollrules } from './pages/features/hr/payroll/payrollrules/payrollrules';
@@ -26,6 +25,10 @@ import { Main } from './pages/features/admin/legal/main/main';
 import { ActivityLogs } from './pages/features/admin/activity-logs/activity-logs';
 import { DataAttendant } from './pages/features/hr/data-attendant/data-attendant';
 import { RewaPunisComponent } from './pages/features/hr/rewa-punis/rewa-punis';
+import { Contracts } from './pages/features/hr/contract_folder/contracts/contracts';
+import { ContractsAdd } from './pages/features/hr/contract_folder/contracts-add/contracts-add';
+import { ContractManager } from './pages/features/hr/contract_folder/contract-main/contract-main';
+import { ContractCreate } from './pages/features/hr/contract_folder/contract-main-add/contract-main-add';
 
 
 export const routes: Routes = [
@@ -60,6 +63,10 @@ export const routes: Routes = [
             { path: 'leaverequest/manage', component: Leaverequestcheck },
             { path: 'contracts', component: Contracts },
             { path: 'contracts/add', component: ContractsAdd },
+            { path: 'contracts/edit', component: ContractManager },
+            { path: 'contracts/edit/add', component: ContractCreate },
+
+
 
 
             //employee
