@@ -14,11 +14,5 @@ public interface EmployeeDocumentRepository extends JpaRepository<EmployeeDocume
 
     List<EmployeeDocumentEntity> findByStatus(EmployeeDocumentEntity.DocumentStatus status);
 
-    @Query("SELECT d FROM EmployeeDocumentEntity d WHERE d.userID.id = :userId " +
-            "AND d.documentType = :type " +
-            "AND d.status = 'APPROVED' " +
-            "AND (d.expiryDate IS NULL OR d.expiryDate >= :checkDate)")
-    List<EmployeeDocumentEntity> findValidDocuments(Integer userId, EmployeeDocumentEntity.DocumentType type, LocalDate checkDate);
 
-    List<EmployeeDocumentEntity> findByUserID_Id(Integer userId);
 }

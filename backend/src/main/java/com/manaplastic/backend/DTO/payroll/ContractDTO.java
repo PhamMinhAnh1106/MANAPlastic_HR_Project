@@ -1,23 +1,50 @@
 package com.manaplastic.backend.DTO.payroll;
 
+import com.manaplastic.backend.constant.Gender;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ContractDTO {
+    // --- Thông tin cơ bản Hợp đồng ---
+    private Integer id;
+    private String contractname;
+    private String type; // Loại hợp đồng
+    private BigDecimal basesalary;
+    private BigDecimal insuranceSalary;
+    private String allowanceToxicType;
+    private String fileurl;
+    private LocalDate signdate;
+    private LocalDate startdate;
+    private LocalDate enddate;
+    private String status;
 
-public record ContractDTO(
-        Integer id,
-        String contractname,
-        String type,
-        BigDecimal basesalary,
-        BigDecimal insuranceSalary,
-        String allowanceToxicType,
-        String fileurl,
-        LocalDate signdate,
-        LocalDate startdate,
-        LocalDate enddate,
-        String status,
-        String username,
-        List<ContractsAllowanceDTO> allowances) {
+    // --- Thông tin Nhân viên (Bổ sung) ---
+    private Integer userId;
+    private String username;
+    private String fullname;
+    private String cccd;
+    private String email;
+    private String phone;
+    private String address;
+    private LocalDate dob;
+    private Gender gender;
 
+    // --- Thông tin Tổ chức ---
+    private String departmentName;
+    private String roleName;
+
+    // --- Thông tin bổ sung của HĐ ---
+    private String workType;
+    private BigDecimal insurancePercent;
+
+    // --- Danh sách phụ cấp ---
+    private List<ContractsAllowanceDTO> allowances;
 }

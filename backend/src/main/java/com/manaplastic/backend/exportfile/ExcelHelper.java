@@ -107,18 +107,20 @@ public class ExcelHelper {
         }
     }
 
-    //Xuất file hdld (DTO là 1 record)
+    //Xuất file hdld (DTO là 1 record) -> đã sửa lại thành DTO là 1 class
     public static ByteArrayInputStream contractsToExcel(List<ContractDTO> contracts) {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-
             Sheet sheet = workbook.createSheet(CONTRACT_SHEET);
+
             CellStyle headerStyle = createHeaderStyle(workbook);
 
+            // Tạo style định dạng tiền tệ
             CellStyle currencyStyle = workbook.createCellStyle();
             DataFormat format = workbook.createDataFormat();
             currencyStyle.setDataFormat(format.getFormat("#,##0"));
 
+            // Tạo Header
             Row headerRow = sheet.createRow(0);
             for (int col = 0; col < CONTRACT_HEADERS.length; col++) {
                 Cell cell = headerRow.createCell(col);
@@ -130,37 +132,42 @@ public class ExcelHelper {
             for (ContractDTO contract : contracts) {
                 Row row = sheet.createRow(rowIdx++);
 
-                row.createCell(0).setCellValue(contract.id());
-                row.createCell(1).setCellValue(contract.username());
-                row.createCell(2).setCellValue(contract.type());
-                row.createCell(3).setCellValue(contract.status());
-
-                if (contract.startdate() != null) {
-                    row.createCell(4).setCellValue(contract.startdate().toString());
+                // Cột 0: ID
+                row.createCell(0).setCellValue(contract.getId());
+                // Cột 1: Username (Thêm check null cho an toàn)
+                row.createCell(1).setCellValue(contract.getUsername() != null ? contract.getUsername() : "");
+                // Cột 2: Loại HĐ
+                row.createCell(2).setCellValue(contract.getType());
+                // Cột 3: Trạng thái
+                row.createCell(3).setCellValue(contract.getStatus());
+                // Cột 4: Ngày bắt đầu
+                if (contract.getStartdate() != null) {
+                    row.createCell(4).setCellValue(contract.getStartdate().toString());
                 } else {
                     row.createCell(4).setCellValue("Trống");
                 }
-
-                if (contract.enddate() != null) {
-                    row.createCell(5).setCellValue(contract.enddate().toString());
+                // Cột 5: Ngày kết thúc
+                if (contract.getEnddate() != null) {
+                    row.createCell(5).setCellValue(contract.getEnddate().toString());
                 } else {
                     row.createCell(5).setCellValue("Vô thời hạn");
                 }
-
+                // Cột 6: Lương cơ bản
                 Cell salaryCell = row.createCell(6);
-                if (contract.basesalary() != null) {
-                    salaryCell.setCellValue(contract.basesalary().doubleValue());
+                if (contract.getBasesalary() != null) {
+                    salaryCell.setCellValue(contract.getBasesalary().doubleValue());
                     salaryCell.setCellStyle(currencyStyle);
                 } else {
                     salaryCell.setCellValue(0);
                 }
-
-                row.createCell(7).setCellValue(contract.allowanceToxicType() != null ? contract.allowanceToxicType() : "Trống");
+                // Cột 7: Độc hại
+                row.createCell(7).setCellValue(contract.getAllowanceToxicType() != null ? contract.getAllowanceToxicType() : "Trống");
             }
-
+            // Auto-size các cột
             for (int col = 0; col < CONTRACT_HEADERS.length; col++) {
                 sheet.autoSizeColumn(col);
             }
+
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {

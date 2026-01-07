@@ -525,9 +525,48 @@ public class ContractService {
     }
 
     private ContractDTO mapToContractDTO(ContractEntity entity) {
-        String username = (entity.getUserID() != null) ? entity.getUserID().getUsername() : null;
+        ContractDTO dto = new ContractDTO();
 
-        // Phụ cấp
+        // Map các trường cơ bản của Contract
+        dto.setId(entity.getId());
+        dto.setContractname(entity.getContractname());
+        dto.setType(entity.getType());
+        dto.setBasesalary(entity.getBasesalary());
+        dto.setInsuranceSalary(entity.getInsuranceSalary());
+        dto.setAllowanceToxicType(entity.getAllowanceToxicType());
+        dto.setFileurl(entity.getFileurl());
+        dto.setSigndate(entity.getSigndate());
+        dto.setStartdate(entity.getStartdate());
+        dto.setEnddate(entity.getEnddate());
+        dto.setStatus(entity.getStatus());
+        dto.setWorkType(entity.getWorkType());
+        dto.setInsurancePercent(entity.getInsurancePercent());
+
+        // Map thông tin User (Nếu có)
+        UserEntity user = entity.getUserID();
+        if (user != null) {
+            dto.setUserId(user.getId());
+            dto.setUsername(user.getUsername());
+            dto.setFullname(user.getFullname());
+            dto.setCccd(user.getCccd());
+            dto.setEmail(user.getEmail());
+            dto.setPhone(user.getPhonenumber());
+            dto.setAddress(user.getAddress());
+            dto.setDob(user.getBirth());
+            dto.setGender(user.getGender());
+
+            // Lấy phòng ban
+            if (user.getDepartmentID() != null) {
+                dto.setDepartmentName(user.getDepartmentID().getDepartmentname());
+            }
+
+            // Lấy chức vụ
+            if (user.getRoleID() != null) {
+                dto.setRoleName(user.getRoleID().getRolename());
+            }
+        }
+
+        // Map danh sách Phụ cấp
         List<ContractsAllowanceDTO> allowanceDTOs = new ArrayList<>();
         List<ContractallowanceEntity> allowanceEntities = contractAllowancesRepository.findByContractID(entity);
 
@@ -545,22 +584,9 @@ public class ContractService {
             }).collect(Collectors.toList());
         }
 
-        // trả về recor
-        return new ContractDTO(
-                entity.getId(),
-                entity.getContractname(),
-                entity.getType(),
-                entity.getBasesalary(),
-                entity.getInsuranceSalary(),
-                entity.getAllowanceToxicType(),
-                entity.getFileurl(),
-                entity.getSigndate(),
-                entity.getStartdate(),
-                entity.getEnddate(),
-                entity.getStatus(),
-                username,
-                allowanceDTOs
-        );
+        dto.setAllowances(allowanceDTOs);
+
+        return dto;
     }
 
     // Noti cho hdld sắp hết hạn
