@@ -108,30 +108,40 @@ public class AttendanceRequestController {
         }
     }
 
-   // Duyệt đơn
-    @PutMapping("/{requestId}/approve")
-    @PreAuthorize("hasAnyAuthority('HR')")
+   // Duyệt đơn -- Quản lý
+   @PutMapping("/{requestId}/managerApprove")
+   @PreAuthorize("hasAnyAuthority('Manager', 'Admin')") // Chỉ cho phép Role Manager hoặc Admin
+   @RequiredPermission(PermissionConst.ATTENDANCE_APPROVE)
+   public ResponseEntity<String> approveByManager(
+           @PathVariable int requestId,
+           @AuthenticationPrincipal UserEntity currentUser) {
+
+       requestService.approveByManager(requestId, currentUser);
+       return ResponseEntity.ok("Đã xác nhận yêu cầu (Cấp quản lý). Đơn đã được chuyển tiếp đến HR.");
+   }
+
+    // Duyệt đơn -- HR
+    @PutMapping("/{requestId}/hrApprove")
+    @PreAuthorize("hasAnyAuthority('HR', 'Admin')")
     @RequiredPermission(PermissionConst.ATTENDANCE_APPROVE)
-//    @LogActivity(action = "APPROVE_ATTENDANCE_REQ", description = "Duyệt yêu cầu công", logType = LogType.WARNING)
-    public ResponseEntity<String> approveRequest(
+    public ResponseEntity<String> approveByHR(
             @PathVariable int requestId,
             @AuthenticationPrincipal UserEntity currentUser) {
 
-        requestService.approveRequest(requestId, currentUser.getId());
-        return ResponseEntity.ok("Đã duyệt yêu cầu và cập nhật dữ liệu chấm công thành công.");
+        requestService.approveByHR(requestId, currentUser);
+        return ResponseEntity.ok("Đã phê duyệt cuối cùng và cập nhật dữ liệu chấm công.");
     }
 
-  //Từ chối đơn
+    // Từ chối đơn (Dùng chung cho cả Manager và HR)
     @PutMapping("/{requestId}/reject")
-    @PreAuthorize("hasAnyAuthority('HR')")
-    @RequiredPermission(PermissionConst.ATTENDANCE_APPROVE)
-    @LogActivity(action = "REJECT_ATTENDANCE_REQ", description = "Từ chối yêu cầu công", logType = LogType.WARNING)
+    @PreAuthorize("hasAnyAuthority('HR', 'Admin', 'Manager')")
     public ResponseEntity<String> rejectRequest(
             @PathVariable int requestId,
-            @RequestParam(required = true) String comment, // Bắt buộc phải có lý do từ chối
+            @RequestParam(required = true) String comment,
             @AuthenticationPrincipal UserEntity currentUser) {
 
-        requestService.rejectRequest(requestId, currentUser.getId(), comment);
+        requestService.rejectRequest(requestId, currentUser, comment);
         return ResponseEntity.ok("Đã từ chối yêu cầu.");
     }
 }
+

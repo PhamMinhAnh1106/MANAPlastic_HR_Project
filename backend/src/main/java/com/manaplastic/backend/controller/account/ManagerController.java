@@ -3,6 +3,7 @@ package com.manaplastic.backend.controller.account;
 import com.manaplastic.backend.DTO.account.ChangePasswordDTO;
 import com.manaplastic.backend.DTO.account.UpdateSelfIn4DTO;
 import com.manaplastic.backend.DTO.account.UserProfileDTO;
+import com.manaplastic.backend.DTO.account.UserSuggestionDTO;
 import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
 import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
@@ -14,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/manager")
@@ -86,4 +89,15 @@ public class ManagerController {
 //        return ResponseEntity.ok(list);
 //    }
 
+    // API Search Autocomplete (Tìm theo Username)
+    @GetMapping("/searchUsers")
+    @PreAuthorize("hasAnyAuthority('Manager', 'HR', 'Admin')")
+    public ResponseEntity<List<UserSuggestionDTO>> searchUsers(
+            @AuthenticationPrincipal UserEntity currentUser,
+            @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword
+    ) {
+
+        List<UserSuggestionDTO> results = userService.searchUsers(currentUser, keyword);
+        return ResponseEntity.ok(results);
+    }
 }

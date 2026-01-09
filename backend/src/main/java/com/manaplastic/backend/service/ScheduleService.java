@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,24 +36,24 @@ public class ScheduleService {
 
         for (DraftRegistrationDTO dto : dtos) {
 
-            Optional<EmployeedraftscheduleEntity> existingDraftOpt = draftRepository.findByEmployeeIDAndDate(employee, dto.date());
-            boolean isActiveChoice = (dto.shiftId() != null || dto.isDayOff());
+            Optional<EmployeedraftscheduleEntity> existingDraftOpt = draftRepository.findByEmployeeIDAndDate(employee, dto.getDate());
+            boolean isActiveChoice = (dto.getShiftId() != null || dto.isDayOff());
 
             if (isActiveChoice) {
                 EmployeedraftscheduleEntity draft = existingDraftOpt.orElse(new EmployeedraftscheduleEntity());
                 draft.setEmployeeID(employee);
-                draft.setDate(dto.date());
+                draft.setDate(dto.getDate());
 
-                if (dto.shiftId() != null) {
-                    ShiftEntity shift = shiftRepository.findById(dto.shiftId())
-                            .orElseThrow(() -> new RuntimeException("Không tìm thấy ca làm việc với ID: " + dto.shiftId()));
+                if (dto.getShiftId() != null) {
+                    ShiftEntity shift = shiftRepository.findById(dto.getShiftId())
+                            .orElseThrow(() -> new RuntimeException("Không tìm thấy ca làm việc với ID: " + dto.getShiftId()));
                     draft.setShiftID(shift);
                 } else {
                     draft.setShiftID(null);
                 }
 
                 draft.setIsDayOff(dto.isDayOff());
-                draft.setMonthYear(dto.date().format(MONTH_YEAR_FORMATTER));
+                draft.setMonthYear(dto.getDate().format(MONTH_YEAR_FORMATTER));
                 draft.setRegistrationDate(Instant.now());
                 schedulesToSave.add(draft);
 
@@ -68,6 +69,46 @@ public class ScheduleService {
             draftRepository.deleteAll(schedulesToDelete);
         }
     }
+    @Transactional
+    public void registerBatchSchedule(BatchScheduleRegistrationDTO batchDto, Integer employeeId) {
+
+        Map<LocalDate, Integer> scheduleMap = new HashMap<>();
+
+        if (batchDto.getFromDate() != null && batchDto.getToDate() != null && batchDto.getRangeShiftId() != null) {
+            if (batchDto.getFromDate().isAfter(batchDto.getToDate())) {
+                throw new RuntimeException("Ngày bắt đầu không được sau ngày kết thúc.");
+            }
+
+            LocalDate currentDate = batchDto.getFromDate();
+            while (!currentDate.isAfter(batchDto.getToDate())) {
+                scheduleMap.put(currentDate, batchDto.getRangeShiftId());
+                currentDate = currentDate.plusDays(1);
+            }
+        }
+
+
+        if (batchDto.getSpecificDays() != null && !batchDto.getSpecificDays().isEmpty()) {
+            for (DraftRegistrationDTO specific : batchDto.getSpecificDays()) {
+                if (specific.getDate() != null && specific.getShiftId() != null) {
+                    scheduleMap.put(specific.getDate(), specific.getShiftId());
+                }
+            }
+        }
+
+        if (scheduleMap.isEmpty()) {
+            throw new RuntimeException("Vui lòng chọn khoảng thời gian hoặc danh sách ngày đăng ký.");
+        }
+
+        List<DraftRegistrationDTO> finalList = new ArrayList<>();
+        for (Map.Entry<LocalDate, Integer> entry : scheduleMap.entrySet()) {
+            DraftRegistrationDTO dto = new DraftRegistrationDTO();
+            dto.setDate(entry.getKey());
+            dto.setShiftId(entry.getValue());
+            finalList.add(dto);
+        }
+
+        registerDraftSchedule(finalList, employeeId);
+    }
 
     public List<DraftRegistrationDTO> getDraftSchedule(Integer employeeId, String monthYear) {
         UserEntity employee = userRepository.findById(employeeId)
@@ -80,18 +121,17 @@ public class ScheduleService {
 
 
     private DraftRegistrationDTO mapEntityToDTO(EmployeedraftscheduleEntity entity) {
-        Integer shiftId = null;
-        String shiftName = null;
+        DraftRegistrationDTO dto = new DraftRegistrationDTO();
+
+        dto.setDate(entity.getDate());
+        dto.setDayOff(entity.getIsDayOff());
+
         if (entity.getShiftID() != null) {
-            shiftId = entity.getShiftID().getId();
-            shiftName = entity.getShiftID().getShiftname();
+            dto.setShiftId(entity.getShiftID().getId());
+            dto.setShiftName(entity.getShiftID().getShiftname());
         }
-        return new DraftRegistrationDTO(
-                entity.getDate(),
-                shiftId,
-                shiftName,
-                entity.getIsDayOff()
-        );
+
+        return dto;
     }
 
     // Lịch chính thức
@@ -105,18 +145,17 @@ public class ScheduleService {
     }
 
     private DraftRegistrationDTO mapOfficialEntityToDTO(EmployeeofficialscheduleEntity entity) {
-        Integer shiftId = null;
-        String shiftName = null;
+        DraftRegistrationDTO dto = new DraftRegistrationDTO();
+
+        dto.setDate(entity.getDate());
+        dto.setDayOff(entity.getIsDayOff());
+
         if (entity.getShiftID() != null) {
-            shiftId = entity.getShiftID().getId();
-            shiftName = entity.getShiftID().getShiftname();
+            dto.setShiftId(entity.getShiftID().getId());
+            dto.setShiftName(entity.getShiftID().getShiftname());
         }
-        return new DraftRegistrationDTO(
-                entity.getDate(),
-                shiftId,
-                shiftName,
-                entity.getIsDayOff()
-        );
+
+        return dto;
     }
 
     // Quản lý
@@ -299,50 +338,84 @@ public class ScheduleService {
         UserEntity manager = getUserOrThrow(managerId);
         Integer departmentId = manager.getDepartmentID().getId();
 
-
         UserEntity employee = userRepository.findByUsername(dto.getUsername())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên với username: " + dto.getUsername()));
 
-        // Manager và Employee phải cùng phòng ban
+        //  Manager và Employee phải cùng phòng ban
         if (employee.getDepartmentID() == null || !employee.getDepartmentID().getId().equals(departmentId)) {
             throw new SecurityException("Manager không có quyền xếp lịch cho nhân viên: " + employee.getFullname());
         }
 
-        ShiftEntity selectedShift = shiftRepository.findById(dto.getShiftId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy ca làm việc với ID: " + dto.getShiftId()));
+        if (dto.getStartDate() == null || dto.getEndDate() == null) {
+            throw new RuntimeException("Vui lòng chọn ngày bắt đầu và ngày kết thúc.");
+        }
+        if (dto.getStartDate().isAfter(dto.getEndDate())) {
+            throw new RuntimeException("Ngày bắt đầu không được sau ngày kết thúc.");
+        }
 
-        // Xác định khoảng thời gian (Từ startDate đến hết tháng)
-        java.time.LocalDate startDate = dto.getStartDate();
-        java.time.YearMonth yearMonth = java.time.YearMonth.from(startDate);
-        java.time.LocalDate endOfMonth = yearMonth.atEndOfMonth();
-        String monthYearStr = startDate.format(MONTH_YEAR_FORMATTER);
+
+        ShiftEntity mainShift = null;
+        if (dto.getShiftId() != null) {
+            mainShift = shiftRepository.findById(dto.getShiftId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy ca làm việc chính với ID: " + dto.getShiftId()));
+        }
+        //map cho ngày ngoại lệ
+        Map<LocalDate, DraftRegistrationDTO> exceptionMap = new HashMap<>();
+        if (dto.getSpecificDays() != null) {
+            for (DraftRegistrationDTO exception : dto.getSpecificDays()) {
+                if (exception.getDate() != null) {
+                    exceptionMap.put(exception.getDate(), exception);
+                }
+            }
+        }
 
         List<EmployeeofficialscheduleEntity> schedulesToSave = new ArrayList<>();
 
-        for (java.time.LocalDate date = startDate; !date.isAfter(endOfMonth); date = date.plusDays(1)) {
-
-            // Check trùng lặp: Nếu ngày đó đã có lịch rồi thì bỏ qua
-            Optional<EmployeeofficialscheduleEntity> existing = officialRepository.findByEmployeeIDAndDate(employee, date);
-            if (existing.isPresent()) continue;
-
+        // Vòng lặp từ StartDate -> EndDate
+        for (LocalDate date = dto.getStartDate(); !date.isAfter(dto.getEndDate()); date = date.plusDays(1)) {
             EmployeeofficialscheduleEntity official = new EmployeeofficialscheduleEntity();
             official.setEmployeeID(employee);
             official.setDate(date);
-            official.setMonthYear(monthYearStr);
+
+            official.setMonthYear(date.format(MONTH_YEAR_FORMATTER));
             official.setApprovedByManagerid(manager);
             official.setPublishedDate(Instant.now());
 
-            //Cứ 7 ngày thì có 1 ngày Off
-            long daysDiff = java.time.temporal.ChronoUnit.DAYS.between(startDate, date);
+            // Trường hợp 1: Ngày này nằm trong danh sách ngoại lệ
+            if (exceptionMap.containsKey(date)) {
+                DraftRegistrationDTO exceptionDto = exceptionMap.get(date);
 
-            boolean isCycleDayOff = (daysDiff + 1) % 7 == 0;
+                if (exceptionDto.isDayOff()) {
+                    official.setIsDayOff(true);
+                    official.setShiftID(null);
+                } else if (exceptionDto.getShiftId() != null) {
+                    ShiftEntity specificShift = shiftRepository.findById(exceptionDto.getShiftId())
+                            .orElseThrow(() -> new RuntimeException("Ca làm việc ngoại lệ không tồn tại ID: " + exceptionDto.getShiftId()));
 
-            if (isCycleDayOff) {
-                official.setShiftID(null);
-                official.setIsDayOff(true);
-            } else {
-                official.setShiftID(selectedShift);
-                official.setIsDayOff(false);
+                    official.setIsDayOff(false);
+                    official.setShiftID(specificShift);
+                } else {
+                    // Ngoại lệ nhưng không set ca cũng ko set dayoff -> Fallback về ca chính
+                    if (mainShift != null) {
+                        official.setIsDayOff(false);
+                        official.setShiftID(mainShift);
+                    } else {
+                        // Không có ca chính luôn -> set nghỉ
+                        official.setIsDayOff(true);
+                        official.setShiftID(null);
+                    }
+                }
+            }
+            // Trường hợp 2: Ngày thường (Dùng ca chính)
+            else {
+                if (mainShift != null) {
+                    official.setIsDayOff(false);
+                    official.setShiftID(mainShift);
+                } else {
+                    // Nếu không có ca chính và không phải ngoại lệ -> Mặc định là ngày nghỉ
+                    official.setIsDayOff(true);
+                    official.setShiftID(null);
+                }
             }
 
             schedulesToSave.add(official);

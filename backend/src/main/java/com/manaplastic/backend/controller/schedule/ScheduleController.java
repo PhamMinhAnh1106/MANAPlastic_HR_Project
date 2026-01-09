@@ -23,16 +23,26 @@ public class ScheduleController {
 
     //Role Nhân viên - employee và quản lý - manager dùng chung
     // vì nhân viên hay quản lý đều có thể dăng ky lịch làm việc
+//    @PostMapping("/user/shiftSchedule/myDraft")
+//    @PreAuthorize("hasAnyAuthority('Manager','Employee')")
+//    @RequiredPermission(PermissionConst.SHIFT_REGISTER)
+//    public ResponseEntity<?> handleDraftScheduleRegistration(
+//            @RequestBody List<DraftRegistrationDTO> registrationDTOs,
+//            @AuthenticationPrincipal UserEntity user
+//    ) {
+//        Integer employeeId = user.getId();
+//        scheduleService.registerDraftSchedule(registrationDTOs, employeeId);
+//        return ResponseEntity.ok("Đăng ký ca làm việc thành công! Bạn đợi quản lý xếp lịch nhé <3 .");
+//    }
     @PostMapping("/user/shiftSchedule/myDraft")
     @PreAuthorize("hasAnyAuthority('Manager','Employee')")
     @RequiredPermission(PermissionConst.SHIFT_REGISTER)
-    public ResponseEntity<?> handleDraftScheduleRegistration(
-            @RequestBody List<DraftRegistrationDTO> registrationDTOs,
+    public ResponseEntity<?> handleBatchScheduleRegistration(
+            @RequestBody BatchScheduleRegistrationDTO batchDTO,
             @AuthenticationPrincipal UserEntity user
     ) {
-        Integer employeeId = user.getId();
-        scheduleService.registerDraftSchedule(registrationDTOs, employeeId);
-        return ResponseEntity.ok("Đăng ký ca làm việc thành công! Bạn đợi quản lý xếp lịch nhé <3 .");
+        scheduleService.registerBatchSchedule(batchDTO, user.getId());
+        return ResponseEntity.ok("Đăng ký lịch làm việc thành công!");
     }
 
     @GetMapping("/user/shiftSchedule/myDraft")

@@ -1,6 +1,7 @@
 package com.manaplastic.backend.service;
 
 import com.manaplastic.backend.DTO.account.UpdateAccountDTO;
+import com.manaplastic.backend.DTO.account.UserSuggestionDTO;
 import com.manaplastic.backend.DTO.criteria.UserFilterCriteria;
 import com.manaplastic.backend.DTO.account.UserProfileDTO;
 import com.manaplastic.backend.DTO.account.UpdateSelfIn4DTO;
@@ -11,6 +12,7 @@ import com.manaplastic.backend.filters.UserFilter;
 import com.manaplastic.backend.repository.DepartmentRepository;
 import com.manaplastic.backend.repository.RoleRepository;
 import com.manaplastic.backend.repository.UserRepository;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -261,6 +266,44 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + userId));
 
         return mapToUserProfileDTO(userEntity);
+    }
+
+    // search auto advice
+    public List<UserSuggestionDTO> searchUsers(UserEntity currentUser, String keyword) {
+
+        Integer filterDeptId = null;
+
+        //  CHECK QUYỀN: Xác định xem có cần lọc theo phòng ban không
+        String roleName = (currentUser.getRoleID() != null) ? currentUser.getRoleID().getRolename() : "";
+
+        // Nếu KHÔNG phải HR/Admin thì bắt buộc phải lấy ID phòng ban hiện tại
+        if (!"HR".equalsIgnoreCase(roleName) && !"Admin".equalsIgnoreCase(roleName)) {
+            if (currentUser.getDepartmentID() == null) {
+                return new ArrayList<>();
+            }
+            filterDeptId = currentUser.getDepartmentID().getId();
+        }
+
+        Integer finalDeptId = filterDeptId;
+
+        Specification<UserEntity> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String likePattern = "%" + keyword.trim().toLowerCase() + "%";
+                predicates.add(cb.like(cb.lower(root.get("username")), likePattern));
+            }
+
+            if (finalDeptId != null) {
+                predicates.add(cb.equal(root.get("departmentID").get("id"), finalDeptId));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+        return userRepository.findAll(spec).stream()
+                .map(user -> new UserSuggestionDTO(user.getUsername(), user.getFullname()))
+                .collect(Collectors.toList());
     }
 
     private UserProfileDTO mapToUserProfileDTO(UserEntity entity) {

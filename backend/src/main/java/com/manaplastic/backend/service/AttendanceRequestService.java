@@ -6,10 +6,7 @@ import com.manaplastic.backend.DTO.criteria.AttendanceRequestFilterCriteria;
 import com.manaplastic.backend.constant.LogType;
 import com.manaplastic.backend.entity.*;
 import com.manaplastic.backend.filters.AttendanceRequestFilter;
-import com.manaplastic.backend.repository.ActivityLogRepository;
-import com.manaplastic.backend.repository.AttendanceRepository;
-import com.manaplastic.backend.repository.AttendanceRequestRepository;
-import com.manaplastic.backend.repository.UserRepository;
+import com.manaplastic.backend.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.Instant;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -46,6 +43,8 @@ public class AttendanceRequestService {
     private String uploadDir;
     @Autowired
     private ActivityLogRepository activityLogRepository;
+    @Autowired
+    private DepartmentRepository departmentRepo;
 
     //Tạo
     public AttendanceRequestEntity createRequest(AttendanceRequestCreateDTO dto, MultipartFile file, Integer userId) {
@@ -78,7 +77,11 @@ public class AttendanceRequestService {
             throw new IllegalArgumentException("Yêu cầu Check-out thiếu giờ ra.");
         }
 
-        if (requestRepo.existsByUseridAndDateAndStatus(user,dto.getDate(),PENDING)) {
+        // check trùng đơn cho cả 2 cấp
+        boolean exists = requestRepo.existsByUseridAndDateAndStatus(user, dto.getDate(), PENDING_MANAGER)
+                || requestRepo.existsByUseridAndDateAndStatus(user, dto.getDate(), PENDING_HR);
+
+        if (exists) {
             throw new IllegalArgumentException("Bạn đang có một yêu cầu chờ duyệt cho ngày này rồi.");
         }
 
@@ -92,38 +95,93 @@ public class AttendanceRequestService {
             entity.setImgproof(imgPath); // Lưu đường dẫn vào DB
         }
         entity.setReason(dto.getReason());
-        entity.setStatus(PENDING);
+        entity.setStatus(PENDING_MANAGER);
 
         return requestRepo.save(entity);
     }
 
-    //Duyệt
+//    //Duyệt
+//    @Transactional
+//    public void approveRequest(int requestId, int approverId) {
+//        AttendanceRequestEntity request = requestRepo.findById(requestId)
+//                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
+//
+//        UserEntity approver = userRepo.findById(approverId)
+//                .orElseThrow(() -> new RuntimeException("Người duyệt không tồn tại."));
+//
+//        if (request.getStatus() != PENDING) {
+//            throw new RuntimeException("Yêu cầu này đã được xử lý trước đó.");
+//        }
+//
+    /// /        UserEntity approver = new UserEntity();
+    /// /        approver.setId(approverId);
+    /// /        request.setStatus(AttendanceRequestEntity.RequestStatus.APPROVED);
+//        request.setStatus(APPROVED);
+//        request.setApproverid(approver);
+//        requestRepo.save(request);
+//
+//
+//        updateAttendanceData(request);
+//        logAttendanceApprovalAction(approver,request);
+//    }
+
+//      Duyệt - Manager
     @Transactional
-    public void approveRequest(int requestId, int approverId) {
+    public void approveByManager(int requestId, UserEntity managerId) {
         AttendanceRequestEntity request = requestRepo.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
 
-        UserEntity approver = userRepo.findById(approverId)
-                .orElseThrow(() -> new RuntimeException("Người duyệt không tồn tại."));
-
-        if (request.getStatus() != PENDING) {
-            throw new RuntimeException("Yêu cầu này đã được xử lý trước đó.");
+        if (request.getStatus() != PENDING_MANAGER) {
+            throw new RuntimeException("Yêu cầu này không ở trạng thái chờ quản lý duyệt.");
         }
 
-//        UserEntity approver = new UserEntity();
-//        approver.setId(approverId);
-//        request.setStatus(AttendanceRequestEntity.RequestStatus.APPROVED);
+        UserEntity requester = request.getUserid();
+        DepartmentEntity department = requester.getDepartmentID();
+
+        if (department == null) {
+            throw new RuntimeException("Nhân viên này chưa thuộc phòng ban nào.");
+        }
+
+
+        UserEntity deptManagerId = department.getManagerID();
+
+        if (deptManagerId == null || !deptManagerId.getId().equals(managerId.getId())) {
+            throw new RuntimeException("Bạn không phải quản lý trực tiếp của phòng ban này.");
+        }
+
+        request.setStatus(PENDING_HR);
+
+        // Lưu thông tin Manager duyệt
+        request.setManagerApproverID(managerId);
+        request.setManagerApprovedAt(LocalDateTime.now());
+
+        requestRepo.save(request);
+        logAttendanceAction(managerId, request, "MANAGER_APPROVE_ATTENDANCE", "đã duyệt sơ bộ (Manager Check)");
+    }
+
+    // HR Duyệt (Chuyển sang APPROVED và Update công)
+    @Transactional
+    public void approveByHR(int requestId, UserEntity hrId) {
+        AttendanceRequestEntity request = requestRepo.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
+
+        if (request.getStatus() != PENDING_HR) {
+            throw new RuntimeException("Yêu cầu này chưa được quản lý duyệt hoặc đã xử lý xong.");
+        }
+
         request.setStatus(APPROVED);
-        request.setApproverid(approver);
+        request.setApproverid(hrId);
+        request.setHrApprovedAt(LocalDateTime.now());
+
         requestRepo.save(request);
 
-
         updateAttendanceData(request);
-        logAttendanceApprovalAction(approver,request);
+        logAttendanceAction(hrId, request, "HR_APPROVE_ATTENDANCE", "đã duyệt và cập nhật công (HR Final)");
     }
 
     // Từ chối
-    public void rejectRequest(int requestId, int approverId, String comment) {
+    @Transactional
+    public void rejectRequest(int requestId, UserEntity rejecterId, String comment) {
         AttendanceRequestEntity request = requestRepo.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
 
@@ -131,17 +189,21 @@ public class AttendanceRequestService {
             throw new RuntimeException("Vui lòng nhập lý do từ chối.");
         }
 
-        if (request.getStatus() != PENDING) {
-            throw new RuntimeException("Yêu cầu đã được xử lý.");
+        // Chỉ được từ chối khi đơn đang chờ
+        if (request.getStatus() == APPROVED || request.getStatus() == REJECTED) {
+            throw new RuntimeException("Yêu cầu đã được xử lý xong, không thể từ chối lại.");
         }
 
-        UserEntity approver = new UserEntity();
-        approver.setId(approverId);
+        UserEntity rejecter = userRepo.findById(rejecterId).orElse(new UserEntity());
+        rejecter.setId(rejecterId.getId());
+
         request.setStatus(REJECTED);
-        request.setApproverid(approver);
+
+        request.setApproverid(rejecter);
         request.setComment(comment);
 
         requestRepo.save(request);
+        logAttendanceAction(rejecter, request, "REJECT_ATTENDANCE_REQ", "đã từ chối yêu cầu. Lý do: " + comment);
     }
 
     // Hàm hỗ trợ lưu file
@@ -229,34 +291,37 @@ public class AttendanceRequestService {
     }
 
     // Ghi log duyệt yêu cầu chấm công
-    private void logAttendanceApprovalAction(UserEntity approver, AttendanceRequestEntity request) {
-        UserEntity requester = request.getUserid(); // Lấy người tạo đơn từ request
+    private void logAttendanceAction(UserEntity actor, AttendanceRequestEntity request, String actionCode, String actionDescription) {
+        UserEntity requester = request.getUserid();
 
         ActivitylogEntity log = new ActivitylogEntity();
-
-        log.setUserID(approver);
+        log.setUserID(actor);
         log.setActiontime(LocalDateTime.now());
 
-        boolean isSelfApproval = approver.getId().equals(requester.getId());
+        // Logic kiểm tra tự duyệt/tự xử lý
+        boolean isSelfAction = actor.getId().equals(requester.getId());
 
-        if (isSelfApproval) {
-           //Tự duyệt
-            log.setAction("SELF_APPROVE_ATTENDANCE");
-            log.setLogType(LogType.DANGER);
-            log.setDetails("CẢNH BÁO: " + approver.getFullname() + " đã TỰ DUYỆT yêu cầu chấm công cho chính mình.");
+        boolean isRejection = actionCode.contains("REJECT");
+
+        if (isSelfAction && !isRejection) {
+            // Tự duyệt
+            log.setAction("SELF_" + actionCode);
+            log.setLogType(LogType.WARNING);
+            log.setDetails("CẢNH BÁO: " + actor.getFullname() + " đã TỰ DUYỆT yêu cầu chấm công cho chính mình.");
         } else {
-            // Bình thươờng
-            log.setAction("APPROVE_ATTENDANCE_REQ");
+            // Bình thường
+            log.setAction(actionCode);
             log.setLogType(LogType.INFO);
 
-            String approverRole = (approver.getRoleID() != null) ? approver.getRoleID().getRolename() : "Admin/HR";
-            log.setDetails(approverRole + " " + approver.getFullname() + " duyệt yêu cầu chấm công cho: " + requester.getFullname());
+            String actorRole = (actor.getRoleID() != null) ? actor.getRoleID().getRolename() : "User";
+
+            log.setDetails(actorRole + " " + actor.getFullname() + " " + actionDescription + " cho: " + requester.getFullname());
         }
 
-        // Bổ sung thông tin chi tiết của đơn (Ngày, Loại yêu cầu, Giờ sửa)
+        // Bổ sung thông tin chi tiết của đơn
         StringBuilder extraInfo = new StringBuilder();
         extraInfo.append(" | Ngày: ").append(request.getDate());
-        extraInfo.append(" | Loại: ").append(request.getRequesttype()); // CHECK_IN, CHECK_OUT, FULL_SHIFT
+        extraInfo.append(" | Loại: ").append(request.getRequesttype());
 
         if (request.getCheckintime() != null) {
             extraInfo.append(" | Vào: ").append(request.getCheckintime());

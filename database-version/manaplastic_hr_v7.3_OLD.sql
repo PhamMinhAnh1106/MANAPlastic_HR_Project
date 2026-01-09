@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th1 09, 2026 lúc 09:14 PM
+-- Thời gian đã tạo: Th1 07, 2026 lúc 10:42 PM
 -- Phiên bản máy phục vụ: 8.2.0
 -- Phiên bản PHP: 8.2.13
 
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `activitylogs` (
   `userID` int DEFAULT NULL,
   PRIMARY KEY (`logID`),
   KEY `userID` (`userID`)
-) ENGINE=InnoDB AUTO_INCREMENT=97 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `activitylogs`
@@ -137,10 +137,7 @@ INSERT INTO `activitylogs` (`logID`, `action`, `logType`, `details`, `actiontime
 (90, 'APPROVED_DOCUMENT', 'INFO', 'Desc: Duyệt/ Từ chối tài liệu, hồ sơ | Data: {\"headers\":{},\"body\":{\"documentID\":1,\"employeeName\":\"Phạm Minh Tài (Đã sửa tên)\",\"type\":\"OTHER\",\"name\":\"CV Nhân viên\",\"status\":\"APPROVED\",\"fileUrl\":\"31b59d76-cf6c-41d1-b82e-f53327b785bb.pdf\",\"expiryDate\":null},\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-05 18:14:24', 'hr_manager', 3),
 (91, 'CREATE_CONTRACT', 'INFO', 'Desc: Tạo mới hợp đồng lao động | Data: {\"headers\":{},\"body\":{\"contractId\":31,\"message\":\"Tạo nháp thành công!\"},\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-06 22:25:00', 'hr_manager', 3),
 (92, 'CREATE_CONTRACT_REQ', 'INFO', 'Desc: Tạo mới yêu cầu sửa đổi file hợp đồng. | Data: {\"headers\":{},\"body\":\"Đã gửi yêu cầu thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-08 04:22:37', 'hr_manager', 3),
-(93, 'APPROVED_CONTRACT_REQ', 'INFO', 'Desc: Xử lý duyệt/từ chối yêu cầu sửa đổi file hợp đồng. | Data: {\"headers\":{},\"body\":\"Đã xử lý cho đơn 1 thành công\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-08 04:58:32', 'hr_manager', 3),
-(94, 'CREATE_ATTENDANCE_REQ', 'INFO', 'Desc: Gửi yêu cầu bổ sung công | Data: {\"headers\":{},\"body\":\"Gửi yêu cầu thành công! Vui lòng chờ quản lý duyệt.\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-10 01:55:59', '000020', 20),
-(95, 'MANAGER_APPROVE_ATTENDANCE', 'INFO', 'Manager Bùi Văn Mực đã duyệt sơ bộ (Manager Check) cho: Lại Thị In Ấn | Ngày: 2026-01-09 | Loại: CHECK_IN | Vào: 2026-01-09T08:00 (Mã đơn: 7)', '2026-01-10 02:04:06', NULL, 9),
-(96, 'HR_APPROVE_ATTENDANCE', 'INFO', 'HR Nguyễn Thị Nhân Sự đã duyệt và cập nhật công (HR Final) cho: Lại Thị In Ấn | Ngày: 2026-01-09 | Loại: CHECK_IN | Vào: 2026-01-09T08:00 (Mã đơn: 7)', '2026-01-10 02:06:39', NULL, 3);
+(93, 'APPROVED_CONTRACT_REQ', 'INFO', 'Desc: Xử lý duyệt/từ chối yêu cầu sửa đổi file hợp đồng. | Data: {\"headers\":{},\"body\":\"Đã xử lý cho đơn 1 thành công\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-08 04:58:32', 'hr_manager', 3);
 
 -- --------------------------------------------------------
 
@@ -201,34 +198,28 @@ CREATE TABLE IF NOT EXISTS `attendancerequests` (
   `checkouttime` datetime DEFAULT NULL,
   `imgproof` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `status` enum('PENDING_MANAGER','PENDING_HR','APPROVED','REJECTED') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING_MANAGER',
-  `managerApproverID` int DEFAULT NULL,
-  `managerApprovedAt` datetime DEFAULT NULL,
-  `rejectReason` text COLLATE utf8mb4_unicode_ci,
+  `status` enum('PENDING','APPROVED','REJECTED') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'PENDING',
   `approverid` int DEFAULT NULL COMMENT 'Người duyệt (HR/Manager)',
-  `HRAprprovedAt` datetime DEFAULT NULL,
   `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `createdat` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedat` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`requestid`),
   KEY `fk_attrequest_user` (`userid`),
   KEY `fk_attrequest_approver` (`approverid`),
-  KEY `fk_attrequest_shift` (`shiftid`),
-  KEY `FK_Request_Manager` (`managerApproverID`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Yêu cầu bổ sung dữ liệu chấm công';
+  KEY `fk_attrequest_shift` (`shiftid`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Yêu cầu bổ sung dữ liệu chấm công';
 
 --
 -- Đang đổ dữ liệu cho bảng `attendancerequests`
 --
 
-INSERT INTO `attendancerequests` (`requestid`, `userid`, `date`, `shiftid`, `requesttype`, `checkintime`, `checkouttime`, `imgproof`, `reason`, `status`, `managerApproverID`, `managerApprovedAt`, `rejectReason`, `approverid`, `HRAprprovedAt`, `comment`, `createdat`, `updatedat`) VALUES
-(1, 6, '2025-11-02', 1, 'CHECK_OUT', NULL, '2025-11-02 17:00:00', 'checkout_fix_6.jpg', 'Quên check-out khi về', 'PENDING_HR', NULL, NULL, NULL, NULL, NULL, NULL, '2025-12-23 21:51:15', '2026-01-09 22:45:59'),
-(2, 8, '2025-11-04', 2, 'FULL_SHIFT', '2025-11-04 06:00:00', '2025-11-04 14:00:00', 'full_fix_8.jpg', 'Máy chấm công bị lỗi không nhận diện được', 'PENDING_HR', NULL, NULL, NULL, NULL, NULL, NULL, '2025-12-23 21:51:15', '2026-01-09 22:45:59'),
-(3, 20, '2025-12-03', 36, 'CHECK_IN', '2025-12-03 08:00:00', NULL, 'a07b9472-6f8c-49e7-b5d9-a1939248dca0_Gemini_Generated_Image_1iwfj11iwfj11iwf (1).png', 'Chấm công hư máy', 'APPROVED', NULL, NULL, NULL, 22, NULL, NULL, '2025-12-23 23:55:15', '2025-12-27 14:42:06'),
-(4, 22, '2025-12-03', 36, 'CHECK_IN', '2025-12-03 08:00:00', NULL, 'b31f9e6c-ac4f-498d-bc50-77151b5ee112_Gemini_Generated_Image_1iwfj11iwfj11iwf__1_.png', 'Chấm công hư máy', 'PENDING_HR', NULL, NULL, NULL, NULL, NULL, NULL, '2025-12-27 15:21:15', '2026-01-09 22:45:59'),
-(5, 3, '2025-12-30', 36, 'CHECK_IN', '2025-12-30 08:00:00', NULL, 'a5a35bd7-13c7-4bd2-9ad9-6f910320dc22_AdobeStock_632882689.jpg', 'Quên chấm công vào', 'PENDING_HR', NULL, NULL, NULL, NULL, NULL, NULL, '2025-12-30 17:05:33', '2026-01-09 22:45:59'),
-(6, 29, '2025-12-31', 45, 'CHECK_IN', '2025-12-31 08:00:00', NULL, '1242f1bc-19a4-4269-8760-d7031eed5c1e_anhminhchung.jpg', 'cty cúp điện', 'REJECTED', NULL, NULL, NULL, 3, NULL, 'không rõ ràng', '2025-12-31 10:05:35', '2025-12-31 10:08:01'),
-(7, 20, '2026-01-09', 36, 'CHECK_IN', '2026-01-09 08:00:00', NULL, 'fde11922-c5f7-48dc-ab99-f9079143e8c3_AdobeStock_632882689.jpg', 'Chấm công hư máy', 'APPROVED', 9, '2026-01-10 02:04:06', NULL, 3, '2026-01-10 02:06:39', NULL, '2026-01-10 01:55:59', '2026-01-10 02:06:39');
+INSERT INTO `attendancerequests` (`requestid`, `userid`, `date`, `shiftid`, `requesttype`, `checkintime`, `checkouttime`, `imgproof`, `reason`, `status`, `approverid`, `comment`, `createdat`, `updatedat`) VALUES
+(1, 6, '2025-11-02', 1, 'CHECK_OUT', NULL, '2025-11-02 17:00:00', 'checkout_fix_6.jpg', 'Quên check-out khi về', 'PENDING', NULL, NULL, '2025-12-23 21:51:15', '2025-12-27 14:42:06'),
+(2, 8, '2025-11-04', 2, 'FULL_SHIFT', '2025-11-04 06:00:00', '2025-11-04 14:00:00', 'full_fix_8.jpg', 'Máy chấm công bị lỗi không nhận diện được', 'PENDING', NULL, NULL, '2025-12-23 21:51:15', '2025-12-27 14:42:06'),
+(3, 20, '2025-12-03', 36, 'CHECK_IN', '2025-12-03 08:00:00', NULL, 'a07b9472-6f8c-49e7-b5d9-a1939248dca0_Gemini_Generated_Image_1iwfj11iwfj11iwf (1).png', 'Chấm công hư máy', 'APPROVED', 22, NULL, '2025-12-23 23:55:15', '2025-12-27 14:42:06'),
+(4, 22, '2025-12-03', 36, 'CHECK_IN', '2025-12-03 08:00:00', NULL, 'b31f9e6c-ac4f-498d-bc50-77151b5ee112_Gemini_Generated_Image_1iwfj11iwfj11iwf__1_.png', 'Chấm công hư máy', 'PENDING', NULL, NULL, '2025-12-27 15:21:15', NULL),
+(5, 3, '2025-12-30', 36, 'CHECK_IN', '2025-12-30 08:00:00', NULL, 'a5a35bd7-13c7-4bd2-9ad9-6f910320dc22_AdobeStock_632882689.jpg', 'Quên chấm công vào', 'PENDING', NULL, NULL, '2025-12-30 17:05:33', NULL),
+(6, 29, '2025-12-31', 45, 'CHECK_IN', '2025-12-31 08:00:00', NULL, '1242f1bc-19a4-4269-8760-d7031eed5c1e_anhminhchung.jpg', 'cty cúp điện', 'REJECTED', 3, 'không rõ ràng', '2025-12-31 10:05:35', '2025-12-31 10:08:01');
 
 -- --------------------------------------------------------
 
@@ -254,7 +245,7 @@ CREATE TABLE IF NOT EXISTS `attendances` (
   KEY `shiftID` (`shiftID`),
   KEY `FK_Attendance_CheckInLog` (`checkInLogID`),
   KEY `FK_Attendance_CheckOutLog` (`checkOutLogID`)
-) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `attendances`
@@ -302,8 +293,7 @@ INSERT INTO `attendances` (`attendanceID`, `date`, `checkin`, `checkout`, `check
 (49, '2025-12-03', '2025-12-03 08:00:00', '2025-12-03 17:05:00', NULL, NULL, 'PRESENT', 36, 20, NULL, NULL),
 (50, '2025-12-27', '2025-12-27 16:02:29', '2025-12-27 16:03:37', '875a992b-42fe-4952-91c2-2ebb7a8f4e89.jpg', '1ada91b8-6141-4371-982f-fe1ed75f5a03.jpg', 'LATE_AND_EARLY', 36, 21, 22, 23),
 (51, '2025-12-31', '2025-12-31 08:54:42', '2025-12-31 09:20:12', '609a6331-4efb-451e-8c50-678603976bfa.jpg', 'b765526a-dde1-4678-b22c-bde5ce796d80.jpg', 'LATE_AND_EARLY', 41, 5, 24, 25),
-(52, '2025-12-31', '2025-12-31 10:01:53', '2025-12-31 10:18:25', '56ebad80-1205-4355-b580-fe7fff419603.jpg', '465869b7-b038-4ced-9e5b-888b45ed129d.jpg', 'LATE_AND_EARLY', 36, 29, 26, 27),
-(53, '2026-01-09', '2026-01-09 08:00:00', NULL, NULL, NULL, 'MISSING_OUTPUT_DATA', 36, 20, NULL, NULL);
+(52, '2025-12-31', '2025-12-31 10:01:53', '2025-12-31 10:18:25', '56ebad80-1205-4355-b580-fe7fff419603.jpg', '465869b7-b038-4ced-9e5b-888b45ed129d.jpg', 'LATE_AND_EARLY', 36, 29, 26, 27);
 
 -- --------------------------------------------------------
 
@@ -461,7 +451,7 @@ CREATE TABLE IF NOT EXISTS `contracts` (
   `enddate` date DEFAULT NULL,
   `Status` enum('DRAFT','SIGNED','ACTIVE','EXPIRING_SOON','EXPIRED','TERMINATED','HISTORY') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'DRAFT',
   `userID` int NOT NULL,
-  `WorkType` enum('FULLTIME','PART_TIME') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `WorkType` enum('FULLTIME','PARTTIME') COLLATE utf8mb4_unicode_ci DEFAULT 'FULLTIME' COMMENT 'Loại hình làm việc: FULLTIME=8h, PARTTIME=6h',
   `template_id` int DEFAULT NULL,
   PRIMARY KEY (`contractID`),
   UNIQUE KEY `contractCode` (`contractCode`),
@@ -629,7 +619,7 @@ CREATE TABLE IF NOT EXISTS `employeedraftschedule` (
   UNIQUE KEY `UQ_Employee_Date_Preference` (`employeeID`,`date`) COMMENT 'Mỗi nhân viên chỉ có 1 đăng ký/ngày',
   KEY `IX_preference_month_year` (`monthyear`),
   KEY `FK_preferences_shift` (`shiftID`)
-) ENGINE=InnoDB AUTO_INCREMENT=604 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=594 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `employeedraftschedule`
@@ -701,17 +691,7 @@ INSERT INTO `employeedraftschedule` (`draftID`, `employeeID`, `date`, `shiftID`,
 (373, 8, '2026-01-01', 36, 0, '2026-01', '2025-12-15 11:57:50'),
 (374, 8, '2026-01-02', 36, 0, '2026-01', '2025-12-15 12:00:51'),
 (376, 23, '2026-01-03', 36, 0, '2026-01', '2025-12-29 17:21:23'),
-(593, 29, '2026-02-02', 36, 0, '2026-02', '2025-12-31 03:12:32'),
-(594, 20, '2026-02-20', 36, 0, '2026-02', '2026-01-09 20:06:07'),
-(595, 20, '2026-02-24', 36, 0, '2026-02', '2026-01-09 20:06:07'),
-(596, 20, '2026-02-23', 36, 0, '2026-02', '2026-01-09 20:06:07'),
-(597, 20, '2026-02-22', 36, 0, '2026-02', '2026-01-09 20:06:07'),
-(598, 20, '2026-02-21', 36, 0, '2026-02', '2026-01-09 20:06:07'),
-(599, 20, '2026-02-14', 36, 0, '2026-02', '2026-01-09 20:07:42'),
-(600, 20, '2026-02-13', 36, 0, '2026-02', '2026-01-09 20:07:42'),
-(601, 20, '2026-02-12', 41, 0, '2026-02', '2026-01-09 20:07:42'),
-(602, 20, '2026-02-11', 36, 0, '2026-02', '2026-01-09 20:07:42'),
-(603, 20, '2026-02-10', 36, 0, '2026-02', '2026-01-09 20:07:42');
+(593, 29, '2026-02-02', 36, 0, '2026-02', '2025-12-31 03:12:32');
 
 -- --------------------------------------------------------
 
@@ -734,7 +714,7 @@ CREATE TABLE IF NOT EXISTS `employeeofficialschedule` (
   KEY `IX_schedule_month_year` (`monthyear`),
   KEY `FK_schedule_shift` (`shiftID`),
   KEY `FK_schedule_manager` (`approvedbymanagerID`)
-) ENGINE=InnoDB AUTO_INCREMENT=585 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=578 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `employeeofficialschedule`
@@ -1305,14 +1285,7 @@ INSERT INTO `employeeofficialschedule` (`officialID`, `employeeID`, `date`, `shi
 (574, 28, '2026-01-29', 36, 0, '2026-01', 9, '2025-12-30 11:35:38'),
 (575, 28, '2026-01-30', 36, 0, '2026-01', 9, '2025-12-30 11:35:38'),
 (576, 28, '2026-01-31', 36, 0, '2026-01', 9, '2025-12-30 11:35:38'),
-(577, 29, '2025-12-31', 36, 0, '2025-12', 9, '2025-12-31 03:00:15'),
-(578, 29, '2026-01-12', 36, 0, '2026-01', 9, '2026-01-09 20:42:56'),
-(579, 29, '2026-01-13', 36, 0, '2026-01', 9, '2026-01-09 20:42:56'),
-(580, 29, '2026-01-14', NULL, 1, '2026-01', 9, '2026-01-09 20:42:56'),
-(581, 29, '2026-01-15', 36, 0, '2026-01', 9, '2026-01-09 20:42:56'),
-(582, 29, '2026-01-16', 41, 0, '2026-01', 9, '2026-01-09 20:42:56'),
-(583, 29, '2026-01-17', 36, 0, '2026-01', 9, '2026-01-09 20:42:56'),
-(584, 29, '2026-01-18', 36, 0, '2026-01', 9, '2026-01-09 20:42:56');
+(577, 29, '2025-12-31', 36, 0, '2025-12', 9, '2025-12-31 03:00:15');
 
 -- --------------------------------------------------------
 
@@ -4542,8 +4515,7 @@ ALTER TABLE `attendancelogs`
 ALTER TABLE `attendancerequests`
   ADD CONSTRAINT `fk_attrequest_approver` FOREIGN KEY (`approverid`) REFERENCES `users` (`userID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_attrequest_shift` FOREIGN KEY (`shiftid`) REFERENCES `shifts` (`shiftID`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_attrequest_user` FOREIGN KEY (`userid`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_Request_Manager` FOREIGN KEY (`managerApproverID`) REFERENCES `users` (`userID`) ON DELETE SET NULL;
+  ADD CONSTRAINT `fk_attrequest_user` FOREIGN KEY (`userid`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `attendances`

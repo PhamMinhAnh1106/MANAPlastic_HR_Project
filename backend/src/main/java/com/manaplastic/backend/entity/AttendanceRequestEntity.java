@@ -23,8 +23,29 @@ import java.time.LocalDateTime;
 @Table(name = "attendancerequests")
 public class AttendanceRequestEntity {
 
-    public enum RequestType { CHECK_IN, CHECK_OUT ,FULL_SHIFT}
-    public enum RequestStatus { PENDING, APPROVED, REJECTED}
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "managerApproverID")
+    private UserEntity managerApproverID;
+
+    @Column(name = "managerApprovedAt")
+    private LocalDateTime managerApprovedAt;
+
+    @Lob
+    @Column(name = "rejectReason")
+    private String rejectReason;
+
+    @Column(name = "HRAprprovedAt")
+    private LocalDateTime hrApprovedAt;
+
+    public enum RequestType {CHECK_IN, CHECK_OUT, FULL_SHIFT}
+
+    public enum RequestStatus {
+        PENDING_MANAGER, // Chờ quản lý duyệt
+        PENDING_HR,      // Quản lý đã duyệt, chờ HR chốt
+        APPROVED,        // Đã hoàn tất
+        REJECTED
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -88,7 +109,7 @@ public class AttendanceRequestEntity {
     @PrePersist
     protected void onCreate() {
         this.createdat = LocalDateTime.now();
-        if (this.status == null) this.status = RequestStatus.PENDING;
+        if (this.status == null) this.status = RequestStatus.PENDING_MANAGER;
     }
 
     @PreUpdate

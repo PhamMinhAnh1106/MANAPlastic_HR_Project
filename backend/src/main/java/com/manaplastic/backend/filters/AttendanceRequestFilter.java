@@ -29,7 +29,7 @@ public class AttendanceRequestFilter {
             if (filter.getDepartmentId() != null) {
                 // Join bảng User để lấy Department
                 // query: where request.user.departmentID.id = ?
-                Join<AttendanceRequestEntity, UserEntity> userJoin = root.join("user", JoinType.INNER);
+                Join<AttendanceRequestEntity, UserEntity> userJoin = root.join("userid", JoinType.INNER);
 
                 predicates.add(criteriaBuilder.equal(
                         userJoin.get("departmentID").get("id"),
