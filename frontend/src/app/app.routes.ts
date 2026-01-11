@@ -4,7 +4,6 @@ import { Home } from './pages/home/home';
 import { Login } from './pages/login/login';
 import { Information } from './pages/user/information/information';
 import { ChangePassword } from './pages/user/change-password/change-password';
-import { AddAccount } from './pages/features/admin/add-account/add-account';
 import { Accounts } from './pages/features/hr/accounts/accounts';
 import { Attendant } from './pages/features/hr/attendant/attendant';
 import { Schedule } from './pages/features/manager/schedule/schedule';
@@ -26,9 +25,9 @@ import { ActivityLogs } from './pages/features/admin/activity-logs/activity-logs
 import { DataAttendant } from './pages/features/hr/data-attendant/data-attendant';
 import { RewaPunisComponent } from './pages/features/hr/rewa-punis/rewa-punis';
 import { Contracts } from './pages/features/hr/contract_folder/contracts/contracts';
-import { ContractsAdd } from './pages/features/hr/contract_folder/contracts-add/contracts-add';
 import { ContractManager } from './pages/features/hr/contract_folder/contract-main/contract-main';
 import { ContractCreate } from './pages/features/hr/contract_folder/contract-main-add/contract-main-add';
+import { Documentsuser } from './pages/features/employee/documentsuser/documentsuser';
 
 
 export const routes: Routes = [
@@ -44,7 +43,6 @@ export const routes: Routes = [
             { path: 'changepassword', component: ChangePassword },
 
             //admin
-            { path: 'add/account', component: AddAccount },
             { path: 'permission', component: Permissions },
             { path: 'law', component: Main },
             { path: 'activity-logs', component: ActivityLogs },
@@ -53,6 +51,7 @@ export const routes: Routes = [
             { path: 'user/account', component: Accounts },
             { path: 'user/attendance', component: Attendant },
             { path: 'user/attendance/data', component: DataAttendant },
+            { path: 'user/Mydocuments', component: Documentsuser },
 
             { path: 'payroll', component: Payrollmain },
             { path: 'payroll/rules', component: Payrollrules },
@@ -62,7 +61,6 @@ export const routes: Routes = [
             //manager 
             { path: 'leaverequest/manage', component: Leaverequestcheck },
             { path: 'contracts', component: Contracts },
-            { path: 'contracts/add', component: ContractsAdd },
             { path: 'contracts/edit', component: ContractManager },
             { path: 'contracts/edit/add', component: ContractCreate },
 

@@ -116,13 +116,21 @@
                 <input type="text" [(ngModel)]="currentTemplate.name" placeholder="Ví dụ: Hợp đồng thử việc 2024...">
               </div>
             </div>
+            
+            <!-- [CHANGED] Chuyển thành Select Box -->
             <div class="meta-item type-item">
               <label>Mã loại (Type)</label>
               <div class="input-with-icon">
                 <i class="fas fa-tag"></i>
-                <input type="text" [(ngModel)]="currentTemplate.type" placeholder="VD: FIXED_TERM">
+                <select [(ngModel)]="currentTemplate.type">
+                  <option value="" disabled selected>-- Chọn loại --</option>
+                  <option value="INDEFINITE">INDEFINITE</option>
+                  <option value="FIXED_TERM">FIXED_TERM</option>
+                  <option value="ALL">ALL</option>
+                </select>
               </div>
             </div>
+
           </div>
         </div>
 

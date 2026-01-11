@@ -11,7 +11,7 @@ import { Alert } from '../../shared/alert/alert';
 
 @Component({
   selector: 'app-information',
-  standalone: true, // Đã thêm standalone: true vì bạn dùng imports
+  standalone: true,
   imports: [NgIf, CommonModule, FormsModule, Loading, Comfirm, Alert],
   templateUrl: './information.html',
   styleUrl: './information.scss',
@@ -22,13 +22,12 @@ export class Information implements OnInit {
   //////////////////////////////////////////////
   isEditing = false;
 
-  // Bạn nên đảm bảo gender ở đây khớp kiểu với interface
   formdata: any = {
     fullname: "",
     cccd: '',
     email: "",
     phonenumber: "",
-    gender: 'MALE', // Giá trị mặc định nên là string nếu dùng select value
+    gender: 'MALE',
     birth: "",
     address: "",
     bankAccount: "",
@@ -36,8 +35,6 @@ export class Information implements OnInit {
     departmentID: 0
   }
 
-  // LƯU Ý: Hãy kiểm tra file user.interface.ts, 
-  // trường 'gender' trong interface 'information' nên là string, không phải boolean
   userInfo: information = {
     userID: 0,
     username: "",
@@ -45,7 +42,7 @@ export class Information implements OnInit {
     cccd: "",
     email: "",
     phonenumber: "",
-    gender: 'MALE', // Mock string để tránh lỗi khởi tạo
+    gender: 'MALE',
     birth: "",
     address: "",
     bankAccount: "",
@@ -72,34 +69,42 @@ export class Information implements OnInit {
     this.isalert = true;
     this.notifyMessage = message;
     this.notifyType = type;
+    // Tự động tắt alert sau 3s nếu cần thiết
+    // setTimeout(() => this.isalert = false, 3000);
   }
 
   /////////////////////////////////
 
   async getInformation() {
-    const res = await getdataRole(this.role);
-    // Map dữ liệu từ API vào biến userInfo
-    this.userInfo = {
-      userID: res.userID,
-      username: res.username,
-      fullname: res.fullname,
-      cccd: res.cccd,
-      email: res.email,
-      phonenumber: res.phonenumber,
-      gender: res.gender, // Đảm bảo API trả về 'MALE'/'FEMALE'
-      birth: res.birth,
-      address: res.address,
-      bankAccount: res.bankAccount,
-      status: res.status,
-      bankName: res.bankName,
-      hireDate: res.hireDate,
-      roleName: res.roleName,
-      departmentID: res.departmentID
+    this.isloading = true; // Thêm loading khi get data
+    try {
+      const res = await getdataRole(this.role);
+      this.userInfo = {
+        userID: res.userID,
+        username: res.username,
+        fullname: res.fullname,
+        cccd: res.cccd,
+        email: res.email,
+        phonenumber: res.phonenumber,
+        gender: res.gender || 'MALE',
+        birth: res.birth,
+        address: res.address,
+        bankAccount: res.bankAccount,
+        status: res.status,
+        bankName: res.bankName,
+        hireDate: res.hireDate,
+        roleName: res.roleName,
+        departmentID: res.departmentID
+      }
+      sessionStorage.setItem("departmentId", String(this.userInfo.departmentID));
+      sessionStorage.setItem("userId", String(this.userInfo.userID));
+    } catch (e) {
+      console.error(e);
+      this.onalert("Không thể tải thông tin người dùng", false);
+    } finally {
+      this.isloading = false;
+      this.cdr.detectChanges();
     }
-    sessionStorage.setItem("departmentId", String(this.userInfo.departmentID));
-    sessionStorage.setItem("userId", String(this.userInfo.userID));
-
-    this.cdr.detectChanges();
   }
 
   getDepartment(id: number) {
@@ -109,8 +114,16 @@ export class Information implements OnInit {
 
   startEdit() {
     this.isEditing = true;
-    // Clone object để tránh binding ngược khi chưa lưu
-    this.formdata = { ...this.userInfo };
+    // Deep clone để an toàn dữ liệu
+    this.formdata = JSON.parse(JSON.stringify(this.userInfo));
+
+    // Format lại ngày sinh để hiển thị đúng trong input type="date" (yyyy-MM-dd)
+    if (this.formdata.birth) {
+      const date = new Date(this.formdata.birth);
+      if (!isNaN(date.getTime())) {
+        this.formdata.birth = date.toISOString().split('T')[0];
+      }
+    }
   }
 
   cancelEdit() {
@@ -118,56 +131,105 @@ export class Information implements OnInit {
     this.formdata = {};
   }
 
-  async onConfirmResult(event: any) {
-    if (event === true) {
-      // Validate đơn giản
-      if (this.formdata.phonenumber) {
-        if (this.formdata.phonenumber.toString().charAt(0) !== '0') {
-          this.onalert("Số điện thoại phải bắt đầu bằng số 0", false);
-          return;
-        }
-        if (this.formdata.phonenumber.length < 10) {
-          console.log("Phone number length:");
-          this.onalert("Số điện thoại không hợp lệ (phải từ 10 đến 12 số)", false);
-          return;
-        }
-      }
-
-
-      try {
-        const res = await UpdateAccount(this.formdata, this.role) as any;
-        if (res.status == 200) {
-          this.onalert(res.data, true);
-          this.isloading = false;
-          this.isconfirm = false;
-          this.isEditing = false;
-          this.getInformation(); // Load lại dữ liệu mới
-          this.cdr.detectChanges();
-        } else {
-          this.onalert(res.response.data.message, false);
-          console.log("Error response:", res);
-        }
-      } catch (error) {
-        this.onalert("Lỗi kết nối server", false);
-      } finally {
-        this.isloading = false;
-        this.isconfirm = false;
-      }
-
-    } else {
-      this.isconfirm = false;
-      this.isloading = false;
+  // Hàm validate riêng biệt
+  validateForm(): boolean {
+    // 1. Validate tên
+    if (!this.formdata.fullname || this.formdata.fullname.trim().length === 0) {
+      this.onalert("Họ và tên không được để trống", false);
+      return false;
     }
+
+    // 2. Validate CCCD/CMND (9 hoặc 12 số)
+    if (this.formdata.cccd) {
+      const cccdRegex = /^[0-9]{9}$|^[0-9]{12}$/;
+      if (!cccdRegex.test(this.formdata.cccd)) {
+        this.onalert("CCCD/CMND phải là 9 hoặc 12 chữ số", false);
+        return false;
+      }
+    }
+
+    // 3. Validate Ngày sinh (Không được lớn hơn hiện tại)
+    if (this.formdata.birth) {
+      const birthDate = new Date(this.formdata.birth);
+      const today = new Date();
+      // Reset giờ phút giây của today để so sánh chính xác ngày
+      today.setHours(0, 0, 0, 0);
+
+      if (birthDate > today) {
+        this.onalert("Ngày sinh không được vượt quá ngày hiện tại", false);
+        return false;
+      }
+    }
+
+    // 4. Validate Email
+    if (this.formdata.email) {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(this.formdata.email)) {
+        this.onalert("Địa chỉ email không hợp lệ", false);
+        return false;
+      }
+    }
+
+    // 5. Validate Số điện thoại
+    if (this.formdata.phonenumber) {
+      const phoneStr = this.formdata.phonenumber.toString();
+      const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/; // Regex cơ bản cho sđt VN
+
+      if (phoneStr.charAt(0) !== '0') {
+        this.onalert("Số điện thoại phải bắt đầu bằng số 0", false);
+        return false;
+      }
+
+      if (phoneStr.length < 10 || phoneStr.length > 11) { // Thường là 10 số
+        this.onalert("Số điện thoại phải có 10-11 chữ số", false);
+        return false;
+      }
+
+      if (!/^\d+$/.test(phoneStr)) {
+        this.onalert("Số điện thoại chỉ được chứa ký tự số", false);
+        return false;
+      }
+    }
+
+    return true;
   }
 
   saveChanges() {
-    this.isconfirm = true;
-    this.confirmMessage = "Bạn có chắc muốn sửa thông tin?";
+    // Gọi validate TRƯỚC khi hiện popup confirm
+    if (this.validateForm()) {
+      this.isconfirm = true;
+      this.confirmMessage = "Bạn có chắc muốn lưu thay đổi thông tin này?";
+    }
+  }
+
+  async onConfirmResult(event: any) {
+    if (event === true) {
+      this.isloading = true;
+      try {
+        const res = await UpdateAccount(this.formdata, this.role) as any;
+        if (res.status == 200) {
+          this.onalert(res.data || "Cập nhật thành công!", true);
+          this.isEditing = false;
+          await this.getInformation(); // Load lại dữ liệu mới
+        } else {
+          // Xử lý lỗi từ server trả về
+          const errorMsg = res.response?.data?.message || "Cập nhật thất bại";
+          this.onalert(errorMsg, false);
+        }
+      } catch (error) {
+        this.onalert("Lỗi kết nối server, vui lòng thử lại sau.", false);
+      } finally {
+        this.isloading = false;
+        this.isconfirm = false;
+        this.cdr.detectChanges();
+      }
+    } else {
+      this.isconfirm = false;
+    }
   }
 
   ngOnInit() {
     this.role = this.cookieService.get("role");
     this.getInformation();
-    this.cdr.detectChanges();
   }
 }

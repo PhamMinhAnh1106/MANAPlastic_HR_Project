@@ -1,5 +1,5 @@
 import { CommonModule, NgFor, NgIf, NgClass, DatePipe } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GetAccountInfo, GetOneAccountInfo, UpdateAccounthr } from '../../../../services/pages/features/hr/accountManager.service';
 import { Department, information } from '../../../../interface/user/user.interface';
@@ -9,6 +9,8 @@ import { Loading } from '../../../shared/loading/loading';
 import { Comfirm } from '../../../shared/comfirm/comfirm';
 import { Alert } from '../../../shared/alert/alert';
 import { Router } from '@angular/router';
+import { Subject, of, from, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-accounts',
@@ -17,7 +19,7 @@ import { Router } from '@angular/router';
   templateUrl: './accounts.html',
   styleUrl: './accounts.scss',
 })
-export class Accounts implements OnInit {
+export class Accounts implements OnInit, OnDestroy {
   sortByIdDesc: boolean = false;
   sortByUsernameDesc: boolean = false;
   sortByGenderDesc: boolean = false;
@@ -31,10 +33,10 @@ export class Accounts implements OnInit {
 
   // Pagination States
   currentPage: number = 0;
-  pageSize: number = 2; // Set mặc định là 2 theo yêu cầu
+  pageSize: number = 2;
   totalPages: number = 0;
   totalElements: number = 0;
-  pageSizeOptions: number[] = [2, 5, 10, 20, 50]; // Các tùy chọn kích thước trang
+  pageSizeOptions: number[] = [2, 5, 10, 20, 50];
 
   // States
   isloading: boolean = false;
@@ -61,10 +63,103 @@ export class Accounts implements OnInit {
 
   department = Department;
 
+  // --- Search Suggestion Variables ---
+  private searchSubject = new Subject<string>();
+  searchSubscription?: Subscription;
+  searchSuggestions: any[] = []; // Danh sách gợi ý hiển thị trong popup
+  showSuggestions: boolean = false; // Trạng thái hiển thị popup
+  isSearching: boolean = false; // Trạng thái đang gọi API background
+
   ngOnInit(): void {
     this.role = this.cookie.get("role");
-    // Gọi hàm load dữ liệu ngay khi khởi tạo
+
+    // Setup Live Search Subscription
+    this.setupLiveSearch();
+
+    // Gọi hàm load dữ liệu ban đầu
     this.filterEmployees();
+  }
+
+  ngOnDestroy(): void {
+    // Unsubscribe để tránh memory leak khi component bị hủy
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
+  }
+
+  setupLiveSearch() {
+    this.searchSubscription = this.searchSubject.pipe(
+      // 1. Chờ 1000ms (1s) sau khi người dùng ngừng gõ
+      debounceTime(1000),
+
+      // 2. Chỉ tiếp tục nếu giá trị thay đổi so với lần trước
+      distinctUntilChanged(),
+
+      // 3. Hủy request cũ nếu có request mới (switchMap)
+      switchMap(keyword => {
+        // FIX: Chuyển về string an toàn trước khi trim
+        const safeKeyword = String(keyword || '');
+
+        if (safeKeyword.trim() === '') {
+          this.showSuggestions = false;
+          return of({ content: [] }); // Trả về mảng rỗng nếu không có keyword
+        }
+
+        this.isSearching = true; // Bật loading nhỏ nếu cần
+        this.cdr.detectChanges();
+
+        // Gọi API (Chuyển Promise sang Observable bằng 'from')
+        return from(GetOneAccountInfo(safeKeyword, this.role)).pipe(
+          catchError(error => {
+            console.error('Search error:', error);
+            return of({ content: [] }); // Trả về rỗng khi lỗi
+          })
+        );
+      })
+    ).subscribe((res: any) => {
+      this.isSearching = false;
+
+      // Xử lý kết quả trả về
+      // Giả sử API trả về object có content. Nếu content là array thì lấy, nếu là object đơn lẻ thì bọc vào array
+      if (res && res.content) {
+        if (Array.isArray(res.content)) {
+          this.searchSuggestions = res.content;
+        } else if (res.content.userID) {
+          // Trường hợp API trả về 1 object duy nhất
+          this.searchSuggestions = [res.content];
+        } else {
+          this.searchSuggestions = [];
+        }
+      } else {
+        this.searchSuggestions = [];
+      }
+
+      this.showSuggestions = true;
+      this.cdr.detectChanges();
+    });
+  }
+
+  // Hàm được gọi mỗi khi user gõ vào ô input (từ template)
+  onSearchInput(event: any) {
+    const value = event.target.value;
+    this.searchSubject.next(value);
+  }
+
+  // Khi user chọn 1 item trong popup
+  selectSuggestion(item: any) {
+    // FIX: Chuyển về string để tránh lỗi type mismatch
+    this.filter.userID = String(item.username);
+    this.showSuggestions = false;
+    this.onPageSizeChange(); // Gọi hàm lọc chính để hiển thị dữ liệu ra bảng
+  }
+
+  // Ẩn popup khi click ra ngoài hoặc focus out (tùy chọn, ở đây mình xử lý đơn giản bằng click overlay hoặc delay)
+  hideSuggestions() {
+    // Delay nhỏ để kịp nhận sự kiện click vào item
+    setTimeout(() => {
+      this.showSuggestions = false;
+      this.cdr.detectChanges();
+    }, 200);
   }
 
   showNotification(message: string, type: boolean) {
@@ -83,15 +178,14 @@ export class Accounts implements OnInit {
     }
   }
 
-  // Xử lý thay đổi trang
   onPageChange(page: number) {
     if (page >= 0 && page < this.totalPages) {
       this.currentPage = page;
       this.filterEmployees();
     }
   }
+
   searchAll = 0;
-  // Xử lý thay đổi số lượng item trên trang hoặc khi bấm Lọc
   onPageSizeChange() {
     this.currentPage = 0;
     this.filterEmployees();
@@ -129,16 +223,15 @@ export class Accounts implements OnInit {
     // Reset mảng dữ liệu hiển thị
     if (this.employee.length > 0) this.employee = [];
 
-    const keyword = this.filter.userID;
+    // FIX: Đảm bảo keyword luôn là string
+    const rawKeyword = this.filter.userID;
+    const keyword = rawKeyword ? String(rawKeyword) : '';
+
     let res: any;
 
-    // LOGIC PHÂN TRANG & TÌM KIẾM ĐƯỢC CẬP NHẬT
-    // Nếu có keyword -> Dùng API Tìm kiếm (GetOneAccountInfo)
     if (keyword && keyword.trim() !== '') {
       res = await GetOneAccountInfo(keyword, this.role);
     }
-    // Nếu không có keyword -> Dùng API Lấy danh sách phân trang (GetAccountInfo)
-
 
     this.isloading = false;
 

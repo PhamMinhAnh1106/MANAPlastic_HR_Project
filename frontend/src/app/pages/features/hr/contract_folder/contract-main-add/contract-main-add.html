@@ -1,11 +1,14 @@
 <div class="main-layout">
   
-  <!-- LEFT PANEL: FORM INPUT -->
+  <!-- FORM PANEL: CENTERED & FULL WIDTH -->
   <div class="form-panel">
     
-    <h4 class="page-title">
-      <span class="material-symbols-outlined">contract_edit</span> Soạn Hợp Đồng Mới
-    </h4>
+    <div class="page-header">
+      <button class="btn-back" routerLink="/home/contracts">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <h4 class="page-title">Soạn Hợp Đồng Mới</h4>
+    </div>
 
     <form [formGroup]="contractForm" (ngSubmit)="onSubmit()">
       
@@ -98,7 +101,7 @@
               <input type="text" formControlName="address">
             </div>
 
-            <!-- PHÒNG BAN (Đã sửa thành Select) -->
+            <!-- PHÒNG BAN -->
             <div class="form-group col-half">
               <label>Phòng ban <span class="required">*</span></label>
               <select formControlName="departmentId" [class.is-invalid]="isFieldInvalid('departmentId')">
@@ -109,7 +112,7 @@
               <div *ngIf="isFieldInvalid('departmentId')" class="error-msg">Vui lòng chọn phòng ban.</div>
             </div>
 
-            <!-- CHỨC VỤ (Đã sửa thành Select) -->
+            <!-- CHỨC VỤ -->
             <div class="form-group col-half">
               <label>Chức vụ <span class="required">*</span></label>
               <select formControlName="roleId" [class.is-invalid]="isFieldInvalid('roleId')">
@@ -142,12 +145,9 @@
               </select>
             </div>
 
-            <div class="form-group col-half">
-              <label>Độc hại</label>
-              <input type="text" formControlName="allowanceToxicType" placeholder="VD: LEVEL_1">
-            </div>
+            <!-- Đã xóa input Độc hại -->
 
-            <!-- NGÀY BẮT ĐẦU: Đã thêm min date -->
+            <!-- NGÀY BẮT ĐẦU -->
             <div class="form-group col-half">
               <label>Ngày bắt đầu <span class="required">*</span></label>
               <input type="date" formControlName="startDate" 
@@ -166,13 +166,13 @@
               <input type="date" formControlName="endDate" [min]="contractForm.get('startDate')?.value">
             </div>
 
-            <div class="form-group col-two-thirds">
+            <div class="form-group col-half">
               <label>Lương cơ bản (VNĐ) <span class="required">*</span></label>
               <input type="number" class="text-bold-green" formControlName="baseSalary" [class.is-invalid]="isFieldInvalid('baseSalary')">
               <div *ngIf="isFieldInvalid('baseSalary')" class="error-msg">Lương > 0.</div>
             </div>
 
-            <div class="form-group col-one-third">
+            <div class="form-group col-half">
               <label>% Đóng BHXH</label>
               <input type="number" formControlName="insurancePercent" [class.is-invalid]="isFieldInvalid('insurancePercent')">
               <div *ngIf="isFieldInvalid('insurancePercent')" class="error-msg">0 - 100.</div>
@@ -246,48 +246,6 @@
       </div>
 
     </form>
-  </div>
-
-  <!-- RIGHT PANEL: PREVIEW -->
-  <div class="preview-panel">
-    <!-- Toolbar -->
-    <div class="toolbar">
-      <div class="toolbar-left">
-        <span class="preview-title">
-          <span class="material-symbols-outlined">visibility</span> Xem trước
-        </span>
-        <span *ngIf="currentContractId; else noData" class="badge-status success">
-          #{{ currentContractId }}
-        </span>
-        <ng-template #noData>
-          <span class="badge-status default">N/A</span>
-        </ng-template>
-      </div>
-
-      <div class="toolbar-right">
-        <button (click)="downloadPdf()" [disabled]="!currentContractId" class="btn-download"
-                [class.disabled]="!currentContractId">
-          <span class="material-symbols-outlined">download</span>
-          <span class="btn-text">Tải PDF</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- PDF Preview Area -->
-    <div class="preview-content">
-        <iframe *ngIf="safePdfUrl" [src]="safePdfUrl" class="pdf-frame animate-fade-in"></iframe>
-        
-        <div *ngIf="!safePdfUrl && currentContractId" class="success-state animate-fade-in">
-          <span class="material-symbols-outlined spin" style="font-size: 64px;">progress_activity</span>
-          <h3>Đang xử lý PDF...</h3>
-          <p>Hợp đồng #{{ currentContractId }} đang được tạo.</p>
-        </div>
-
-        <div *ngIf="!safePdfUrl && !currentContractId" class="empty-state">
-          <span class="material-symbols-outlined" style="font-size: 64px; opacity: 0.5;">description</span>
-          <p>Điền thông tin để tạo hồ sơ</p>
-        </div>
-    </div>
   </div>
 </div>
 

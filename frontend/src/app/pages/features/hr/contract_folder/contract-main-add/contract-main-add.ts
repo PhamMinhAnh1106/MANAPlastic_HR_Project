@@ -1,16 +1,14 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { Router, RouterModule } from '@angular/router'; // Import Router
 
-import { Allowance, contracttemplate, createContract, CreateContractPayload, getContractPdfUrl, getcontracttemplate }
+import { Allowance, contracttemplate, createContract, CreateContractPayload, getcontracttemplate }
   from '../../../../../services/pages/features/hr/contracts.service';
 import { Loading } from '../../../../shared/loading/loading';
 import { Alert } from '../../../../shared/alert/alert';
 import { Comfirm } from '../../../../shared/comfirm/comfirm';
 import { Department, Role } from '../../../../../interface/user/user.interface';
-
-
 
 // --- CUSTOM VALIDATOR: Không cho chọn ngày quá khứ ---
 function futureDateValidator(control: AbstractControl): ValidationErrors | null {
@@ -29,15 +27,17 @@ function futureDateValidator(control: AbstractControl): ValidationErrors | null 
 @Component({
   selector: 'app-contract-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Loading, Alert, Comfirm],
+  imports: [CommonModule, ReactiveFormsModule, Loading, Alert, Comfirm, RouterModule], // Thêm RouterModule
   templateUrl: './contract-main-add.html',
   styleUrls: ['./contract-main-add.scss']
 })
 export class ContractCreate implements OnInit {
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private router: Router // Inject Router
+  ) { }
 
   private fb = inject(FormBuilder);
-  private sanitizer = inject(DomSanitizer);
 
   // Expose data to template
   departmentList = Department;
@@ -57,7 +57,7 @@ export class ContractCreate implements OnInit {
   notifyType: boolean = true;
 
   currentContractId: number | null = null;
-  safePdfUrl: SafeResourceUrl | null = null;
+  // Đã xóa safePdfUrl vì không còn phần preview
 
   sections = {
     config: true,
@@ -86,7 +86,7 @@ export class ContractCreate implements OnInit {
     roleId: [4, [Validators.required]],
 
     workType: ['FULLTIME'],
-    allowanceToxicType: [''],
+    // Đã xóa allowanceToxicType
 
     // Thêm validator futureDateValidator
     startDate: [this.todayStr, [Validators.required, futureDateValidator]],
@@ -165,29 +165,7 @@ export class ContractCreate implements OnInit {
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
-  async showPreview(id: number) {
-    this.safePdfUrl = null;
-    const url = await getContractPdfUrl(id);
-
-    if (typeof url === 'string' && !url.startsWith("co loi")) {
-      this.safePdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-      this.cdr.detectChanges();
-    } else {
-      this.showNotification(url, false);
-    }
-  }
-
-  downloadPdf() {
-    if (this.currentContractId) {
-      getContractPdfUrl(this.currentContractId).then(url => {
-        if (typeof url === 'string' && !url.startsWith("co loi")) {
-          window.open(url, '_blank');
-        } else {
-          this.showNotification(url, false);
-        }
-      });
-    }
-  }
+  // Đã xóa showPreview và downloadPdf vì không còn UI tương ứng trong màn hình này
 
   resetForm() {
     this.confirmMessage = "Bạn có chắc muốn làm mới form? Dữ liệu chưa lưu sẽ mất.";
@@ -210,7 +188,6 @@ export class ContractCreate implements OnInit {
       this.allowances.clear();
       this.addAllowance();
       this.currentContractId = null;
-      this.safePdfUrl = null;
       this.sections = { config: true, profile: true, salary: true, allowance: true };
 
       this.showNotification("Đã làm mới form", true);
@@ -246,7 +223,7 @@ export class ContractCreate implements OnInit {
       endDate: formVal.endDate || null,
       baseSalary: Number(formVal.baseSalary),
       insurancePercent: Number(formVal.insurancePercent),
-      allowanceToxicType: formVal.allowanceToxicType,
+      allowanceToxicType: '', // Đã xóa khỏi form, gửi chuỗi rỗng hoặc null tùy backend
       allowances: formVal.allowances
         .filter((a: any) => a.allowanceName && a.allowanceAmount)
         .map((a: any): Allowance => ({
@@ -265,9 +242,11 @@ export class ContractCreate implements OnInit {
 
       if (result && result.status === 200 && result.data) {
         this.currentContractId = result.data.contractId || result.data.id;
-        this.showPreview(this.currentContractId as number);
         this.sections.config = false;
         this.showNotification(result.data.message, true);
+
+        // Tùy chọn: Sau khi tạo thành công có thể navigate về danh sách hoặc giữ nguyên
+        this.router.navigate(['/home/contracts']);
       } else {
         this.showNotification(result.response.data.message, false);
       }

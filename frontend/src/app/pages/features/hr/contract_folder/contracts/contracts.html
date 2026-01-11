@@ -1,407 +1,716 @@
 <div class="page-container">
   
-  <!-- PAGE HEADER: Title + Add Button -->
-  <div class="page-header">
-    <div class="header-title">
-      <h2>Quản lý Hợp đồng</h2>
-      <p>Tra cứu, kiểm tra và quản lý hồ sơ hợp đồng nhân viên</p>
-    </div>
-    <button class="btn-primary add-contract-btn" (click)="addContract()">
-      <span class="material-symbols-outlined">add</span> Thêm mới
-    </button>
-  </div>
-
-  <!-- TABS NAVIGATION -->
-  <div class="tabs-container">
-    <div class="tab-item" [class.active]="tab === 'check'" (click)="changeTab('check')">
-      <span class="material-symbols-outlined">fact_check</span> Kiểm tra nhanh
-    </div>
-    <div class="tab-item" [class.active]="tab === 'search'" (click)="changeTab('search')">
-      <span class="material-symbols-outlined">search</span> Tra cứu nâng cao
-    </div>
-  </div>
-
-  <!-- CONTENT AREA -->
-  <div class="content-card">
-    
-    <!-- ===== TAB 1: KIỂM TRA HỢP ĐỒNG ===== -->
-    <div *ngIf="tab === 'check'" class="tab-content fadeIn">
-      <div class="check-panel">
-        <div class="input-group-large">
-          <label>Nhập Mã Nhân Viên (ID)</label>
-          <div class="input-wrapper">
-            <span class="material-symbols-outlined icon">badge</span>
-            <input type="text" [(ngModel)]="employeeId" placeholder="VD: 1024..." (keyup.enter)="checkSignedContract()">
-          </div>
-        </div>
-        
-        <div class="action-buttons">
-          <button class="btn-primary" (click)="checkSignedContract()">
-            <span class="material-symbols-outlined">verified</span> Kiểm tra trạng thái
-          </button>
-          <button class="btn-secondary" (click)="viewEmployeeContracts()">
-            <span class="material-symbols-outlined">history_edu</span> Xem lịch sử hợp đồng
-          </button>
-        </div>
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="header-title">
+        <h2>Quản lý Hợp đồng</h2>
+        <p>Tra cứu, kiểm tra và quản lý hồ sơ hợp đồng nhân viên</p>
       </div>
+      <button class="btn-primary add-contract-btn" (click)="addContract()">
+        <span class="material-symbols-outlined">add</span> Thêm mới
+      </button>
+    </div>
+  
+    <!-- TABS -->
+    <div class="tabs-container">
+      <div class="tab-item" [class.active]="tab === 'check'" (click)="changeTab('check')">
+        <span class="material-symbols-outlined">fact_check</span> Kiểm tra nhanh
+      </div>
+      <div class="tab-item" [class.active]="tab === 'search'" (click)="changeTab('search')">
+        <span class="material-symbols-outlined">search</span> Tra cứu nâng cao
+      </div>
+      <!-- Tab Quản lý Yêu cầu (Admin/HR) -->
+      <div class="tab-item" [class.active]="tab === 'requests'" (click)="changeTab('requests')" >
+        <span class="material-symbols-outlined">rate_review</span> Duyệt yêu cầu
+      </div>
+      <!-- Tab Lịch sử (Admin/HR) -->
+      <div class="tab-item" [class.active]="tab === 'history'" (click)="changeTab('history')" >
+        <span class="material-symbols-outlined">history</span> Lịch sử chỉnh sửa
+      </div>
+    </div>
+  
+    <!-- CONTENT -->
+    <div class="content-card">
       
-      <div class="illustration">
-        <span class="material-symbols-outlined large-icon">contract</span>
-        <p>Nhập mã nhân viên để kiểm tra hợp đồng đang hiệu lực hoặc xem toàn bộ hồ sơ.</p>
-      </div>
-    </div>
-
-    <!-- ===== TAB 2: TÌM KIẾM HỢP ĐỒNG ===== -->
-    <div *ngIf="tab === 'search'" class="tab-content fadeIn">
-      <div class="search-grid">
-        <div class="form-group">
-          <label>Tên nhân viên / Username</label>
-          <input type="text" [(ngModel)]="filters.username" placeholder="Nhập tên user...">
-        </div>
-
-        <div class="form-group">
-          <label>Loại hợp đồng</label>
-          <select [(ngModel)]="filters.type">
-            <option value="">-- Tất cả --</option>
-            <option value="INDEFINITE">Không xác định thời hạn</option>
-            <option value="FIXED_TERM">Có thời hạn</option>
-            <option value="PROBATION">Thử việc</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Trạng thái</label>
-          <select [(ngModel)]="filters.status">
-            <option value="">-- Tất cả --</option>
-            <option *ngFor="let st of statusContract" [value]="st">
-              {{translateContractStatus(st)}}
-            </option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Phụ cấp độc hại</label>
-          <select [(ngModel)]="filters.allowanceToxicType">
-            <option value="">-- Tất cả --</option>
-            <option value="NONE">Không áp dụng</option>
-            <option value="CASH">Tiền mặt</option>
-            <option value="IN_KIND">Hiện vật</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Từ ngày (Start Date)</label>
-          <input type="date" [(ngModel)]="filters.startdate">
-        </div>
-
-        <div class="form-group">
-          <label>Đến ngày (End Date)</label>
-          <input type="date" [(ngModel)]="filters.enddate">
-        </div>
-      </div>
-
-      <div class="search-actions">
-        <button class="btn-primary" (click)="searchContract()">
-          <span class="material-symbols-outlined">search</span> Tìm kiếm
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== MODAL POPUP (LIST & MESSAGE) ===== -->
-<div class="overlay" *ngIf="showPopup">
-  <div class="modal-box" [ngClass]="{'modal-large': popupMode === 'list'}">
-    
-    <div class="modal-header">
-      <h3>{{ popupMode === 'message' ? 'Thông báo' : 'Danh sách Hợp đồng' }}</h3>
-      <button class="close-btn" (click)="closePopup()">
-        <span class="material-symbols-outlined">close</span>
-      </button>
-    </div>
-
-    <div class="modal-body">
-      <!-- MODE: MESSAGE -->
-      <div *ngIf="popupMode === 'message'" class="message-content">
-        <span class="material-symbols-outlined icon-info">info</span>
-        <p>{{ messageCheckContract }}</p>
-      </div>
-
-      <!-- MODE: LIST -->
-      <div *ngIf="popupMode === 'list'" class="list-content">
-        <div class="table-responsive">
-          <table class="modern-table" *ngIf="listContracts.length > 0; else noData">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Tên hợp đồng</th>
-                <th>Người sở hữu</th>
-                <th>Loại</th>
-                <th>Lương cơ bản</th>
-                <th>Hiệu lực</th>
-                <th>Trạng thái</th>
-                <th class="text-center">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let c of listContracts">
-                <td><strong>#{{ c.id }}</strong></td>
-                <td>
-                    <div class="contract-name" title="{{ c.contractname }}">{{ c.contractname }}</div>
-                    <small class="text-muted">Ký ngày: {{ c.signdate | date:'dd/MM/yyyy' }}</small>
-                </td>
-                <td><strong>{{ c.username }}</strong></td>
-                <td>{{ getVietnameseContractType(c.type) }}</td>
-                <td class="text-right">{{ c.basesalary | number }} VNĐ</td>
-                <td>
-                  <div class="date-range">
-                    <span>{{ c.startdate | date:'dd/MM/yyyy' }}</span>
-                    <span *ngIf="c.enddate">➝ {{ c.enddate | date:'dd/MM/yyyy' }}</span>
-                  </div>
-                </td>
-                <td>
-                  <span class="status-badge" [ngClass]="c.status">
-                    {{ translateContractStatus(c.status) }}
-                  </span>
-                </td>
-                <td class="text-center action-col">
-                    <!-- Nút Xem File -->
-                    <button *ngIf="c.fileurl" class="btn-icon" (click)="viewContractImage(c.fileurl)" title="Xem file hợp đồng">
-                        <span class="material-symbols-outlined">visibility</span>
-                    </button>
-                    <!-- Nút Active/Upload (Mới) -->
-                    <button class="btn-icon btn-active" (click)="openActivePopup(c)" title="Active Hợp đồng">
-                        <span class="material-symbols-outlined">check_circle</span>
-                    </button>
-                    <!-- Nút Sửa -->
-                    <button class="btn-icon btn-edit" (click)="openEditContract(c)" title="Sửa hợp đồng">
-                        <span class="material-symbols-outlined">edit_square</span>
-                    </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <ng-template #noData>
-             <div class="empty-state">
-                <span class="material-symbols-outlined icon">folder_open</span>
-                <p>Không có dữ liệu hợp đồng nào.</p>
-             </div>
-          </ng-template>
-        </div>
-
-        <!-- PAGINATION FOOTER -->
-        <div class="pagination-footer" *ngIf="listContracts.length > 0">
-          <div class="page-size-selector">
-            <span>Hiển thị</span>
-            <select [(ngModel)]="size" (change)="onPageSizeChange()">
-              <option *ngFor="let s of pageSizeOptions" [value]="s">{{ s }}</option>
-            </select>
-            <span>dòng</span>
+      <!-- TAB 1: CHECK (Kiểm tra nhanh) -->
+      <div *ngIf="tab === 'check'" class="tab-content fadeIn">
+          <div class="check-panel">
+            <div class="input-group-large">
+              <label>Nhập Mã Nhân Viên (ID)</label>
+              <div class="input-wrapper">
+                <span class="material-symbols-outlined icon">badge</span>
+                <input type="text" [(ngModel)]="employeeId" placeholder="VD: 1024..." (keyup.enter)="checkSignedContract()">
+              </div>
+            </div>
+            <div class="action-buttons">
+              <button class="btn-primary" (click)="checkSignedContract()">
+                <span class="material-symbols-outlined">verified</span> Kiểm tra trạng thái
+              </button>
+              <button class="btn-secondary" (click)="viewEmployeeContracts()">
+                <span class="material-symbols-outlined">history_edu</span> Xem lịch sử
+              </button>
+            </div>
           </div>
-          
-          <div class="page-info">
-            {{ page * size + 1 }} - {{ (page + 1) * size > totalElements ? totalElements : (page + 1) * size }} 
-            trong tổng số <strong>{{ totalElements }}</strong>
+          <div class="illustration">
+             <span class="material-symbols-outlined large-icon">contract</span>
+             <p>Nhập mã nhân viên để kiểm tra hồ sơ.</p>
           </div>
-
-          <div class="page-controls">
-            <button class="btn-page" [disabled]="page === 0" (click)="onPageChange(page - 1)">
-              <span class="material-symbols-outlined">chevron_left</span>
-            </button>
-            <span class="current-page">Trang {{ page + 1 }} / {{ totalPages }}</span>
-            <button class="btn-page" [disabled]="page >= totalPages - 1" (click)="onPageChange(page + 1)">
-              <span class="material-symbols-outlined">chevron_right</span>
-            </button>
+      </div>
+  
+      <!-- TAB 2: SEARCH (Tra cứu nâng cao) -->
+      <div *ngIf="tab === 'search'" class="tab-content fadeIn">
+        <div class="search-grid">
+          <div class="form-group">
+              <label>Tên nhân viên / Username</label>
+              <input type="text" [(ngModel)]="filters.username" placeholder="Nhập tên user...">
+          </div>
+          <div class="form-group">
+              <label>Loại hợp đồng</label>
+              <select [(ngModel)]="filters.type">
+                  <option value="">-- Tất cả --</option>
+                  <option value="INDEFINITE">Không xác định thời hạn</option>
+                  <option value="FIXED_TERM">Có thời hạn</option>
+                  <option value="PROBATION">Thử việc</option>
+              </select>
+          </div>
+          <div class="form-group">
+              <label>Trạng thái</label>
+              <select [(ngModel)]="filters.status">
+                  <option value="">-- Tất cả --</option>
+                  <option *ngFor="let st of statusContract" [value]="st">{{translateContractStatus(st)}}</option>
+              </select>
+          </div>
+          <div class="form-group">
+              <label>Phụ cấp độc hại</label>
+              <select [(ngModel)]="filters.allowanceToxicType">
+                  <option value="">-- Tất cả --</option>
+                  <option value="NONE">Không áp dụng</option>
+                  <option value="CASH">Tiền mặt</option>
+                  <option value="IN_KIND">Hiện vật</option>
+              </select>
+          </div>
+          <div class="form-group">
+              <label>Từ ngày</label>
+              <input type="date" [(ngModel)]="filters.startdate">
+          </div>
+          <div class="form-group">
+              <label>Đến ngày</label>
+              <input type="date" [(ngModel)]="filters.enddate">
           </div>
         </div>
-
-      </div>
-    </div>
-
-    <div class="modal-footer" *ngIf="popupMode === 'list' && listContracts.length > 0">
-      <button class="btn-success" (click)="ExportExcel()">
-        <span class="material-symbols-outlined">download</span> Xuất Excel
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== [UPDATED] EDIT CONTRACT MODAL ===== -->
-<div class="overlay" *ngIf="showEditPopup">
-    <div class="modal-box edit-modal-box">
-        <div class="modal-header">
-            <h3>Điều chỉnh Hợp đồng #{{editForm.id}}</h3>
-            <button class="close-btn" (click)="closeEditPopup()">
-                <span class="material-symbols-outlined">close</span>
-            </button>
+        <div class="search-actions">
+          <button class="btn-primary" (click)="searchContract()">
+              <span class="material-symbols-outlined">search</span> Tìm kiếm
+          </button>
         </div>
-        
-        <div class="modal-body">
-            <!-- Row 1: Username & Contract Name -->
-            <div class="form-row">
-                <div class="form-group-lg half">
-                    <label>Người sở hữu (Read-only)</label>
-                    <input type="text" [value]="editForm.username" class="custom-input-lg" disabled style="background-color: #f1f5f9;">
-                </div>
-                <div class="form-group-lg half">
-                    <label>Tên hợp đồng *</label>
-                    <input type="text" [(ngModel)]="editForm.contractName" class="custom-input-lg" placeholder="Nhập tên HĐ...">
-                </div>
-            </div>
+  
+        <!-- LIST TABLE (Search Results - Drafts) -->
+        <div class="draft-section" *ngIf="recentDrafts.length > 0">
+           <div class="section-divider"></div>
+           <h4 class="section-title">
+               <span class="material-symbols-outlined">list_alt</span>
+               Danh sách Hợp đồng (Bản nháp)
+           </h4>
+           <div class="table-responsive">
+              <table class="modern-table">
+                  <thead>
+                      <tr>
+                          <th>ID</th>
+                          <th>Tên hợp đồng</th>
+                          <th>Loại</th>
+                          <th>Lương cơ bản</th>
+                          <th>Trạng thái</th>
+                          <th class="text-center">Thao tác</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr *ngFor="let c of recentDrafts">
+                          <td><strong>#{{ c.id }}</strong></td>
+                          <td>
+                              <div class="contract-name" title="{{ c.contractname }}">{{ c.contractname }}</div>
+                              <small class="text-muted">{{ c.signdate | date:'dd/MM/yyyy' }}</small>
+                          </td>
+                          <td>{{ getVietnameseContractType(c.type) }}</td>
+                          <td class="text-right">{{ c.basesalary | number }} VNĐ</td>
+                          <td><span class="status-badge" [ngClass]="c.status">{{ translateContractStatus(c.status) }}</span></td>
+                          <td class="text-center action-col">
+                              <!-- 1. Xem file Upload cũ -->
+                              <button *ngIf="c.fileurl" class="btn-icon" (click)="viewContractImage(c.fileurl)" title="Xem file scan"><span class="material-symbols-outlined">visibility</span></button>
+                              
+                              <!-- 2. Xem bản in PDF từ hệ thống -->
+                              <button class="btn-icon" (click)="viewPrintContract(c.id)" title="Xem bản in HĐ"><span class="material-symbols-outlined">print</span></button>
 
-            <!-- Row 2: Type & Status -->
-            <div class="form-row">
-                <div class="form-group-lg half">
-                    <label>Loại hợp đồng *</label>
-                    <select [(ngModel)]="editForm.type" class="custom-input-lg">
-                        <option *ngFor="let t of contractTypes" [value]="t.value">{{ t.label }}</option>
-                    </select>
-                </div>
-                <div class="form-group-lg half">
-                    <label>Trạng thái *</label>
-                    <select [(ngModel)]="editForm.status" class="custom-input-lg">
-                         <option *ngFor="let s of statusContract" [value]="s">{{ translateContractStatus(s) }}</option>
-                    </select>
-                </div>
-            </div>
+                              <!-- 3. Active (Chỉ hiện khi DRAFT) -->
+                              <button class="btn-icon btn-active" *ngIf="c.status === 'DRAFT'" (click)="openActivePopup(c)" title="Active (Kích hoạt)">
+                                <span class="material-symbols-outlined">check_circle</span>
+                              </button>
+                              
+                              <!-- 4. Edit -->
+                              <button class="btn-icon btn-edit" (click)="openEditContract(c)" title="Sửa thông tin"><span class="material-symbols-outlined">edit_square</span></button>
 
-            <!-- Row 3: Dates -->
-            <div class="form-row">
-                <div class="form-group-lg half">
-                    <label>Ngày ký *</label>
-                    <input type="date" [(ngModel)]="editForm.signDate" class="custom-input-lg">
-                </div>
-                <div class="form-group-lg half">
-                    <label>Ngày hiệu lực *</label>
-                    <input type="date" [(ngModel)]="editForm.startDate" class="custom-input-lg">
-                </div>
-            </div>
-             <div class="form-group-lg">
-                <label>Ngày hết hạn</label>
-                <input type="date" [(ngModel)]="editForm.endDate" class="custom-input-lg">
-            </div>
+                              <!-- 5. Yêu cầu cập nhật HĐ (MOVED TO LAST) -->
+                              <button class="btn-icon btn-danger" (click)="openRequestUpdatePopup(c)" title="Yêu cầu cập nhật HĐ">
+                                  <span class="material-symbols-outlined">sync_problem</span>
+                              </button>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+           </div>
+        </div>
+      </div>
 
-            <!-- Row 4: Salaries -->
-            <div class="form-row">
-                <div class="form-group-lg half">
-                    <label>Lương cơ bản (VNĐ) *</label>
-                    <input type="number" [(ngModel)]="editForm.baseSalary" class="custom-input-lg">
-                </div>
-                <div class="form-group-lg half">
-                    <label>Lương đóng BH (VNĐ)</label>
-                    <input type="number" [(ngModel)]="editForm.insuranceSalary" class="custom-input-lg">
-                </div>
+      <!-- TAB 3: REQUESTS (Quản lý Yêu cầu) -->
+      <div *ngIf="tab === 'requests'" class="tab-content fadeIn">
+         <div class="search-grid" style="grid-template-columns: 1fr 200px auto;">
+            <div class="form-group">
+                <label>Tìm kiếm yêu cầu</label>
+                <input type="text" [(ngModel)]="requestKeyword" placeholder="Nhập tên người yêu cầu, lý do..." (keyup.enter)="searchRequests()">
             </div>
-
-            <!-- Row 5: Allowance Toxic -->
-            <div class="form-group-lg">
-                <label>Phụ cấp độc hại</label>
-                <select [(ngModel)]="editForm.allowanceToxicType" class="custom-input-lg">
-                    <option *ngFor="let a of allowanceToxicTypes" [value]="a.value">{{ a.label }}</option>
+            <div class="form-group">
+                <label>Trạng thái</label>
+                <select [(ngModel)]="requestStatusFilter" (change)="filterRequestsLocal()">
+                    <option value="ALL">Tất cả</option>
+                    <option value="PENDING">Chờ duyệt</option>
+                    <option value="APPROVED">Đã duyệt</option>
+                    <option value="REJECTED">Đã từ chối</option>
                 </select>
             </div>
-
-            <!-- Row 6: File Upload -->
-            <div class="form-group-lg">
-                <label>File đính kèm (PDF, Ảnh)</label>
-                <div class="file-upload-wrapper">
-                    <input type="file" id="editFile" (change)="onFileSelected($event)" accept=".pdf, .jpg, .jpeg, .png" class="hidden-input">
-                    <label for="editFile" class="file-label">
-                        <span class="material-symbols-outlined">cloud_upload</span>
-                        <span>{{ selectedFileName || 'Chọn file mới (Để trống nếu không thay đổi)' }}</span>
-                    </label>
-                </div>
+            <div class="search-actions" style="justify-content: flex-end; align-items: flex-end;">
+                 <button class="btn-primary" (click)="searchRequests()">
+                    <span class="material-symbols-outlined">refresh</span> Tải lại
+                 </button>
             </div>
+         </div>
 
-        </div>
+         <div class="table-responsive" style="margin-top: 20px;">
+             <table class="modern-table" *ngIf="filteredRequests.length > 0; else noReq">
+                 <thead>
+                     <tr>
+                         <th>ID</th>
+                         <th>Người yêu cầu</th>
+                         <th>Hợp đồng gốc</th>
+                         <th>Lý do</th>
+                         <th>Trạng thái</th>
+                         <th>Ngày tạo</th>
+                         <th class="text-center">Thao tác</th>
+                     </tr>
+                 </thead>
+                 <tbody>
+                     <tr *ngFor="let req of filteredRequests">
+                         <td><strong>#{{req.requestId}}</strong></td>
+                         <td>
+                             <div>{{req.requesterName}}</div>
+                             <small class="text-muted">Owner: {{req.contractOwnerName}}</small>
+                         </td>
+                         <td>
+                             <span class="text-primary cursor-pointer" (click)="viewContractImage(req.oldFileUrl)">#{{req.contractId}} (Xem cũ)</span>
+                         </td>
+                         <td>{{req.reason}}</td>
+                         <td>
+                             <span class="status-badge" [ngClass]="req.status">{{req.status}}</span>
+                         </td>
+                         <td>{{req.createdAt | date:'dd/MM/yyyy HH:mm'}}</td>
+                         <td class="text-center">
+                             <button class="btn-icon btn-edit" (click)="openReviewPopup(req)" title="Xem xét / Duyệt">
+                                 <span class="material-symbols-outlined">rate_review</span>
+                             </button>
+                         </td>
+                     </tr>
+                 </tbody>
+             </table>
+             <ng-template #noReq><div class="empty-state">Không tìm thấy yêu cầu nào phù hợp.</div></ng-template>
+         </div>
+      </div>
 
-        <div class="modal-footer">
-            <button class="btn-secondary" (click)="closeEditPopup()">Hủy</button>
-            <button class="btn-primary" (click)="submitEditContract()">Cập nhật</button>
-        </div>
-    </div>
-</div>
-
-<!-- ===== ACTIVE CONTRACT MODAL (NEW) ===== -->
-<div class="overlay" *ngIf="showActivePopup">
-    <div class="modal-box edit-modal-box">
-        <div class="modal-header">
-            <h3>Active Hợp đồng #{{selectedActiveContractId}}</h3>
-            <button class="close-btn" (click)="closeActivePopup()">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-        </div>
-        
-        <div class="modal-body">
-            <div class="message-content" style="padding-bottom: 0;">
-                <p style="font-size: 0.9rem; margin-bottom: 15px;">
-                    Vui lòng tải lên file hợp đồng (PDF) để kích hoạt tài khoản/hợp đồng này.
-                </p>
+      <!-- TAB 4: HISTORY (Lịch sử chỉnh sửa) -->
+      <div *ngIf="tab === 'history'" class="tab-content fadeIn">
+          <div class="check-panel" style="max-width: 600px;">
+            <div class="input-group-large">
+              <label>Xem lịch sử theo ID Hợp đồng</label>
+              <div class="input-wrapper">
+                <span class="material-symbols-outlined icon">history</span>
+                <input type="number" [(ngModel)]="historyContractId" placeholder="Nhập ID hợp đồng (VD: 30)..." (keyup.enter)="searchHistory()">
+              </div>
             </div>
-
-            <div class="form-group-lg">
-                <label>File Hợp đồng (Chỉ nhận PDF) *</label>
-                <div class="file-upload-wrapper">
-                    <!-- Chỉ nhận file PDF -->
-                    <input type="file" id="activeFile" (change)="onActiveFileSelected($event)" accept=".pdf" class="hidden-input">
-                    <label for="activeFile" class="file-label" [class.has-file]="activeFileName">
-                        <span class="material-symbols-outlined">picture_as_pdf</span>
-                        <span>{{ activeFileName || 'Chọn file PDF...' }}</span>
-                    </label>
-                </div>
+            <div class="action-buttons">
+              <button class="btn-primary" (click)="searchHistory()">
+                <span class="material-symbols-outlined">search</span> Xem lịch sử
+              </button>
             </div>
-        </div>
+          </div>
 
-        <div class="modal-footer">
-            <button class="btn-secondary" (click)="closeActivePopup()">Hủy</button>
-            <button class="btn-primary" (click)="submitActiveContract()">
-                <span class="material-symbols-outlined" style="font-size: 18px;">check_circle</span> Active
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- ===== PREVIEW FILE MODAL (PDF & IMAGE) ===== -->
-<div class="overlay image-overlay" *ngIf="showImagePreview">
-  <div class="modal-box image-modal-box">
-    
-    <div class="modal-header">
-       <h3>Chi tiết Hợp đồng</h3>
-       <button class="close-btn" (click)="closeImagePreview()">
-         <span class="material-symbols-outlined">close</span>
-       </button>
-    </div>
-    
-    <div class="modal-body image-body">
-        
-        <!-- Case 1: PDF (Dùng Iframe) -->
-        <div *ngIf="!isloading && previewContentUrl && fileType === 'pdf'" class="pdf-container">
-            <iframe [src]="previewContentUrl" frameborder="0"></iframe>
-        </div>
-
-        <!-- Case 2: Image (Dùng Img) -->
-        <img *ngIf="!isloading && previewContentUrl && fileType === 'image'" 
-             [src]="previewContentUrl" 
-             alt="Contract Preview" 
-             class="preview-img">
-
-        <!-- Case 3: Empty/Error -->
-        <div *ngIf="!isloading && !previewContentUrl" class="empty-state">
-          <span class="material-symbols-outlined icon">broken_image</span>
-          <p>Không thể hiển thị tài liệu này.</p>
-        </div>
-
-        <!-- Case 4: Loading -->
-        <div *ngIf="isloading" class="loading-state">
-          <div class="spinner"></div>
-          <p style="margin-top: 10px; color: #64748b;">Đang tải tài liệu...</p>
-        </div>
+          <div class="table-responsive" style="margin-top: 30px;" *ngIf="listHistory.length > 0 || hasSearchedHistory">
+              <h4 class="section-title" *ngIf="listHistory.length > 0">Kết quả cho Hợp đồng #{{historyContractId}}</h4>
+              <table class="modern-table" *ngIf="listHistory.length > 0; else noHistData">
+                  <thead>
+                      <tr>
+                          <th>ID Version</th>
+                          <th>Thời gian lưu</th>
+                          <th>Lý do thay đổi</th>
+                          <th>Người yêu cầu</th>
+                          <th>Người duyệt</th>
+                          <th>File cũ</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr *ngFor="let h of listHistory">
+                          <td><strong>v{{h.historyId}}</strong></td>
+                          <td>{{h.archivedAt | date:'dd/MM/yyyy HH:mm'}}</td>
+                          <td>{{h.reasonForChange}}</td>
+                          <td>{{h.requestedBy}}</td>
+                          <td>{{h.approvedBy}}</td>
+                          <td>
+                              <button class="btn-icon" (click)="viewContractImage(h.oldFileUrl)" title="Tải file cũ">
+                                  <span class="material-symbols-outlined">download</span>
+                              </button>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+              <ng-template #noHistData><div class="empty-state">Không có lịch sử chỉnh sửa nào cho hợp đồng này.</div></ng-template>
+          </div>
+      </div>
 
     </div>
   </div>
-</div>
+  
+  <!-- ========================================== -->
+  <!-- MODALS AREA -->
+  <!-- ========================================== -->
 
-<!-- Shared Components -->
-<app-loading *ngIf="isloading && !showImagePreview"></app-loading>
-<app-alert *ngIf="isalert" [message]="notifyMessage" [notifyType]="notifyType" (hidden)="isalert = false"></app-alert>
+  <!-- 1. POPUP FORM YÊU CẦU CẬP NHẬT (REQUEST UPDATE) - [UPDATED CLASS] -->
+  <div class="overlay layer-form" *ngIf="showRequestPopup">
+      <div class="modal-box request-modal-box">
+          <div class="modal-header">
+              <h3>Yêu cầu cập nhật HĐ #{{requestUpdateForm.contractId}}</h3>
+              <button class="close-btn" (click)="closeRequestPopup()"><span class="material-symbols-outlined">close</span></button>
+          </div>
+          <div class="modal-body">
+              <div class="form-group-lg">
+                  <label>Tên hợp đồng</label>
+                  <input type="text" [value]="requestUpdateForm.contractName" class="custom-input-lg bg-gray" readonly>
+              </div>
+              <div class="form-group-lg">
+                  <label>Lý do cập nhật <span class="text-danger">*</span></label>
+                  <textarea [(ngModel)]="requestUpdateForm.reason" rows="4" class="custom-input-lg" placeholder="Nhập lý do chi tiết cho việc thay đổi hợp đồng..."></textarea>
+              </div>
+              <div class="form-group-lg">
+                  <label>File Hợp đồng mới (PDF) <span class="text-danger">*</span></label>
+                  <div class="file-upload-wrapper">
+                      <input type="file" id="reqFile" (change)="onRequestFileSelected($event)" accept=".pdf" class="hidden-input">
+                      <label for="reqFile" class="file-label" [class.has-file]="requestUpdateForm.fileName">
+                          <span class="material-symbols-outlined">cloud_upload</span>
+                          <span>{{ requestUpdateForm.fileName || 'Chọn file PDF...' }}</span>
+                      </label>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button class="btn-secondary" (click)="closeRequestPopup()">Hủy bỏ</button>
+              <button class="btn-primary" (click)="submitRequestUpdate()">
+                  <span class="material-symbols-outlined">send</span> Gửi yêu cầu
+              </button>
+          </div>
+      </div>
+  </div>
+
+  <!-- 2. POPUP DUYỆT YÊU CẦU (REVIEW) -->
+  <div class="overlay layer-form" *ngIf="showReviewPopup && reviewForm">
+      <div class="modal-box edit-modal-box">
+          <div class="modal-header">
+              <div style="display: flex; gap: 10px; align-items: center;">
+                  <h3>Duyệt yêu cầu #{{reviewForm.requestId}}</h3>
+                  <span class="status-badge" [ngClass]="reviewForm.status">{{reviewForm.status}}</span>
+              </div>
+              <button class="close-btn" (click)="closeReviewPopup()"><span class="material-symbols-outlined">close</span></button>
+          </div>
+          <div class="modal-body">
+              <div class="form-row">
+                  <div class="form-group-lg half"><label>Người yêu cầu</label><input type="text" [value]="reviewForm.requesterName" readonly class="custom-input-lg bg-gray"></div>
+                  <div class="form-group-lg half"><label>Hợp đồng gốc</label><input type="text" [value]="'#' + reviewForm.contractId" readonly class="custom-input-lg bg-gray"></div>
+              </div>
+              <div class="form-group-lg">
+                  <label>Lý do thay đổi</label>
+                  <div class="text-box-readonly">{{reviewForm.reason}}</div>
+              </div>
+              
+              <div class="file-compare-container">
+                  <div class="file-card old">
+                      <label>Bản hiện tại (Cũ)</label>
+                      <button class="btn-file-view" (click)="viewContractImage(reviewForm.oldFileUrl)">
+                          <span class="material-symbols-outlined">visibility</span> Xem file cũ
+                      </button>
+                  </div>
+                  <div class="arrow"><span class="material-symbols-outlined">arrow_forward</span></div>
+                  <div class="file-card new">
+                      <label>Bản mới (Đề xuất)</label>
+                      <button class="btn-file-view primary" (click)="viewContractImage(reviewForm.newFileUrl)">
+                          <span class="material-symbols-outlined">visibility</span> Xem file mới
+                      </button>
+                  </div>
+              </div>
+
+              <!-- Admin Action Area -->
+              <div class="form-group-lg" *ngIf="reviewForm.status === 'PENDING'" style="margin-top: 20px;">
+                  <label>Ghi chú của Admin (Lý do duyệt/từ chối)</label>
+                  <textarea [(ngModel)]="adminNoteInput" rows="2" class="custom-input-lg" placeholder="Nhập ghi chú..."></textarea>
+              </div>
+               <div class="form-group-lg" *ngIf="reviewForm.status !== 'PENDING'">
+                  <label>Ghi chú Admin (Đã xử lý)</label>
+                  <div class="text-box-readonly">{{reviewForm.adminNote || 'Không có ghi chú'}}</div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button class="btn-secondary" (click)="closeReviewPopup()">Đóng</button>
+              <ng-container *ngIf="reviewForm.status === 'PENDING'">
+                  <button class="btn-danger" (click)="submitReview('REJECTED')">Từ chối</button>
+                  <button class="btn-primary" (click)="submitReview('APPROVED')">Phê duyệt</button>
+              </ng-container>
+          </div>
+      </div>
+  </div>
+
+  <!-- 3. SEARCH RESULT LIST POPUP (Layer Base) -->
+  <div class="overlay layer-base" *ngIf="showPopup">
+    <div class="modal-box" [ngClass]="{'modal-large': popupMode === 'list'}">
+      <div class="modal-header">
+        <h3>{{ popupMode === 'message' ? 'Thông báo' : 'Kết quả tìm kiếm' }}</h3>
+        <button class="close-btn" (click)="closePopup()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="popupMode === 'message'" class="message-content">
+          <span class="material-symbols-outlined icon-info">info</span>
+          <p>{{ messageCheckContract }}</p>
+        </div>
+        <div *ngIf="popupMode === 'list'" class="list-content">
+          <div class="table-responsive">
+            <table class="modern-table" *ngIf="listContracts.length > 0; else noData">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Tên hợp đồng</th><th>Loại</th><th>Lương cơ bản</th><th>Trạng thái</th><th class="text-center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let c of listContracts">
+                  <td><strong>#{{ c.id }}</strong></td>
+                  <td><div class="contract-name">{{ c.contractname }}</div></td>
+                  <td>{{ getVietnameseContractType(c.type) }}</td>
+                  <td class="text-right">{{ c.basesalary | number }}</td>
+                  <td><span class="status-badge" [ngClass]="c.status">{{ translateContractStatus(c.status) }}</span></td>
+                  <td class="text-center action-col">
+                      <button *ngIf="c.fileurl" class="btn-icon" (click)="viewContractImage(c.fileurl)"><span class="material-symbols-outlined">visibility</span></button>
+                      
+                      <!-- VIEW PRINT PDF BUTTON -->
+                      <button class="btn-icon" (click)="viewPrintContract(c.id)" title="Xem bản in HĐ"><span class="material-symbols-outlined">print</span></button>
+
+                      <!-- ACTIVE: Chỉ hiện khi DRAFT -->
+                      <button class="btn-icon btn-active" *ngIf="c.status === 'DRAFT'" (click)="openActivePopup(c)" title="Active (Kích hoạt)">
+                        <span class="material-symbols-outlined">check_circle</span>
+                      </button>
+                      
+                      <!-- EDIT -->
+                      <button class="btn-icon btn-edit" (click)="openEditContract(c)"><span class="material-symbols-outlined">edit_square</span></button>
+                      
+                      <!-- HISTORY: Click sẽ tắt popup -->
+                      <button class="btn-icon" (click)="viewContractHistory(c.id)" title="Lịch sử">
+                          <span class="material-symbols-outlined">history</span>
+                      </button>
+
+                      <!-- REQUEST UPDATE: MOVED TO LAST -->
+                      <button class="btn-icon btn-danger" (click)="openRequestUpdatePopup(c)" title="Yêu cầu cập nhật">
+                          <span class="material-symbols-outlined">sync_problem</span>
+                      </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <ng-template #noData><div class="empty-state"><p>Không có dữ liệu.</p></div></ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. EDIT MODAL (Layer Form: 1050) -->
+  <div class="overlay layer-form" *ngIf="showEditPopup">
+      <div class="modal-box edit-modal-box">
+          <div class="modal-header">
+              <div class="header-left">
+                  <h3>{{ isReadOnly ? 'Chi tiết Hợp đồng' : 'Điều chỉnh Hợp đồng' }} #{{editForm.id}}</h3>
+                  <span class="status-badge" [ngClass]="currentStatusRaw">
+                    {{ currentStatus }}
+                  </span>
+              </div>
+              <button class="close-btn" (click)="closeEditPopup()">
+                  <span class="material-symbols-outlined">close</span>
+              </button>
+          </div>
+          
+          <div class="modal-body">
+               <div *ngIf="isReadOnly" class="read-only-alert">
+                   <span class="material-symbols-outlined">lock</span>
+                   <span>Hợp đồng này đang ở trạng thái <b>{{currentStatus}}</b>, bạn chỉ có thể xem.</span>
+               </div>
+  
+              <!-- SECTION 1: CONTRACT DETAILS -->
+              <h4 class="section-header">1. Thông tin hợp đồng</h4>
+              <div class="form-row">
+                  <div class="form-group-lg full-width">
+                      <label>Tên hợp đồng *</label>
+                      <input type="text" [(ngModel)]="editForm.contractname" class="custom-input-lg" [disabled]="isReadOnly">
+                  </div>
+              </div>
+  
+              <div class="form-row three-col">
+                  <div class="form-group-lg">
+                      <label>Loại hợp đồng</label>
+                      <select [(ngModel)]="editForm.contractType" class="custom-input-lg" [disabled]="isReadOnly">
+                          <option *ngFor="let t of contractTypes" [value]="t.value">{{ t.label }}</option>
+                      </select>
+                  </div>
+                   <div class="form-group-lg">
+                      <label>Hình thức làm việc</label>
+                      <select [(ngModel)]="editForm.workType" class="custom-input-lg" [disabled]="isReadOnly">
+                          <option value="FULLTIME">Toàn thời gian</option>
+                          <option value="PART_TIME">Bán thời gian</option>
+                      </select>
+                  </div>
+                  <div class="form-group-lg">
+                    <label>Mẫu Hợp đồng (Template)</label>
+                    <select [(ngModel)]="editForm.templateId" class="custom-input-lg" [disabled]="isReadOnly">
+                        <option [ngValue]="0">-- Chọn mẫu hợp đồng --</option>
+                        <option *ngFor="let t of listTemplates" [ngValue]="t.id">{{ t.name }}</option>
+                    </select>
+                  </div>
+              </div>
+  
+              <div class="form-row three-col">
+                  <div class="form-group-lg">
+                      <label>Ngày ký (Sign Date)</label>
+                      <input type="date" [(ngModel)]="editForm.signDate" class="custom-input-lg" [disabled]="isReadOnly">
+                  </div>
+                  <div class="form-group-lg">
+                      <label>Ngày hiệu lực (Start Date) *</label>
+                      <input type="date" [(ngModel)]="editForm.startDate" class="custom-input-lg" [disabled]="isReadOnly">
+                  </div>
+                  <div class="form-group-lg">
+                      <label>Ngày kết thúc (End Date)</label>
+                      <input type="date" [(ngModel)]="editForm.endDate" class="custom-input-lg" [disabled]="isReadOnly">
+                  </div>
+              </div>
+
+              <div class="form-row">
+                 <div class="form-group-lg full-width">
+                    <label>Phụ cấp độc hại</label>
+                    <select [(ngModel)]="editForm.allowanceToxicType" class="custom-input-lg" [disabled]="isReadOnly">
+                        <option *ngFor="let a of allowanceToxicTypes" [value]="a.value">{{ a.label }}</option>
+                    </select>
+                 </div>
+              </div>
+  
+              <!-- SECTION 2: SALARY & INSURANCE -->
+              <h4 class="section-header">2. Chế độ Lương & Bảo hiểm</h4>
+              <div class="form-row three-col">
+                  <div class="form-group-lg">
+                      <label>Lương cơ bản (VNĐ) *</label>
+                      <input type="number" [(ngModel)]="editForm.baseSalary" class="custom-input-lg font-bold" [disabled]="isReadOnly">
+                  </div>
+                  <div class="form-group-lg">
+                      <label>Lương đóng BH (VNĐ)</label>
+                      <input type="number" [(ngModel)]="editForm.insuranceSalary" class="custom-input-lg" [disabled]="isReadOnly" placeholder="Tự động tính nếu để trống">
+                  </div>
+                  <div class="form-group-lg">
+                      <label>% Đóng Bảo hiểm</label>
+                      <div class="input-suffix">
+                          <input type="number" [(ngModel)]="editForm.insurancePercent" class="custom-input-lg" [disabled]="isReadOnly">
+                          <span class="suffix">%</span>
+                      </div>
+                  </div>
+              </div>
+  
+              <!-- ALLOWANCE LIST -->
+              <div class="allowance-section">
+                  <div class="section-label">
+                      <span>Danh sách Phụ cấp</span>
+                      <button *ngIf="!isReadOnly" class="btn-add-mini" (click)="addAllowance()">
+                          <span class="material-symbols-outlined">add</span>
+                      </button>
+                  </div>
+                  <div class="allowance-list">
+                      <div *ngFor="let al of editForm.allowances; let i = index" class="allowance-item">
+                          <div class="item-row main">
+                              <input type="text" [(ngModel)]="al.allowanceName" placeholder="Tên phụ cấp" [disabled]="isReadOnly" style="flex: 2;">
+                              <select [(ngModel)]="al.allowanceType" [disabled]="isReadOnly" class="mini-select">
+                                <option value="MONTHLY">Tháng</option>
+                                <option value="ONE_TIME">Một lần</option>
+                              </select>
+                              <input type="number" [(ngModel)]="al.amount" placeholder="Số tiền" [disabled]="isReadOnly" style="flex: 1;">
+                          </div>
+                          <div class="item-row sub">
+                              <div class="checkbox-group">
+                                <label><input type="checkbox" [(ngModel)]="al.isTaxable" [disabled]="isReadOnly"> Chịu thuế</label>
+                                <label><input type="checkbox" [(ngModel)]="al.isInsuranceBase" [disabled]="isReadOnly"> Đóng BH</label>
+                              </div>
+                              <button *ngIf="!isReadOnly" class="btn-remove" (click)="removeAllowance(i)">
+                                  <span class="material-symbols-outlined">delete</span>
+                              </button>
+                          </div>
+                      </div>
+                      <div *ngIf="editForm.allowances.length === 0" class="empty-text">Chưa có phụ cấp nào.</div>
+                  </div>
+              </div>
+  
+              <!-- SECTION 3: EMPLOYEE INFO -->
+               <h4 class="section-header">3. Thông tin nhân sự</h4>
+               <div class="form-row three-col">
+                   <div class="form-group-lg">
+                       <label>Họ và tên</label>
+                       <input type="text" [(ngModel)]="editForm.fullname" class="custom-input-lg" [disabled]="isReadOnly">
+                   </div>
+                   <div class="form-group-lg">
+                       <label>CCCD/CMND</label>
+                       <input type="text" [(ngModel)]="editForm.cccd" class="custom-input-lg" [disabled]="isReadOnly">
+                   </div>
+                   <div class="form-group-lg">
+                       <label>Ngày sinh</label>
+                       <input type="date" [(ngModel)]="editForm.dob" class="custom-input-lg" [disabled]="isReadOnly">
+                   </div>
+               </div>
+   
+               <div class="form-row three-col">
+                   <div class="form-group-lg">
+                       <label>Email</label>
+                       <input type="text" [(ngModel)]="editForm.email" class="custom-input-lg" [disabled]="isReadOnly">
+                   </div>
+                   <div class="form-group-lg">
+                       <label>Điện thoại</label>
+                       <input type="text" [(ngModel)]="editForm.phone" class="custom-input-lg" [disabled]="isReadOnly">
+                   </div>
+                   <div class="form-group-lg">
+                       <label>Giới tính</label>
+                       <select [(ngModel)]="editForm.gender" class="custom-input-lg" [disabled]="isReadOnly">
+                           <option value="MALE">Nam</option>
+                           <option value="FEMALE">Nữ</option>
+                       </select>
+                   </div>
+               </div>
+   
+               <div class="form-row">
+                   <div class="form-group-lg half">
+                       <label>Phòng ban (ID)</label>
+                       <input type="number" [(ngModel)]="editForm.departmentId" class="custom-input-lg" [disabled]="isReadOnly">
+                   </div>
+                   <div class="form-group-lg half">
+                       <label>Chức vụ (Role)</label>
+                       <select [(ngModel)]="editForm.roleId" class="custom-input-lg" [disabled]="isReadOnly">
+                           <option [ngValue]="0">-- Chọn chức vụ --</option>
+                           <option *ngFor="let r of listRoles" [ngValue]="r.roleId">{{ r.roleName }}</option>
+                       </select>
+                   </div>
+               </div>
+               <div class="form-row">
+                    <div class="form-group-lg full-width">
+                        <label>Địa chỉ</label>
+                        <input type="text" [(ngModel)]="editForm.address" class="custom-input-lg" [disabled]="isReadOnly">
+                    </div>
+                </div>
+  
+              <!-- FILES SECTION -->
+              <div class="form-group-lg" *ngIf="isAdmin" style="margin-top: 20px; border-top: 1px dashed #e2e8f0; padding-top: 15px;">
+                  <label>File đính kèm (PDF, Ảnh) <small class="text-admin">(Admin Only)</small></label>
+                  <div *ngIf="!isReadOnly; else fileReadOnly" class="file-upload-wrapper">
+                      <input type="file" id="editFile" (change)="onFileSelected($event)" accept=".pdf, .jpg, .jpeg, .png" class="hidden-input">
+                      <label for="editFile" class="file-label">
+                          <span class="material-symbols-outlined">cloud_upload</span>
+                          <span>{{ selectedFileName || 'Chọn file mới (Để trống nếu không thay đổi)' }}</span>
+                      </label>
+                  </div>
+                  <ng-template #fileReadOnly>
+                      <div class="file-read-only">
+                           <span class="material-symbols-outlined">lock</span>
+                           <span>Không thể thay đổi file ở chế độ xem.</span>
+                      </div>
+                  </ng-template>
+              </div>
+          </div>
+  
+          <!-- MODAL FOOTER -->
+          <div class="modal-footer">
+              <button class="btn-secondary" (click)="closeEditPopup()">Đóng</button>
+              <button *ngIf="showExportButton" class="btn-success fadeIn" (click)="exportContractPdf()">
+                   <span class="material-symbols-outlined">download</span> Xuất file HĐ
+              </button>
+              <button *ngIf="!isReadOnly" class="btn-primary" (click)="submitEditContract()">Cập nhật</button>
+          </div>
+      </div>
+  </div>
+  
+  <!-- 5. ACTIVE MODAL (Layer Form: 1050) -->
+  <div class="overlay layer-form" *ngIf="showActivePopup">
+      <div class="modal-box edit-modal-box">
+          <div class="modal-header">
+              <h3>Active Hợp đồng #{{selectedActiveContractId}}</h3>
+              <button class="close-btn" (click)="closeActivePopup()">
+                  <span class="material-symbols-outlined">close</span>
+              </button>
+          </div>
+          
+          <div class="modal-body">
+              <div class="message-content" style="padding-bottom: 0;">
+                  <p style="font-size: 0.9rem; margin-bottom: 15px;">
+                      Vui lòng tải lên file hợp đồng (PDF) để kích hoạt tài khoản/hợp đồng này.
+                  </p>
+              </div>
+  
+              <div class="form-group-lg">
+                  <label>File Hợp đồng (Chỉ nhận PDF) *</label>
+                  <div class="file-upload-wrapper">
+                      <input type="file" id="activeFile" (change)="onActiveFileSelected($event)" accept=".pdf" class="hidden-input">
+                      <label for="activeFile" class="file-label" [class.has-file]="activeFileName">
+                          <span class="material-symbols-outlined">picture_as_pdf</span>
+                          <span>{{ activeFileName || 'Chọn file PDF...' }}</span>
+                      </label>
+                  </div>
+              </div>
+  
+              <div class="confirmation-checkbox">
+                  <label>
+                      <input type="checkbox" [(ngModel)]="isActiveConfirmed">
+                      <span>Tôi chắc chắn với nội dung hợp đồng và tôi sẽ chịu mọi trách nhiệm.</span>
+                  </label>
+              </div>
+          </div>
+  
+          <div class="modal-footer">
+              <button class="btn-secondary" (click)="closeActivePopup()">Hủy</button>
+              <button class="btn-primary" (click)="submitActiveContract()">
+                  <span class="material-symbols-outlined" style="font-size: 18px;">check_circle</span> Active
+              </button>
+          </div>
+      </div>
+  </div>
+  
+  <!-- 6. PREVIEW MODAL (Layer Top: 1100) -->
+  <div class="overlay image-overlay layer-top" *ngIf="showImagePreview">
+    <div class="modal-box image-modal-box">
+      <div class="modal-header">
+         <h3>Chi tiết</h3>
+         <button class="close-btn" (click)="closeImagePreview()"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="modal-body image-body">
+          <div *ngIf="!isloading && previewContentUrl && fileType === 'pdf'" class="pdf-container"><iframe [src]="previewContentUrl" frameborder="0"></iframe></div>
+          <img *ngIf="!isloading && previewContentUrl && fileType === 'image'" [src]="previewContentUrl" class="preview-img">
+          <div *ngIf="isloading" class="loading-state"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 7. SYSTEM ALERTS (Layer Top: 1100) -->
+  <app-loading *ngIf="isloading && !showImagePreview"></app-loading>
+  <app-alert *ngIf="isalert" [message]="notifyMessage" [notifyType]="notifyType" (hidden)="isalert = false"></app-alert>
+  
+  <!-- 8. CONFIRM POPUP (Layer Top: 1100) -->
+  <app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>

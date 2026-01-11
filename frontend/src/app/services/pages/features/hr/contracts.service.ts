@@ -99,43 +99,22 @@ export async function getNotificationContract() {
         return "co loi xay ra " + error;
     }
 }
-export interface EditContractInterface {
+
+
+// Interface mở rộng để bao gồm ID phục vụ cho việc gọi API PUT
+export interface EditContractParams extends CreateContractPayload {
     id: number;
-    username: string;
-    contractName: string;
-    type: string;
-    baseSalary: number;
-    insuranceSalary: number;
-    allowanceToxicType: string;
-    signDate: string;
-    startDate: string;
-    endDate: string;
-    status: string;
-    file?: File | null;
 }
 
-// [UPDATE] Hàm gọi API dùng FormData
-export async function EditContract(form: EditContractInterface) {
+// 2. Hàm EditContract đã chỉnh sửa
+export async function EditContract(form: EditContractParams) {
     try {
-        const formData = new FormData();
-        formData.append('id', form.id.toString());
-        formData.append('username', form.username);
-        formData.append('contractName', form.contractName);
-        formData.append('type', form.type);
-        formData.append('baseSalary', form.baseSalary.toString());
-        formData.append('insuranceSalary', form.insuranceSalary.toString());
-        formData.append('allowanceToxicType', form.allowanceToxicType);
-        formData.append('signDate', form.signDate);
-        formData.append('startDate', form.startDate);
-        if (form.endDate) formData.append('endDate', form.endDate);
-        formData.append('status', form.status);
+        // Tách ID ra khỏi payload để dùng cho URL, phần còn lại là body
+        const { id, ...payload } = form;
 
-        // Chỉ append file nếu có chọn file mới
-        if (form.file) {
-            formData.append('file', form.file);
-        }
-
-        const res = await api.put(`/hr/contracts/${form.id}`, formData);
+        // Gọi API với method PUT và gửi body dạng JSON
+        // Lưu ý: Đảm bảo headers của axios/fetch là 'Content-Type': 'application/json'
+        const res = await api.put(`/hr/contracts/${id}`, payload);
 
         return {
             data: res.data,

@@ -140,20 +140,55 @@ export class Home implements OnInit {
     switch (currentRole) {
       case "Admin":
         const icon_admin = [
+          // 1. Quản trị hệ thống & Tài khoản (Gốc của Admin)
           {
             iconName: "manage_accounts",
             path: "/home/user/account",
-            task: [{ name: "Quản Lý Tài Khoản", path: "/home/user/account" }, { name: "Cấp Quyền Hạn", path: "/home/permission" }]
+            task: [
+              { name: "Quản Lý Tài Khoản", path: "/home/user/account" },
+              { name: "Cấp Quyền Hạn", path: "/home/permission" }
+            ]
           },
+          // 2. Nhân sự & Chấm công (Lấy từ HR + Manager)
           {
-            iconName: "paid",
+            iconName: "event_available",
+            path: "/home/user/attendance",
+            task: [
+              { name: "Quản Lý Chấm Công", path: "/home/user/attendance" },
+              { name: "Lịch Làm Việc", path: "/home/schedule" }, // Thêm từ Manager
+              { name: "Quản Lý Phép", path: "/home/leaverequest/manage" },
+              { name: "Đăng Ký Nghỉ Phép", path: "/home/leaverequest" } // Admin cũng có thể cần nghỉ phép
+            ]
+          },
+          // 3. Hợp đồng (Lấy từ HR)
+          {
+            iconName: "article",
+            path: "/home/contracts",
+            task: [
+              { name: "Quản Lý Hợp Đồng", path: "/home/contracts/edit" },
+              { name: "Kiểm tra Hợp Đồng", path: "/home/contracts" },
+              { name: "Thêm Hợp Đồng", path: "/home/contracts/edit/add" }
+            ],
+          },
+          // 4. Lương & Thưởng (Gộp Admin + HR)
+          {
+            iconName: "paid", // Hoặc dùng icon currency_exchange của HR
             path: "/home/payroll",
-            task: [{ name: "Cấu Hình Lương", path: "/home/payroll/rules" }, { name: "Tính Lương", path: "/home/payroll" },],
-          }, {
+            task: [
+              { name: "Cấu Hình Lương", path: "/home/payroll/rules" },
+              { name: "Tính Lương", path: "/home/payroll" },
+              { name: "Xem Lương", path: "/home/payroll/payslip" },
+              { name: "Lọc DS Lương", path: "/home/payroll/payslip/filter" },
+              { name: "Quản Lý Thưởng/Phạt", path: "/home/user/reward-punish" }
+            ],
+          },
+          // 5. Luật (Gốc của Admin)
+          {
             iconName: "gavel",
             path: "/home/law",
             task: [{ name: "Quản Lý Cấu Hình Luật", path: "/home/law" }],
           },
+          // 6. Logs hệ thống (Gốc của Admin)
           {
             iconName: "event_note",
             path: "/home/activity-logs",
@@ -179,9 +214,15 @@ export class Home implements OnInit {
           {
             iconName: "article",
             path: "/home/contracts",
-            task: [{ name: "Quản Lý Hợp Đồng", path: "/home/contracts/edit" }, { name: "kiểm tra Hợp Đồng", path: "/home/contracts" }
-              , { name: "Thêm Hợp Đồng", path: "/home/contracts/edit/add" }
+            task: [{ name: "Quản Lý Hợp Đồng", path: "/home/contracts" },
+            { name: "Hợp Đồng Mẫu", path: "/home/contracts/edit" }
+              // , { name: "Thêm Hợp Đồng", path: "/home/contracts/edit/add" }
             ],
+          },
+          {
+            iconName: "document_search",
+            path: "/home/user/Mydocuments",
+            task: [{ name: "Quản Lý Hồ Sơ", path: "/home/user/Mydocuments" }]
           },
           {
             iconName: "currency_exchange",
@@ -215,6 +256,11 @@ export class Home implements OnInit {
             task: [{ name: "Nghỉ Phép", path: "/home/leaverequest" }, { name: "Quản Lý Phép", path: "/home/leaverequest/manage" }]
           },
           {
+            iconName: "document_search",
+            path: "/home/user/Mydocuments",
+            task: [{ name: "Quản Lý Hồ Sơ", path: "/home/user/Mydocuments" }]
+          },
+          {
             iconName: "receipt_long",
             path: "/home/payroll/payslip",
             task: [{ name: "Xem Lương", path: "/home/payroll/payslip" },],
@@ -236,6 +282,11 @@ export class Home implements OnInit {
             iconName: "beach_access",
             path: "/home/leaverequest",
             task: [{ name: "Nghỉ Phép", path: "/home/leaverequest" }]
+          },
+          {
+            iconName: "document_search",
+            path: "/home/user/Mydocuments",
+            task: [{ name: "Quản Lý Hồ Sơ", path: "/home/user/Mydocuments" }]
           },
           {
             iconName: "payments",

@@ -1,11 +1,6 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-// [NOTE] Import components chung của bạn ở đây nếu cần (nếu chúng không được import global)
-// import { LoadingComponent } from '...';
-// import { ConfirmComponent } from '...';
-// import { AlertComponent } from '...';
 
 // Import API Service
 import {
@@ -45,15 +40,15 @@ export class ContractManager implements OnInit, AfterViewInit, OnDestroy {
   isSidebarOpen = false;
   isToolsOpen = false;
 
-  // [NEW] Shared Components State
+  // Shared Components State
   isloading: boolean = false;
   isconfirm: boolean = false;
   confirmMessage = "";
   isalert: boolean = false;
   notifyMessage = "";
-  notifyType: boolean = true; // true: success, false: error/warning (tùy logic component alert của bạn)
+  notifyType: boolean = true;
 
-  // Callbacks cho confirm popup
+  // Callbacks
   private pendingConfirmAction: (() => void) | null = null;
 
   isEditMode = true;
@@ -73,24 +68,19 @@ export class ContractManager implements OnInit, AfterViewInit, OnDestroy {
       title: 'Thông tin chung',
       items: [
         { code: '{{contract_code}}' },
-        { code: '{{day}}' },
-        { code: '{{month}}' },
-        { code: '{{year}}' }
+        { code: '{{day}}' }, { code: '{{month}}' }, { code: '{{year}}' }
       ]
     },
     {
       title: 'Thông tin nhân sự',
       items: [
-        { code: '{{employee_name}}' },
-        { code: '{{cccd}}' },
-        { code: '{{address}}' }
+        { code: '{{employee_name}}' }, { code: '{{cccd}}' }, { code: '{{address}}' }
       ]
     },
     {
       title: 'Vị trí & Lương',
       items: [
-        { code: '{{position}}' },
-        { code: '{{base_salary}}' }
+        { code: '{{position}}' }, { code: '{{base_salary}}' }
       ]
     },
     {
@@ -102,9 +92,22 @@ export class ContractManager implements OnInit, AfterViewInit, OnDestroy {
     }
   ];
 
-
   constructor(private cdr: ChangeDetectorRef) {
     this.loadExternalScripts();
+  }
+
+  // --- [NEW] Bắt sự kiện Ctrl + S ---
+  @HostListener('window:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    // Kiểm tra nếu phím Ctrl (hoặc Cmd trên Mac) + S được nhấn
+    if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+      event.preventDefault(); // Ngăn trình duyệt mở hộp thoại Save
+
+      // Chỉ lưu nếu không có popup (loading, confirm) đang hiển thị để tránh xung đột
+      if (!this.isloading && !this.isconfirm && !this.isalert) {
+        this.handleSave();
+      }
+    }
   }
 
   ngOnInit() {
@@ -114,7 +117,7 @@ export class ContractManager implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     setTimeout(() => {
       this.initCKEditor();
-    }, 1000);
+    }, 500);
   }
 
   ngOnDestroy() {
@@ -179,38 +182,101 @@ export class ContractManager implements OnInit, AfterViewInit, OnDestroy {
   async initCKEditor() {
     try {
       // @ts-ignore
-      const { ClassicEditor, Essentials, Bold, Italic, Underline, Strikethrough, Paragraph, Heading, Font, Alignment, List, Link, BlockQuote, Table, TableToolbar, TableProperties, TableCellProperties, Indent, IndentBlock, HorizontalLine, PageBreak, RemoveFormat, SpecialCharacters, FindAndReplace, SelectAll, SourceEditing, GeneralHtmlSupport } = await import('https://cdn.ckeditor.com/ckeditor5/43.3.1/ckeditor5.js');
+      const CKEDITOR = await import(/* webpackIgnore: true */ 'https://cdn.ckeditor.com/ckeditor5/43.3.1/ckeditor5.js');
+
+      const {
+        ClassicEditor, Essentials, Bold, Italic, Underline, Strikethrough,
+        Paragraph, Heading, Font, Alignment, List, ListProperties,
+        Link, BlockQuote,
+        Table, TableToolbar, TableProperties, TableCellProperties, TableColumnResize,
+        Indent, IndentBlock, HorizontalLine, PageBreak,
+        RemoveFormat, SpecialCharacters, FindAndReplace, SelectAll,
+        SourceEditing, GeneralHtmlSupport, PasteFromOffice,
+        Image, ImageToolbar, ImageCaption, ImageStyle, ImageResize, ImageUpload
+      } = CKEDITOR;
 
       const editor = await ClassicEditor.create(this.editorElement.nativeElement, {
         plugins: [
           Essentials, Bold, Italic, Underline, Strikethrough, Paragraph, Heading,
-          Font, Alignment, List, Link, BlockQuote, Table, TableToolbar, TableProperties,
-          TableCellProperties, Indent, IndentBlock, HorizontalLine, PageBreak,
-          RemoveFormat, SpecialCharacters, FindAndReplace, SelectAll, SourceEditing, GeneralHtmlSupport
+          Font, Alignment, List, ListProperties, Link, BlockQuote,
+          Table, TableToolbar, TableProperties, TableCellProperties, TableColumnResize,
+          Indent, IndentBlock, HorizontalLine, PageBreak,
+          RemoveFormat, SpecialCharacters, FindAndReplace, SelectAll,
+          SourceEditing, GeneralHtmlSupport, PasteFromOffice,
+          Image, ImageToolbar, ImageCaption, ImageStyle, ImageResize, ImageUpload
         ],
         toolbar: {
           items: [
-            'sourceEditing', '|', 'undo', 'redo', '|', 'findAndReplace', 'selectAll', '|',
-            'heading', '|', 'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|',
-            'bold', 'italic', 'underline', 'strikethrough', 'removeFormat', '|',
-            'alignment', '|', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|',
-            'insertTable', 'link', 'blockQuote', 'horizontalLine', 'pageBreak', '|', 'specialCharacters'
+            'sourceEditing', '|',
+            'undo', 'redo', '|',
+            'findAndReplace', 'selectAll', '|',
+            'heading', '|',
+            'fontFamily', 'fontSize', 'fontColor', 'fontBackgroundColor', '|',
+            'bold', 'italic', 'underline', 'strikethrough', '|',
+            'alignment', '|',
+            'bulletedList', 'numberedList', '|',
+            'outdent', 'indent', '|',
+            'insertTable', 'link', 'blockQuote', 'horizontalLine', 'pageBreak', '|',
+            'removeFormat', 'specialCharacters'
           ],
-          shouldNotGroupWhenFull: true
+          shouldNotGroupWhenFull: false
         },
         fontFamily: {
-          options: ['default', 'Times New Roman, Times, serif', 'Arial, Helvetica, sans-serif', 'Courier New, Courier, monospace'],
+          options: [
+            'default',
+            'Times New Roman, Times, serif',
+            'Arial, Helvetica, sans-serif',
+            'Verdana, Geneva, sans-serif',
+            'Courier New, Courier, monospace',
+            'Tahoma, Geneva, sans-serif'
+          ],
           supportAllValues: true
         },
         fontSize: {
-          options: [10, 11, 12, 13, 14, 'default', 16, 18, 20, 22, 24, 28, 32],
+          options: [
+            9, 10, 11, 12, 13, 'default', 14, 15, 16, 17, 18, 20, 22, 24, 26, 28, 36, 48
+          ],
           supportAllValues: true
         },
+        list: {
+          properties: {
+            styles: true,
+            startIndex: true,
+            reversed: true
+          }
+        },
         table: {
-          contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'splitCellVertically', 'splitCellHorizontally', 'tableProperties', 'tableCellProperties']
+          contentToolbar: [
+            'tableColumn', 'tableRow', 'mergeTableCells',
+            'tableProperties', 'tableCellProperties'
+          ],
+          tableProperties: {
+            defaultProperties: {
+              borderStyle: 'solid',
+              borderColor: 'black',
+              borderWidth: '1px',
+              alignment: 'center'
+            }
+          }
         },
         htmlSupport: {
-          allow: [{ name: /.*/, attributes: true, classes: true, styles: true }]
+          allow: [
+            {
+              name: /.*/,
+              attributes: true,
+              classes: true,
+              styles: true
+            }
+          ]
+        },
+        pasteFromOffice: {
+          visual: true
+        },
+        image: {
+          toolbar: [
+            'imageStyle:inline', 'imageStyle:block', 'imageStyle:side',
+            '|', 'toggleImageCaption', 'imageTextAlternative'
+          ]
         }
       });
 
@@ -222,7 +288,7 @@ export class ContractManager implements OnInit, AfterViewInit, OnDestroy {
 
     } catch (error: any) {
       console.error("❌ Lỗi khởi tạo Editor:", error);
-      this.showNotification("Không thể khởi tạo bộ soạn thảo: " + error.message, false);
+      this.showNotification("Không thể khởi tạo bộ soạn thảo (Kiểm tra kết nối mạng): " + error.message, false);
     }
   }
 
@@ -270,7 +336,6 @@ export class ContractManager implements OnInit, AfterViewInit, OnDestroy {
   }
 
   startCreateNew() {
-    // Sử dụng popup confirm trước khi reset
     this.showConfirm("Bạn có chắc muốn tạo mới? Dữ liệu hiện tại chưa lưu sẽ bị mất.", () => {
       this.isEditMode = false;
       this.selectedTemplateId = 0;
@@ -300,12 +365,10 @@ export class ContractManager implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    // Xác nhận trước khi lưu
     const actionName = this.isEditMode ? "cập nhật" : "tạo mới";
     this.showConfirm(`Bạn có chắc chắn muốn ${actionName} mẫu hợp đồng này không?`, async () => {
 
       if (this.isEditMode) {
-        // --- UPDATE ---
         if (!this.selectedTemplateId) {
           this.showNotification("Vui lòng chọn một mẫu để cập nhật", false);
           return;
@@ -336,7 +399,6 @@ export class ContractManager implements OnInit, AfterViewInit, OnDestroy {
         }
 
       } else {
-        // --- CREATE ---
         const payload: contracttemplatecreate = {
           name: this.currentTemplate.name,
           type: this.currentTemplate.type || "OTHER",
@@ -367,9 +429,7 @@ export class ContractManager implements OnInit, AfterViewInit, OnDestroy {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Xác nhận import file
     this.showConfirm("Import file sẽ thay thế nội dung hiện tại. Bạn có muốn tiếp tục?", () => {
-      // Tự động chuyển sang mode tạo mới khi import file để an toàn
       this.isEditMode = false;
       this.selectedTemplateId = 0;
       this.currentTemplate.name = file.name.split('.')[0];

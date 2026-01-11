@@ -1,0 +1,344 @@
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Symbols+Outlined" rel="stylesheet">
+
+<app-loading *ngIf="isloading"></app-loading>
+<app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
+<app-alert *ngIf="isalert" [message]="alertmessage" [notifyType]="alertType" (hidden)="isalert = false"></app-alert>
+
+<div class="attendance-container">
+    <!-- HEADER -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h2>Quản Lý Hồ Sơ</h2>
+                <p class="subtitle">Hệ thống lưu trữ và quản lý hồ sơ nhân sự</p>
+            </div>
+        </div>
+
+        <!-- TAB NAVIGATION -->
+        <!-- Hiển thị 3 Tabs cho tất cả, nhưng ẩn các tab không thuộc role -->
+        <div class="tab-navigation">
+            
+            <!-- Tab 1: Duyệt Hồ Sơ (Chỉ HR) -->
+            <button *ngIf="currentRole === 'hr'" class="tab-btn" [class.active]="activeTab === 'approval'" (click)="switchTab('approval')">
+                <span class="material-icons">fact_check</span> Duyệt Hồ Sơ 
+                <span class="count-badge" *ngIf="hrDocuments.length">{{ hrDocuments.length }}</span>
+            </button>
+            
+            <!-- Tab 2: Tra Cứu (Chỉ HR) -->
+            <button *ngIf="currentRole === 'hr'" class="tab-btn" [class.active]="activeTab === 'search'" (click)="switchTab('search')">
+                <span class="material-icons">search</span> Tra Cứu Nhân Viên
+            </button>
+
+            <!-- Tab 3: Hồ Sơ Của Tôi (Tất cả Role đều thấy) -->
+            <button class="tab-btn" [class.active]="activeTab === 'personal'" (click)="switchTab('personal')">
+                <span class="material-icons">folder_shared</span> Hồ Sơ Của Tôi
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content animate-fade-in">
+        
+        <!-- CONTENT: DUYỆT HỒ SƠ (HR Only) -->
+        <ng-container *ngIf="activeTab === 'approval' && currentRole === 'hr'">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Danh sách chờ duyệt</h3>
+                </div>
+                <div class="table-responsive">
+                    <table *ngIf="hrDocuments.length > 0; else noDataHr">
+                        <thead>
+                            <tr>
+                                <th>Nhân viên</th>
+                                <th>Loại hồ sơ</th>
+                                <th>Tên hồ sơ</th>
+                                <th class="text-center">Trạng thái</th>
+                                <th class="text-center">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let doc of hrDocuments">
+                                <td>
+                                    <div class="user-info">
+                                        <span class="user-name">{{ doc.employeeName }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ doc.type }}</td>
+                                <td>
+                                    <a href="javascript:void(0)" class="doc-link" (click)="viewFile(doc.fileUrl)">
+                                        <span class="material-icons">description</span> {{ doc.name }}
+                                    </a>
+                                </td>
+                                <td class="text-center">
+                                    <span class="status-badge" [ngClass]="getStatusClass(doc.status)">{{ doc.status }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="action-buttons">
+                                        <button class="action-btn success" (click)="openApprovalModal(doc.documentID,doc, 'APPROVED')" title="Duyệt">
+                                            <span class="material-icons">check_circle</span>
+                                        </button>
+                                        <button class="action-btn danger" (click)="openApprovalModal(doc.documentID,doc, 'REJECTED')" title="Từ chối">
+                                            <span class="material-icons">cancel</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- CONTENT: TRA CỨU (HR Only) -->
+        <ng-container *ngIf="activeTab === 'search' && currentRole === 'hr'">
+            <div class="card">
+                <div class="filter-grid">
+                    <div class="form-group">
+                        <label>User ID Nhân Viên</label>
+                        <input type="text" [(ngModel)]="searchUserId" class="form-input" placeholder="Nhập ID (VD: 1, 2)">
+                    </div>
+                    <div class="form-group">
+                        <label>Trạng thái</label>
+                        <select [(ngModel)]="searchKeyword" class="form-select">
+                            <option value="">-- Tất cả --</option>
+                            <option value="PENDING">Chờ duyệt</option>
+                            <option value="APPROVE">Đã duyệt</option>
+                            <option value="REJECT">Đã từ chối</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="justify-content: flex-end; display: flex;">
+                        <button class="btn-filter" (click)="onSearchEmployee()">
+                            <span class="material-icons">search</span> Tìm kiếm
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card animate-fade-in" *ngIf="hasSearched">
+                <div class="table-responsive">
+                    <table *ngIf="searchedDocuments.length > 0; else noDataSearch">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nhân viên</th>
+                                <th>Tên Hồ Sơ</th>
+                                <th>Loại</th>
+                                <th class="text-center">Trạng thái</th>
+                                <th>Ngày hết hạn</th>
+                                <th class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let doc of searchedDocuments">
+                                <td><span class="id-badge">#{{ doc.documentID }}</span></td>
+                                <td><span class="user-name">{{ doc.employeeName }}</span></td>
+                                <td>{{ doc.name }}</td>
+                                <td>{{ doc.type }}</td>
+                                <td class="text-center">
+                                    <span class="status-badge" [ngClass]="getStatusClass(doc.status)">{{ doc.status }}</span>
+                                </td>
+                                <td>{{ doc.expiryDate || '-' }}</td>
+                                <td class="text-center">
+                                    <button class="action-btn" (click)="viewFile(doc.fileUrl)" title="Xem">
+                                        <span class="material-icons">visibility</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- CONTENT: HỒ SƠ CỦA TÔI (All Roles) -->
+        <ng-container *ngIf="activeTab === 'personal'">
+            <div class="card">
+                <div class="card-header-flex">
+                    <h3>Hồ Sơ Của Tôi</h3>
+                    <button class="btn-add" (click)="openUploadModal()">
+                        <span class="material-icons">add_circle</span> Thêm hồ sơ
+                    </button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table *ngIf="myDocuments.length > 0; else noDataMy">
+                        <thead>
+                            <tr>
+                                <th>Tên hồ sơ</th>
+                                <th>Loại</th>
+                                <th class="text-center">Trạng thái</th>
+                                <th>Ngày hết hạn</th>
+                                <th class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let doc of myDocuments">
+                                <td>
+                                    <div class="file-info">
+                                        <span class="material-icons file-icon">description</span>
+                                        <strong>{{ doc.name }}</strong>
+                                    </div>
+                                </td>
+                                <td>{{ doc.type }}</td>
+                                <td class="text-center">
+                                    <span class="status-badge" [ngClass]="getStatusClass(doc.status)">{{ doc.status }}</span>
+                                </td>
+                                <td class="note-cell" [title]="doc.note || ''">{{ doc.expiryDate || '-' }}</td>
+                                <td class="text-center">
+                                    <div class="action-buttons">
+                                        <button class="action-btn" (click)="viewFile(doc.fileUrl)" title="Xem">
+                                            <span class="material-icons">visibility</span>
+                                        </button>
+                                        <button class="action-btn" (click)="downloadFile(doc.fileUrl)" title="Tải về">
+                                            <span class="material-icons">download</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- NO DATA TEMPLATES -->
+        <ng-template #noDataHr>
+            <div class="empty-state">
+                <img src="https://cdn-icons-png.flaticon.com/512/7486/7486754.png" alt="No Data" width="64">
+                <p>Không có hồ sơ nào cần duyệt.</p>
+            </div>
+        </ng-template>
+        <ng-template #noDataSearch>
+            <div class="empty-state">
+                <span class="material-icons" style="font-size: 48px; color: #cbd5e0;">search_off</span>
+                <p>Không tìm thấy hồ sơ nào.</p>
+            </div>
+        </ng-template>
+        <ng-template #noDataMy>
+            <div class="empty-state">
+                <img src="https://cdn-icons-png.flaticon.com/512/7486/7486754.png" alt="No Data" width="64">
+                <p>Bạn chưa tải lên hồ sơ nào.</p>
+            </div>
+        </ng-template>
+    </div>
+
+    <!-- MODAL: UPLOAD -->
+    <div *ngIf="showUploadModal" class="modal-backdrop" (click)="closeUploadModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Nộp Hồ Sơ Mới</h3>
+                <button class="close-btn" (click)="closeUploadModal()">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="uploadForm" (ngSubmit)="onUpload()">
+                    <div class="form-group">
+                        <label class="form-label">Tên Hồ Sơ <span class="text-red">*</span></label>
+                        <input formControlName="documentName" type="text" class="form-input" [class.is-invalid]="isFieldInvalid('documentName')">
+                        <div *ngIf="isFieldInvalid('documentName')" class="error-message">Vui lòng nhập tên hồ sơ.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Loại Hồ Sơ <span class="text-red">*</span></label>
+                        <select formControlName="documentType" class="form-select" [class.is-invalid]="isFieldInvalid('documentType')">
+                            <option value="" disabled selected>-- Chọn loại hồ sơ --</option>
+                            <option value="DEGREE">Bằng cấp</option>
+                            <option value="CERTIFICATE">Chứng chỉ</option>
+                            <option value="MEDICAL_PREGNANCY">Thai sản</option>
+                            <option value="MEDICAL_DISABILITY">Bệnh tật/Thương tật</option>
+                            <option value="IDENTIFICATION">Giấy tờ tùy thân (CCCD/CMND)</option>
+                            <option value="OTHER">Khác</option>
+                        </select>
+                        <div *ngIf="isFieldInvalid('documentType')" class="error-message">Vui lòng chọn loại hồ sơ.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Cơ quan cấp <span class="text-red">*</span></label>
+                        <input formControlName="issuingAuthority" type="text" class="form-input" [class.is-invalid]="isFieldInvalid('issuingAuthority')">
+                        <div *ngIf="isFieldInvalid('issuingAuthority')" class="error-message">Vui lòng nhập cơ quan cấp.</div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Ngày cấp <span class="text-red">*</span></label>
+                            <input formControlName="issueDate" type="date" class="form-input" [class.is-invalid]="isFieldInvalid('issueDate')">
+                            <div *ngIf="isFieldInvalid('issueDate')" class="error-message">Chọn ngày cấp.</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ngày hết hạn</label>
+                            <input formControlName="expiryDate" type="date" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Ghi chú</label>
+                        <textarea formControlName="note" rows="3" class="form-textarea"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">File đính kèm (PDF) <span class="text-red">*</span></label>
+                        <input type="file" id="fileUpload" (change)="onFileSelect($event)" accept=".pdf" style="display: none;">
+                        <label for="fileUpload" class="upload-area" [class.has-file]="selectedFileName" [class.border-error]="fileError">
+                            <span class="material-icons">cloud_upload</span>
+                            <span *ngIf="!selectedFileName">Nhấn để chọn file PDF</span>
+                            <span *ngIf="selectedFileName" class="file-name">{{ selectedFileName }}</span>
+                        </label>
+                        <div *ngIf="fileError" class="error-message">Vui lòng chọn file.</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button (click)="onUpload()" class="btn btn-primary">
+                    <span class="material-icons">upload</span> Tải Lên
+                </button>
+                <button (click)="closeUploadModal()" class="btn btn-secondary">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: APPROVAL -->
+    <div *ngIf="showApprovalModal" class="modal-backdrop" (click)="showApprovalModal = false">
+        <div class="modal-content modal-sm" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Xác Nhận {{ approvalAction === 'APPROVED' ? 'Duyệt' : 'Từ chối' }}</h3>
+                <button class="close-btn" (click)="showApprovalModal = false">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Ghi chú / Lý do</label>
+                    <textarea [(ngModel)]="approvalNote" class="form-textarea" rows="4" placeholder="Nhập lý do..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" [ngClass]="approvalAction === 'APPROVED' ? 'btn-success' : 'btn-danger'" (click)="submitApproval()">
+                    Xác nhận
+                </button>
+                <button class="btn btn-secondary" (click)="showApprovalModal = false">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PREVIEW -->
+    <div *ngIf="showPreviewModal" class="modal-backdrop" (click)="closePreview()">
+        <div class="modal-content modal-xl" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Xem trước tài liệu</h3>
+                <button class="close-btn" (click)="closePreview()">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="modal-body preview-body">
+                <iframe *ngIf="previewUrl" [src]="previewUrl" class="preview-iframe"></iframe>
+                <div *ngIf="!previewUrl" class="empty-state">
+                    <span class="material-icons">error_outline</span>
+                    <p>Không thể tải file preview.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" (click)="closePreview()">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>

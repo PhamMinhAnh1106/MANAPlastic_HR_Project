@@ -13,21 +13,21 @@
           </div>
           
           <div class="user-identity">
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 name-row">
               <h1 class="user-name">{{ userInfo.fullname || 'Chưa cập nhật tên' }}</h1>
               <span class="badge role-badge">{{ userInfo.roleName || 'Nhân viên' }}</span>
             </div>
             <div class="user-meta">
               <span class="meta-item">
-                <i class="icon"></i> NV-{{ userInfo.userID }}
+                <span class="material-symbols-outlined icon-mini">badge</span> NV-{{ userInfo.userID }}
               </span>
               <span class="meta-separator">•</span>
               <span class="meta-item">
-                <i class="icon"></i> {{ getDepartment(userInfo.departmentID) }}
+                <span class="material-symbols-outlined icon-mini">apartment</span> {{ getDepartment(userInfo.departmentID) }}
               </span>
               <span class="meta-separator">•</span>
               <span class="meta-item">
-                <i class="icon"></i> Vào làm: {{ userInfo.hireDate || '---' }}
+                <span class="material-symbols-outlined icon-mini">calendar_month</span> Vào làm: {{ userInfo.hireDate || '---' }}
               </span>
             </div>
           </div>
@@ -185,10 +185,12 @@
             <div class="row-2">
               <div class="form-control-group">
                 <label>Giới tính</label>
-                <select [(ngModel)]="formdata.gender" name="gender">
-                  <option value="MALE">Nam</option>
-                  <option value="FEMALE">Nữ</option>
-                </select>
+                <div class="select-wrapper">
+                    <select [(ngModel)]="formdata.gender" name="gender">
+                    <option value="MALE">Nam</option>
+                    <option value="FEMALE">Nữ</option>
+                    </select>
+                </div>
               </div>
               <div class="form-control-group">
                 <label>Ngày sinh</label>
@@ -198,7 +200,7 @@
 
             <div class="form-control-group">
               <label>CCCD/CMND</label>
-              <input type="text" [(ngModel)]="formdata.cccd" name="cccd" maxlength="12">
+              <input type="text" [(ngModel)]="formdata.cccd" name="cccd" maxlength="12" placeholder="9 hoặc 12 số">
             </div>
           </div>
 
@@ -207,17 +209,17 @@
             <h4 class="section-title">Liên hệ</h4>
             <div class="form-control-group">
               <label>Email</label>
-              <input type="email" [(ngModel)]="formdata.email" name="email" >
+              <input type="email" [(ngModel)]="formdata.email" name="email" placeholder="example@email.com">
             </div>
 
             <div class="form-control-group">
               <label>Số điện thoại</label>
-              <input type="text" [(ngModel)]="formdata.phonenumber" name="phonenumber" maxlength="10">
+              <input type="tel" [(ngModel)]="formdata.phonenumber" name="phonenumber" maxlength="11" placeholder="0xxxxxxxxx">
             </div>
 
             <div class="form-control-group">
               <label>Địa chỉ thường trú</label>
-              <textarea [(ngModel)]="formdata.address" name="address" rows="3"></textarea>
+              <textarea [(ngModel)]="formdata.address" name="address" rows="3" placeholder="Nhập địa chỉ..."></textarea>
             </div>
           </div>
 
@@ -227,11 +229,11 @@
             <div class="row-2">
                <div class="form-control-group">
                 <label>Ngân hàng</label>
-                <input type="text" [(ngModel)]="formdata.bankName" name="bankName">
+                <input type="text" [(ngModel)]="formdata.bankName" name="bankName" placeholder="Tên ngân hàng">
               </div>
               <div class="form-control-group">
                 <label>Số tài khoản</label>
-                <input type="text" [(ngModel)]="formdata.bankAccount" name="bankAccount">
+                <input type="text" [(ngModel)]="formdata.bankAccount" name="bankAccount" placeholder="Số tài khoản">
               </div>
             </div>
           </div>
@@ -240,14 +242,13 @@
 
       <div class="drawer-footer">
         <button class="btn btn-outline" (click)="cancelEdit()">Hủy bỏ</button>
-        <!-- Nút này kích hoạt biến isconfirm -> Hiện popup app-comfirm -->
         <button class="btn btn-primary" (click)="saveChanges()">
           Lưu thay đổi
         </button>
       </div>
     </div>
 
-    <!-- CÁC COMPONENT HỆ THỐNG CỦA BẠN (Đã xóa Toast thừa) -->
+    <!-- SYSTEM COMPONENTS -->
     <app-loading *ngIf="isloading"></app-loading>
 
     <app-comfirm *ngIf="isconfirm"
