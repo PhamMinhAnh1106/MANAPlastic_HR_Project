@@ -58,6 +58,10 @@
       <img src="assets/avatar.png" alt="User Avatar" class="avatar" (click)="toggleUserDropdown()" />
 
       <div class="dropdown-menu" *ngIf="isUserOpen">
+        <button class="menu-btn theme-btn" (click)="toggleTheme()">
+          <span class="material-symbols-outlined theme-icon">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
+          {{ isDarkMode ? 'Chế độ sáng' : 'Chế độ tối' }}
+        </button>
         <button class="menu-btn" (click)="changepass()">Đổi mật khẩu</button>
         <button class="logout-btn" (click)="logout()">Đăng xuất</button>
       </div>

@@ -1,0 +1,106 @@
+// Theme Variables
+// Import this file in your SCSS files using: @import '../styles/theme';
+
+// Light Theme (Default)
+:root {
+  // Background Colors
+  --theme-bg-primary: #f5f6fa;
+  --theme-bg-secondary: #ffffff;
+  --theme-bg-tertiary: #f8f9fa;
+  
+  // Text Colors
+  --theme-text-primary: #2c3e50;
+  --theme-text-secondary: #636e72;
+  --theme-text-tertiary: #b2bec3;
+  
+  // Border Colors
+  --theme-border-color: #e9ecef;
+  --theme-border-light: #f1f2f6;
+  
+  // Header/Sidebar Colors
+  --theme-header-bg: #1c2655;
+  --theme-sidebar-bg: #1c2655;
+  --theme-sidebar-hover: rgba(255, 255, 255, 0.08);
+  --theme-sidebar-active: rgba(255, 255, 255, 0.15);
+  
+  // Dropdown Colors
+  --theme-dropdown-bg: #ffffff;
+  --theme-dropdown-hover: #f1f2f6;
+  
+  // Card Colors
+  --theme-card-bg: #ffffff;
+  --theme-card-shadow: rgba(0, 0, 0, 0.1);
+  
+  // Button Colors
+  --theme-btn-primary: #1c2655;
+  --theme-btn-primary-hover: #2a3a6b;
+  --theme-btn-danger: #ff4757;
+  --theme-btn-danger-hover: #ff6b7a;
+  
+  // Input Colors
+  --theme-input-bg: #ffffff;
+  --theme-input-border: #e9ecef;
+  --theme-input-focus: #1c2655;
+  
+  // Notification Colors
+  --theme-notification-bg: #f8f9fa;
+  --theme-notification-header-bg: #f8f9fa;
+  --theme-notification-item-hover: #f1f3f5;
+  
+  // Settings Modal
+  --theme-modal-bg: #ffffff;
+  --theme-modal-overlay: rgba(0, 0, 0, 0.5);
+}
+
+// Dark Theme
+:root.dark-mode,
+.dark-mode {
+  // Background Colors
+  --theme-bg-primary: #1a1a2e;
+  --theme-bg-secondary: #16213e;
+  --theme-bg-tertiary: #0f3460;
+  
+  // Text Colors
+  --theme-text-primary: #e4e4e4;
+  --theme-text-secondary: #b8b8b8;
+  --theme-text-tertiary: #8a8a8a;
+  
+  // Border Colors
+  --theme-border-color: #2d3748;
+  --theme-border-light: #3a4556;
+  
+  // Header/Sidebar Colors
+  --theme-header-bg: #0f1419;
+  --theme-sidebar-bg: #0f1419;
+  --theme-sidebar-hover: rgba(255, 255, 255, 0.1);
+  --theme-sidebar-active: rgba(255, 255, 255, 0.2);
+  
+  // Dropdown Colors
+  --theme-dropdown-bg: #16213e;
+  --theme-dropdown-hover: #1a2a4a;
+  
+  // Card Colors
+  --theme-card-bg: #16213e;
+  --theme-card-shadow: rgba(0, 0, 0, 0.5);
+  
+  // Button Colors
+  --theme-btn-primary: #2a3a6b;
+  --theme-btn-primary-hover: #3a4a7b;
+  --theme-btn-danger: #ff4757;
+  --theme-btn-danger-hover: #ff6b7a;
+  
+  // Input Colors
+  --theme-input-bg: #16213e;
+  --theme-input-border: #2d3748;
+  --theme-input-focus: #3a4a7b;
+  
+  // Notification Colors
+  --theme-notification-bg: #16213e;
+  --theme-notification-header-bg: #0f1419;
+  --theme-notification-item-hover: #1a2a4a;
+  
+  // Settings Modal
+  --theme-modal-bg: #16213e;
+  --theme-modal-overlay: rgba(0, 0, 0, 0.7);
+}
+

@@ -1,3 +1,6 @@
+// Import theme variables
+@import '../../styles/theme';
+
 // --- 1. GLOBAL SETTINGS ---
 * {
     box-sizing: border-box;
@@ -6,9 +9,11 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #f5f6fa;
+    background-color: var(--theme-bg-primary);
     overflow-x: hidden;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--theme-text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 // --- 2. HEADER (TASK BAR) ---
@@ -18,10 +23,10 @@ body {
     left: 0;
     width: 100%;
     height: 60px;
-    background-color: #1c2655;
+    background-color: var(--theme-header-bg);
     color: white;
     padding: 0 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--theme-card-shadow);
     display: flex;
     justify-content: space-between; // Thay đổi để chứa nút menu bên trái
     align-items: center;
@@ -99,25 +104,27 @@ body {
             position: absolute;
             top: 130%;
             right: -60px;
-            background: #fff;
+            background: var(--theme-dropdown-bg);
             border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 40px var(--theme-card-shadow);
             width: 350px;
             max-width: 90vw;
             overflow: hidden;
             z-index: 102;
             animation: slideDownSubmenu 0.2s ease-out;
             transform-origin: top right;
+            transition: background-color 0.3s ease;
 
             .notifi-header {
                 padding: 15px 20px;
-                border-bottom: 1px solid #f1f2f6;
+                border-bottom: 1px solid var(--theme-border-light);
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 font-weight: 600;
-                color: #2c3e50;
-                background-color: #f8f9fa;
+                color: var(--theme-text-primary);
+                background-color: var(--theme-notification-header-bg);
+                transition: background-color 0.3s ease, color 0.3s ease;
 
                 .count-tag {
                     background-color: #ffeaa7;
@@ -135,19 +142,19 @@ body {
                 .empty-notifi {
                     padding: 30px;
                     text-align: center;
-                    color: #b2bec3;
+                    color: var(--theme-text-tertiary);
                 }
 
                 .notifi-item {
                     display: flex;
                     padding: 15px 20px;
-                    border-bottom: 1px solid #f1f2f6;
+                    border-bottom: 1px solid var(--theme-border-light);
                     cursor: pointer;
                     transition: background 0.2s;
                     gap: 15px;
 
                     &:hover {
-                        background-color: #f1f3f5;
+                        background-color: var(--theme-notification-item-hover);
                     }
 
                     &:last-child {
@@ -172,13 +179,13 @@ body {
                         .notifi-title {
                             font-size: 0.9rem;
                             font-weight: 600;
-                            color: #2d3436;
+                            color: var(--theme-text-primary);
                             margin-bottom: 2px;
                         }
 
                         .notifi-subtitle {
                             font-size: 0.85rem;
-                            color: #636e72;
+                            color: var(--theme-text-secondary);
                             margin-bottom: 4px;
                         }
 
@@ -215,13 +222,14 @@ body {
             position: absolute;
             top: 130%;
             right: 0;
-            background: #fff;
+            background: var(--theme-dropdown-bg);
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 12px var(--theme-card-shadow);
             min-width: 180px;
             overflow: hidden;
             z-index: 101;
             padding: 5px 0;
+            transition: background-color 0.3s ease;
 
             .menu-btn,
             .logout-btn {
@@ -232,22 +240,31 @@ body {
                 padding: 12px 20px;
                 cursor: pointer;
                 font-size: 14px;
-                color: #2c3e50;
-                transition: background 0.1s;
+                color: var(--theme-text-primary);
+                transition: background 0.1s, color 0.1s;
+                display: flex;
+                align-items: center;
+                gap: 10px;
 
                 &:hover {
-                    background: #f1f2f6;
-                    color: #1c2655;
+                    background: var(--theme-dropdown-hover);
+                    color: var(--theme-text-primary);
+                }
+            }
+
+            .theme-btn {
+                .theme-icon {
+                    font-size: 18px;
                 }
             }
 
             .logout-btn {
-                border-top: 1px solid #f1f2f6;
-                color: #ff4757;
+                border-top: 1px solid var(--theme-border-light);
+                color: var(--theme-btn-danger);
 
                 &:hover {
-                    background: #ffe1e1;
-                    color: #ff4757;
+                    background: rgba(255, 71, 87, 0.1);
+                    color: var(--theme-btn-danger);
                 }
             }
         }
@@ -261,7 +278,7 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--theme-modal-overlay);
     backdrop-filter: blur(4px);
     z-index: 10000;
     display: flex;
@@ -271,25 +288,27 @@ body {
 }
 
 .settings-modal {
-    background: #fff;
+    background: var(--theme-modal-bg);
     width: 90%;
     max-width: 500px;
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px var(--theme-card-shadow);
     overflow: hidden;
     animation: slideUp 0.3s;
+    transition: background-color 0.3s ease;
 
     .settings-header {
         padding: 20px 25px;
-        background-color: #fff;
-        border-bottom: 1px solid #e9ecef;
+        background-color: var(--theme-modal-bg);
+        border-bottom: 1px solid var(--theme-border-color);
         display: flex;
         justify-content: space-between;
         align-items: center;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
 
         h3 {
             margin: 0;
-            color: #1c2655;
+            color: var(--theme-text-primary);
             font-size: 1.4rem;
             font-weight: 600;
         }
@@ -298,13 +317,14 @@ body {
             background: none;
             border: none;
             cursor: pointer;
-            color: #adb5bd;
+            color: var(--theme-text-tertiary);
             padding: 8px;
             border-radius: 50%;
+            transition: background-color 0.2s, color 0.2s;
 
             &:hover {
-                background-color: #f1f3f5;
-                color: #ff4757;
+                background-color: var(--theme-dropdown-hover);
+                color: var(--theme-btn-danger);
             }
 
             span {
@@ -325,7 +345,7 @@ body {
     left: 0;
     height: 100vh;
     width: 4rem; // 64px
-    background-color: #1c2655;
+    background-color: var(--theme-sidebar-bg);
     display: flex;
     flex-direction: column;
     z-index: 100; // Thấp hơn header một chút hoặc ngang bằng, nhưng cần xử lý mobile
@@ -333,7 +353,7 @@ body {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow-x: hidden;
     white-space: nowrap;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    box-shadow: 2px 0 5px var(--theme-card-shadow);
 
     &:hover {
         width: 16rem;
@@ -429,13 +449,13 @@ body {
             }
 
             &:hover {
-                background-color: rgba(255, 255, 255, 0.08);
+                background-color: var(--theme-sidebar-hover);
                 color: #fff;
             }
 
             &.active {
                 color: #fff;
-                background-color: rgba(255, 255, 255, 0.15);
+                background-color: var(--theme-sidebar-active);
 
                 &::before {
                     background-color: #2ed573;
@@ -520,7 +540,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--theme-modal-overlay);
     z-index: 100; // Dưới sidebar mobile (nếu sidebar là 101+)
     backdrop-filter: blur(2px);
     animation: fadeIn 0.3s;

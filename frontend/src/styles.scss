@@ -5,6 +5,9 @@
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
+// Import theme variables
+@import 'app/styles/theme';
+
 html {
     @include mat.theme((color: (primary: mat.$azure-palette,
                 tertiary: mat.$blue-palette,

@@ -7,6 +7,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { DecodeTokenRole } from '../../utils/token.utils';
 import { Loout_service } from '../../services/pages/login.service';
 import { getNotificationContract } from '../../services/pages/features/hr/contracts.service';
+import { ThemeService } from '../../services/theme.service';
 
 interface ContractNotification {
   id: number;
@@ -24,7 +25,12 @@ interface ContractNotification {
   styleUrl: './home.scss',
 })
 export class Home implements OnInit {
-  constructor(private cookieService: CookieService, private router: Router, private cdr: ChangeDetectorRef) { }
+  constructor(
+    private cookieService: CookieService, 
+    private router: Router, 
+    private cdr: ChangeDetectorRef,
+    private themeService: ThemeService
+  ) { }
 
   @ViewChild('addDrop') addDrop!: ElementRef;
   @ViewChild('userDrop') userDrop!: ElementRef;
@@ -91,29 +97,22 @@ export class Home implements OnInit {
   openSettings() {
     this.isSettingsOpen = true;
     this.isUserOpen = false;
-    const savedDarkMode = sessionStorage.getItem('darkMode');
-    this.isDarkMode = savedDarkMode === 'true';
-    this.applyDarkMode();
+    this.isDarkMode = this.themeService.getCurrentTheme() === 'dark';
   }
 
   closeSettings() {
     this.isSettingsOpen = false;
   }
 
-  toggleDarkMode() {
-    this.isDarkMode = !this.isDarkMode;
-    sessionStorage.setItem('darkMode', this.isDarkMode.toString());
-    this.applyDarkMode();
+  toggleTheme() {
+    this.themeService.toggleTheme();
+    this.isDarkMode = this.themeService.getCurrentTheme() === 'dark';
+    this.isUserOpen = false; // Close dropdown after toggle
   }
 
-  applyDarkMode() {
-    if (this.isDarkMode) {
-      document.documentElement.classList.add('dark-mode');
-      document.body.classList.add('dark-mode');
-    } else {
-      document.documentElement.classList.remove('dark-mode');
-      document.body.classList.remove('dark-mode');
-    }
+  toggleDarkMode() {
+    this.themeService.toggleTheme();
+    this.isDarkMode = this.themeService.getCurrentTheme() === 'dark';
   }
 
   openAddAccount() {
@@ -340,9 +339,12 @@ export class Home implements OnInit {
   ngOnInit() {
     this.CheckLogin();
     this.checkrole();
-    const savedDarkMode = sessionStorage.getItem('darkMode');
-    this.isDarkMode = savedDarkMode === 'true';
-    this.applyDarkMode();
+    this.isDarkMode = this.themeService.getCurrentTheme() === 'dark';
+    
+    // Subscribe to theme changes
+    this.themeService.theme$.subscribe(theme => {
+      this.isDarkMode = theme === 'dark';
+    });
 
     this.loadNotifications();
   }
