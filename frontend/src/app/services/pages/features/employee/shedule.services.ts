@@ -1,17 +1,21 @@
 import { ChangeSchedule, schedule } from "../../../../interface/schedule.interface";
 import { api } from "../../../api.service";
 
+export interface specificDays {
+    date: string,
+    shiftId: number,
+    dayoff?: boolean
+}
 
-
-export async function RegisterScheduleEmployee(forms: schedule) {
+export interface registerShiftRoute {
+    fromDate: string,
+    toDate: string,
+    rangeShiftId: number
+    specificDays?: specificDays[]
+}
+export async function RegisterScheduleEmployee(forms: registerShiftRoute) {
     try {
-        const res = await api.post("/user/shiftSchedule/myDraft", [
-            {
-                date: forms.date,
-                shiftId: forms.shiftId,
-                isDayOff: forms.isDayOff
-            }
-        ])
+        const res = await api.post("/user/shiftSchedule/myDraft", forms)
         return {
             data: res.data,
             status: res.status
@@ -157,7 +161,8 @@ export async function RejectReschedule(id: number) {
 export interface NewEmployeeInterface {
     username: string,
     startDate: string,
-    shiftId: number
+    shiftId: number,
+    specificDays?: specificDays[]
 }
 export async function AddNewEmployee(form: NewEmployeeInterface) {
     try {

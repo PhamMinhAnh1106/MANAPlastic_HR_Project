@@ -71,7 +71,7 @@ export class AutoSchedule {
   rulesDatalength = 0;
   shiftName = getAllSchedules();
 
-  month: string[] = ['01', '02', '03', '04', '05', '06', '07', '08', '04', '05', '06', '07', '08', '06', '07', '08', '09', '10', '11', '12'];
+  month: string[] = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
   year: number[] = [2024, 2025, 2026, 2027];
   savemonth = '';
   saveyear = '';
@@ -96,6 +96,9 @@ export class AutoSchedule {
   closeDraftPopup() { this.draftPopupVisible = false; }
   closeRulesPopup() { this.rulesPopupVisible = false; }
   showRules() { this.rulesPopupVisible = true; }
+
+  // Điều hướng về trang lịch
+  goBack() { window.location.href = '/home/schedule'; }
   viewSchedule() { window.location.href = '/home/schedule'; }
 
   // --- ADD LOGIC ---
@@ -155,11 +158,14 @@ export class AutoSchedule {
     this.isloading = true;
     const res = await AutoAssignSchedule(month_year) as { data: string, status: number };
     this.isloading = false;
+    this.cdr.detectChanges(); // Cập nhật UI ngay sau khi tắt loading
+
     if (res.status == 200) {
       this.Onalert(res.data, true);
     } else {
       this.Onalert(res.data, false);
     }
+    // Giữ nguyên setTimeout để đảm bảo alert hiển thị nếu có transition
     setTimeout(() => this.cdr.detectChanges(), 1000);
   }
 
@@ -175,15 +181,20 @@ export class AutoSchedule {
       this.isloading = true;
       const res = await RequirementsAutoSchedule(form);
       this.isloading = false;
+      this.cdr.detectChanges(); // Cập nhật UI
+
       if (res == 201) {
         this.Onalert("Thêm thành công", true);
+        // Reset form sau khi lưu
+        this.formSchedule.rules = [];
+        this.formSchedule.totalStaffNeeded = '';
         this.rulesPopupVisible = false;
       } else {
         this.Onalert("Thêm thất bại", false);
       }
       setTimeout(() => this.cdr.detectChanges(), 1000);
     } else {
-      this.isconfirm = false
+      this.isconfirm = false;
     }
   }
 
@@ -198,20 +209,28 @@ export class AutoSchedule {
 
   async checkRules() {
     if (!this.validateDateSelection()) return;
-    this.requirementPopupVisible = true;
+    this.isloading = true;
+    this.cdr.detectChanges(); // Trigger show loading
+
     const res = await GetRequirementsAutoSchedule();
+    this.isloading = false;
     this.rulesData = res;
     this.rulesDatalength = res.length;
-    this.cdr.detectChanges();
+    this.requirementPopupVisible = true;
+    this.cdr.detectChanges(); // Cập nhật UI với dữ liệu mới
   }
 
   async checkDraftSchedule() {
     if (!this.validateDateSelection()) return;
     const month_year = `${this.saveyear}-${this.savemonth}`;
+    this.isloading = true;
+    this.cdr.detectChanges(); // Trigger show loading
+
     const res = await CheckAutoAssignSchedule(month_year);
+    this.isloading = false;
     this.draftData = res;
     this.draftPopupVisible = true;
-    this.cdr.detectChanges();
+    this.cdr.detectChanges(); // Cập nhật UI với dữ liệu mới
   }
 
   // --- EDIT FUNCTIONS ---
@@ -244,6 +263,7 @@ export class AutoSchedule {
     }
 
     this.isloading = true;
+    this.cdr.detectChanges();
 
     // Map dữ liệu sang formRule interface
     const form: any = {
@@ -258,6 +278,7 @@ export class AutoSchedule {
 
     const res = await updateRuleData(form);
     this.isloading = false;
+    this.cdr.detectChanges(); // Update UI tắt loading
 
     // Kiểm tra kết quả trả về từ service
     if (res && typeof res === 'string' && res.includes("co loi xay ra")) {

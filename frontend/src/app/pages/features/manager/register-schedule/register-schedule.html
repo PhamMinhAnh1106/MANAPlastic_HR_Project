@@ -2,7 +2,7 @@
   <div class="popup zoom-in">
     <!-- Header -->
     <div class="popup-header">
-      <h3>Đăng ký ca làm việc</h3>
+      <h3>Đăng ký lịch làm việc</h3>
       <button class="close-btn" (click)="closePopup()">
         <span class="material-symbols-outlined">close</span>
       </button>
@@ -12,24 +12,37 @@
     <div class="popup-content">
       <form #f="ngForm" (ngSubmit)="submit()">
 
-        <!-- Date Picker -->
+        <!-- Date Range Picker -->
         <div class="form-group">
-            <label>Chọn ngày</label>
-            <input 
-              type="date"
-              [(ngModel)]="date"
-              name="date"
-              required
-              class="form-control"
-            />
+            <label>Thời gian đăng ký</label>
+            <div class="date-range-group">
+                <div class="date-input">
+                    <span class="sub-label">Từ ngày</span>
+                    <input 
+                      type="date"
+                      [(ngModel)]="fromDate"
+                      name="fromDate"
+                      required
+                      class="form-control"
+                    />
+                </div>
+                <div class="date-input">
+                    <span class="sub-label">Đến ngày</span>
+                    <input 
+                      type="date"
+                      [(ngModel)]="toDate"
+                      name="toDate"
+                      required
+                      class="form-control"
+                    />
+                </div>
+            </div>
         </div>
 
-        <!-- Shift Type (Radio Cards) -->
+        <!-- Shift Type (Radio Cards) for Range -->
         <div class="form-group">
-            <label>Loại ca</label>
+            <label>Loại ca (Cho cả giai đoạn)</label>
             <div class="type-group">
-              <!-- Ca 8 Tiếng -->
-              <!-- Sử dụng biến #r8 để kiểm tra trạng thái checked cho CSS -->
               <label class="radio-card" [class.active]="r8.checked">
                 <input 
                   #r8
@@ -45,7 +58,6 @@
                 </div>
               </label>
     
-              <!-- Ca 6 Tiếng -->
               <label class="radio-card" [class.active]="r6.checked">
                 <input 
                   #r6
@@ -63,22 +75,20 @@
             </div>
         </div>
 
-        <!-- Shift Select -->
+        <!-- Range Shift Select -->
         <div class="form-group">
-            <label>Chọn ca cụ thể</label>
+            <label>Chọn ca chính</label>
             <div class="select-wrapper">
                 <select 
-                  [(ngModel)]="shiftId" 
-                  name="shiftId"
+                  [(ngModel)]="rangeShiftId" 
+                  name="rangeShiftId"
                   required
                   class="form-control"
                 >
-                  <option value="" disabled selected>-- Vui lòng chọn ca --</option>
-        
+                  <option value="" disabled selected>-- Chọn ca mặc định --</option>
                   <option *ngFor="let s of list" [value]="s.shift_id">
                     {{ s.shift_name }} ({{ s.start_time }} - {{ s.end_time }})
                   </option>
-                  
                   <optgroup label="Nghỉ phép">
                       <option value="53">AL (Phép năm)</option>
                       <option value="54">SL (Nghỉ ốm)</option>
@@ -89,6 +99,54 @@
                 </select>
             </div>
         </div>
+
+        <!-- Specific Days Section -->
+        <div class="form-group specific-days-section">
+            <div class="section-header">
+                <label>Các ngày khác (Tùy chọn)</label>
+                <button type="button" class="btn-add-mini" (click)="addSpecificDay()">
+                    + Thêm ca khác
+                </button>
+            </div>
+
+            <div class="specific-item" *ngFor="let item of specificDays; let i = index">
+                <div class="specific-inputs">
+                    <input 
+                        type="date" 
+                        [(ngModel)]="item.date" 
+                        [name]="'specDate' + i"
+                        required
+                        class="form-control"
+                        placeholder="Ngày"
+                    />
+                    <select 
+                        [(ngModel)]="item.shiftId" 
+                        [name]="'specShift' + i"
+                        required
+                        class="form-control"
+                    >
+                        <option value="" disabled selected>Chọn ca</option>
+                        <option *ngFor="let s of list" [value]="s.shift_id">
+                            {{ s.shift_name }}
+                        </option>
+                        <optgroup label="Nghỉ phép">
+                            <option value="53">AL</option>
+                            <option value="54">SL</option>
+                            <option value="55">PL</option>
+                            <option value="56">ML</option>
+                            <option value="57">UL</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <button type="button" class="btn-remove" (click)="removeSpecificDay(i)">
+                    <span class="material-symbols-outlined">delete</span>
+                </button>
+            </div>
+            
+            <p *ngIf="specificDays.length === 0" class="hint-text">
+                Nếu không chọn ngày cụ thể, ca chính sẽ áp dụng cho toàn bộ giai đoạn.
+            </p>
+        </div>
         
       </form>
     </div>
@@ -96,7 +154,6 @@
     <!-- Footer -->
     <div class="popup-footer">
       <button class="btn btn-cancel" (click)="closePopup()">Hủy</button>
-      <!-- Disabled nút Lưu nếu form chưa hợp lệ -->
       <button class="btn btn-save" (click)="f.ngSubmit.emit()" [disabled]="f.invalid">
         <span *ngIf="!isloading">Đăng ký ngay</span>
         <span *ngIf="isloading">Đang xử lý...</span>

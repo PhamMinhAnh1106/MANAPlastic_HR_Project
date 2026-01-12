@@ -8,7 +8,6 @@ import { Accounts } from './pages/features/hr/accounts/accounts';
 import { Attendant } from './pages/features/hr/attendant/attendant';
 import { Schedule } from './pages/features/manager/schedule/schedule';
 import { RegisterSchedule } from './pages/features/manager/register-schedule/register-schedule';
-import { Tablemonth } from './pages/shared/tablemonth/tablemonth';
 import { Leaverequests } from './pages/features/employee/leaverequests/leaverequests';
 import { ADdleaverequest } from './pages/features/employee/addleaverequest/addleaverequest';
 import { Leaverequestcheck } from './pages/features/hr/leaverequestcheck/leaverequestcheck';
@@ -69,7 +68,7 @@ export const routes: Routes = [
 
             //employee
             {
-                path: 'calender', component: Tablemonth,
+                path: 'calender', component: Schedule,
             },
             { path: 'schedule/register', component: RegisterSchedule },
             { path: 'schedule/auto', component: AutoSchedule },

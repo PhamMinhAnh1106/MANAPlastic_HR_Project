@@ -1,129 +1,156 @@
-<div class="container">
+<div class="main-container">
     
-    <!-- CARD DUY NHẤT: CHỨA TOÀN BỘ CẤU HÌNH -->
-    <div class="card">
-        <h2>Thiết Lập Xếp Ca Tự Động</h2>
-        
-        <!-- Phần 1: Chọn Thời Gian -->
-        <div class="month_year">
-            <label>
-                Tháng
-                <select [(ngModel)]="savemonth" name="month">
-                    <option value="" disabled selected>-- Chọn --</option>
-                    <option *ngFor="let m of month" [value]="m">Tháng {{m}}</option>
-                </select>
-            </label>
-            <label>
-                Năm
-                <select [(ngModel)]="saveyear" name="year">
-                    <option value="" disabled selected>-- Chọn --</option>
-                    <option *ngFor="let y of year" [value]="y">{{y}}</option>
-                </select>
-            </label>
-        </div>
+    <!-- HEADER BAR: Nút Back và Tiêu đề -->
+    <header class="header-bar">
+        <button class="back-btn" (click)="goBack()">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Quay lại
+        </button>
+        <h1>Thiết Lập Xếp Ca Tự Động</h1>
+        <div class="spacer"></div> <!-- Spacer để cân đối layout -->
+    </header>
 
-        <hr>
-
-        <!-- Phần 2: Cấu hình Tiêu chí -->
-        <h3><span class="material-symbols-outlined" style="vertical-align: bottom;">tune</span> Thiết lập Tiêu chí</h3>
+    <div class="content-wrapper">
         
-        <div class="config-grid">
-            <!-- Loại ca: Segmented Control -->
-            <div class="input-group">
-                <label>Loại ca làm việc</label>
-                <div class="radio-group">
-                    <label>
-                        <input type="radio" name="type" (change)="changeType(8)" value="8" />
-                        <span>8 Tiếng</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="type" (change)="changeType(6)" value="6" />
-                        <span>6 Tiếng</span>
-                    </label>
+        <!-- CARD CONFIGURATION -->
+        <div class="card config-card">
+            
+            <!-- Phần 1: Chọn Thời Gian (Nổi bật) -->
+            <div class="section-title">
+                <span class="material-symbols-outlined">calendar_month</span>
+                <h3>Thời gian áp dụng</h3>
+            </div>
+
+            <div class="time-selector">
+                <div class="select-group">
+                    <label>Tháng</label>
+                    <select [(ngModel)]="savemonth" name="month">
+                        <option value="" disabled selected>-- Chọn Tháng --</option>
+                        <option *ngFor="let m of month" [value]="m">Tháng {{m}}</option>
+                    </select>
+                </div>
+                <div class="select-group">
+                    <label>Năm</label>
+                    <select [(ngModel)]="saveyear" name="year">
+                        <option value="" disabled selected>-- Chọn Năm --</option>
+                        <option *ngFor="let y of year" [value]="y">{{y}}</option>
+                    </select>
                 </div>
             </div>
 
-            <!-- Chọn ca -->
-            <div class="input-group">
-                <label>Chọn ca cụ thể</label>
-                <select [(ngModel)]="shiftId" name="shiftId" class="form-control">
-                    <option [ngValue]="''" disabled selected>-- Chọn ca --</option>
-                    <option *ngFor="let s of list" [value]="s.shift_id">
-                        {{ s.shift_name }} ({{ s.start_time }} - {{ s.end_time }})
-                    </option>
-                    <optgroup label="Nghỉ phép">
-                        <option value="53">AL (Annually Leave)</option>
-                        <option value="54">SL (Sick Leave)</option>
-                    </optgroup>
-                </select>
+            <div class="divider"></div>
+
+            <!-- Phần 2: Cấu hình Ca làm việc -->
+            <div class="section-title">
+                <span class="material-symbols-outlined">tune</span>
+                <h3>Cấu hình ca làm việc</h3>
+            </div>
+            
+            <div class="form-grid">
+                <!-- Loại ca -->
+                <div class="form-group">
+                    <label>Loại ca</label>
+                    <div class="segmented-control">
+                        <label>
+                            <input type="radio" name="type" (change)="changeType(8)" value="8" />
+                            <span class="segment-box">8 Tiếng</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="type" (change)="changeType(6)" value="6" />
+                            <span class="segment-box">6 Tiếng</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Chọn ca -->
+                <div class="form-group">
+                    <label>Ca cụ thể</label>
+                    <div class="select-wrapper">
+                        <select [(ngModel)]="shiftId" name="shiftId" class="custom-select">
+                            <option [ngValue]="''" disabled selected>-- Chọn ca làm việc --</option>
+                            <option *ngFor="let s of list" [value]="s.shift_id">
+                                {{ s.shift_name }} ({{ s.start_time }} - {{ s.end_time }})
+                            </option>
+                            <optgroup label="Nghỉ phép">
+                                <option value="53">AL (Annually Leave)</option>
+                                <option value="54">SL (Sick Leave)</option>
+                            </optgroup>
+                        </select>
+                        <span class="material-symbols-outlined select-arrow">expand_more</span>
+                    </div>
+                </div>
+
+                <!-- Tổng NV -->
+                <div class="form-group">
+                    <label>Tổng nhân sự cần</label>
+                    <input type="number" [(ngModel)]="formSchedule.totalStaffNeeded" class="custom-input" placeholder="VD: 10">
+                </div>
             </div>
 
-            <!-- Tổng NV -->
-            <div class="input-group">
-                <label>Tổng nhân sự cần</label>
-                <input type="number" [(ngModel)]="formSchedule.totalStaffNeeded" class="form-control" placeholder="Nhập số lượng...">
+            <!-- Phần 3: Bảng Rules -->
+             <div class="section-title" style="margin-top: 2rem;">
+                <span class="material-symbols-outlined">group_add</span>
+                <h3>Yêu cầu kỹ năng (Skill Rules)</h3>
+            </div>
+
+            <div class="table-container">
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">STT</th>
+                            <th>Cấp độ (Skill Grade)</th>
+                            <th>Số lượng tối thiểu</th>
+                            <th style="width: 100px; text-align: center;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dòng Input Thêm mới (Luôn hiển thị đầu tiên hoặc cuối cùng tùy ý, ở đây để cuối cho tự nhiên) -->
+                        <tr class="input-row">
+                            <td><span class="material-symbols-outlined" style="color: #64748b;">add_circle</span></td>
+                            <td><input type="text" [(ngModel)]="tempSkill" placeholder="Nhập cấp độ (VD: Senior)..."></td>
+                            <td><input type="number" [(ngModel)]="tempMinStaff" placeholder="Nhập số lượng..."></td>
+                            <td style="text-align: center;">
+                                <button class="icon-btn add" (click)="addRuleToTable()" title="Thêm dòng này">
+                                    <span class="material-symbols-outlined">add</span>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Danh sách Rule đã thêm -->
+                        <tr *ngFor="let rule of formSchedule.rules; let i = index">
+                            <td>{{ i + 1 }}</td>
+                            <td><span class="badge skill">{{ rule.requiredSkillGrade }}</span></td>
+                            <td><span class="badge count">{{ rule.minStaffCount }} Nhân sự</span></td>
+                            <td style="text-align: center;">
+                                <button class="icon-btn delete" (click)="removeRule(i)" title="Xóa dòng này">
+                                    <span class="material-symbols-outlined">delete</span>
+                                </button>
+                            </td>
+                        </tr>
+                        
+                        <tr *ngIf="formSchedule.rules.length === 0" class="empty-row">
+                            <td colspan="4">Chưa có quy tắc nào được thêm. Vui lòng nhập ở dòng trên.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Nút Action Chính -->
+            <div class="card-actions">
+                <div class="left-actions">
+                    <button class="btn-outline" (click)="checkRules()"> 
+                        <span class="material-symbols-outlined">list_alt</span> DS Tiêu chí
+                    </button>
+                    <button class="btn-outline blue" (click)="checkDraftSchedule()"> 
+                        <span class="material-symbols-outlined">fact_check</span> Check Lịch Nháp
+                    </button>
+                </div>
+                <button class="btn-primary" [disabled]="!hasRules" (click)="saveSchedule()">
+                    <span class="material-symbols-outlined">save</span> Lưu Cấu Hình
+                </button>
             </div>
         </div>
 
-        <!-- Phần 3: Bảng Rules -->
-        <div class="rule-input-table">
-            <h4>Chi tiết yêu cầu kỹ năng (Skill Rules)</h4>
-            <table class="modern-table">
-                <thead>
-                    <tr>
-                        <th style="width: 50px;">STT</th>
-                        <th>Cấp độ nhân viên (Skill Grade)</th>
-                        <th>Số lượng tối thiểu (Min Staff)</th>
-                        <th style="width: 100px; text-align: center;">Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Danh sách Rule đã thêm -->
-                    <tr *ngFor="let rule of formSchedule.rules; let i = index">
-                        <td>{{ i + 1 }}</td>
-                        <td><strong>{{ rule.requiredSkillGrade }}</strong></td>
-                        <td>{{ rule.minStaffCount }}</td>
-                        <td style="text-align: center;">
-                            <button class="delete-btn" (click)="removeRule(i)">
-                                <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
-                            </button>
-                        </td>
-                    </tr>
-                    
-                    <!-- Dòng Input Thêm mới -->
-                    <tr class="input-tr">
-                        <td>#</td>
-                        <td><input type="text" [(ngModel)]="tempSkill" placeholder="VD: Senior, Junior, 1, 2..."></td>
-                        <td><input type="number" [(ngModel)]="tempMinStaff" placeholder="VD: 5"></td>
-                        <td>
-                            <button class="add-btn" (click)="addRuleToTable()">
-                                <span class="material-symbols-outlined" style="font-size: 16px;">add</span> Thêm
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Nút Lưu -->
-        <div style="margin-top: 25px; text-align: right; border-top: 1px dashed #e2e8f0; padding-top: 15px;">
-            <button class="btn-primary" [disabled]="!hasRules" (click)="saveSchedule()">
-                <span class="material-symbols-outlined">save</span> Lưu Tiêu Chí Này
-            </button>
-        </div>
-    </div>
-
-    <!-- CARD 2: CHỨC NĂNG CHÍNH -->
-    <div class="function-buttons">
-        <button class="btn-success" (click)="checkRules()"> 
-            <span class="material-symbols-outlined">list_alt</span> Xem DS Tiêu chí
-        </button>
-        <button class="btn-primary" style="background-color: #0ea5e9;" (click)="checkDraftSchedule()"> 
-            <span class="material-symbols-outlined">fact_check</span> Kiểm tra Lịch Nháp
-        </button>
-        <button class="btn-warning" style="background-color: #d97706;" (click)="viewSchedule()"> 
-            <span class="material-symbols-outlined">calendar_month</span> Xem Lịch Chi tiết
-        </button>
     </div>
 
     <!-- POPUP 1: DANH SÁCH TIÊU CHÍ -->
@@ -136,51 +163,50 @@
             
             <div class="popup-content">
                 <div *ngIf="rulesDatalength > 0; else noReqData">
-                    <table class="modern-table">
-                        <thead>
-                            <tr>
-                                <th>Ca làm việc</th>
-                                <th>Tổng cần</th>
-                                <th>Rule ID</th>
-                                <th>Skill Grade</th>
-                                <th>Min Staff</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <ng-container *ngFor="let req of rulesData">
-                                <tr *ngFor="let r of req.rules; let i = index">
-                                    <td *ngIf="i === 0" [attr.rowspan]="req.rules.length" style="background: #fff; vertical-align: top; font-weight: bold;">
-                                        {{ getShiftName(req.shiftId) }}
-                                    </td>
-                                    <td *ngIf="i === 0" [attr.rowspan]="req.rules.length" style="background: #fff; vertical-align: top;">
-                                        {{ req.totalStaffNeeded }}
-                                    </td>
-                                    
-                                    <td>{{ r.ruleId }}</td>
-                                    <td>{{ r.requiredSkillGrade }}</td>
-                                    <td>{{ r.minStaffCount }}</td>
-                                    <td>
-                                        <!-- Nút Sửa gọi hàm mở modal sửa -->
-                                        <button class="edit-btn" style="background: #fef08a; color: #854d0e; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;" (click)="openEditModal(req)">
-                                            Sửa
-                                        </button>
-                                    </td>
+                    <div class="table-responsive">
+                        <table class="styled-table sticky-header">
+                            <thead>
+                                <tr>
+                                    <th>Ca làm việc</th>
+                                    <th>Tổng cần</th>
+                                    <th>Skill Grade</th>
+                                    <th>Min Staff</th>
+                                    <th class="text-center">Thao tác</th>
                                 </tr>
-                            </ng-container>
-                        </tbody>
-                    </table>
-                    <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                            </thead>
+                            <tbody>
+                                <ng-container *ngFor="let req of rulesData">
+                                    <tr *ngFor="let r of req.rules; let i = index">
+                                        <td *ngIf="i === 0" [attr.rowspan]="req.rules.length" class="merged-cell shift-name">
+                                            {{ getShiftName(req.shiftId) }}
+                                        </td>
+                                        <td *ngIf="i === 0" [attr.rowspan]="req.rules.length" class="merged-cell total-staff">
+                                            {{ req.totalStaffNeeded }}
+                                        </td>
+                                        
+                                        <td>{{ r.requiredSkillGrade }}</td>
+                                        <td>{{ r.minStaffCount }}</td>
+                                        <td class="text-center">
+                                            <button class="icon-btn edit" (click)="openEditModal(req)" title="Chỉnh sửa">
+                                                <span class="material-symbols-outlined">edit</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="popup-footer">
                         <button class="btn-primary" (click)="autoassign()">
-                            <span class="material-symbols-outlined">autoplay</span> Xếp Ca Tự Động (Tạo Nháp)
+                            <span class="material-symbols-outlined">autoplay</span> Chạy Xếp Ca Tự Động
                         </button>
                     </div>
                 </div>
 
                 <ng-template #noReqData>
-                    <div class="no-data">
-                        <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1;">folder_off</span>
-                        <p>Chưa có tiêu chí nào được thiết lập.</p>
+                    <div class="empty-state">
+                        <span class="material-symbols-outlined">folder_off</span>
+                        <p>Chưa có dữ liệu tiêu chí cho tháng này.</p>
                     </div>
                 </ng-template>
             </div>
@@ -189,93 +215,102 @@
 
     <!-- POPUP 2: KẾT QUẢ KIỂM TRA -->
     <div class="popup-overlay" *ngIf="draftPopupVisible">
-        <div class="popup">
+        <!-- Đã thêm class large-popup để rộng hơn -->
+        <div class="popup large-popup">
             <div class="popup-header">
                 <h3>Kết quả Kiểm tra Lịch Nháp</h3>
                 <button class="close-btn" (click)="closeDraftPopup()">&times;</button>
             </div>
             <div class="popup-content">
-                <table class="modern-table">
-                    <thead>
-                        <tr>
-                            <th>Ngày</th>
-                            <th>Ca làm việc</th>
-                            <th>Trạng thái</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let d of draftData">
-                            <td>{{ d.date }}</td>
-                            <td>{{ d.shiftName }}</td>
-                            <td>
-                                <span class="status-badge" [ngClass]="{'ok': d.isCompliant, 'err': !d.isCompliant}">
-                                    {{ d.message }}
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <!-- Đổi thành class draft-table-container để control height -->
+                <div class="table-responsive draft-table-container">
+                    <table class="styled-table sticky-header">
+                        <thead>
+                            <tr>
+                                <th style="width: 120px;">Ngày</th>
+                                <th style="width: 200px;">Ca làm việc</th>
+                                <th>Trạng thái & Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let d of draftData">
+                                <td><strong>{{ d.date }}</strong></td>
+                                <td>{{ d.shiftName }}</td>
+                                <td>
+                                    <!-- Thêm thẻ div hoặc span wrap text để tránh đè -->
+                                    <div class="status-wrap">
+                                        <span class="status-badge" [ngClass]="{'ok': d.isCompliant, 'err': !d.isCompliant}">
+                                            {{ d.isCompliant ? 'Đạt yêu cầu' : 'Không đạt' }}
+                                        </span>
+                                        <span class="status-message" *ngIf="d.message && d.message !== 'OK'">
+                                            {{ d.message }}
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- POPUP 3: SỬA TIÊU CHÍ (EDIT MODAL) -->
     <div class="popup-overlay" *ngIf="isEditing">
-        <div class="popup large-popup" style="z-index: 10001;">
+        <div class="popup medium-popup">
             <div class="popup-header">
-                <h3>Cập nhật Tiêu chí #{{ editingData.requirementId }}</h3>
+                <h3>Cập nhật Tiêu chí</h3>
                 <button class="close-btn" (click)="closeEditModal()">&times;</button>
             </div>
 
             <div class="popup-content">
-                <div class="config-grid">
-                    <div class="input-group">
-                        <label>Ca làm việc:</label>
-                        <input type="text" [value]="getShiftName(editingData.shiftId)" disabled class="form-control" style="background: #e9ecef;">
+                <div class="edit-form">
+                    <div class="form-group full-width">
+                        <label>Ca làm việc</label>
+                        <div class="static-input">{{ getShiftName(editingData.shiftId) }}</div>
                     </div>
-                    <div class="input-group">
-                        <label>Tổng nhân sự cần:</label>
-                        <input type="number" [(ngModel)]="editingData.totalStaffNeeded" class="form-control">
+                    <div class="form-group full-width">
+                        <label>Tổng nhân sự cần</label>
+                        <input type="number" [(ngModel)]="editingData.totalStaffNeeded" class="custom-input">
                     </div>
-                </div>
 
-                <div class="rule-input-table" style="margin-top: 20px;">
-                    <h4>Danh sách yêu cầu kỹ năng</h4>
-                    <table class="modern-table">
-                        <thead>
-                            <tr>
-                                <th>Skill Grade</th>
-                                <th>Min Staff</th>
-                                <th class="text-center">Xóa</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let rule of editingData.rules; let i = index">
-                                <td>
-                                    <input type="text" [(ngModel)]="rule.requiredSkillGrade" placeholder="VD: 1, 2...">
-                                </td>
-                                <td>
-                                    <input type="number" [(ngModel)]="rule.minStaffCount">
-                                </td>
-                                <td class="text-center">
-                                    <button class="delete-btn" (click)="removeRuleInEdit(i)">
-                                        <span class="material-symbols-outlined">delete</span>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="separator"><span>Danh sách yêu cầu</span></div>
+
+                    <div class="table-container small">
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>Skill Grade</th>
+                                    <th>Min Staff</th>
+                                    <th class="text-center">Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let rule of editingData.rules; let i = index">
+                                    <td>
+                                        <input type="text" [(ngModel)]="rule.requiredSkillGrade" class="cell-input">
+                                    </td>
+                                    <td>
+                                        <input type="number" [(ngModel)]="rule.minStaffCount" class="cell-input">
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="icon-btn delete small" (click)="removeRuleInEdit(i)">
+                                            <span class="material-symbols-outlined">close</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     
-                    <button class="add-btn" style="margin-top: 10px;" (click)="addRuleInEdit()">
-                        <span class="material-symbols-outlined">add</span> Thêm dòng
+                    <button class="btn-text-icon" (click)="addRuleInEdit()">
+                        <span class="material-symbols-outlined">add</span> Thêm dòng kỹ năng
                     </button>
                 </div>
 
-                <div style="margin-top: 20px; text-align: right; border-top: 1px solid #eee; padding-top: 15px;">
-                    <button class="btn-secondary" style="margin-right: 10px; border: 1px solid #ccc; background: white;" (click)="closeEditModal()">Hủy</button>
-                    <button class="btn-primary" (click)="saveEditRule()">
-                        <span class="material-symbols-outlined">save</span> Lưu Thay Đổi
-                    </button>
+                <div class="popup-footer right">
+                    <button class="btn-text" (click)="closeEditModal()">Hủy</button>
+                    <button class="btn-primary" (click)="saveEditRule()">Lưu Thay Đổi</button>
                 </div>
             </div>
         </div>
