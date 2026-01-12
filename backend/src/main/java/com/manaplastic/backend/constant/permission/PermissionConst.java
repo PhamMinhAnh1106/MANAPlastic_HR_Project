@@ -56,6 +56,15 @@ public final class PermissionConst {
     public static final String EVALUATE_VIEW = "EVALUATE_VIEW";
     public static final String EVALUATE_CREATE = "EVALUATE_CREATE";
 
-    // --- I. LỊCH LÀM ---
+    // --- I. OT ---
+    public static final String OVERTIME_VIEW = "OVERTIME_VIEW";
+    public static final String OVERTIME_VIEW_DETAIL = "OVERTIME_VIEW_DETAIL";
+    public static final String OVERTIME_CREATE = "OVERTIME_CREATE";
+    public static final String OVERTIME_UPDATE = "OVERTIME_UPDATE";
+    public static final String OVERTIME_DELETE = "OVERTIME_DELETE";
+
+    public static final String OVERTIME_APPROVE_MANAGER = "OVERTIME_APPROVE_MANAGER";
+    public static final String OVERTIME_APPROVE_HR = "OVERTIME_APPROVE_HR";
+    public static final String OVERTIME_REJECT = "OVERTIME_REJECT";
 
 }

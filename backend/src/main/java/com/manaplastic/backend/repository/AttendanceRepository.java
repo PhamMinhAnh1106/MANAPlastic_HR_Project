@@ -28,5 +28,7 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
                             @Param("endDate") LocalDate endDate);
 
 
+    List<AttendanceEntity> findAllByDate(LocalDate date);
+
 
 }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th1 12, 2026 lúc 02:24 PM
+-- Thời gian đã tạo: Th1 09, 2026 lúc 09:14 PM
 -- Phiên bản máy phục vụ: 8.2.0
 -- Phiên bản PHP: 8.2.13
 
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `activitylogs` (
   `userID` int DEFAULT NULL,
   PRIMARY KEY (`logID`),
   KEY `userID` (`userID`)
-) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=97 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `activitylogs`
@@ -140,35 +140,7 @@ INSERT INTO `activitylogs` (`logID`, `action`, `logType`, `details`, `actiontime
 (93, 'APPROVED_CONTRACT_REQ', 'INFO', 'Desc: Xử lý duyệt/từ chối yêu cầu sửa đổi file hợp đồng. | Data: {\"headers\":{},\"body\":\"Đã xử lý cho đơn 1 thành công\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-08 04:58:32', 'hr_manager', 3),
 (94, 'CREATE_ATTENDANCE_REQ', 'INFO', 'Desc: Gửi yêu cầu bổ sung công | Data: {\"headers\":{},\"body\":\"Gửi yêu cầu thành công! Vui lòng chờ quản lý duyệt.\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-10 01:55:59', '000020', 20),
 (95, 'MANAGER_APPROVE_ATTENDANCE', 'INFO', 'Manager Bùi Văn Mực đã duyệt sơ bộ (Manager Check) cho: Lại Thị In Ấn | Ngày: 2026-01-09 | Loại: CHECK_IN | Vào: 2026-01-09T08:00 (Mã đơn: 7)', '2026-01-10 02:04:06', NULL, 9),
-(96, 'HR_APPROVE_ATTENDANCE', 'INFO', 'HR Nguyễn Thị Nhân Sự đã duyệt và cập nhật công (HR Final) cho: Lại Thị In Ấn | Ngày: 2026-01-09 | Loại: CHECK_IN | Vào: 2026-01-09T08:00 (Mã đơn: 7)', '2026-01-10 02:06:39', NULL, 3),
-(97, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:04:46', 'admin', 1),
-(98, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:04:47', 'admin', 1),
-(99, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:04:50', 'admin', 1),
-(100, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:04:50', 'admin', 1),
-(101, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:04:52', 'admin', 1),
-(102, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:04:56', 'admin', 1),
-(103, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:04:56', 'admin', 1),
-(104, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:03', 'admin', 1),
-(105, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:04', 'admin', 1),
-(106, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:04', 'admin', 1),
-(107, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:05', 'admin', 1),
-(108, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:12', 'admin', 1),
-(109, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:13', 'admin', 1),
-(110, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:24', 'admin', 1),
-(111, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:25', 'admin', 1),
-(112, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:26', 'admin', 1),
-(113, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:27', 'admin', 1),
-(114, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:29', 'admin', 1),
-(115, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:32', 'admin', 1),
-(116, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:41', 'admin', 1),
-(117, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:42', 'admin', 1),
-(118, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:44', 'admin', 1),
-(119, 'UPDATE_ROLE_PERMISSION', 'WARNING', 'Desc: Mở quyền/Ngăn chặn khẩn cấp quyền mặc đinh của role | Data: {\"headers\":{},\"body\":\"Cập nhật quyền cho Role thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:05:46', 'admin', 1),
-(120, 'OT_CREATE', 'INFO', 'Desc: Tạo đơn OT | Data: {\"headers\":{},\"body\":\"Tạo yêu cầu tăng ca thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 02:42:53', 'inan_lead', 9),
-(121, 'OT_CREATE', 'INFO', 'Desc: Tạo đơn OT | Data: {\"headers\":{},\"body\":\"Tạo yêu cầu tăng ca thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 03:20:27', 'inan_lead', 9),
-(122, 'OT_CREATE', 'INFO', 'Desc: Tạo đơn OT | Data: {\"headers\":{},\"body\":\"Tạo yêu cầu tăng ca thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 20:10:35', 'inan_lead', 9),
-(123, 'OT_CREATE', 'INFO', 'Desc: Tạo đơn OT | Data: {\"headers\":{},\"body\":\"Tạo yêu cầu tăng ca thành công!\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 21:02:09', 'inan_lead', 9),
-(124, 'OT_APPROVE_MANAGER', 'INFO', 'Desc: Quản lý duyệt đơn OT | Data: {\"headers\":{},\"body\":\"Đã duyệt đơn tăng ca (Cấp Quản lý).\",\"statusCode\":\"OK\",\"statusCodeValue\":200}', '2026-01-12 21:07:09', 'inan_lead', 9);
+(96, 'HR_APPROVE_ATTENDANCE', 'INFO', 'HR Nguyễn Thị Nhân Sự đã duyệt và cập nhật công (HR Final) cho: Lại Thị In Ấn | Ngày: 2026-01-09 | Loại: CHECK_IN | Vào: 2026-01-09T08:00 (Mã đơn: 7)', '2026-01-10 02:06:39', NULL, 3);
 
 -- --------------------------------------------------------
 
@@ -209,8 +181,8 @@ INSERT INTO `attendancelogs` (`attendanceLogID`, `timestamp`, `imgurl`, `userID`
 (23, '2025-12-27 16:03:37', '1ada91b8-6141-4371-982f-fe1ed75f5a03.jpg', 21),
 (24, '2025-12-31 08:54:42', '609a6331-4efb-451e-8c50-678603976bfa.jpg', 5),
 (25, '2025-12-31 09:20:12', 'b765526a-dde1-4678-b22c-bde5ce796d80.jpg', 5),
-(26, '2025-12-31 07:55:00', '56ebad80-1205-4355-b580-fe7fff419603.jpg', 29),
-(27, '2025-12-31 23:01:00', '465869b7-b038-4ced-9e5b-888b45ed129d.jpg', 29);
+(26, '2025-12-31 10:01:53', '56ebad80-1205-4355-b580-fe7fff419603.jpg', 29),
+(27, '2025-12-31 10:18:25', '465869b7-b038-4ced-9e5b-888b45ed129d.jpg', 29);
 
 -- --------------------------------------------------------
 
@@ -327,10 +299,10 @@ INSERT INTO `attendances` (`attendanceID`, `date`, `checkin`, `checkout`, `check
 (46, '2025-11-30', '2025-11-30 07:55:00', '2025-11-30 17:05:00', NULL, NULL, 'PRESENT', 36, 21, NULL, NULL),
 (47, '2025-12-01', '2025-12-01 07:55:00', '2025-12-01 17:00:00', NULL, NULL, 'PRESENT', 36, 20, NULL, NULL),
 (48, '2025-12-02', '2025-12-02 21:50:00', '2025-12-03 06:10:00', NULL, NULL, 'PRESENT', 50, 20, NULL, NULL),
-(49, '2025-12-03', '2025-12-03 08:00:00', '2025-12-03 23:04:00', NULL, NULL, 'PRESENT', 36, 20, NULL, NULL),
+(49, '2025-12-03', '2025-12-03 08:00:00', '2025-12-03 17:05:00', NULL, NULL, 'PRESENT', 36, 20, NULL, NULL),
 (50, '2025-12-27', '2025-12-27 16:02:29', '2025-12-27 16:03:37', '875a992b-42fe-4952-91c2-2ebb7a8f4e89.jpg', '1ada91b8-6141-4371-982f-fe1ed75f5a03.jpg', 'LATE_AND_EARLY', 36, 21, 22, 23),
 (51, '2025-12-31', '2025-12-31 08:54:42', '2025-12-31 09:20:12', '609a6331-4efb-451e-8c50-678603976bfa.jpg', 'b765526a-dde1-4678-b22c-bde5ce796d80.jpg', 'LATE_AND_EARLY', 41, 5, 24, 25),
-(52, '2025-12-31', '2025-12-31 07:55:00', '2025-12-31 23:01:00', '56ebad80-1205-4355-b580-fe7fff419603.jpg', '465869b7-b038-4ced-9e5b-888b45ed129d.jpg', 'PRESENT', 36, 29, 26, 27),
+(52, '2025-12-31', '2025-12-31 10:01:53', '2025-12-31 10:18:25', '56ebad80-1205-4355-b580-fe7fff419603.jpg', '465869b7-b038-4ced-9e5b-888b45ed129d.jpg', 'LATE_AND_EARLY', 36, 29, 26, 27),
 (53, '2026-01-09', '2026-01-09 08:00:00', NULL, NULL, NULL, 'MISSING_OUTPUT_DATA', 36, 20, NULL, NULL);
 
 -- --------------------------------------------------------
@@ -1649,47 +1621,34 @@ INSERT INTO `monthlypayrollconfigs` (`ConfigID`, `Month`, `Year`, `CycleStartDat
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `overtimerequests`
+-- Cấu trúc bảng cho bảng `overtime`
 --
 
-DROP TABLE IF EXISTS `overtimerequests`;
-CREATE TABLE IF NOT EXISTS `overtimerequests` (
-  `requestID` int NOT NULL AUTO_INCREMENT,
-  `userID` int NOT NULL COMMENT 'Nhân viên làm OT',
-  `departmentID` int DEFAULT NULL COMMENT 'Lưu cứng phòng ban tại thời điểm OT (để thống kê)',
-  `shiftID` int DEFAULT NULL COMMENT 'Ca làm việc gốc của ngày hôm đó',
-  `date` date NOT NULL COMMENT 'Ngày thực hiện OT',
-  `startTime` time NOT NULL COMMENT 'Giờ bắt đầu tổng (VD: 18:00)',
-  `endTime` time NOT NULL COMMENT 'Giờ kết thúc tổng (VD: 23:00)',
-  `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'Lý do tăng ca',
-  `totalHours` double DEFAULT '0' COMMENT 'Tổng giờ đăng ký (Sum của bảng con)',
-  `finalPaidHours` double DEFAULT NULL COMMENT 'Tổng giờ thực tế được duyệt chi tiền (HR chốt)',
-  `isSystemGenerated` tinyint(1) DEFAULT '0' COMMENT '1: Do hệ thống tự quét, 0: Do người tạo',
-  `status` enum('PENDING_MANAGER','PENDING_HR','APPROVED','REJECTED','PENDING_CONFIRMATION') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'PENDING_MANAGER',
-  `actualCheckOut` datetime DEFAULT NULL COMMENT 'Giờ chấm công thực tế (dùng để đối chiếu)',
-  `managerApproverID` int DEFAULT NULL,
-  `managerApprovedAt` datetime DEFAULT NULL,
-  `hrApproverID` int DEFAULT NULL,
-  `hrApprovedAt` datetime DEFAULT NULL,
-  `rejectReason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updatedAt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`requestID`),
-  KEY `FK_OT_User` (`userID`),
-  KEY `FK_OT_Dept` (`departmentID`),
-  KEY `FK_OT_Shift` (`shiftID`),
-  KEY `FK_OT_Manager` (`managerApproverID`),
-  KEY `FK_OT_HR` (`hrApproverID`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `overtime`;
+CREATE TABLE IF NOT EXISTS `overtime` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `userid` int NOT NULL COMMENT 'ID nhân viên (FK)',
+  `overtimetypeid` int NOT NULL COMMENT 'ID loại tăng ca (FK)',
+  `date` date NOT NULL COMMENT 'Ngày làm thêm giờ',
+  `hours` double NOT NULL COMMENT 'Số giờ làm thêm',
+  `status` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'APPROVED' COMMENT 'Trạng thái: APPROVED, PENDING, REJECTED',
+  `reason` text COLLATE utf8mb4_unicode_ci COMMENT 'Lý do làm thêm',
+  PRIMARY KEY (`id`),
+  KEY `fk_overtime_users` (`userid`),
+  KEY `fk_overtime_type` (`overtimetypeid`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `overtimerequests`
+-- Đang đổ dữ liệu cho bảng `overtime`
 --
 
-INSERT INTO `overtimerequests` (`requestID`, `userID`, `departmentID`, `shiftID`, `date`, `startTime`, `endTime`, `reason`, `totalHours`, `finalPaidHours`, `isSystemGenerated`, `status`, `actualCheckOut`, `managerApproverID`, `managerApprovedAt`, `hrApproverID`, `hrApprovedAt`, `rejectReason`, `createdAt`, `updatedAt`) VALUES
-(1, 9, 5, NULL, '2026-01-20', '20:00:00', '23:00:00', 'Trực server đêm', 3, NULL, 0, 'PENDING_MANAGER', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-12 20:10:35', '2026-01-12 20:10:35'),
-(2, 29, 5, NULL, '2025-12-31', '17:00:00', '23:01:00', 'Hệ thống phát hiện chênh lệch giờ về (OT phát sinh)', 6.016666666666667, 5, 1, 'PENDING_HR', '2025-12-31 23:01:00', 9, '2026-01-12 21:07:09', NULL, NULL, NULL, '2026-01-12 20:20:19', '2026-01-12 20:20:19'),
-(3, 9, 5, NULL, '2026-01-10', '20:00:00', '23:00:00', 'Trực server đêm', 3, 3, 0, 'PENDING_MANAGER', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-12 21:02:09', '2026-01-12 21:02:09');
+INSERT INTO `overtime` (`id`, `userid`, `overtimetypeid`, `date`, `hours`, `status`, `reason`) VALUES
+(1, 1, 1, '2025-10-15', 3, 'APPROVED', 'Chạy deadline dự án'),
+(2, 1, 2, '2025-10-19', 4, 'APPROVED', 'Bảo trì hệ thống cuối tuần'),
+(3, 2, 1, '2025-10-20', 2, 'PENDING', 'Hỗ trợ khách hàng muộn'),
+(4, 20, 1, '2025-12-01', 2, 'APPROVED', 'Làm cố nốt dự án'),
+(5, 20, 5, '2025-12-03', 2, 'APPROVED', 'Hỗ trợ khách hàng nước ngoài'),
+(6, 20, 2, '2025-12-07', 4, 'APPROVED', 'Bảo trì máy móc cuối tuần');
 
 -- --------------------------------------------------------
 
@@ -1724,37 +1683,6 @@ INSERT INTO `overtimetypes` (`OvertimeTypeID`, `OtCode`, `OtName`, `Rate`, `Calc
 (5, 'OT_NIGHT_WEEKDAY', 'Tăng ca đêm ngày thường (200%)', 2.00, 'MULTIPLIER', 1, 'EXCESS_ONLY', 0.00, 'Làm thêm giờ vào ban đêm ngày thường'),
 (6, 'OT_NIGHT_WEEKEND', 'Tăng ca đêm ngày nghỉ (260%)', 2.60, 'MULTIPLIER', 1, 'EXCESS_ONLY', 0.00, 'Làm thêm giờ vào ban đêm ngày nghỉ tuần'),
 (7, 'OT_NIGHT_HOLIDAY', 'Tăng ca đêm Lễ Tết (390%)', 3.80, 'MULTIPLIER', 1, 'EXCESS_ONLY', 0.00, 'Làm thêm giờ vào ban đêm ngày Lễ/Tết');
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `overtime_request_details`
---
-
-DROP TABLE IF EXISTS `overtime_request_details`;
-CREATE TABLE IF NOT EXISTS `overtime_request_details` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `requestID` int NOT NULL COMMENT 'Link tới bảng cha overtimerequests',
-  `overtimeTypeID` int NOT NULL COMMENT 'Link tới bảng overtimetypes (Xác định hệ số lương)',
-  `startTime` time DEFAULT NULL COMMENT 'Giờ bắt đầu của khúc này (VD: 22:00)',
-  `endTime` time DEFAULT NULL COMMENT 'Giờ kết thúc của khúc này (VD: 23:00)',
-  `hours` double NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `FK_Detail_Request` (`requestID`),
-  KEY `FK_Detail_Type` (`overtimeTypeID`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `overtime_request_details`
---
-
-INSERT INTO `overtime_request_details` (`id`, `requestID`, `overtimeTypeID`, `startTime`, `endTime`, `hours`) VALUES
-(1, 1, 1, '20:00:00', '22:00:00', 2),
-(2, 1, 5, '22:00:00', '23:00:00', 1),
-(3, 2, 1, '17:00:00', '22:00:00', 5),
-(4, 2, 5, '22:00:00', '23:01:00', 1),
-(5, 3, 1, '20:00:00', '22:00:00', 2),
-(6, 3, 5, '22:00:00', '23:00:00', 1);
 
 -- --------------------------------------------------------
 
@@ -1861,7 +1789,7 @@ CREATE TABLE IF NOT EXISTS `permissions` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`permissionID`),
   UNIQUE KEY `permissionname` (`permissionname`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `permissions`
@@ -1912,14 +1840,7 @@ INSERT INTO `permissions` (`permissionID`, `permissionname`, `description`, `is_
 (42, 'SYS_MAIL_SCHEDULE', 'Gửi mail lịch làm việc', 1),
 (43, 'SYS_MAIL_LEAVE', 'Gửi mail thông báo đơn phép', 1),
 (44, 'SYS_MAIL_CONTRACT', 'Gửi mail cảnh báo hết hạn HĐ', 1),
-(45, 'SYS_IMPORT_QR', 'Nhận dữ liệu chấm công QR', 1),
-(46, 'OVERTIME_VIEW', 'Xem danh sách đơn tăng ca', 1),
-(47, 'OVERTIME_CREATE', 'Tạo đơn tăng ca', 1),
-(48, 'OVERTIME_UPDATE', 'Cập nhật đơn tăng ca', 1),
-(49, 'OVERTIME_DELETE', 'Xóa đơn tăng ca', 1),
-(50, 'OVERTIME_APPROVE_MANAGER', 'Quản lý duyệt đơn tăng ca', 1),
-(51, 'OVERTIME_APPROVE_HR', 'HR duyệt đơn tăng ca', 1),
-(52, 'OVERTIME_REJECT', 'Từ chối đơn tăng ca', 1);
+(45, 'SYS_IMPORT_QR', 'Nhận dữ liệu chấm công QR', 1);
 
 -- --------------------------------------------------------
 
@@ -2047,13 +1968,6 @@ INSERT INTO `rolespermissions` (`roleID`, `permissionID`, `active`) VALUES
 (1, 12, 1),
 (1, 13, 1),
 (1, 31, 1),
-(1, 46, 1),
-(1, 47, 1),
-(1, 48, 1),
-(1, 49, 1),
-(1, 50, 1),
-(1, 51, 1),
-(1, 52, 1),
 (2, 1, 1),
 (2, 2, 1),
 (2, 3, 1),
@@ -2080,12 +1994,6 @@ INSERT INTO `rolespermissions` (`roleID`, `permissionID`, `active`) VALUES
 (2, 36, 1),
 (2, 37, 1),
 (2, 38, 1),
-(2, 46, 1),
-(2, 47, 1),
-(2, 48, 1),
-(2, 49, 1),
-(2, 51, 1),
-(2, 52, 1),
 (3, 1, 1),
 (3, 2, 1),
 (3, 3, 1),
@@ -2105,12 +2013,6 @@ INSERT INTO `rolespermissions` (`roleID`, `permissionID`, `active`) VALUES
 (3, 30, 1),
 (3, 39, 1),
 (3, 40, 1),
-(3, 46, 1),
-(3, 47, 1),
-(3, 48, 1),
-(3, 49, 1),
-(3, 50, 1),
-(3, 52, 1),
 (4, 1, 1),
 (4, 2, 1),
 (4, 3, 1),
@@ -2123,11 +2025,7 @@ INSERT INTO `rolespermissions` (`roleID`, `permissionID`, `active`) VALUES
 (4, 24, 1),
 (4, 25, 1),
 (4, 26, 1),
-(4, 30, 1),
-(4, 46, 1),
-(4, 47, 1),
-(4, 48, 1),
-(4, 49, 1);
+(4, 30, 1);
 
 -- --------------------------------------------------------
 
@@ -4595,21 +4493,21 @@ INSERT INTO `users` (`userID`, `username`, `password`, `fullname`, `cccd`, `emai
 --
 DROP VIEW IF EXISTS `v_employee_profile_flat`;
 CREATE TABLE IF NOT EXISTS `v_employee_profile_flat` (
-`userID` int
-,`GENDER` enum('MALE','FEMALE')
-,`JOB_TYPE` varchar(100)
-,`SKILL_GRADE` int
-,`AGE` bigint
-,`SENIORITY_DAYS` int
-,`SENIORITY_MONTHS` bigint
+`AGE` bigint
 ,`BASE_SALARY` decimal(15,2)
 ,`CONTRACT_TYPE` varchar(100)
-,`TOXIC_TYPE` enum('NONE','CASH','IN_KIND')
-,`INSURANCE_BASE` decimal(15,2)
-,`DEPT_NAME` varchar(255)
-,`IS_OFFICE` bit(1)
-,`ROLE_NAME` varchar(100)
 ,`DEPENDENT_COUNT` bigint
+,`DEPT_NAME` varchar(255)
+,`GENDER` enum('MALE','FEMALE')
+,`INSURANCE_BASE` decimal(15,2)
+,`IS_OFFICE` bit(1)
+,`JOB_TYPE` varchar(100)
+,`ROLE_NAME` varchar(100)
+,`SENIORITY_DAYS` int
+,`SENIORITY_MONTHS` bigint
+,`SKILL_GRADE` int
+,`TOXIC_TYPE` enum('NONE','CASH','IN_KIND')
+,`userID` int
 );
 
 -- --------------------------------------------------------
@@ -4740,21 +4638,11 @@ ALTER TABLE `leaverequests`
   ADD CONSTRAINT `leaverequests_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `overtimerequests`
+-- Các ràng buộc cho bảng `overtime`
 --
-ALTER TABLE `overtimerequests`
-  ADD CONSTRAINT `FK_OT_Dept` FOREIGN KEY (`departmentID`) REFERENCES `departments` (`departmentID`) ON DELETE SET NULL,
-  ADD CONSTRAINT `FK_OT_HR` FOREIGN KEY (`hrApproverID`) REFERENCES `users` (`userID`) ON DELETE SET NULL,
-  ADD CONSTRAINT `FK_OT_Manager` FOREIGN KEY (`managerApproverID`) REFERENCES `users` (`userID`) ON DELETE SET NULL,
-  ADD CONSTRAINT `FK_OT_Shift` FOREIGN KEY (`shiftID`) REFERENCES `shifts` (`shiftID`) ON DELETE SET NULL,
-  ADD CONSTRAINT `FK_OT_User` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE;
-
---
--- Các ràng buộc cho bảng `overtime_request_details`
---
-ALTER TABLE `overtime_request_details`
-  ADD CONSTRAINT `FK_Detail_Request` FOREIGN KEY (`requestID`) REFERENCES `overtimerequests` (`requestID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `FK_Detail_Type` FOREIGN KEY (`overtimeTypeID`) REFERENCES `overtimetypes` (`OvertimeTypeID`);
+ALTER TABLE `overtime`
+  ADD CONSTRAINT `fk_overtime_type` FOREIGN KEY (`overtimetypeid`) REFERENCES `overtimetypes` (`OvertimeTypeID`),
+  ADD CONSTRAINT `fk_overtime_users` FOREIGN KEY (`userid`) REFERENCES `users` (`userID`);
 
 --
 -- Các ràng buộc cho bảng `payrolls`
