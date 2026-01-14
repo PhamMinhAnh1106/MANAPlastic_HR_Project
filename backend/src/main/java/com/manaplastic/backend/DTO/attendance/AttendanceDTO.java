@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -24,5 +25,6 @@ public class AttendanceDTO {
     private int shiftId;
     private String shiftName;
     private String status;
+    private BigDecimal estimatedSalary;
 
 }

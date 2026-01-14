@@ -17,7 +17,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/legalsetting/overtimeTypes")
 @CrossOrigin(origins = "*")
-@PreAuthorize("hasAnyAuthority('HR','Admin')")
 public class OvertimeTypeController {
 
     @Autowired
@@ -25,12 +24,14 @@ public class OvertimeTypeController {
 
     // Lấy
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<OvertimetypeEntity>> getAll() {
         return ResponseEntity.ok(service.getAll());
     }
 
     //Thêm
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('HR','Admin')")
     @LogActivity(action ="CREATE_OVERTIME_TYPE",description = "Thêm chính sách loại tăng ca mới")
     @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
     public ResponseEntity<OvertimetypeEntity> create(@RequestBody OvertimeTypeDTO req) {
@@ -39,6 +40,7 @@ public class OvertimeTypeController {
 
     //Sửa
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('HR','Admin')")
     @LogActivity(action="UPDATE_OVERTIME_TYPE",description = "Sửa chính sách loại tăng ca",logType = LogType.WARNING)
     @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
     public ResponseEntity<OvertimetypeEntity> update(@PathVariable int id, @RequestBody OvertimeTypeDTO req) {
@@ -46,6 +48,7 @@ public class OvertimeTypeController {
     }
         // Xóa
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('HR','Admin')")
     @LogActivity(action="DELETE_OVERTIME_TYPE", description = "Xóa chính sách loại tăng ca", logType = LogType.DANGER)
     @RequiredPermission(PermissionConst.PAYROLL_CALCULATE)
     public ResponseEntity<String> delete(@PathVariable int id) {

@@ -68,6 +68,7 @@ public class AttendanceService {
                 .shiftId(entity.getShiftID() != null ? entity.getShiftID().getId() : null)
                 .shiftName(entity.getShiftID().getShiftname() == null ? "Trống" : entity.getShiftID().getShiftname())
                 .status(String.valueOf(entity.getStatus()))
+                .estimatedSalary(entity.getEstimatedSalary())
                 .build();
     }
 
