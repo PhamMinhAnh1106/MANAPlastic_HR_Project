@@ -43,6 +43,13 @@ public interface ContractRepository extends JpaRepository<ContractEntity, Intege
             "AND (:startDate <= c.enddate OR c.enddate IS NULL)")
     int countOverlappingActiveContracts(Integer userId, LocalDate startDate, Integer excludeContractId);
 
+    // Thêm vào trong interface ContractRepository
+    @Query("SELECT c FROM ContractEntity c " +
+            "WHERE c.userID.id = :userId " +
+            "AND c.status = 'ACTIVE' " +
+            "AND :date BETWEEN c.startdate AND c.enddate")
+    ContractEntity findActiveContract(@Param("userId") Integer userId, @Param("date") LocalDate date);
+
     // KIẾN THỨC LƯU Ý về Spring để tránh truy vấn db nhiều lần cho 1 tác vụ nhỏ
 //    Khi nào truyền Entity? Khi ta đã có sẵn đối tượng User đầy đủ trong tay (ví dụ lúc save contract mới).
 //    Khi nào truyền ID (@Param)? Khi ta chỉ muốn viết câu truy vấn nhanh, kiểm tra đếm số lượng, hoặc khi tên biến trong Entity dễ gây hiểu nhầm cho Spring.

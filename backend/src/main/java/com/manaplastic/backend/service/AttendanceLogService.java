@@ -1,10 +1,7 @@
 package com.manaplastic.backend.service;
 
 import com.manaplastic.backend.entity.*;
-import com.manaplastic.backend.repository.AttendanceLogRepository;
-import com.manaplastic.backend.repository.AttendanceRepository;
-import com.manaplastic.backend.repository.EmployeeOfficialScheduleRepository;
-import com.manaplastic.backend.repository.ShiftRepository;
+import com.manaplastic.backend.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,14 +29,18 @@ public class AttendanceLogService {
     private EmployeeOfficialScheduleRepository scheduleRepository;
     @Autowired
     private ShiftRepository shiftRepository;
+    @Autowired
+    private EmployeeDocumentRepository documentRepo;
 
     // Cấu hình TimeZone (Việt Nam) để convert từ Instant sang LocalDate
     private final ZoneId zoneId = ZoneId.of("Asia/Ho_Chi_Minh");
     // Cho phép đi trễ/về sớm bao nhiêu phút
     private static final int TOLERANCE_MINUTES = 5; // 5p thôii
+    private static final int TOLERANCE_MATERNITY_MINUTES = 30; // thai sản 30
     // Thời gian tối thiểu giữa 2 lần chấm công (15p =  900s)
     private static final long SPAM_COOLDOWN_SECONDS = 900;
     private static final Integer OFFICE_SHIFT_ID = 36;
+
     @Value("${app.upload.attendance}")
     private String uploadDir;
 
@@ -167,11 +168,13 @@ public class AttendanceLogService {
         }
 
         ShiftEntity shift = attendance.getShiftID();
+        LocalDate workDate = attendance.getDate();
+        boolean isPregnant = isMaternity(attendance.getUserID(), workDate);
+
+        int currentTolerance = isPregnant ? TOLERANCE_MATERNITY_MINUTES : TOLERANCE_MINUTES;
 
         LocalTime shiftStart = shift.getStarttime();
         LocalTime shiftEnd = shift.getEndtime();
-        LocalDate workDate = attendance.getDate();
-
 
         // Ghép ngày làm việc với giờ bắt đầu ca
         LocalDateTime expectedStartTime = LocalDateTime.of(workDate, shiftStart);
@@ -193,13 +196,27 @@ public class AttendanceLogService {
         LocalDateTime actualCheckOut = attendance.getCheckout();
 
         // So sánh và gắn cờ (Cho phép trễ X phút tolerance, công ty cho 5p)
-        boolean isLate = actualCheckIn.isAfter(expectedStartTime.plusMinutes(TOLERANCE_MINUTES));
-        boolean isEarlyLeave = actualCheckOut.isBefore(expectedEndTime.minusMinutes(TOLERANCE_MINUTES));
+        boolean isLate = actualCheckIn.isAfter(expectedStartTime.plusMinutes(currentTolerance));
+        boolean isEarlyLeave = (actualCheckOut != null) &&
+                                actualCheckOut.isBefore(expectedEndTime.minusMinutes(currentTolerance));
 
         if (isLate || isEarlyLeave) {
             return AttendanceEntity.AttendanceStatus.LATE_AND_EARLY;
         } else {
             return AttendanceEntity.AttendanceStatus.PRESENT;
         }
+    }
+
+    public boolean isMaternity(UserEntity user, LocalDate date) {
+        if (user == null || user.getId() == null || date == null) {
+            return false;
+        }
+
+        return documentRepo.isDocumentActive(
+                user.getId(),
+                date,
+                EmployeeDocumentEntity.DocumentType.MEDICAL_PREGNANCY,
+                EmployeeDocumentEntity.DocumentStatus.APPROVED
+        );
     }
 }

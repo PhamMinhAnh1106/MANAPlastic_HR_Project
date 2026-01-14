@@ -8,6 +8,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,6 +19,10 @@ import java.time.LocalDateTime;
 @Table(name = "attendances")
 public class AttendanceEntity {
 
+
+    @ColumnDefault("0.00")
+    @Column(name = "estimated_salary", precision = 15, scale = 4)
+    private BigDecimal estimatedSalary;
 
     public enum AttendanceStatus {
         PRESENT, ABSENT, LATE_AND_EARLY,ON_LEAVE, MISSING_OUTPUT_DATA, MISSING_INPUT_DATA

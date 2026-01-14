@@ -161,7 +161,7 @@ public class ExcelHelper {
                     salaryCell.setCellValue(0);
                 }
                 // Cột 7: Độc hại
-                row.createCell(7).setCellValue(contract.getAllowanceToxicType() != null ? contract.getAllowanceToxicType() : "Trống");
+                row.createCell(7).setCellValue(contract.getStandardHours() != null);
             }
             // Auto-size các cột
             for (int col = 0; col < CONTRACT_HEADERS.length; col++) {

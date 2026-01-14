@@ -19,7 +19,7 @@ public class ContractDTO {
     private String type; // Loại hợp đồng
     private BigDecimal basesalary;
     private BigDecimal insuranceSalary;
-    private String allowanceToxicType;
+    private BigDecimal standardHours;
     private String fileurl;
     private LocalDate signdate;
     private LocalDate startdate;

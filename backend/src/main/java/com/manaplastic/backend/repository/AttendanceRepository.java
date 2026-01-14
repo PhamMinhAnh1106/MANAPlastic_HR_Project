@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -27,8 +28,17 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
                             @Param("startDate") LocalDate startDate,
                             @Param("endDate") LocalDate endDate);
 
+    @Query("SELECT COALESCE(SUM(a.estimatedSalary), 0) FROM AttendanceEntity a " +
+            "WHERE a.userID.id = :userId " +
+            "AND MONTH(a.date) = :month " +
+            "AND YEAR(a.date) = :year")
+    BigDecimal sumEstimatedSalaryByMonth(@Param("userId") Integer userId,
+                                         @Param("month") int month,
+                                         @Param("year") int year);
 
     List<AttendanceEntity> findAllByDate(LocalDate date);
 
-
+    @Query("SELECT a FROM AttendanceEntity a " +
+            "WHERE MONTH(a.date) = :month AND YEAR(a.date) = :year")
+    List<AttendanceEntity> findAllByMonthAndYear(@Param("month") int month, @Param("year") int year);
 }

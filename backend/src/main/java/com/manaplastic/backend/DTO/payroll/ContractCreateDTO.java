@@ -27,7 +27,7 @@ public class ContractCreateDTO {
     private BigDecimal baseSalary;
     private String workType;
     private Double insurancePercent;
-    private String allowanceToxicType;
+    private BigDecimal standardHours;
     private Long departmentId;
     private Long roleId;
     private Integer templateId; // ID của mẫu hợp đồng được chọn

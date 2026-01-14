@@ -52,11 +52,6 @@ public class ContractEntity {
     @Column(name = "InsuranceSalary", precision = 15, scale = 2)
     private BigDecimal insuranceSalary;
 
-    @ColumnDefault("'NONE'")
-    @Lob
-    @Column(name = "AllowanceToxicType")
-    private String allowanceToxicType;
-
     @ColumnDefault("'DRAFT'")
     @Lob
     @Column(name = "Status")
@@ -88,4 +83,9 @@ public class ContractEntity {
     @ManyToOne
     @JoinColumn(name = "template_id")
     private ContractTemplateEntity contractTemplate;
+
+    @ColumnDefault("8.0")
+    @Column(name = "StandardHours", precision = 4, scale = 1)
+    private BigDecimal standardHours;
+
 }

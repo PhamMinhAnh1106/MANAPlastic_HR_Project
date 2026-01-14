@@ -18,8 +18,7 @@ public class ContractUpdateDTO {
     private BigDecimal baseSalary;
     private BigDecimal insuranceSalary;
     private Double insurancePercent;    // % đóng BHXH
-
-    private String allowanceToxicType;
+    private BigDecimal standardHours;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate signDate;

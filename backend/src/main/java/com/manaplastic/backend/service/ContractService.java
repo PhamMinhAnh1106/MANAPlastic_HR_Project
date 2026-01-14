@@ -243,7 +243,7 @@ public class ContractService {
                 .divide(BigDecimal.valueOf(100));
 
         contract.setInsuranceSalary(insSalary);
-        contract.setAllowanceToxicType(request.getAllowanceToxicType());
+        contract.setStandardHours(request.getStandardHours());
 
         String typeNameVN = "FIXED_TERM".equalsIgnoreCase(request.getContractType()) ? "Xác định thời hạn" : "Vô thời hạn";
         contract.setContractname("Hợp đồng lao động " + typeNameVN + " - " + employee.getFullname());
@@ -406,6 +406,8 @@ public class ContractService {
         Number percent = contract.getInsurancePercent() != null ? contract.getInsurancePercent() : 100.0;
         data.put("{{insurance_percent}}", String.valueOf(percent));
 
+        String stdHours = contract.getStandardHours() != null ? String.valueOf(contract.getStandardHours()) : "...";
+        data.put("{{standard_hours}}", stdHours);
         // -- Bảng Phụ cấp --
         String tableHtml = generateAllowanceTableHtml(contract);
         // Lưu ý: CKEditor có thể lưu biến trong thẻ span, ví dụ <span style="...">{{allowances_table}}</span>
@@ -533,7 +535,7 @@ public class ContractService {
         dto.setType(entity.getType());
         dto.setBasesalary(entity.getBasesalary());
         dto.setInsuranceSalary(entity.getInsuranceSalary());
-        dto.setAllowanceToxicType(entity.getAllowanceToxicType());
+        dto.setStandardHours(entity.getStandardHours());
         dto.setFileurl(entity.getFileurl());
         dto.setSigndate(entity.getSigndate());
         dto.setStartdate(entity.getStartdate());
@@ -643,7 +645,6 @@ public class ContractService {
 
         // CẬP NHẬT THÔNG TIN HỢP ĐỒNG
         if (request.getContractName() != null) contract.setContractname(request.getContractName());
-        if (request.getAllowanceToxicType() != null) contract.setAllowanceToxicType(request.getAllowanceToxicType());
         if (request.getSignDate() != null) contract.setSigndate(request.getSignDate());
 //        if (request.getWorkType() != null) contract.setWorkType(request.getWorkType());
         if (request.getWorkType() != null) {
@@ -670,7 +671,9 @@ public class ContractService {
         if (request.getInsurancePercent() != null) {
             contract.setInsurancePercent(BigDecimal.valueOf(request.getInsurancePercent()));
         }
-
+        if (request.getStandardHours() != null) {
+            contract.setStandardHours(request.getStandardHours());
+        }
         // Tự động tính lại InsuranceSalary nếu có thay đổi Lương hoặc % (Giống logic create)
         if (request.getBaseSalary() != null || request.getInsurancePercent() != null) {
             BigDecimal base = request.getBaseSalary() != null ? request.getBaseSalary() : contract.getBasesalary();

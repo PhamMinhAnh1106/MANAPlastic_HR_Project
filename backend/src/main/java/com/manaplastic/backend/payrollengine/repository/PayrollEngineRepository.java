@@ -15,17 +15,32 @@ public class PayrollEngineRepository {
     private JdbcTemplate jdbcTemplate;
 
     //Lấy danh sách các Rule đang ở trạng thái APPROVED
+//    public List<Map<String, Object>> fetchApprovedRules() {
+//        String sql = """
+//                    SELECT r.rule_code, r.name, v.dsl_json
+//                    FROM salary_rule r
+//                    JOIN salary_rule_version v ON r.current_version_id = v.version_id
+//                    WHERE r.status = 'APPROVED'
+//                    ORDER BY r.priority ASC
+//                """;
+//        return jdbcTemplate.queryForList(sql);
+//    }
     public List<Map<String, Object>> fetchApprovedRules() {
         String sql = """
-                    SELECT r.rule_code, r.name, v.dsl_json 
-                    FROM salary_rule r 
-                    JOIN salary_rule_version v ON r.current_version_id = v.version_id 
-                    WHERE r.status = 'APPROVED' 
-                    ORDER BY r.priority ASC
-                """;
+            SELECT 
+                r.rule_code, 
+                r.name, 
+                v.dsl_json,
+                r.priority
+            FROM salary_rule r 
+            JOIN salary_rule_version v ON r.current_version_id = v.version_id 
+            WHERE r.status = 'APPROVED' 
+            ORDER BY r.priority ASC
+        """;
+
+        // Sử dụng queryForList để trả về List<Map>, dễ dàng loop trong Service
         return jdbcTemplate.queryForList(sql);
     }
-
     // Lưu cache cho Biến đầu vào (Variable Input)
     public void saveVariableInputToCache(String variableCode, BigDecimal value, Integer empId, String period) {
         String sql = """
