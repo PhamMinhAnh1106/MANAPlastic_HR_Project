@@ -1,13 +1,10 @@
 <!-- Overlay để đóng sidebar khi click ra ngoài trên mobile -->
 <div class="sidebar-overlay" *ngIf="isSidebarOpen" (click)="closeSidebar()"></div>
-
 <header class="task-bar">
-
   <!-- Mobile Menu Button -->
   <button class="mobile-menu-btn" (click)="toggleSidebar()">
     <span class="material-symbols-outlined">menu</span>
   </button>
-
   <!-- Notification Section -->
   <div class="user-actions">
     <!-- Nút thêm tài khoản -->
@@ -18,7 +15,6 @@
         </div>
       </div>
     </div>
-
     <!-- Notification Bell -->
     <div class="notification-wrapper" *ngIf="role[0] =='HR'" #notifiDrop>
       <div class="notification-icon-box" (click)="toggleNotifiDropdown()">
@@ -67,7 +63,6 @@
       </div>
     </div>
   </div>
-
 </header>
 
 <!-- SETTINGS MODAL -->

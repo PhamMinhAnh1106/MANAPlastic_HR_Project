@@ -36,7 +36,8 @@
                 <div class="filter-option" [class.active]="currentStatusFilter === ''" (click)="filterByStatus('')">
                   Tất cả
                 </div>
-                <div class="filter-option" [class.active]="currentStatusFilter === 'PENDING'" (click)="filterByStatus('PENDING')">
+                <!-- UPDATE: PENDING -> PENDING_MANAGER -->
+                <div class="filter-option" [class.active]="currentStatusFilter === 'PENDING_MANAGER'" (click)="filterByStatus('PENDING_MANAGER')">
                   Chờ duyệt
                 </div>
                 <div class="filter-option" [class.active]="currentStatusFilter === 'APPROVED'" (click)="filterByStatus('APPROVED')">
@@ -156,7 +157,8 @@
             </div>
           </div>
 
-          <div *ngIf="selectedRequest.status !== 'PENDING'" class="info-group">
+          <!-- UPDATE: PENDING -> PENDING_MANAGER -->
+          <div *ngIf="selectedRequest.status !== 'PENDING_MANAGER'" class="info-group">
               <span class="info-label">Người duyệt/Từ chối</span>
               <div class="info-value">{{ selectedRequest.approverName || 'N/A' }}</div>
               <div *ngIf="selectedRequest.comment" class="text-red" style="font-size: 0.875rem; margin-top: 0.25rem;">
@@ -165,7 +167,7 @@
           </div>
         </div>
 
-        <!-- Ảnh Minh Chứng (Đã cập nhật logic) -->
+        <!-- Ảnh Minh Chứng -->
         <div>
           <span class="info-label" style="margin-bottom: 0.5rem;">Ảnh minh chứng</span>
           <div class="proof-image-container">
@@ -194,7 +196,8 @@
     </div>
 
     <div class="modal-footer">
-        <ng-container *ngIf="selectedRequest.status === 'PENDING'; else readonlyActions">
+        <!-- UPDATE: PENDING -> PENDING_MANAGER -->
+        <ng-container *ngIf="selectedRequest.status === 'PENDING_MANAGER'; else readonlyActions">
             
             <!-- CHECK ROLE: Chỉ HR mới được duyệt -->
             <ng-container *ngIf="currentUserRole === 'HR'; else noPermission">

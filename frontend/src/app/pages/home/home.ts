@@ -17,6 +17,55 @@ interface ContractNotification {
   daysRemaining: number;
 }
 
+// 1. KHO DỮ LIỆU (MASTER DATA)
+// Định nghĩa danh sách chức năng duy nhất, dùng ID làm khóa chính.
+const MENU_MASTER_DATA = [
+  { id: 1, name: "Trang chủ", path: "/home/info", icon: "home" },
+  { id: 2, name: "Quản Lý Tài Khoản", path: "/home/user/account", icon: "manage_accounts" },
+  { id: 3, name: "Cấp Quyền Hạn", path: "/home/permission", icon: "manage_accounts" },
+  { id: 4, name: "Quản Lý Chấm Công", path: "/home/user/attendance", icon: "event_available" },
+  { id: 5, name: "Lịch Làm Việc", path: "/home/schedule", icon: "event_available" },
+  { id: 6, name: "Quản Lý Phép", path: "/home/leaverequest/manage", icon: "event_available" },
+  { id: 18, name: "Quản Lý Ngày OverTime", path: "/home/manage/overtime", icon: "event_available" },
+  { id: 7, name: "Đăng Ký Nghỉ Phép", path: "/home/leaverequest", icon: "flight_takeoff" },
+  { id: 8, name: "Quản Lý Hợp Đồng", path: "/home/contracts", icon: "article" },
+  { id: 9, name: "Hợp Đồng Mẫu", path: "/home/contracts/edit", icon: "article" },
+  { id: 10, name: "Cấu Hình Lương", path: "/home/payroll/rules", icon: "paid" },
+  { id: 11, name: "Tính Lương", path: "/home/payroll", icon: "paid" },
+  { id: 12, name: "Xem Lương", path: "/home/payroll/payslip", icon: "paid" },
+  { id: 13, name: "Lọc DS Lương", path: "/home/payroll/payslip/filter", icon: "paid" },
+  { id: 14, name: "Quản Lý Thưởng/Phạt", path: "/home/user/reward-punish", icon: "paid" },
+  { id: 19, name: "Kiểm Tra Lương", path: "/home/salarydate", icon: "paid" },
+  { id: 15, name: "Quản Lý Cấu Hình Luật", path: "/home/law", icon: "gavel" },
+  { id: 16, name: "Quản Lý Hoạt Động", path: "/home/activity-logs", icon: "event_note" },
+  { id: 17, name: "Quản Lý Hồ Sơ", path: "/home/user/Mydocuments", icon: "document_search" },
+
+
+];
+
+// Helper để lấy thông tin item nhanh theo ID
+const getMenuItem = (id: number) => MENU_MASTER_DATA.find(item => item.id === id);
+
+// Helper để tạo nhóm menu
+function buildGroup(iconName: string, rootPath: string, childIds: number[]) {
+  const tasks = childIds
+    .map(id => getMenuItem(id))
+    .filter(item => item !== undefined) // Loại bỏ item không tồn tại
+    .map(item => ({
+      name: item!.name,
+      path: item!.path
+      // Có thể thêm icon cho item con ở đây nếu giao diện hỗ trợ
+    }));
+
+  if (tasks.length === 0) return null; // Không tạo nhóm nếu không có item con nào hợp lệ
+
+  return {
+    iconName: iconName,
+    path: rootPath,
+    task: tasks
+  };
+}
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -26,8 +75,8 @@ interface ContractNotification {
 })
 export class Home implements OnInit {
   constructor(
-    private cookieService: CookieService, 
-    private router: Router, 
+    private cookieService: CookieService,
+    private router: Router,
     private cdr: ChangeDetectorRef,
     private themeService: ThemeService
   ) { }
@@ -127,177 +176,111 @@ export class Home implements OnInit {
   }
 
   checkrole() {
-    const icon: any[] = [{
-      iconName: "home", path: "/home/info", task: [{ name: "Trang chủ", path: "/home/info" }]
-    }];
+    // 1. Luôn có trang chủ (ID 1)
+    const homeItem = getMenuItem(1);
+    const icon: any[] = homeItem ? [{
+      iconName: homeItem.icon,
+      path: homeItem.path,
+      task: [{ name: homeItem.name, path: homeItem.path }]
+    }] : [];
+
+    // 2. Lấy Role từ token
     this.role = DecodeTokenRole(this.token);
     if (this.role.length > 0)
       this.cookieService.set("role", this.role[0], { path: "/" });
 
     const currentRole = this.role[0] || '';
+    let roleMenus: any[] = [];
 
+    // 3. Cấu hình Menu cho từng Role dựa trên ID
     switch (currentRole) {
       case "Admin":
-        const icon_admin = [
-          // 1. Quản trị hệ thống & Tài khoản (Gốc của Admin)
-          {
-            iconName: "manage_accounts",
-            path: "/home/user/account",
-            task: [
-              { name: "Quản Lý Tài Khoản", path: "/home/user/account" },
-              { name: "Cấp Quyền Hạn", path: "/home/permission" }
-            ]
-          },
-          // 2. Nhân sự & Chấm công (Lấy từ HR + Manager)
-          {
-            iconName: "event_available",
-            path: "/home/user/attendance",
-            task: [
-              { name: "Quản Lý Chấm Công", path: "/home/user/attendance" },
-              { name: "Lịch Làm Việc", path: "/home/schedule" }, // Thêm từ Manager
-              { name: "Quản Lý Phép", path: "/home/leaverequest/manage" },
-              { name: "Đăng Ký Nghỉ Phép", path: "/home/leaverequest" } // Admin cũng có thể cần nghỉ phép
-            ]
-          },
-          // 3. Hợp đồng (Lấy từ HR)
-          {
-            iconName: "article",
-            path: "/home/contracts",
-            task: [
-              { name: "Quản Lý Hợp Đồng", path: "/home/contracts/edit" },
-              { name: "Kiểm tra Hợp Đồng", path: "/home/contracts" },
-              { name: "Thêm Hợp Đồng", path: "/home/contracts/edit/add" }
-            ],
-          },
-          // 4. Lương & Thưởng (Gộp Admin + HR)
-          {
-            iconName: "paid", // Hoặc dùng icon currency_exchange của HR
-            path: "/home/payroll",
-            task: [
-              { name: "Cấu Hình Lương", path: "/home/payroll/rules" },
-              { name: "Tính Lương", path: "/home/payroll" },
-              { name: "Xem Lương", path: "/home/payroll/payslip" },
-              { name: "Lọc DS Lương", path: "/home/payroll/payslip/filter" },
-              { name: "Quản Lý Thưởng/Phạt", path: "/home/user/reward-punish" }
-            ],
-          },
-          // 5. Luật (Gốc của Admin)
-          {
-            iconName: "gavel",
-            path: "/home/law",
-            task: [{ name: "Quản Lý Cấu Hình Luật", path: "/home/law" }],
-          },
-          // 6. Logs hệ thống (Gốc của Admin)
-          {
-            iconName: "event_note",
-            path: "/home/activity-logs",
-            task: [{ name: "Quản Lý Hoạt Động", path: "/home/activity-logs" }],
-          },
+        roleMenus = [
+          // Quản trị hệ thống & Tài khoản (Gốc Admin) - ID: 2, 3
+          buildGroup("manage_accounts", "/home/user/account", [2, 3]),
+
+          // Nhân sự & Chấm công (Từ HR + Manager) - ID: 4, 5, 6, 7
+          buildGroup("event_available", "/home/user/attendance", [4, 5, 6, 7]),
+
+          // Hợp đồng (Từ HR) - ID: 8, 9
+          buildGroup("article", "/home/contracts", [8, 9]),
+
+          // Lương & Thưởng (Gộp Admin + HR) - ID: 10, 11, 12, 13, 14
+          buildGroup("paid", "/home/payroll", [10, 11, 12, 13, 14, 19]),
+
+          // Luật (Gốc Admin) - ID: 15
+          buildGroup("gavel", "/home/law", [15]),
+
+          // Logs hệ thống (Gốc Admin) - ID: 16
+          buildGroup("event_note", "/home/activity-logs", [16]),
+
+          // Hồ sơ - ID: 17
+          buildGroup("document_search", "/home/user/Mydocuments", [17]),
         ];
-        icon.push(...icon_admin)
-        this.icon_handleBar = icon;
         break;
 
       case "HR":
-        const icon_hr = [
-          {
-            iconName: "manage_accounts",
-            path: "/home/user/account",
-            task: [{ name: "Quản Lý Nhân Sự", path: "/home/user/account" }],
-          },
-          {
-            iconName: "event_available",
-            path: "/home/user/attendance",
-            task: [{ name: "Quản Lý Chấm Công", path: "/home/user/attendance" }, { name: "Quản Lý Phép", path: "/home/leaverequest/manage" }]
-          },
-          {
-            iconName: "article",
-            path: "/home/contracts",
-            task: [{ name: "Quản Lý Hợp Đồng", path: "/home/contracts" },
-            { name: "Hợp Đồng Mẫu", path: "/home/contracts/edit" }
-              // , { name: "Thêm Hợp Đồng", path: "/home/contracts/edit/add" }
-            ],
-          },
-          {
-            iconName: "document_search",
-            path: "/home/user/Mydocuments",
-            task: [{ name: "Quản Lý Hồ Sơ", path: "/home/user/Mydocuments" }]
-          },
-          {
-            iconName: "currency_exchange",
-            path: "/home/payroll",
-            task: [{ name: "Tính Lương", path: "/home/payroll" },
-            { name: "Cấu Hình Lương", path: "/home/payroll/rules" },
-            { name: "Xem Lương", path: "/home/payroll/payslip" },
-            { name: "Lọc DS Lương", path: "/home/payroll/payslip/filter" },
-            { name: "Quản Lý Thưởng/Phạt", path: "/home/user/reward-punish" }
-            ],
-          }, {
-            iconName: "gavel",
-            path: "/home/law",
-            task: [{ name: "Quản Lý Cấu Hình Luật", path: "/home/law" }],
-          },
+        roleMenus = [
+          // Quản lý nhân sự - ID: 2
+          buildGroup("manage_accounts", "/home/user/account", [2]),
+
+          // Chấm công & Phép - ID: 4, 6
+          buildGroup("event_available", "/home/user/attendance", [4, 6, 18]),
+
+          // Hợp đồng - ID: 8, 9
+          buildGroup("article", "/home/contracts", [8, 9]),
+
+          // Hồ sơ - ID: 17
+          buildGroup("document_search", "/home/user/Mydocuments", [17]),
+
+          // Lương - ID: 11, 10, 12, 13, 14
+          buildGroup("currency_exchange", "/home/payroll", [11, 10, 12, 13, 14, 19]),
+
+          // Luật - ID: 15
+          buildGroup("gavel", "/home/law", [15]),
         ];
-        icon.push(...icon_hr)
-        this.icon_handleBar = icon;
         break;
 
       case "Manager":
-        const icon_manager = [
-          {
-            iconName: "edit_calendar",
-            path: "/home/user/attendance",
-            task: [{ name: "Quản Lý Chấm Công", path: "/home/user/attendance" }, { name: "Lịch Làm Việc", path: "/home/schedule" }]
-          },
-          {
-            iconName: "flight_takeoff",
-            path: "/home/leaverequest",
-            task: [{ name: "Nghỉ Phép", path: "/home/leaverequest" }, { name: "Quản Lý Phép", path: "/home/leaverequest/manage" }]
-          },
-          {
-            iconName: "document_search",
-            path: "/home/user/Mydocuments",
-            task: [{ name: "Quản Lý Hồ Sơ", path: "/home/user/Mydocuments" }]
-          },
-          {
-            iconName: "receipt_long",
-            path: "/home/payroll/payslip",
-            task: [{ name: "Xem Lương", path: "/home/payroll/payslip" },],
-          },
+        roleMenus = [
+          // Chấm công Manager - ID: 4, 5
+          buildGroup("edit_calendar", "/home/user/attendance", [4, 5, 18]),
 
+          // Nghỉ phép - ID: 7, 6
+          buildGroup("flight_takeoff", "/home/leaverequest", [7, 6]),
+
+          // Hồ sơ - ID: 17
+          buildGroup("document_search", "/home/user/Mydocuments", [17]),
+
+          // Xem lương - ID: 12
+          buildGroup("receipt_long", "/home/payroll/payslip", [12, 19]),
         ];
-        icon.push(...icon_manager)
-        this.icon_handleBar = icon;
         break;
 
       case "Employee":
-        const icon_employee = [
-          {
-            iconName: "calendar_month",
-            path: "/home/user/attendance",
-            task: [{ name: "Quản Lý Chấm Công", path: "/home/user/attendance" }, { name: "Lịch Làm Việc", path: "/home/schedule" }]
-          },
-          {
-            iconName: "beach_access",
-            path: "/home/leaverequest",
-            task: [{ name: "Nghỉ Phép", path: "/home/leaverequest" }]
-          },
-          {
-            iconName: "document_search",
-            path: "/home/user/Mydocuments",
-            task: [{ name: "Quản Lý Hồ Sơ", path: "/home/user/Mydocuments" }]
-          },
-          {
-            iconName: "payments",
-            path: "/home/payroll/payslip",
-            task: [{ name: "Xem Lương", path: "/home/payroll/payslip" }],
-          },
+        roleMenus = [
+          // Chấm công Employee - ID: 4, 5
+          buildGroup("calendar_month", "/home/user/attendance", [4, 5, 18]),
+
+          // Nghỉ phép - ID: 7
+          buildGroup("beach_access", "/home/leaverequest", [7]),
+
+          // Hồ sơ - ID: 17
+          buildGroup("document_search", "/home/user/Mydocuments", [17]),
+
+          // Xem lương - ID: 12
+          buildGroup("payments", "/home/payroll/payslip", [12, 19]),
         ];
-        icon.push(...icon_employee)
-        this.icon_handleBar = icon;
         break;
     }
+
+    // 4. Lọc bỏ các group null (nếu có lỗi ID) và gộp vào icon chính
+    const validMenus = roleMenus.filter(g => g !== null);
+    icon.push(...validMenus);
+
+    this.icon_handleBar = icon;
   }
+
   activeIndex: number | null = 0;
 
   toggleSubmenu(index: number) {
@@ -340,7 +323,7 @@ export class Home implements OnInit {
     this.CheckLogin();
     this.checkrole();
     this.isDarkMode = this.themeService.getCurrentTheme() === 'dark';
-    
+
     // Subscribe to theme changes
     this.themeService.theme$.subscribe(theme => {
       this.isDarkMode = theme === 'dark';

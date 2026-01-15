@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // --- Variables ---
 $primary-color: #4361ee;
 $secondary-color: #3f37c9;
@@ -206,7 +208,7 @@ button {
     padding: 0.6rem 1.2rem;
 
     &:hover {
-        background-color: darken($success-color, 10%);
+        background-color: color.adjust($success-color, $lightness: -10%);
         transform: translateY(-1px);
     }
 }
@@ -254,6 +256,12 @@ table {
 
     tr:hover td {
         background-color: #f8f9fa;
+    }
+
+    // Custom style for salary column
+    .salary-text {
+        font-weight: 600;
+        color: $primary-color;
     }
 }
 
@@ -402,7 +410,7 @@ table {
 
     &.present {
         background-color: rgba($success-color, 0.15);
-        color: darken($success-color, 15%);
+        color: color.adjust($success-color, $lightness: -15%);
     }
 
     &.absent {
@@ -418,7 +426,7 @@ table {
     &.missing_output_data,
     &.missing_input_data {
         background-color: rgba($warning-color, 0.2);
-        color: darken($warning-color, 45%);
+        color: color.adjust($warning-color, $lightness: -45%);
     }
 }
 
@@ -676,7 +684,7 @@ table {
             color: white;
 
             &:hover {
-                background-color: darken($primary-color, 10%);
+                background-color: color.adjust($primary-color, $lightness: -10%);
             }
         }
 
@@ -685,7 +693,7 @@ table {
             color: $text-dark;
 
             &:hover {
-                background-color: darken(#e9ecef, 10%);
+                background-color: color.adjust(#e9ecef, $lightness: -10%);
             }
         }
     }

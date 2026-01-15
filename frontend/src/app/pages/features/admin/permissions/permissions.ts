@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import {
   Changepermission,
   Deletepermission,
@@ -14,6 +14,11 @@ import { Comfirm } from '../../../shared/comfirm/comfirm';
 import { FormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
 import { GetOneAccountInfo } from '../../../../services/pages/features/hr/accountManager.service';
+// Import RxJS và hàm tìm kiếm từ utils
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { findUserbyUsername } from '../../../../utils/finduser.utils';
+// Lưu ý: Hãy sửa lại đường dẫn import này cho đúng với cấu trúc thư mục thực tế của bạn
 
 interface UserInfo {
   userID: number;
@@ -37,7 +42,7 @@ interface ChangePer {
   templateUrl: './permissions.html',
   styleUrl: './permissions.scss',
 })
-export class Permissions implements OnInit {
+export class Permissions implements OnInit, OnDestroy {
   // --- TABS CONFIG ---
   activeTab: 'user' | 'role' = 'user';
 
@@ -57,6 +62,12 @@ export class Permissions implements OnInit {
   currentPage: number = 0;
   pageSize: number = 10;
   isLastPage: boolean = false;
+
+  // --- AUTOCOMPLETE VARIABLES (NEW) ---
+  showUserSearchDropdown: boolean = false;
+  userSearchResults: any[] = [];
+  private searchSubject = new Subject<string>();
+  private searchSubscription: Subscription | undefined;
 
   // --- ROLE TAB VARIABLES ---
   rolesList: any[] = [
@@ -88,16 +99,31 @@ export class Permissions implements OnInit {
 
   ngOnInit(): void {
     this.initRoles();
+
+    // Thiết lập Debounce cho tìm kiếm user
+    this.searchSubscription = this.searchSubject.pipe(
+      debounceTime(300), // Đợi 300ms sau khi ngừng gõ
+      distinctUntilChanged() // Chỉ tìm nếu giá trị thay đổi
+    ).subscribe(searchValue => {
+      this.performUserSearch(searchValue);
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Hủy subscription để tránh leak memory
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
   }
 
   showNotification(message: string, type: boolean) {
     this.notifyMessage = message;
     this.notifyType = type;
     this.isalert = true;
-    this.cdr.detectChanges(); // Cập nhật UI để hiện thông báo ngay
+    this.cdr.detectChanges();
     setTimeout(() => {
       this.isalert = false;
-      this.cdr.detectChanges(); // Cập nhật UI khi ẩn thông báo
+      this.cdr.detectChanges();
     }, 3000);
   }
 
@@ -107,8 +133,57 @@ export class Permissions implements OnInit {
   }
 
   // ==========================================
-  // TAB 1: USER LOGIC
+  // TAB 1: USER LOGIC (UPDATED WITH AUTOCOMPLETE)
   // ==========================================
+
+  // Hàm bắt sự kiện input từ HTML
+  onSearchUser(event: any) {
+    const value = event.target.value;
+    // Nếu rỗng thì ẩn dropdown
+    if (!value || value.trim() === '') {
+      this.showUserSearchDropdown = false;
+      this.userSearchResults = [];
+      return;
+    }
+    // Push vào subject để debounce
+    this.searchSubject.next(value);
+  }
+
+  // Hàm gọi API tìm kiếm (từ file utils)
+  async performUserSearch(username: string) {
+    try {
+      // Gọi hàm API được yêu cầu
+      const res = await findUserbyUsername(username) as any[];
+
+      // Giới hạn 5 kết quả
+      if (res && Array.isArray(res)) {
+        this.userSearchResults = res.slice(0, 5);
+        this.showUserSearchDropdown = this.userSearchResults.length > 0;
+      } else {
+        this.userSearchResults = [];
+        this.showUserSearchDropdown = false;
+      }
+    } catch (error) {
+      console.error(error);
+      this.userSearchResults = [];
+      this.showUserSearchDropdown = false;
+    }
+    this.cdr.detectChanges();
+  }
+
+  // Hàm chọn user từ dropdown
+  selectSearchUser(user: any) {
+    // Gán giá trị vào ô input
+    this.searchUsername = user.username || user.fullName || '';
+
+    // Ẩn dropdown
+    this.showUserSearchDropdown = false;
+
+    // Tự động gọi hàm tìm kiếm quyền chính
+    this.searchPermission(true);
+  }
+
+  // --- Logic cũ vẫn giữ nguyên ---
 
   private buildQueryString(): string {
     let query = '';
@@ -140,6 +215,9 @@ export class Permissions implements OnInit {
   }
 
   async searchPermission(isNewUserSearch: boolean = false) {
+    // Ẩn dropdown gợi ý khi bắt đầu tìm kiếm chính thức
+    this.showUserSearchDropdown = false;
+
     if (!this.searchUsername.trim()) {
       this.showNotification("Vui lòng nhập username", false);
       return;
@@ -153,7 +231,6 @@ export class Permissions implements OnInit {
     }
 
     this.isloading = true;
-    this.cdr.detectChanges(); // Trigger loading state
 
     try {
       const role = this.cookie.get('role').toLowerCase();
@@ -216,7 +293,7 @@ export class Permissions implements OnInit {
       if (isNewUserSearch) this.permissions = [];
     } finally {
       this.isloading = false;
-      this.cdr.detectChanges(); // Trigger update UI after loading
+      this.cdr.detectChanges();
     }
   }
 
@@ -243,7 +320,7 @@ export class Permissions implements OnInit {
     if (!this.selectedPermission || !this.searchUsername) return;
     this.showEditModal = false;
     this.isloading = true;
-    this.cdr.detectChanges(); // Update UI loading start
+    this.cdr.detectChanges();
 
     const form: ChangePer = {
       username: this.searchUsername,
@@ -263,7 +340,7 @@ export class Permissions implements OnInit {
       this.showNotification("Lỗi kết nối", false);
     } finally {
       this.isloading = false;
-      this.cdr.detectChanges(); // Update UI loading end
+      this.cdr.detectChanges();
     }
   }
 
@@ -275,7 +352,7 @@ export class Permissions implements OnInit {
 
   async onConfirmResult(confirmed: boolean) {
     this.isconfirm = false;
-    this.cdr.detectChanges(); // Ẩn confirm modal ngay
+    this.cdr.detectChanges();
 
     if (confirmed && this.itemToDelete) {
       this.isloading = true;
@@ -294,7 +371,7 @@ export class Permissions implements OnInit {
       } finally {
         this.isloading = false;
         this.itemToDelete = null;
-        this.cdr.detectChanges(); // Update UI
+        this.cdr.detectChanges();
       }
     }
   }
@@ -360,7 +437,7 @@ export class Permissions implements OnInit {
       this.rolePermissions = [];
     } finally {
       this.isloading = false;
-      this.cdr.detectChanges(); // Update UI sau khi load xong
+      this.cdr.detectChanges();
     }
   }
 
@@ -378,7 +455,7 @@ export class Permissions implements OnInit {
 
     const previousState = permission.active;
     permission.active = !previousState;
-    this.cdr.detectChanges(); // Update UI switch ngay lập tức (Optimistic)
+    this.cdr.detectChanges();
 
     const form: PutRoleForm = {
       roleId: this.selectedRoleId,
@@ -396,9 +473,9 @@ export class Permissions implements OnInit {
         throw new Error("Failed");
       }
     } catch (error) {
-      permission.active = previousState; // Revert nếu lỗi
+      permission.active = previousState;
       this.showNotification("Lỗi cập nhật server", false);
-      this.cdr.detectChanges(); // Update lại UI sau khi revert
+      this.cdr.detectChanges();
     }
   }
 }

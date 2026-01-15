@@ -273,7 +273,6 @@
       </div>
 
     </div>
-  </div>
   
   <!-- ========================================== -->
   <!-- MODALS AREA -->
@@ -479,26 +478,30 @@
                       </select>
                   </div>
                   <div class="form-group-lg">
+                    <!-- SỬA TEMPLATE SELECT -->
                     <label>Mẫu Hợp đồng (Template)</label>
                     <select [(ngModel)]="editForm.templateId" class="custom-input-lg" [disabled]="isReadOnly">
                         <option [ngValue]="0">-- Chọn mẫu hợp đồng --</option>
-                        <option *ngFor="let t of listTemplates" [ngValue]="t.id">{{ t.name }}</option>
+                        <option *ngFor="let t of listTemplates" [ngValue]="t.id">{{ t.contractname }}</option>
                     </select>
                   </div>
               </div>
   
               <div class="form-row three-col">
                   <div class="form-group-lg">
+                      <!-- SỬA signdate -->
                       <label>Ngày ký (Sign Date)</label>
-                      <input type="date" [(ngModel)]="editForm.signDate" class="custom-input-lg" [disabled]="isReadOnly">
+                      <input type="date" [(ngModel)]="editForm.signdate" class="custom-input-lg" [disabled]="isReadOnly">
                   </div>
                   <div class="form-group-lg">
+                      <!-- SỬA startdate -->
                       <label>Ngày hiệu lực (Start Date) *</label>
-                      <input type="date" [(ngModel)]="editForm.startDate" class="custom-input-lg" [disabled]="isReadOnly">
+                      <input type="date" [(ngModel)]="editForm.startdate" class="custom-input-lg" [disabled]="isReadOnly">
                   </div>
                   <div class="form-group-lg">
+                      <!-- SỬA enddate -->
                       <label>Ngày kết thúc (End Date)</label>
-                      <input type="date" [(ngModel)]="editForm.endDate" class="custom-input-lg" [disabled]="isReadOnly">
+                      <input type="date" [(ngModel)]="editForm.enddate" class="custom-input-lg" [disabled]="isReadOnly">
                   </div>
               </div>
 
@@ -714,3 +717,4 @@
   
   <!-- 8. CONFIRM POPUP (Layer Top: 1100) -->
   <app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
+</div>

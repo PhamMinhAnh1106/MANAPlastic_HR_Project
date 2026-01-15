@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // --- VARIABLES ---
 $primary: #4f46e5;
 $primary-hover: #4338ca;
@@ -436,11 +438,11 @@ button {
 
     &.blue {
         color: $info;
-        border-color: lighten($info, 30%);
-        background: lighten($info, 48%);
+        border-color: color.adjust($info, $lightness: 30%);
+        background: color.adjust($info, $lightness: 48%);
 
         &:hover {
-            background: lighten($info, 40%);
+            background: color.adjust($info, $lightness: 40%);
             border-color: $info;
         }
     }

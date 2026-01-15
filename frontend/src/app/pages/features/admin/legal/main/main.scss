@@ -1,3 +1,4 @@
+@use "sass:color";
 // --- Variables ---
 $primary-color: #2563eb; // Xanh dương
 $text-color: #1f2937;
@@ -64,7 +65,7 @@ $white: #ffffff;
     transition: background-color 0.2s;
 
     &:hover {
-        background-color: darken($primary-color, 10%);
+        background-color: color.adjust($primary-color, $lightness: -10%);
     }
 }
 

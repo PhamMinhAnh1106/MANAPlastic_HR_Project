@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // --- Variables ---
 $primary-color: #4361ee;
 $secondary-color: #3f37c9;
@@ -19,17 +21,15 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .attendance-container {
+    padding: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+
     @media (max-width: 768px) {
         margin-left: 0;
         padding: 1rem;
         padding-top: 4rem;
     }
-
-    padding: 1rem;
-    max-width: 1400px;
-    margin: 0 auto;
-
-
 }
 
 // --- Header & Tabs ---
@@ -204,7 +204,7 @@ button {
     padding: 0.6rem 1.2rem;
 
     &:hover {
-        background-color: darken($primary-color, 5%);
+        background-color: color.adjust($primary-color, $lightness: -5%);
         transform: translateY(-1px);
     }
 
@@ -217,7 +217,7 @@ button {
     padding: 0.6rem 1.2rem;
 
     &:hover {
-        background-color: darken($success-color, 10%);
+        background-color: color.adjust($success-color, $lightness: -10%);
         transform: translateY(-1px);
     }
 
@@ -230,7 +230,7 @@ button {
     padding: 0.6rem 1.2rem;
 
     &:hover {
-        background-color: darken(#e9ecef, 5%);
+        background-color: color.adjust(#e9ecef, $lightness: -5%);
     }
 
 
@@ -242,7 +242,7 @@ button {
     padding: 0.6rem 1.2rem;
 
     &:hover {
-        background-color: darken($success-color, 5%);
+        background-color: color.adjust($success-color, $lightness: -5%);
     }
 
 
@@ -254,7 +254,7 @@ button {
     padding: 0.6rem 1.2rem;
 
     &:hover {
-        background-color: darken($danger-color, 5%);
+        background-color: color.adjust($danger-color, $lightness: -5%);
     }
 
 
@@ -361,12 +361,12 @@ table {
 
     &.status-pending {
         background-color: rgba($warning-color, 0.15);
-        color: darken($warning-color, 25%);
+        color: color.adjust($warning-color, $lightness: -25%);
     }
 
     &.status-approved {
         background-color: rgba($success-color, 0.15);
-        color: darken($success-color, 15%);
+        color: color.adjust($success-color, $lightness: -15%);
     }
 
     &.status-rejected {

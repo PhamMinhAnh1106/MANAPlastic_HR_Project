@@ -27,6 +27,8 @@ import { Contracts } from './pages/features/hr/contract_folder/contracts/contrac
 import { ContractManager } from './pages/features/hr/contract_folder/contract-main/contract-main';
 import { ContractCreate } from './pages/features/hr/contract_folder/contract-main-add/contract-main-add';
 import { Documentsuser } from './pages/features/employee/documentsuser/documentsuser';
+import { OtManager } from './pages/features/manager/manage-overtime/manage-overtime';
+import { salarydate } from './pages/features/employee/salarydate/salarydate';
 
 
 export const routes: Routes = [
@@ -62,19 +64,19 @@ export const routes: Routes = [
             { path: 'contracts', component: Contracts },
             { path: 'contracts/edit', component: ContractManager },
             { path: 'contracts/edit/add', component: ContractCreate },
+            { path: 'manage/overtime', component: OtManager },
 
 
 
 
             //employee
-            {
-                path: 'calender', component: Schedule,
-            },
+            { path: 'calender', component: Schedule },
             { path: 'schedule/register', component: RegisterSchedule },
             { path: 'schedule/auto', component: AutoSchedule },
             { path: 'schedule', component: Schedule },
             { path: 'leaverequest', component: Leaverequests },
             { path: 'leaverequest/add', component: ADdleaverequest },
+            { path: 'salarydate', component: salarydate },
 
 
 

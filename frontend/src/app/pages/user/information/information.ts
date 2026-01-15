@@ -114,10 +114,8 @@ export class Information implements OnInit {
 
   startEdit() {
     this.isEditing = true;
-    // Deep clone để an toàn dữ liệu
     this.formdata = JSON.parse(JSON.stringify(this.userInfo));
 
-    // Format lại ngày sinh để hiển thị đúng trong input type="date" (yyyy-MM-dd)
     if (this.formdata.birth) {
       const date = new Date(this.formdata.birth);
       if (!isNaN(date.getTime())) {
@@ -131,7 +129,6 @@ export class Information implements OnInit {
     this.formdata = {};
   }
 
-  // Hàm validate riêng biệt
   validateForm(): boolean {
     // 1. Validate tên
     if (!this.formdata.fullname || this.formdata.fullname.trim().length === 0) {
@@ -210,7 +207,7 @@ export class Information implements OnInit {
         if (res.status == 200) {
           this.onalert(res.data || "Cập nhật thành công!", true);
           this.isEditing = false;
-          await this.getInformation(); // Load lại dữ liệu mới
+          await this.getInformation();
         } else {
           // Xử lý lỗi từ server trả về
           const errorMsg = res.response?.data?.message || "Cập nhật thất bại";

@@ -98,6 +98,7 @@
               <th>Ca làm</th>
               <th>Giờ vào</th>
               <th>Giờ ra</th>
+              <th>Lương ngày (Est)</th> <!-- Thêm cột Lương ngày -->
               <th class="text-center">Trạng thái</th>
               <th class="text-center">Minh chứng</th>
               <th *ngIf="role === 'hr'" class="text-center">Thao tác</th>
@@ -131,6 +132,13 @@
                   <span><span class="dot red"></span>{{ getTime(att.checkOut) }}</span>
                 </div>
                 <span *ngIf="!att.checkOut" class="text-light">-</span>
+              </td>
+
+              <!-- Hiển thị lương ngày -->
+              <td>
+                <span class="salary-text">
+                    {{ att.estimatedSalary | number:'1.0-0' }} đ
+                </span>
               </td>
 
               <td class="text-center">

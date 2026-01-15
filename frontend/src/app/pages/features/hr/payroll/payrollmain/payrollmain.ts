@@ -159,6 +159,8 @@ export class Payrollmain implements OnInit {
       this.showAlert(`Lỗi kết nối: ${msg}`, false);
     } finally {
       this.isloading = false;
+      this.cdr.detectChanges()
+
     }
   }
 
@@ -177,7 +179,6 @@ export class Payrollmain implements OnInit {
       const data = await RulesPayroll(this.empId, m, y);
       if (Array.isArray(data)) {
         this.debugData = data.map((row: DebugRecord) => this.processRow(row));
-        this.cdr.detectChanges();
       } else {
         console.warn("Dữ liệu trả về không phải là mảng:", data);
         this.showAlert('Không tìm thấy dữ liệu cho nhân viên này', false);
@@ -186,7 +187,10 @@ export class Payrollmain implements OnInit {
       console.error(err);
       this.showAlert('Lỗi khi tải dữ liệu chi tiết', false);
     } finally {
+
       this.isloading = false;
+      this.cdr.detectChanges();
+
     }
   }
 

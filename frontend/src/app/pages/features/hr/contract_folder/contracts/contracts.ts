@@ -48,9 +48,11 @@ export interface CreateContractPayload {
   contractType: string;
   workType: string;
   templateId: number;
-  signDate?: string;
-  startDate: string;
-  endDate: string | null;
+  // --- CHỈNH SỬA: Đảm bảo viết thường (d) cho các biến ngày ---
+  signdate?: string;
+  startdate: string;
+  enddate: string | null;
+  // -----------------------------------------------------------
   baseSalary: number;
   insuranceSalary?: number;
   insurancePercent: number;
@@ -76,7 +78,8 @@ export const Role: role[] = [
 
 export interface ContractTemplate {
   id: number;
-  name: string;
+  // --- CHỈNH SỬA: Đổi từ 'name' sang 'contractname' ---
+  contractname: string;
   type?: string;
   content?: string;
   isActive?: boolean;
@@ -154,6 +157,7 @@ export class Contracts implements OnInit {
     type: '',
     status: '',
     allowanceToxicType: '',
+    // --- Đảm bảo viết thường ---
     startdate: '',
     enddate: ''
   };
@@ -264,7 +268,12 @@ export class Contracts implements OnInit {
 
   getEmptyEditForm(): EditContractParams {
     return {
-      id: 0, userId: null, departmentId: 0, roleId: 0, fullname: '', contractname: '', cccd: '', email: '', phone: '', address: '', dob: '', gender: 'MALE', contractType: 'FIXED_TERM', workType: 'FULLTIME', templateId: 0, signDate: '', startDate: '', endDate: null, baseSalary: 0, insuranceSalary: 0, insurancePercent: 0, allowanceToxicType: 'NONE', allowances: []
+      // --- Đảm bảo viết thường ---
+      id: 0, userId: null, departmentId: 0, roleId: 0, fullname: '', contractname: '', cccd: '', email: '', phone: '', address: '', dob: '', gender: 'MALE', contractType: 'FIXED_TERM', workType: 'FULLTIME', templateId: 0,
+      signdate: '',
+      startdate: '',
+      enddate: null,
+      baseSalary: 0, insuranceSalary: 0, insurancePercent: 0, allowanceToxicType: 'NONE', allowances: []
     };
   }
 
@@ -448,9 +457,10 @@ export class Contracts implements OnInit {
       insuranceSalary: c.insuranceSalary || (c.baseSalary && c.insurancePercent ? (c.baseSalary * c.insurancePercent / 100) : 0),
       allowanceToxicType: c.allowanceToxicType || 'NONE',
 
-      signDate: this.formatDateForInput(c.signDate),
-      startDate: this.formatDateForInput(c.startDate || c.signdate),
-      endDate: this.formatDateForInput(c.endDate),
+      // --- Đảm bảo viết thường: signdate, startdate, enddate ---
+      signdate: this.formatDateForInput(c.signdate),
+      startdate: this.formatDateForInput(c.startdate || c.signdate),
+      enddate: this.formatDateForInput(c.enddate),
 
       userId: c.userId || null,
       departmentId: c.departmentId || 0,
@@ -520,7 +530,8 @@ export class Contracts implements OnInit {
 
   async submitEditContract() {
     if (this.isReadOnly) return;
-    if (!this.editForm.startDate) {
+    // --- Đảm bảo viết thường: startdate ---
+    if (!this.editForm.startdate) {
       this.showNotification("Ngày bắt đầu là bắt buộc", false);
       return;
     }
@@ -535,7 +546,8 @@ export class Contracts implements OnInit {
 
     this.isloading = true;
     try {
-      const res: any = await EditContract(this.editForm);
+      // Cast to any to avoid type mismatch with service definition
+      const res: any = await EditContract(this.editForm as any);
       if (res && res.status === 200) {
         this.showNotification("Cập nhật hợp đồng thành công!", true);
 

@@ -76,7 +76,7 @@
       <div class="form-group">
         <label>Phòng ban</label>
         <select [(ngModel)]="filter.departmentId">
-          <option value="">-- Tất cả --</option>
+          
           <option *ngFor="let dept of department" [value]="dept.departmentId">{{ dept.departmentName }}</option>
         </select>
       </div>

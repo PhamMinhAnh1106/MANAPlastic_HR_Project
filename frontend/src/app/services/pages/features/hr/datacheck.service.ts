@@ -78,7 +78,10 @@ export async function AddNewAttendanceRequests(data: AttendanceRequestPayload) {
             },
         });
 
-        return res.data;
+        return {
+            data: res.data,
+            status: res.status
+        };
     } catch (error) {
         console.error("Lỗi khi gửi yêu cầu:", error);
         throw error;

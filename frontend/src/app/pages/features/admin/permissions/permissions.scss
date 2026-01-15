@@ -21,1009 +21,1105 @@ $radius: 12px; // Giảm bo góc một chút cho gọn
     background-color: $bg-app;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     color: $text-main;
+    padding-bottom: 2rem; // Thêm padding bottom để trang thoáng hơn
 
     // --- QUAN TRỌNG: Fix lỗi tràn chiều ngang ---
     // Đảm bảo padding và border nằm trong kích thước width
+    // Layout & Spacing
+    width: 100%; // Đảm bảo container không bị co
+    max-width: 1250px;
+    margin: 0 auto;
+    overflow-x: hidden;
+    // --- Font size cơ bản ---
+    font-size: 14px;
+
     *,
     *::before,
     *::after {
         box-sizing: border-box;
     }
 
-    // Layout & Spacing
-    width: 100%; // Đảm bảo container không bị co
-    max-width: 1250px;
-    margin: 0 auto;
-
-    overflow-x: hidden;
-
-    // --- Font size cơ bản ---
-    font-size: 14px;
-
     @media (max-width: 768px) {
         padding: 1rem 0.5rem;
     }
-}
 
-// --- Header ---
-.header-section {
-    position: relative;
-    height: 220px;
-    background: linear-gradient(135deg, $primary-dark 0%, #818cf8 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    overflow: hidden;
-    margin-bottom: 2rem;
-    border-radius: $radius;
-    box-shadow: $shadow-md;
-    padding: 0 1.5rem;
-    max-width: 100%; // Ngăn tràn
+    // --- Header ---
+    .header-section {
+        position: relative;
+        height: 220px;
+        background: linear-gradient(135deg, $primary-dark 0%, #818cf8 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        border-radius: $radius;
+        box-shadow: $shadow-md;
+        padding: 0 1.5rem;
+        max-width: 100%; // Ngăn tràn
 
-    @media (max-width: 768px) {
-        height: auto;
-        padding: 2.5rem 1.5rem 3.5rem;
-        border-radius: 1rem;
+        @media (max-width: 768px) {
+            height: auto;
+            padding: 2.5rem 1.5rem 3.5rem;
+            border-radius: 1rem;
+
+            .header-content {
+                margin-top: 0;
+
+                h1 {
+                    font-size: 1.75rem;
+                }
+
+                p {
+                    font-size: 1rem;
+                }
+            }
+        }
+
+        .header-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 25%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 30%);
+        }
 
         .header-content {
-            margin-top: 0;
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            margin-top: -15px;
+            max-width: 100%; // Đảm bảo nội dung không tràn header
 
             h1 {
-                font-size: 1.75rem;
+                font-size: 2.25rem;
+                font-weight: 800;
+                margin-bottom: 0.5rem;
+                letter-spacing: -0.025em;
+                word-wrap: break-word; // Xuống dòng nếu chữ quá dài
             }
 
             p {
-                font-size: 1rem;
+                font-size: 1.1rem;
+                opacity: 0.95;
+                font-weight: 400;
             }
         }
     }
 
-    .header-overlay {
-        position: absolute;
-        inset: 0;
-        background-image: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 25%),
-            radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 30%);
-    }
+    // --- Components ---
 
-    .header-content {
-        position: relative;
-        z-index: 2;
-        text-align: center;
-        margin-top: -15px;
-        max-width: 100%; // Đảm bảo nội dung không tràn header
-
-        h1 {
-            font-size: 2.25rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.025em;
-            word-wrap: break-word; // Xuống dòng nếu chữ quá dài
-        }
-
-        p {
-            font-size: 1.1rem;
-            opacity: 0.95;
-            font-weight: 400;
-        }
-    }
-}
-
-// --- Components ---
-
-// Glass Card
-.glass-card {
-    margin-top: 0.5rem;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: $radius;
-    padding: 1.5rem;
-    box-shadow: $shadow-md;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    transition: transform 0.2s;
-    width: 100%;
-    max-width: 100%; // Ngăn tràn
-
-    &:hover {
-        box-shadow: $shadow-lg;
-    }
-
-    @media (max-width: 640px) {
-        padding: 1rem;
-    }
-}
-
-// Tab Switcher
-.tab-container {
-    display: flex;
-    justify-content: center;
-    background: white;
-    padding: 0.4rem;
-    border-radius: 99px;
-    width: fit-content;
-    max-width: 100%; // Đảm bảo không tràn màn hình
-    margin: 0 auto 2rem;
-    position: relative;
-    box-shadow: $shadow-md;
-
-    @media (max-width: 640px) {
+    // Glass Card
+    .glass-card {
+        margin-top: 0.5rem;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: $radius;
+        padding: 1.5rem;
+        box-shadow: $shadow-md;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        transition: transform 0.2s;
         width: 100%;
-        border-radius: 12px;
-        flex-direction: column;
-        gap: 0.5rem;
-        background: transparent;
-        box-shadow: none;
-        padding: 0;
+        max-width: 100%; // Ngăn tràn
 
-        .tab-slider {
-            display: none;
-        }
-
-        .tab-btn {
-            width: 100%;
-            background: white;
-            border-radius: 10px;
-            padding: 0.75rem;
-            justify-content: center;
-            color: $text-sub;
-            box-shadow: $shadow-sm;
-            font-size: 0.95rem;
-
-            &.active {
-                background: $primary;
-                color: white;
-            }
-        }
-    }
-
-    .tab-slider {
-        position: absolute;
-        top: 0.4rem;
-        left: 0.4rem;
-        width: calc(50% - 0.4rem);
-        height: calc(100% - 0.8rem);
-        background: $primary;
-        border-radius: 99px;
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 1;
-
-        &.slide-right {
-            transform: translateX(100%);
-        }
-    }
-
-    .tab-btn {
-        position: relative;
-        z-index: 2;
-        padding: 0.65rem 2rem;
-        border: none;
-        background: transparent;
-        font-weight: 600;
-        font-size: 0.95rem;
-        color: $text-sub;
-        cursor: pointer;
-        transition: color 0.3s;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        white-space: nowrap;
-
-        &.active {
-            color: white;
-        }
-
-        i {
-            font-size: 1.1em;
-        }
-    }
-}
-
-// Search Area
-.search-wrapper {
-    display: flex;
-    // Căn đáy để Icon thẳng hàng với Input (vì Input có Label ở trên)
-    align-items: flex-end;
-    gap: 1rem;
-    width: 100%;
-
-    @media (max-width: 640px) {
-        // Giữ nguyên hàng ngang trên mobile, chỉ giảm khoảng cách
-        gap: 0.5rem;
-    }
-
-    .icon-box {
-        width: 52px;
-        height: 52px;
-        background: rgba($primary, 0.1);
-        color: $primary;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-
-        span {
-            font-size: 28px;
+        &:hover {
+            box-shadow: $shadow-lg;
         }
 
         @media (max-width: 640px) {
-            width: 48px;
-            height: 48px;
-            // Ẩn margin auto để không bị đẩy ra giữa khi đang flex row
-            margin: 0;
+            padding: 1rem;
         }
     }
 
-    .input-col {
-        flex: 1;
+    // Tab Switcher
+    .tab-container {
         display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        min-width: 0;
-
-        label {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: $text-sub;
-        }
-
-        // Div chứa Input và Button
-        >div {
-            display: flex; // Bắt buộc xếp ngang
-            align-items: center;
-            gap: 0.5rem;
-            width: 100%;
-
-            @media (max-width: 640px) {
-                // Đảm bảo vẫn xếp ngang trên mobile
-                flex-direction: row;
-
-                button {
-                    width: auto;
-                    margin-top: 0;
-                }
-            }
-        }
-    }
-}
-
-// Inputs & Buttons
-.modern-input,
-.modern-select {
-    width: 100%;
-    padding: 0.65rem 1rem;
-    border: 1px solid $border;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-    background: #fff;
-    max-width: 100%; // Ràng buộc chiều ngang
-
-    &:focus {
-        outline: none;
-        border-color: $primary;
-        box-shadow: 0 0 0 3px rgba($primary, 0.15);
-    }
-
-    &.sm {
-        padding: 0.5rem;
-        font-size: 0.85rem;
-    }
-}
-
-.btn-primary {
-    background: $primary;
-    color: white;
-    border: none;
-    padding: 0.65rem 1.5rem;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-
-    &:hover {
-        background: $primary-dark;
-        transform: translateY(-1px);
-    }
-
-    &:active {
-        transform: translateY(0);
-    }
-
-    &.sm {
-        padding: 0.5rem 1rem;
-        font-size: 0.85rem;
-    }
-}
-
-.btn-secondary {
-    background: white;
-    border: 1px solid $border;
-    color: $text-main;
-    padding: 0.65rem 1.25rem;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-        background: $bg-app;
-        border-color: $text-sub;
-    }
-
-    &.sm {
-        padding: 0.5rem;
-    }
-}
-
-// Filters Grid
-.card-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid $border;
-    padding-bottom: 0.75rem;
-
-    h3 {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: $text-main;
-        margin: 0;
-    }
-
-    span {
-        font-size: 1.25rem;
-    }
-}
-
-.filter-grid {
-    display: grid;
-    // Điều chỉnh minmax nhỏ hơn để vừa các màn hình hẹp
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 1rem;
-    width: 100%;
-
-    @media (max-width: 640px) {
-        grid-template-columns: 1fr;
-    }
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    min-width: 0; // Ngăn flex/grid item bị tràn
-
-    label {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: $text-sub;
-    }
-}
-
-// Custom Checkbox
-.custom-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 500;
-
-    input {
-        display: none;
-    }
-
-    .checkmark {
-        width: 20px;
-        height: 20px;
-        border: 2px solid $border;
-        border-radius: 6px;
-        position: relative;
-        transition: all 0.2s;
-        flex-shrink: 0;
-    }
-
-    input:checked~.checkmark {
-        background: $primary;
-        border-color: $primary;
-
-        &:after {
-            content: '';
-            position: absolute;
-            left: 6px;
-            top: 2px;
-            width: 5px;
-            height: 10px;
-            border: solid white;
-            border-width: 0 2px 2px 0;
-            transform: rotate(45deg);
-        }
-    }
-}
-
-// User Summary
-.user-summary-card {
-    margin-top: 1.5rem;
-    background: white;
-    border-radius: $radius;
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    border-left: 5px solid $primary;
-    box-shadow: $shadow-sm;
-    max-width: 100%;
-
-    @media (max-width: 768px) {
-        flex-direction: column;
-        text-align: center;
-        gap: 1rem;
-        padding: 1.25rem;
-        border-left: none;
-        border-top: 5px solid $primary;
-
-        .avatar-section {
-            margin: 0 auto;
-        }
-
-        .info-grid {
-            width: 100%;
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-
-            .info-item {
-                flex-direction: row;
-                justify-content: space-between;
-                border-bottom: 1px dashed $border;
-                padding-bottom: 0.5rem;
-
-                &:last-child {
-                    border-bottom: none;
-                }
-            }
-        }
-    }
-
-    .avatar-section {
-        width: 64px;
-        height: 64px;
-        background: #e0e7ff;
-        color: $primary;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
         justify-content: center;
-        font-size: 2rem;
-        font-weight: 700;
-        flex-shrink: 0;
+        background: white;
+        padding: 0.4rem;
+        border-radius: 99px;
+        width: fit-content;
+        max-width: 100%; // Đảm bảo không tràn màn hình
+        margin: 0 auto 2rem;
+        position: relative;
+        box-shadow: $shadow-md;
+
+        @media (max-width: 640px) {
+            width: 100%;
+            border-radius: 12px;
+            flex-direction: column;
+            gap: 0.5rem;
+            background: transparent;
+            box-shadow: none;
+            padding: 0;
+
+            .tab-slider {
+                display: none;
+            }
+
+            .tab-btn {
+                width: 100%;
+                background: white;
+                border-radius: 10px;
+                padding: 0.75rem;
+                justify-content: center;
+                color: $text-sub;
+                box-shadow: $shadow-sm;
+                font-size: 0.95rem;
+
+                &.active {
+                    background: $primary;
+                    color: white;
+                }
+            }
+        }
+
+        .tab-slider {
+            position: absolute;
+            top: 0.4rem;
+            left: 0.4rem;
+            width: calc(50% - 0.4rem);
+            height: calc(100% - 0.8rem);
+            background: $primary;
+            border-radius: 99px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+
+            &.slide-right {
+                transform: translateX(100%);
+            }
+        }
+
+        .tab-btn {
+            position: relative;
+            z-index: 2;
+            padding: 0.65rem 2rem;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: $text-sub;
+            cursor: pointer;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+
+            &.active {
+                color: white;
+            }
+
+            i {
+                font-size: 1.1em;
+            }
+        }
     }
 
-    .info-grid {
-        flex: 1;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1.5rem;
-        min-width: 0; // Fix grid overflow
+    // Search Area
+    .search-wrapper {
+        display: flex;
+        // Căn đáy để Icon thẳng hàng với Input (vì Input có Label ở trên)
+        align-items: flex-end;
+        gap: 1rem;
+        width: 100%;
 
-        .info-item {
+        @media (max-width: 640px) {
+            // Giữ nguyên hàng ngang trên mobile, chỉ giảm khoảng cách
+            gap: 0.5rem;
+        }
+
+        .icon-box {
+            width: 52px;
+            height: 52px;
+            background: rgba($primary, 0.1);
+            color: $primary;
+            border-radius: 12px;
             display: flex;
-            flex-direction: column;
-            gap: 0.2rem;
-            min-width: 0; // Fix text overflow
-
-            label {
-                font-size: 0.8rem;
-                text-transform: uppercase;
-                color: $text-sub;
-                font-weight: 700;
-            }
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
 
             span {
-                font-weight: 600;
-                font-size: 1.05rem;
-                word-break: break-word;
+                font-size: 28px;
             }
 
-            // Ngắt dòng nếu quá dài
-            .highlight {
-                color: $primary;
+            @media (max-width: 640px) {
+                width: 48px;
+                height: 48px;
+                // Ẩn margin auto để không bị đẩy ra giữa khi đang flex row
+                margin: 0;
             }
+        }
 
-            .role-tag {
-                background: #fef3c7;
-                color: #d97706;
-                padding: 3px 10px;
-                border-radius: 6px;
-                width: fit-content;
+        .input-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 0;
+            position: relative; // --- ADDED: Định vị tương đối để dropdown bám theo
+
+            label {
                 font-size: 0.9rem;
-                max-width: 100%; // Ngăn tag quá dài
+                font-weight: 700;
+                color: $text-sub;
+            }
 
-                @media (max-width: 768px) {
-                    margin-left: auto;
+            // Div chứa Input và Button
+            >div {
+                display: flex; // Bắt buộc xếp ngang
+                align-items: center;
+                gap: 0.5rem;
+                width: 100%;
+
+                @media (max-width: 640px) {
+                    // Đảm bảo vẫn xếp ngang trên mobile
+                    flex-direction: row;
+
+                    button {
+                        width: auto;
+                        margin-top: 0;
+                    }
                 }
             }
         }
     }
-}
 
-// Table
-.table-card {
-    background: white;
-    border-radius: $radius;
-    overflow: hidden;
-    box-shadow: $shadow-md;
-    border: 1px solid $border;
-    width: 100%;
-    max-width: 100%; // Quan trọng
-    margin-top: 1.5rem;
-}
+    // --- ADDED: Style cho dropdown kết quả tìm kiếm ---
+    .user-search-dropdown {
+        position: absolute;
+        top: 100%; // Hiển thị ngay bên dưới
+        left: 0;
+        width: 100%; // Chiều rộng bằng ô input + button
+        max-width: 400px; // Giới hạn chiều rộng tối đa
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        z-index: 100; // Đảm bảo đè lên các thành phần khác
+        margin-top: 8px;
+        overflow: hidden;
+        animation: dropdownSlideIn 0.2s ease-out;
 
-.overflow-x-auto {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-    display: block; // Đảm bảo block để scroll hoạt động
-}
+        .search-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
 
-.modern-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    min-width: 800px; // Giữ min-width để bảng ko bị nát, scroll ngang sẽ kích hoạt
+            &:last-child {
+                border-bottom: none;
+            }
 
-    thead th {
-        background: #f1f5f9;
-        padding: 1rem;
-        font-size: 0.85rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: $text-sub;
-        border-bottom: 2px solid $border;
-        white-space: nowrap;
-    }
+            &:hover {
+                background-color: rgba(99, 102, 241, 0.08); // Màu primary nhạt ($primary: #6366f1)
+                padding-left: 20px; // Hiệu ứng đẩy nhẹ sang phải
+            }
 
-    tbody tr {
-        transition: background 0.1s;
+            .username-text {
+                font-weight: 600;
+                color: $text-main;
+                font-size: 0.95rem;
+            }
 
-        &:hover {
-            background: #f8fafc;
-        }
-
-        &:not(:last-child) td {
-            border-bottom: 1px solid $border;
-        }
-
-        td {
-            padding: 1rem;
-            vertical-align: middle;
-            font-size: 0.95rem;
-        }
-
-        &.inactive-row {
-            opacity: 0.6;
-            background: #f9fafb;
+            .fullname-text {
+                font-size: 0.85rem;
+                color: $text-sub;
+            }
         }
     }
-}
 
-.code-badge {
-    background: #f3f4f6;
-    color: #374151;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-family: monospace;
-    font-weight: 600;
-    font-size: 0.9rem;
-    border: 1px solid #e5e7eb;
-    white-space: nowrap;
-}
+    // Inputs & Buttons
+    .modern-input,
+    .modern-select {
+        width: 100%;
+        padding: 0.65rem 1rem;
+        border: 1px solid $border;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        background: #fff;
+        max-width: 100%; // Ràng buộc chiều ngang
 
-.status-badge {
-    padding: 4px 12px;
-    border-radius: 99px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    white-space: nowrap;
+        &:focus {
+            outline: none;
+            border-color: $primary;
+            box-shadow: 0 0 0 3px rgba($primary, 0.15);
+        }
 
-    &.success {
-        background: #dcfce7;
-        color: #166534;
+        &.sm {
+            padding: 0.5rem;
+            font-size: 0.85rem;
+        }
     }
 
-    &.danger {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-
-    &.default {
-        background: #e2e8f0;
-        color: #475569;
-    }
-}
-
-.status-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #cbd5e1;
-    margin-right: 6px;
-
-    &.online {
-        background: $success;
-        box-shadow: 0 0 0 2px rgba($success, 0.2);
-    }
-}
-
-.action-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-
-    .icon-btn {
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px;
+    .btn-primary {
+        background: $primary;
+        color: white;
         border: none;
+        padding: 0.65rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.95rem;
         cursor: pointer;
         transition: all 0.2s;
+        white-space: nowrap;
+
+        &:hover {
+            background: $primary-dark;
+            transform: translateY(-1px);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+
+        &.sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+    }
+
+    .btn-secondary {
+        background: white;
+        border: 1px solid $border;
+        color: $text-main;
+        padding: 0.65rem 1.25rem;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            background: $bg-app;
+            border-color: $text-sub;
+        }
+
+        &.sm {
+            padding: 0.5rem;
+        }
+    }
+
+    // Filters Grid
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid $border;
+        padding-bottom: 0.75rem;
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: $text-main;
+            margin: 0;
+        }
 
         span {
             font-size: 1.25rem;
         }
-
-        &.edit {
-            background: #e0e7ff;
-            color: $primary;
-
-            &:hover {
-                background: $primary;
-                color: white;
-            }
-        }
-
-        &.delete {
-            background: #fee2e2;
-            color: $danger;
-
-            &:hover {
-                background: $danger;
-                color: white;
-            }
-        }
-    }
-}
-
-// Switch Toggle
-.modern-switch {
-    position: relative;
-    display: inline-block;
-    width: 48px;
-    height: 26px;
-
-    input {
-        opacity: 0;
-        width: 0;
-        height: 0;
     }
 
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #cbd5e1;
-        transition: .4s;
-        border-radius: 34px;
+    .filter-grid {
+        display: grid;
+        // Điều chỉnh minmax nhỏ hơn để vừa các màn hình hẹp
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        width: 100%;
 
-        &:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        @media (max-width: 640px) {
+            grid-template-columns: 1fr;
         }
     }
 
-    input:checked+.slider {
-        background-color: $success;
-    }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        min-width: 0; // Ngăn flex/grid item bị tràn
 
-    input:checked+.slider:before {
-        transform: translateX(22px);
-    }
-}
-
-// Pagination
-.pagination-bar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 1rem;
-    background: #f8fafc;
-    border-top: 1px solid $border;
-    max-width: 100%; // Ngăn tràn
-
-    @media (max-width: 640px) {
-        gap: 0.75rem;
-        flex-wrap: wrap; // Cho phép xuống dòng nếu nút quá to
-
-        .page-btn {
-            padding: 0.5rem 0.75rem;
-            font-size: 0.9rem;
-        }
-
-        .page-info {
-            font-size: 0.9rem;
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: $text-sub;
         }
     }
 
-    .page-btn {
+    // Custom Checkbox
+    .custom-checkbox {
         display: flex;
         align-items: center;
-        gap: 4px;
-        padding: 0.6rem 1rem;
-        border: 1px solid $border;
-        background: white;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.95rem;
-        color: $text-main;
+        gap: 0.5rem;
         cursor: pointer;
-        transition: all 0.2s;
-
-        &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        &:not(:disabled):hover {
-            border-color: $primary;
-            color: $primary;
-        }
-    }
-
-    .page-info {
-        font-weight: 600;
-        color: $text-sub;
         font-size: 0.95rem;
-    }
-}
+        font-weight: 500;
 
-// Role Chips
-.role-selector-area {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+        input {
+            display: none;
+        }
 
-    label {
-        font-weight: 700;
-        color: $text-sub;
-        font-size: 1rem;
-    }
-
-    .role-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-
-        .role-chip {
-            padding: 0.6rem 1.25rem;
-            border-radius: 99px;
+        .checkmark {
+            width: 20px;
+            height: 20px;
             border: 2px solid $border;
-            background: white;
-            font-weight: 600;
-            font-size: 1rem;
-            color: $text-sub;
-            cursor: pointer;
+            border-radius: 6px;
+            position: relative;
             transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        input:checked~.checkmark {
+            background: $primary;
+            border-color: $primary;
+
+            &:after {
+                content: '';
+                position: absolute;
+                left: 6px;
+                top: 2px;
+                width: 5px;
+                height: 10px;
+                border: solid white;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+            }
+        }
+    }
+
+    // User Summary
+    .user-summary-card {
+        margin-top: 1.5rem;
+        background: white;
+        border-radius: $radius;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        border-left: 5px solid $primary;
+        box-shadow: $shadow-sm;
+        max-width: 100%;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+            padding: 1.25rem;
+            border-left: none;
+            border-top: 5px solid $primary;
+
+            .avatar-section {
+                margin: 0 auto;
+            }
+
+            .info-grid {
+                width: 100%;
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+
+                .info-item {
+                    flex-direction: row;
+                    justify-content: space-between;
+                    border-bottom: 1px dashed $border;
+                    padding-bottom: 0.5rem;
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+                }
+            }
+        }
+
+        .avatar-section {
+            width: 64px;
+            height: 64px;
+            background: #e0e7ff;
+            color: $primary;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .info-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            min-width: 0; // Fix grid overflow
+
+            .info-item {
+                display: flex;
+                flex-direction: column;
+                gap: 0.2rem;
+                min-width: 0; // Fix text overflow
+
+                label {
+                    font-size: 0.8rem;
+                    text-transform: uppercase;
+                    color: $text-sub;
+                    font-weight: 700;
+                }
+
+                span {
+                    font-weight: 600;
+                    font-size: 1.05rem;
+                    word-break: break-word;
+                }
+
+                // Ngắt dòng nếu quá dài
+                .highlight {
+                    color: $primary;
+                }
+
+                .role-tag {
+                    background: #fef3c7;
+                    color: #d97706;
+                    padding: 3px 10px;
+                    border-radius: 6px;
+                    width: fit-content;
+                    font-size: 0.9rem;
+                    max-width: 100%; // Ngăn tag quá dài
+
+                    @media (max-width: 768px) {
+                        margin-left: auto;
+                    }
+                }
+            }
+        }
+    }
+
+    // Table
+    .table-card {
+        background: white;
+        border-radius: $radius;
+        overflow: hidden;
+        box-shadow: $shadow-md;
+        border: 1px solid $border;
+        width: 100%;
+        max-width: 100%; // Quan trọng
+        margin-top: 1.5rem;
+    }
+
+    .overflow-x-auto {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        display: block; // Đảm bảo block để scroll hoạt động
+    }
+
+    .modern-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        min-width: 800px; // Giữ min-width để bảng ko bị nát, scroll ngang sẽ kích hoạt
+
+        thead th {
+            background: #f1f5f9;
+            padding: 1rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: $text-sub;
+            border-bottom: 2px solid $border;
             white-space: nowrap;
+        }
+
+        tbody tr {
+            transition: background 0.1s;
 
             &:hover {
+                background: #f8fafc;
+            }
+
+            &:not(:last-child) td {
+                border-bottom: 1px solid $border;
+            }
+
+            td {
+                padding: 1rem;
+                vertical-align: middle;
+                font-size: 0.95rem;
+            }
+
+            &.inactive-row {
+                opacity: 0.6;
+                background: #f9fafb;
+            }
+        }
+    }
+
+    // --- ADDED: Empty State Styling ---
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 5rem 2rem; // Padding lớn để tạo khoảng trắng đẹp
+        background: white;
+        border-radius: $radius;
+        margin-top: 1.5rem;
+        box-shadow: $shadow-sm;
+        border: 1px dashed #cbd5e1; // Viền nét đứt nhẹ nhàng
+        min-height: 500px; // Chiều cao tối thiểu dài hơn theo yêu cầu
+        text-align: center;
+        transition: all 0.3s ease;
+
+        img {
+            max-width: 280px; // Ảnh lớn hơn một chút
+            width: 100%;
+            height: auto;
+            margin-bottom: 2rem;
+            opacity: 0.85;
+            filter: grayscale(20%); // Hiệu ứng nhẹ cho ảnh
+        }
+
+        p {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: $text-sub;
+            margin: 0;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+    }
+
+    .code-badge {
+        background: #f3f4f6;
+        color: #374151;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-family: monospace;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 1px solid #e5e7eb;
+        white-space: nowrap;
+    }
+
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 99px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        white-space: nowrap;
+
+        &.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        &.danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        &.default {
+            background: #e2e8f0;
+            color: #475569;
+        }
+    }
+
+    .status-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #cbd5e1;
+        margin-right: 6px;
+
+        &.online {
+            background: $success;
+            box-shadow: 0 0 0 2px rgba($success, 0.2);
+        }
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            span {
+                font-size: 1.25rem;
+            }
+
+            &.edit {
+                background: #e0e7ff;
+                color: $primary;
+
+                &:hover {
+                    background: $primary;
+                    color: white;
+                }
+            }
+
+            &.delete {
+                background: #fee2e2;
+                color: $danger;
+
+                &:hover {
+                    background: $danger;
+                    color: white;
+                }
+            }
+        }
+    }
+
+    // Switch Toggle
+    .modern-switch {
+        position: relative;
+        display: inline-block;
+        width: 48px;
+        height: 26px;
+
+        input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: .4s;
+            border-radius: 34px;
+
+            &:before {
+                position: absolute;
+                content: "";
+                height: 20px;
+                width: 20px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        input:checked+.slider {
+            background-color: $success;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(22px);
+        }
+    }
+
+    // Pagination
+    .pagination-bar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border-top: 1px solid $border;
+        max-width: 100%; // Ngăn tràn
+
+        @media (max-width: 640px) {
+            gap: 0.75rem;
+            flex-wrap: wrap; // Cho phép xuống dòng nếu nút quá to
+
+            .page-btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            .page-info {
+                font-size: 0.9rem;
+            }
+        }
+
+        .page-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0.6rem 1rem;
+            border: 1px solid $border;
+            background: white;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: $text-main;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            &:not(:disabled):hover {
                 border-color: $primary;
                 color: $primary;
             }
+        }
 
-            &.active {
-                background: $primary;
-                border-color: $primary;
-                color: white;
-                box-shadow: 0 4px 6px -1px rgba($primary, 0.4);
-            }
+        .page-info {
+            font-weight: 600;
+            color: $text-sub;
+            font-size: 0.95rem;
         }
     }
-}
 
-// Modal
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: fadeIn 0.2s;
-    padding: 1rem;
-
-    .modal-card {
-        background: white;
-        width: 100%;
-        max-width: 600px;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-        animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    // Role Chips
+    .role-selector-area {
         display: flex;
         flex-direction: column;
-        max-height: 90vh;
+        gap: 1rem;
 
-        .modal-header {
-            padding: 1.25rem;
-            border-bottom: 1px solid $border;
+        label {
+            font-weight: 700;
+            color: $text-sub;
+            font-size: 1rem;
+        }
+
+        .role-list {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #f8fafc;
-            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 0.75rem;
 
-            h3 {
-                margin: 0;
-                font-size: 1.25rem;
-                font-weight: 700;
-            }
-
-            .close-btn {
-                background: none;
-                border: none;
-                font-size: 1.75rem;
-                cursor: pointer;
+            .role-chip {
+                padding: 0.6rem 1.25rem;
+                border-radius: 99px;
+                border: 2px solid $border;
+                background: white;
+                font-weight: 600;
+                font-size: 1rem;
                 color: $text-sub;
+                cursor: pointer;
+                transition: all 0.2s;
+                white-space: nowrap;
 
                 &:hover {
-                    color: $danger;
+                    border-color: $primary;
+                    color: $primary;
+                }
+
+                &.active {
+                    background: $primary;
+                    border-color: $primary;
+                    color: white;
+                    box-shadow: 0 4px 6px -1px rgba($primary, 0.4);
                 }
             }
         }
+    }
 
-        .modal-body {
-            padding: 1.75rem;
-            overflow-y: auto;
+    // Modal
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.2s;
+        padding: 1rem;
 
-            @media (max-width: 640px) {
+        .modal-card {
+            background: white;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+
+            .modal-header {
                 padding: 1.25rem;
-            }
+                border-bottom: 1px solid $border;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: #f8fafc;
+                flex-shrink: 0;
 
-            .context-info {
-                background: #f1f5f9;
-                padding: 1rem;
-                border-radius: 10px;
-                margin-bottom: 1.5rem;
-
-                p {
-                    margin: 0.4rem 0;
-                    font-size: 0.95rem;
-                    word-break: break-all;
-                }
-            }
-
-            .action-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 1rem;
-
-                @media (max-width: 640px) {
-                    grid-template-columns: 1fr;
+                h3 {
+                    margin: 0;
+                    font-size: 1.25rem;
+                    font-weight: 700;
                 }
 
-                .choice-btn {
-                    padding: 1.5rem;
-                    border: 2px solid $border;
-                    background: white;
-                    border-radius: 12px;
+                .close-btn {
+                    background: none;
+                    border: none;
+                    font-size: 1.75rem;
                     cursor: pointer;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 0.5rem;
-                    transition: all 0.2s;
-
-                    @media (max-width: 640px) {
-                        flex-direction: row;
-                        padding: 1rem;
-
-                        .desc {
-                            display: none;
-                        }
-                    }
-
-                    .icon {
-                        font-size: 2rem;
-                        color: $text-sub;
-                    }
-
-                    .label {
-                        font-weight: 700;
-                        font-size: 1.05rem;
-                    }
-
-                    .desc {
-                        font-size: 0.85rem;
-                        color: $text-sub;
-                        text-align: center;
-                    }
+                    color: $text-sub;
 
                     &:hover {
-                        transform: translateY(-3px);
-                        box-shadow: $shadow-md;
+                        color: $danger;
+                    }
+                }
+            }
+
+            .modal-body {
+                padding: 1.75rem;
+                overflow-y: auto;
+
+                @media (max-width: 640px) {
+                    padding: 1.25rem;
+                }
+
+                .context-info {
+                    background: #f1f5f9;
+                    padding: 1rem;
+                    border-radius: 10px;
+                    margin-bottom: 1.5rem;
+
+                    p {
+                        margin: 0.4rem 0;
+                        font-size: 0.95rem;
+                        word-break: break-all;
+                    }
+                }
+
+                .action-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 1rem;
+
+                    @media (max-width: 640px) {
+                        grid-template-columns: 1fr;
                     }
 
-                    &.block.selected {
-                        border-color: $danger;
-                        background: #fef2f2;
+                    .choice-btn {
+                        padding: 1.5rem;
+                        border: 2px solid $border;
+                        background: white;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        gap: 0.5rem;
+                        transition: all 0.2s;
 
-                        .icon {
-                            color: $danger;
+                        @media (max-width: 640px) {
+                            flex-direction: row;
+                            padding: 1rem;
+
+                            .desc {
+                                display: none;
+                            }
                         }
-                    }
-
-                    &.grant.selected {
-                        border-color: $success;
-                        background: #f0fdf4;
 
                         .icon {
-                            color: $success;
+                            font-size: 2rem;
+                            color: $text-sub;
+                        }
+
+                        .label {
+                            font-weight: 700;
+                            font-size: 1.05rem;
+                        }
+
+                        .desc {
+                            font-size: 0.85rem;
+                            color: $text-sub;
+                            text-align: center;
+                        }
+
+                        &:hover {
+                            transform: translateY(-3px);
+                            box-shadow: $shadow-md;
+                        }
+
+                        &.block.selected {
+                            border-color: $danger;
+                            background: #fef2f2;
+
+                            .icon {
+                                color: $danger;
+                            }
+                        }
+
+                        &.grant.selected {
+                            border-color: $success;
+                            background: #f0fdf4;
+
+                            .icon {
+                                color: $success;
+                            }
                         }
                     }
                 }
             }
         }
     }
-}
 
-// Animations
-@keyframes fadeIn {
-    from {
-        opacity: 0;
+    // Animations
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
     }
 
-    to {
-        opacity: 1;
+    @keyframes scaleUp {
+        from {
+            transform: scale(0.9);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
     }
-}
 
-@keyframes scaleUp {
-    from {
-        transform: scale(0.9);
-        opacity: 0;
+    // Animations helpers for dropdown
+    @keyframes dropdownSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    to {
-        transform: scale(1);
-        opacity: 1;
+    .animate-fade-in {
+        animation: fadeIn 0.4s ease-out;
     }
-}
 
-.animate-fade-in {
-    animation: fadeIn 0.4s ease-out;
-}
-
-.animate-slide-up {
-    animation: scaleUp 0.4s ease-out;
+    .animate-slide-up {
+        animation: scaleUp 0.4s ease-out;
+    }
 }

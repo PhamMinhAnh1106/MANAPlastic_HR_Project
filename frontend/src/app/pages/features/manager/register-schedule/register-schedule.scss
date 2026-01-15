@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // --- Variables ---
 $primary: #3b82f6; // Blue 500
 $primary-hover: #2563eb;
@@ -177,7 +179,7 @@ $danger: #ef4444;
         overflow: hidden;
 
         &:hover {
-            border-color: lighten($primary, 20%);
+            border-color: color.adjust($primary, $lightness: 20%);
             background-color: #f0f9ff;
         }
 

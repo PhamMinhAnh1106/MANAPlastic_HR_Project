@@ -159,7 +159,7 @@ export class Accounts implements OnInit, OnDestroy {
     setTimeout(() => {
       this.showSuggestions = false;
       this.cdr.detectChanges();
-    }, 200);
+    }, 1000);
   }
 
   showNotification(message: string, type: boolean) {
@@ -197,20 +197,27 @@ export class Accounts implements OnInit, OnDestroy {
       .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
       .join('&');
 
-    this.isloading = true;
     if (this.employee.length > 0) this.employee = [];
+    try {
+      this.isloading = true;
+      const res = await FilterUser(query, this.role);
+      if (res.content.length > 0) {
+        this.employee.push(res.content);
+        this.toggleAdvancedFilter();
+        this.totalPages = 1;
+        this.totalElements = res.length;
+      }
+    } catch (error) {
+      // 4. Xử lý lỗi (API chết, mất mạng, lỗi code backend...)
+      console.error('Lỗi khi lọc nâng cao:', error);
 
-    const res = await FilterUser(query, this.role);
+      // Ví dụ: Hiển thị thông báo cho user (nếu có service notification)
+      // this.notificationService.error('Đã xảy ra lỗi khi tải dữ liệu.');
 
-    if (res.content.length > 0) {
-      this.employee.push(res.content);
-      this.toggleAdvancedFilter();
-      this.totalPages = 1;
-      this.totalElements = res.length;
+    } finally {
+      this.isloading = false;
+      this.cdr.detectChanges();
     }
-
-    this.isloading = false;
-    this.cdr.detectChanges();
   }
 
   openEditModal(emp: any) {
@@ -275,7 +282,7 @@ export class Accounts implements OnInit, OnDestroy {
         }
       }
       this.isloading = true;
-      const res = await UpdateAccounthr(this.emp, this.role) as { data: string, status: number };
+      const res = await UpdateAccounthr(this.emp, this.role) as { data: any, status: number };
 
       this.isloading = false;
       if (res.status == 200) {
@@ -283,7 +290,7 @@ export class Accounts implements OnInit, OnDestroy {
         this.selectedEmployee = null;
         this.filterEmployees(); // Reload lại trang hiện tại
       } else {
-        this.showNotification(res.data, false);
+        this.showNotification(res.data.response.data.message, false);
       }
       this.cdr.detectChanges();
     }

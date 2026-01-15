@@ -10,7 +10,7 @@ import { getMyPayslip, getUserPayrollDetail } from '../../../../../services/page
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './Payrollpayslip.html',
-  styleUrls: ['./Payrollpayslip.scss']
+  styleUrls: ['./payrollpayslip.scss']
 })
 export class Payrollpayslip implements OnInit {
   // --- STATE ---

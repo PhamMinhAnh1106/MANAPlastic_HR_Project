@@ -38,19 +38,31 @@
                     <div class="icon-box">
                         <span class="material-symbols-outlined">person_search</span>
                     </div>
-                    <div class="input-col">
+                    <div class="input-col relative"> <!-- Thêm relative để định vị dropdown -->
                         <label>Tìm kiếm nhân viên</label>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 relative">
                             <input 
                                 type="text" 
                                 [(ngModel)]="searchUsername" 
+                                (input)="onSearchUser($event)"
                                 (keyup.enter)="searchPermission(true)"
                                 placeholder="Nhập username hệ thống..." 
                                 class="modern-input"
+                                autocomplete="off"
                             />
                             <button class="btn-primary" (click)="searchPermission(true)">
                                 Tra cứu
                             </button>
+
+                            <!-- DROPDOWN GỢI Ý (MỚI) -->
+                            <div *ngIf="showUserSearchDropdown" class="user-search-dropdown">
+                                <div *ngFor="let user of userSearchResults" 
+                                     class="search-item" 
+                                     (click)="selectSearchUser(user)">
+                                    <div class="username-text">{{ user.username }}</div>
+                                    <div class="fullname-text">{{ user.fullName || user.fullname }}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

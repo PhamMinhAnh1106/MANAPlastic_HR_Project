@@ -1,0 +1,128 @@
+<!-- Import Fonts -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Symbols+Outlined" rel="stylesheet">
+
+<!-- Shared Components -->
+<app-loading *ngIf="isloading"></app-loading>
+<app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
+<app-alert *ngIf="isalert" [message]="alertmessage" [notifyType]="alertType" (hidden)="isalert = false"></app-alert>
+
+<div class="salary-container">
+    
+    <!-- HEADER -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-title">
+                    <h2>Thông Tin Lương</h2>
+                    <p class="subtitle">Theo dõi thu nhập cá nhân hàng ngày và hàng tháng</p>
+                </div>
+            </div>
+
+            <!-- ACTION BUTTON: Chỉ hiện với HR -->
+            <div class="header-right" *ngIf="currentRole === 'hr'">
+                <button class="btn-recalculate" (click)="onRecalculateClick()">
+                    <span class="material-icons">sync</span>
+                    Cập nhật Lương (HR)
+                </button>
+            </div>
+        </div>
+
+        <!-- TAB NAVIGATION -->
+        <div class="tab-navigation">
+            <button class="tab-btn" [class.active]="activeTab === 'monthly'" (click)="switchTab('monthly')">
+                <span class="material-icons">calendar_month</span> Xem Theo Tháng
+            </button>
+            <button class="tab-btn" [class.active]="activeTab === 'daily'" (click)="switchTab('daily')">
+                <span class="material-icons">today</span> Xem Theo Ngày
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content animate-fade-in">
+
+        <!-- TAB 1: LƯƠNG THÁNG -->
+        <ng-container *ngIf="activeTab === 'monthly'">
+            <div class="card">
+                <div class="card-header-flex">
+                    <h3>Tổng Hợp Lương Tháng</h3>
+                    
+                    <!-- Filter Controls -->
+                    <div class="filter-controls">
+                        <div class="form-group-inline">
+                            <label>Tháng:</label>
+                            <input type="number" min="1" max="12" [(ngModel)]="currentMonth" class="form-input-sm">
+                        </div>
+                        <div class="form-group-inline">
+                            <label>Năm:</label>
+                            <input type="number" min="2020" [(ngModel)]="currentYear" class="form-input-sm">
+                        </div>
+                        <button class="btn-filter" (click)="fetchMonthlyData()">
+                            <span class="material-icons">search</span> Xem
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div *ngIf="monthlySalary; else noMonthlyData" class="salary-detail-box">
+                        <div class="detail-row">
+                            <span class="label">Thời gian:</span>
+                            <span class="value">Tháng {{ monthlySalary.month }} / {{ monthlySalary.year }}</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="detail-row highlight">
+                            <span class="label">Tổng lương tạm tính:</span>
+                            <span class="value money">{{ monthlySalary.totalEstimatedSalary | number:'1.0-0' }} đ</span>
+                        </div>
+                        <div class="info-note">
+                            * Lương này đã tính chưa bao gồm thuế và các khoản khấu trừ và chưa là con số cuối cùng !
+                        </div>
+                    </div>
+
+                    <ng-template #noMonthlyData>
+                        <div class="empty-state">
+                            <span class="material-icons">sentiment_dissatisfied</span>
+                            <p>Chưa có dữ liệu lương cho tháng {{currentMonth}}/{{currentYear}}</p>
+                            <button class="btn-link" *ngIf="currentRole === 'hr'" (click)="onRecalculateClick()">Tính toán ngay</button>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- TAB 2: LƯƠNG NGÀY -->
+        <ng-container *ngIf="activeTab === 'daily'">
+            <div class="card daily-wrapper">
+                <div class="card-header">
+                    <h3>Lương Hôm Nay</h3>
+                </div>
+                <div class="card-body">
+                    <ng-container *ngIf="dailySalary; else noDailyData">
+                        <div class="daily-salary-content">
+                            <div class="icon-wrapper">
+                                <span class="material-icons">attach_money</span>
+                            </div>
+                            <div class="amount-display">
+                                {{ dailySalary.amount | number:'1.0-0' }} đ
+                            </div>
+                            <div class="message-display">
+                                {{ dailySalary.message }}
+                            </div>
+                             <div class="info-note">
+                            * Lương này đã tính chưa bao gồm thuế và các khoản khấu trừ và chưa là con số cuối cùng !
+                        </div>
+                        </div>
+                    </ng-container>
+                    
+                    <ng-template #noDailyData>
+                        <div class="empty-state">
+                            <span class="material-icons">event_busy</span>
+                            <p>Không có dữ liệu chấm công/lương cho ngày hôm nay.</p>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </ng-container>
+
+    </div>
+</div>

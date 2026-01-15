@@ -28,7 +28,8 @@ interface attendance {
   checkOutImg: string,
   shiftId: number,
   shiftName: string,
-  status: string
+  status: string,
+  estimatedSalary: number // Thêm trường lương ước tính
 }
 
 @Component({
@@ -146,9 +147,7 @@ export class Attendant implements OnInit {
   async loadCheckInImage(fileName: string) {
     this.isLoadingCheckIn = true;
     try {
-      // Gọi API getImageChamcong (giả định cần thêm dấu / nếu API yêu cầu, hoặc name đã có sẵn)
-      // Lưu ý: api path trong prompt là `/chamCong/images${name}`
-      // Nếu name không bắt đầu bằng /, cần xử lý string name cho phù hợp
+
       const apiName = fileName.startsWith('/') ? fileName : `/${fileName}`;
       const blob = await getImageChamcong(apiName);
 
@@ -259,17 +258,17 @@ export class Attendant implements OnInit {
 
       const res: any = await AddNewAttendanceRequests(payload);
 
-      if (res) {
-        this.Onalert("Gửi yêu cầu bổ sung thành công!", true);
+      if (res.data && res.status === 200) {
+        this.Onalert(res.data, true);
         this.closeAddModal();
         if (this.activeTab === 'list') {
           this.filterAttendance();
         }
       } else {
-        this.Onalert("Gửi thất bại, vui lòng thử lại.", false);
+        this.Onalert(res.data.response.data.message, false);
       }
-    } catch (error) {
-      this.Onalert("Lỗi kết nối server!", false);
+    } catch (error: any) {
+      this.Onalert(error.response.data.message, false);
       console.error(error);
     } finally {
       this.isloading = false;
@@ -383,7 +382,6 @@ export class Attendant implements OnInit {
 
   ngOnInit(): void {
     this.shiftsList = getAllSchedules();
-    console.log(this.shiftsList);
     if (this.cookie.get("role")) {
       this.role = this.cookie.get("role").toLowerCase();
     }

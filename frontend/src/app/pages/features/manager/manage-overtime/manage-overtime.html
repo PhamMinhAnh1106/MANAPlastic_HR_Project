@@ -1,0 +1,291 @@
+<div class="ot-page-container">
+  
+  <!-- HEADER & TOOLBAR -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Quản Lý Overtime</h1>
+      <p class="page-subtitle">Xem và duyệt các yêu cầu làm thêm giờ</p>
+    </div>
+
+    <div class="header-actions">
+      <!-- Nút Cập nhật dữ liệu mới -->
+      <button (click)="openScanModal()" class="btn btn-secondary" style="margin-right: 8px;">
+        <span class="material-icons icon">sync</span>
+        Cập nhật
+      </button>
+
+      <!-- Nút Tạo đơn -->
+      <button (click)="openCreateModal()" class="btn btn-primary">
+        <span class="material-icons icon">add_circle</span>
+        Tạo đơn OT
+      </button>
+    </div>
+  </div>
+
+  <!-- TABLE LIST -->
+  <div class="card table-card">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nhân viên</th>
+            <th>Phòng ban</th>
+            <th>Ngày OT</th>
+            <th class="text-center">Tổng giờ</th>
+            <th>Trạng thái</th>
+            <th class="text-right">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of requests">
+            <td>
+              <div class="user-info">
+                <div class="avatar">
+                  {{ item.employeeName ? item.employeeName.charAt(0) : '?' }}
+                </div>
+                <div class="details">
+                  <div class="name">{{ item.employeeName }}</div>
+                  <div class="id">{{ item.employeeId }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="dept-name">{{ item.departmentName }}</td>
+            <td>
+              <div class="date-info">
+                <div class="date">{{ item.date | date:'dd/MM/yyyy' }}</div>
+                <div class="time">{{ item.startTime }} - {{ item.endTime }}</div>
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="badge-hours">{{ item.totalHours }}h</span>
+            </td>
+            <td>
+              <span class="badge-status" [class]="getStatusClass(item.status)">
+                {{ item.status }}
+              </span>
+            </td>
+            <td class="text-right">
+              <button (click)="viewDetail(item)" class="btn-icon" title="Xem chi tiết">
+                <span class="material-icons">visibility</span>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="requests.length === 0 && !isloading">
+            <td colspan="6" class="state-cell text-center">Không có dữ liệu</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DETAIL MODAL -->
+  <div *ngIf="selectedRequest" class="modal-overlay" (click)="closeDetail()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">Chi tiết OT #{{ selectedRequest.requestId }}</h3>
+          <p class="modal-subtitle">{{ selectedRequest.date | date:'EEEE, dd/MM/yyyy' }}</p>
+        </div>
+        <button (click)="closeDetail()" class="btn-close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Nhân viên</label>
+            <div class="value">{{ selectedRequest.employeeName }}</div>
+            <div class="sub-value">{{ selectedRequest.employeeId }}</div>
+          </div>
+          <div class="info-item">
+            <label>Phòng ban</label>
+            <div class="value">{{ selectedRequest.departmentName }}</div>
+          </div>
+          <div class="info-item">
+            <label>Quản lý duyệt</label>
+            <div class="value">{{ selectedRequest.managerName || '---' }}</div>
+          </div>
+          <div class="info-item">
+            <label>HR duyệt</label>
+            <div class="value">{{ selectedRequest.hrName || '---' }}</div>
+          </div>
+          <div class="info-item" *ngIf="selectedRequest.finalPaidHours">
+            <label>Giờ thực tế được duyệt</label>
+            <div class="value" style="color: #2563eb;">{{ selectedRequest.finalPaidHours }}h</div>
+          </div>
+        </div>
+
+        <div class="reason-box">
+          <label>Lý do OT</label>
+          <p>"{{ selectedRequest.reason }}"</p>
+        </div>
+
+        <div class="details-section">
+          <h4>
+            <span class="material-icons icon-small">schedule</span>
+            Chi tiết khung giờ
+          </h4>
+          <div class="detail-table-wrapper">
+             <table class="detail-table">
+                <thead>
+                  <tr>
+                    <th>Loại OT</th>
+                    <th class="text-center">Bắt đầu</th>
+                    <th class="text-center">Kết thúc</th>
+                    <th class="text-right">Số giờ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let d of selectedRequest.details">
+                    <td>{{ d.overtimeTypeName }}</td>
+                    <td class="text-center mono">{{ d.startTime }}</td>
+                    <td class="text-center mono">{{ d.endTime }}</td>
+                    <td class="text-right bold">{{ d.hours }}h</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="3" class="text-right label-total">Tổng cộng:</td>
+                    <td class="text-right value-total">{{ selectedRequest.totalHours }}h</td>
+                  </tr>
+                </tfoot>
+             </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button (click)="closeDetail()" class="btn btn-secondary">Đóng</button>
+        
+        <ng-container *ngIf="canApprove()">
+          <button (click)="openReviewAction('reject')" class="btn btn-danger">
+            <span class="material-icons icon-btn">block</span> Từ chối
+          </button>
+          <button (click)="openReviewAction('approve')" class="btn btn-success">
+            <span class="material-icons icon-btn">check</span> Duyệt đơn
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVIEW MODAL -->
+  <div *ngIf="isReviewOpen" class="modal-overlay review-modal-overlay">
+    <div class="modal-container modal-small">
+      <div class="modal-header">
+        <h3 class="modal-title" [class.text-red-600]="reviewType === 'reject'" [class.text-green-600]="reviewType === 'approve'">
+          {{ reviewType === 'approve' ? 'Xác nhận Duyệt' : 'Xác nhận Từ Chối' }}
+        </h3>
+        <button (click)="isReviewOpen = false" class="btn-close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form (submit)="submitReview()" class="create-form">
+          <div class="form-group">
+            <label>Số giờ được duyệt (Final Paid Hours)</label>
+            <input type="number" step="0.1" [(ngModel)]="reviewData.finalPaidHours" name="finalPaidHours" class="form-control font-bold text-blue-600" required>
+            <p class="text-xs text-gray-500 mt-1">Tổng giờ đăng ký ban đầu: {{ selectedRequest?.totalHours }}h</p>
+          </div>
+          
+          <div class="form-group">
+            <label>Ghi chú / Lý do (Note)</label>
+            <textarea [(ngModel)]="reviewData.note" name="note" rows="3" class="form-control" placeholder="Nhập ghi chú cho nhân viên..." required></textarea>
+          </div>
+
+          <div class="modal-footer form-actions">
+            <button type="button" (click)="isReviewOpen = false" class="btn btn-secondary">Hủy</button>
+            <button type="submit" class="btn" [ngClass]="reviewType === 'approve' ? 'btn-success' : 'btn-danger'">
+              {{ reviewType === 'approve' ? 'Xác nhận Duyệt' : 'Xác nhận Từ Chối' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREATE FORM MODAL -->
+  <div *ngIf="isCreateOpen" class="modal-overlay create-modal-overlay">
+    <div class="modal-container modal-small">
+      <div class="modal-header">
+        <h3 class="modal-title">Tạo đơn OT Mới</h3>
+        <button (click)="isCreateOpen = false" class="btn-close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (submit)="submitCreate()" class="create-form">
+          <div class="form-group">
+            <label>Ngày</label>
+            <input type="date" [(ngModel)]="newRequest.date" name="date" class="form-control" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Bắt đầu</label>
+              <input type="time" [(ngModel)]="newRequest.startTime" name="startTime" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>Kết thúc</label>
+              <input type="time" [(ngModel)]="newRequest.endTime" name="endTime" class="form-control" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Loại OT</label>
+            <select [(ngModel)]="newRequest.overtimetypeid" name="type" class="form-control">
+              <option [value]="1">Ngày thường (150%)</option>
+              <option [value]="2">Cuối tuần (200%)</option>
+              <option [value]="3">Ngày lễ (300%)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Lý do</label>
+            <textarea [(ngModel)]="newRequest.reason" name="reason" rows="3" class="form-control" placeholder="Nhập lý do chi tiết..." required></textarea>
+          </div>
+          <div class="modal-footer form-actions">
+            <button type="button" (click)="isCreateOpen = false" class="btn btn-secondary">Hủy</button>
+            <button type="submit" class="btn btn-primary">Gửi đơn</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCAN MODAL (Cập nhật dữ liệu) -->
+  <div *ngIf="isScanOpen" class="modal-overlay create-modal-overlay">
+    <div class="modal-container modal-small">
+      <div class="modal-header">
+        <h3 class="modal-title">Cập nhật dữ liệu OT</h3>
+        <button (click)="isScanOpen = false" class="btn-close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (submit)="submitScan()" class="create-form">
+          <div class="form-group">
+            <label>Chọn ngày cần quét</label>
+            <input type="date" [(ngModel)]="scanDate" name="scanDate" class="form-control" required>
+            <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #6b7280;">
+              Hệ thống sẽ tính toán lại giờ OT dựa trên dữ liệu chấm công của ngày đã chọn.
+            </p>
+          </div>
+          
+          <div class="modal-footer form-actions">
+            <button type="button" (click)="isScanOpen = false" class="btn btn-secondary">Hủy</button>
+            <button type="submit" class="btn btn-primary">
+              <span class="material-icons icon" style="font-size: 1.1rem;">sync</span> 
+              Cập nhật
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM COMPONENTS -->
+  <app-loading *ngIf="isloading"></app-loading>
+  <app-comfirm *ngIf="isconfirm" [message]="confirmMessage" (result)="onConfirmResult($event)"></app-comfirm>
+  <app-alert *ngIf="isalert" [message]="alertmessage" [notifyType]="alertType" (hidden)="isalert = false"></app-alert>
+
+</div>

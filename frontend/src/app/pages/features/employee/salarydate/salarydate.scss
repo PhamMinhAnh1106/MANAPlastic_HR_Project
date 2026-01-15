@@ -1,0 +1,393 @@
+@use "sass:color";
+
+// --- Variables (Match DocumentsUser) ---
+$primary-color: #4361ee;
+$secondary-color: #3f37c9;
+$danger-color: #ef476f;
+$success-color: #06d6a0;
+$warning-color: #ffd166;
+$text-dark: #2b2d42;
+$text-light: #8d99ae;
+$bg-color: #e2e8f0;
+$card-bg: #ffffff;
+$border-radius: 12px;
+$shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+:host {
+    display: block;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    background-color: $bg-color;
+    min-height: 100vh;
+}
+
+.salary-container {
+    padding: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+
+    @media (max-width: 768px) {
+        margin-left: 0;
+        padding: 1rem;
+        padding-top: 4rem;
+    }
+}
+
+// --- Header & Tabs ---
+.page-header {
+    background: $card-bg;
+    border-radius: $border-radius;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+
+    .header-content {
+        padding: 1.25rem 1.5rem 0.5rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+
+        .header-title {
+            h2 {
+                font-size: 1.25rem;
+                color: $text-dark;
+                margin: 0;
+                font-weight: 700;
+            }
+
+            .subtitle {
+                color: $text-light;
+                margin: 0.25rem 0 0 0;
+                font-size: 0.85rem;
+            }
+        }
+    }
+
+    .tab-navigation {
+        display: flex;
+        padding: 0 1.5rem;
+        gap: 1.5rem;
+        border-bottom: 1px solid #edf2f7;
+        margin-top: 0.5rem;
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.8rem 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: $text-light;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            .material-icons {
+                font-size: 1.2rem;
+            }
+
+            &:hover {
+                color: $primary-color;
+            }
+
+            &.active {
+                color: $primary-color;
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -1px;
+                    left: 0;
+                    width: 100%;
+                    height: 3px;
+                    background-color: $primary-color;
+                    border-radius: 3px 3px 0 0;
+                }
+            }
+        }
+    }
+}
+
+// --- Cards ---
+.card {
+    background: $card-bg;
+    border-radius: $border-radius;
+    box-shadow: $shadow;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.02);
+    min-height: 200px;
+
+    .card-header,
+    .card-header-flex {
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid #edf2f7;
+        padding-bottom: 1rem;
+
+        h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: $text-dark;
+        }
+    }
+
+    .card-header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}
+
+// --- Filter Controls ---
+.filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .form-group-inline {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: $text-dark;
+        }
+
+        .form-input-sm {
+            width: 70px;
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+
+            &:focus {
+                outline: none;
+                border-color: $primary-color;
+            }
+        }
+    }
+}
+
+// --- Buttons ---
+button {
+    cursor: pointer;
+    font-family: inherit;
+    border: none;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-recalculate {
+    background-color: $warning-color;
+    color: darken($warning-color, 45%);
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba($warning-color, 0.3);
+
+    &:hover {
+        background-color: color.adjust($warning-color, $lightness: -5%);
+        transform: translateY(-1px);
+    }
+}
+
+.btn-filter {
+    background-color: $primary-color;
+    color: white;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+
+    &:hover {
+        background-color: color.adjust($primary-color, $lightness: -5%);
+    }
+}
+
+.btn-link {
+    background: none;
+    color: $primary-color;
+    text-decoration: underline;
+    padding: 0;
+    font-weight: 600;
+
+    &:hover {
+        color: color.adjust($primary-color, $lightness: -10%);
+    }
+}
+
+// --- Content Styles ---
+
+// 1. Monthly Style
+.salary-detail-box {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    text-align: center;
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+
+        .label {
+            color: $text-light;
+            font-weight: 500;
+        }
+
+        .value {
+            color: $text-dark;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        &.highlight {
+            margin-top: 1rem;
+
+            .label {
+                font-size: 1.1rem;
+                color: $text-dark;
+            }
+
+            .value.money {
+                color: $primary-color;
+                font-size: 2rem;
+            }
+        }
+    }
+
+    .divider {
+        height: 1px;
+        background: #e2e8f0;
+        margin: 1rem 0;
+    }
+
+    .info-note {
+        margin-top: 1.5rem;
+        font-size: 0.8rem;
+        color: $text-light;
+        font-style: italic;
+    }
+}
+
+// 2. Daily Style
+.daily-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    .card-body {
+        width: 100%;
+    }
+}
+
+.daily-salary-content {
+    padding: 2rem;
+
+    .icon-wrapper {
+        width: 60px;
+        height: 60px;
+        background: rgba($success-color, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+
+        .material-icons {
+            font-size: 2rem;
+            color: $success-color;
+        }
+    }
+
+    .amount-display {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: $success-color;
+        margin-bottom: 0.5rem;
+    }
+
+    .message-display {
+        color: $text-light;
+        font-size: 1rem;
+    }
+}
+
+// --- Empty State ---
+.empty-state {
+    padding: 3rem;
+    text-align: center;
+    color: $text-light;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+
+    .material-icons {
+        font-size: 3rem;
+        opacity: 0.5;
+    }
+
+    p {
+        margin: 0;
+        font-size: 1rem;
+    }
+}
+
+// --- Animations ---
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Responsive
+@media (max-width: 600px) {
+    .card-header-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+
+        .filter-controls {
+            width: 100%;
+            justify-content: space-between;
+        }
+    }
+
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .header-right {
+            width: 100%;
+
+            button {
+                width: 100%;
+            }
+        }
+    }
+}

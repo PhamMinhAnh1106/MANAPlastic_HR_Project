@@ -1,3 +1,5 @@
+@use "sass:color";
+
 /* --- COLORS PALETTE --- */
 $bg-body: #f3f4f6;
 $bg-white: #ffffff;
@@ -235,7 +237,7 @@ $row-hover: #f9fafb;
             font-size: 1rem;
 
             &:hover {
-                background: darken($btn-green, 5%);
+                background: color.adjust($btn-green, $lightness: -5%);
             }
         }
     }

@@ -1,12 +1,18 @@
 import { CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core'; // Thêm OnDestroy
 import { FormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
+import { Subject, Subscription } from 'rxjs'; // Import RxJS
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators'; // Import Operators
 import { Approveleaverequest, getleaverequestManage, Rejectleaverequest } from '../../../../services/pages/features/employee/leaverequest.services';
 import { leaverequests } from '../../../../interface/leaverequest.interface';
 import { Loading } from '../../../shared/loading/loading';
 import { Alert } from '../../../shared/alert/alert';
 import { Comfirm } from '../../../shared/comfirm/comfirm';
+
+// Đảm bảo đường dẫn import đúng tới file utils bạn đã tạo
+// Ví dụ: import { findUserbyUsername } from '../../../../utils/finduser.utils';
+import { findUserbyUsername } from '../../../../utils/finduser.utils';
 
 @Component({
   selector: 'app-leaverequestcheck',
@@ -15,7 +21,7 @@ import { Comfirm } from '../../../shared/comfirm/comfirm';
   templateUrl: './leaverequestcheck.html',
   styleUrl: './leaverequestcheck.scss',
 })
-export class Leaverequestcheck implements OnInit {
+export class Leaverequestcheck implements OnInit, OnDestroy {
   constructor(private cdr: ChangeDetectorRef, private cookie: CookieService) { }
 
   role: string = "";
@@ -26,63 +32,111 @@ export class Leaverequestcheck implements OnInit {
   };
   leaveRequests: leaverequests[] = [];
 
-  // Biến chứa thống kê
-  stats = {
-    pending: 0,
-    approved: 0,
-    rejected: 0
-  };
+  // Stats
+  stats = { pending: 0, approved: 0, rejected: 0 };
 
   id: number = 0;
 
-  // --- PAGINATION STATES ---
+  // Pagination
   page: number = 0;
-  size: number = 5;
+  size: number = 10;
   totalPages: number = 0;
   totalElements: number = 0;
-  pageSizeOptions: number[] = [5, 10, 20, 50];
+  pageSizeOptions: number[] = [10, 20, 50, 100];
 
-  // Confirm & Alert States
+  // UI States
   isconfirm: boolean = false;
   isalert: boolean = false;
   isloading: boolean = false;
   confirmMessage = '';
   alertmessage = '';
   alertType: boolean = true;
+  actionType: 'approve' | 'reject' | '' = '';
+
+  // --- AUTOCOMPLETE VARIABLES ---
+  userSearchResults: any[] = [];
+  showUserSearchDropdown: boolean = false;
+  searchSubject = new Subject<string>();
+  private searchSubscription: Subscription | undefined;
 
   Onalert(message: string, type: boolean) {
     this.isalert = true;
     this.alertmessage = message;
     this.alertType = type;
   }
-  actionType: 'approve' | 'reject' | '' = '';
 
-  // --- LOGIC FETCH DATA (Bảng dữ liệu) ---
+  // --- AUTOCOMPLETE LOGIC ---
+  onSearchUser(event: any) {
+    const value = event.target.value;
+    // Cập nhật giá trị filter ngay khi gõ
+    this.filter.username = value;
+
+    // Nếu rỗng thì ẩn dropdown
+    if (!value || value.trim() === '') {
+      this.showUserSearchDropdown = false;
+      this.userSearchResults = [];
+      return;
+    }
+    // Push vào subject để debounce
+    this.searchSubject.next(value);
+  }
+
+  async performUserSearch(username: string) {
+    try {
+      // Gọi hàm từ file utils
+      const res = await findUserbyUsername(username) as any[];
+
+      // Giới hạn 5 kết quả
+      if (res && Array.isArray(res)) {
+        this.userSearchResults = res.slice(0, 5);
+        this.showUserSearchDropdown = this.userSearchResults.length > 0;
+      } else {
+        this.userSearchResults = [];
+        this.showUserSearchDropdown = false;
+      }
+    } catch (error) {
+      console.error(error);
+      this.userSearchResults = [];
+      this.showUserSearchDropdown = false;
+    }
+    this.cdr.detectChanges();
+  }
+
+  selectSearchUser(user: any) {
+    // Gán giá trị vào filter
+    this.filter.username = user.username || user.fullName || '';
+
+    // Ẩn dropdown
+    this.showUserSearchDropdown = false;
+
+    // Gọi tìm kiếm dữ liệu bảng ngay lập tức
+    this.onSearch();
+  }
+
+  // Ẩn dropdown khi click ra ngoài (đơn giản hóa bằng cách dùng delay để click event kịp chạy)
+  hideDropdownDelayed() {
+    setTimeout(() => {
+      this.showUserSearchDropdown = false;
+    }, 200);
+  }
+
+  // --- MAIN LOGIC ---
   async filterLeave() {
     this.isloading = true;
     try {
-      // Gọi API lấy dữ liệu cho bảng (có phân trang và filter hiện tại)
       const res: any = await getleaverequestManage(this.filter.username, this.page, this.size);
-
       if (res) {
         let content = res.content || [];
-
-        // Logic lọc client-side (nếu cần thiết)
         if (this.filter.status !== '') {
           content = content.filter((item: { status: string; }) => item.status === this.filter.status);
         }
-
         this.leaveRequests = content;
         this.totalPages = res.totalPages || 0;
         this.totalElements = res.totalElements || 0;
-
-        // ĐÃ XÓA: Không gọi calculateStats ở đây nữa để tránh tính lại khi filter
-
       } else {
         this.leaveRequests = [];
         this.totalElements = 0;
       }
-
     } catch (error) {
       this.Onalert("Lỗi tải dữ liệu", false);
       this.leaveRequests = [];
@@ -92,14 +146,9 @@ export class Leaverequestcheck implements OnInit {
     }
   }
 
-  // --- LOGIC TÍNH STATS (Chạy 1 lần) ---
   async loadInitialStats() {
     try {
-      // Gọi API riêng để lấy dữ liệu thống kê tổng quát.
-      // Lưu ý: Để thống kê chính xác, ta cần lấy toàn bộ dữ liệu (hoặc số lượng lớn) mà KHÔNG có filter status.
-      // Ta truyền username rỗng và page size lớn (ví dụ 1000) để đếm được tổng quan.
       const res: any = await getleaverequestManage('', 0, 1000);
-
       if (res && res.content) {
         this.calculateStats(res.content);
       }
@@ -108,20 +157,13 @@ export class Leaverequestcheck implements OnInit {
     }
   }
 
-  // Hàm tính toán thống kê
   calculateStats(data: leaverequests[]) {
     this.stats.pending = data.filter(item => item.status === 'PENDING').length;
     this.stats.approved = data.filter(item => item.status === 'APPROVED').length;
     this.stats.rejected = data.filter(item => item.status === 'REJECTED').length;
   }
 
-  resetStats() {
-    this.stats = { pending: 0, approved: 0, rejected: 0 };
-  }
-
-  // Hàm hỗ trợ click vào thẻ thống kê để lọc nhanh
   quickFilter(status: string) {
-    // Nếu đang chọn status đó rồi thì bỏ chọn (về tất cả)
     if (this.filter.status === status) {
       this.filter.status = '';
     } else {
@@ -130,9 +172,9 @@ export class Leaverequestcheck implements OnInit {
     this.onSearch();
   }
 
-  // --- PAGINATION HANDLERS ---
   onSearch() {
     this.page = 0;
+    this.showUserSearchDropdown = false; // Ẩn dropdown gợi ý khi bấm tìm kiếm
     this.filterLeave();
   }
 
@@ -144,11 +186,11 @@ export class Leaverequestcheck implements OnInit {
   }
 
   onPageSizeChange() {
+    localStorage.setItem('leaveRequestPageSize', this.size.toString());
     this.page = 0;
     this.filterLeave();
   }
 
-  // --- LOGIC CONFIRMATION ---
   approve(id: number) {
     this.isconfirm = true;
     this.confirmMessage = "Bạn có chắc muốn duyệt đơn này?";
@@ -175,7 +217,6 @@ export class Leaverequestcheck implements OnInit {
 
     try {
       let res: { data: string, status: number };
-
       if (this.actionType === 'approve') {
         res = await Approveleaverequest(this.id) as { data: string, status: number };
       } else {
@@ -184,8 +225,8 @@ export class Leaverequestcheck implements OnInit {
 
       if (res.status === 200 || res.status === 201) {
         this.Onalert(res.data, true);
-        await this.filterLeave(); // Load lại bảng dữ liệu
-        await this.loadInitialStats(); // Cập nhật lại stats sau khi duyệt/từ chối thành công
+        await this.filterLeave();
+        await this.loadInitialStats();
       } else {
         this.Onalert(res.data || "Có lỗi xảy ra", false);
       }
@@ -199,7 +240,6 @@ export class Leaverequestcheck implements OnInit {
     }
   }
 
-  // --- UTILS ---
   getVietnameseLeaveType(type: string): string {
     switch (type) {
       case 'ANNUAL': return 'Phép Năm';
@@ -215,10 +255,31 @@ export class Leaverequestcheck implements OnInit {
     if (this.cookie.get('role')) {
       this.role = this.cookie.get('role');
     }
-    // Load dữ liệu bảng
-    this.filterLeave();
 
-    // Load thống kê (chạy riêng biệt)
+    // Load size preference
+    const savedSize = localStorage.getItem('leaveRequestPageSize');
+    if (savedSize) {
+      this.size = Number(savedSize);
+    } else {
+      this.size = 10;
+    }
+
+    // Init Data
+    this.filterLeave();
     this.loadInitialStats();
+
+    // --- SETUP DEBOUNCE SEARCH ---
+    this.searchSubscription = this.searchSubject.pipe(
+      debounceTime(400), // Chờ 400ms sau khi ngừng gõ
+      distinctUntilChanged()
+    ).subscribe(searchTerm => {
+      this.performUserSearch(searchTerm);
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
   }
 }
