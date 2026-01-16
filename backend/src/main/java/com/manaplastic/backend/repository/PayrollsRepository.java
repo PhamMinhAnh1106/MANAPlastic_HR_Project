@@ -14,10 +14,5 @@ import java.util.Optional;
 public interface PayrollsRepository extends JpaRepository<PayrollEntity, Integer>, JpaSpecificationExecutor<PayrollEntity> {
     Optional<PayrollEntity> findByUserIDAndPayperiod(UserEntity user, String payperiod);
 
-    @Transactional
-    void deleteByPayperiod(String payperiod);
-
-    boolean existsByPayperiod(String period);
-
-    List<PayrollEntity> findByPayperiod(String period);
+    List<PayrollEntity> findAllByPayperiod(String payPeriod);
 }

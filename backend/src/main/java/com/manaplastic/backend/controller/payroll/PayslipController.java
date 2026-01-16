@@ -2,6 +2,7 @@ package com.manaplastic.backend.controller.payroll;
 
 import com.manaplastic.backend.DTO.payroll.PayrollDTO;
 import com.manaplastic.backend.DTO.criteria.PayrollFilterCriteria;
+import com.manaplastic.backend.DTO.payroll.PayrollDetailDTO;
 import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
 import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
@@ -38,8 +39,8 @@ public class PayslipController {
             if (currentUser == null) {
                 return ResponseEntity.status(401).body("User chưa đăng nhập!");
             }
-            Integer userId = currentUser.getId();
-            Map<String, Object> payslip = payslipService.getMyPayslip(userId, month, year);
+
+            PayrollDetailDTO payslip = payslipService.getMyPayslip(currentUser, month, year);
             return ResponseEntity.ok(payslip);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Lỗi: " + e.getMessage());
@@ -68,7 +69,7 @@ public class PayslipController {
 //        }
 //    }
     @GetMapping("/filter")
-    @PreAuthorize("hasAuthority('HR')")
+    @PreAuthorize("hasAnyAuthority('HR','Admin')")
     @RequiredPermission(PermissionConst.PAYROLL_VIEW_ALL)
     public ResponseEntity<Page<PayrollDTO>> filterPayrolls(
             @ModelAttribute PayrollFilterCriteria criteria,
@@ -79,14 +80,14 @@ public class PayslipController {
 
     // Lấy của user nhân sự muốn xem
     @GetMapping("/{userId}")
-    @PreAuthorize("hasAuthority('HR')")
+    @PreAuthorize("hasAnyAuthority('HR','Admin')")
     @RequiredPermission(PermissionConst.PAYROLL_VIEW_ALL)
     public ResponseEntity<?> getPayrollDetailById(
             @PathVariable Integer userId,
             @RequestParam int month,
             @RequestParam int year
     ) {
-            Map<String, Object> payslipDetail = payslipService.getMyPayslip(userId, month, year);
+        PayrollDetailDTO payslipDetail = payslipService.getPayrollDetailById(userId, month, year);
             return ResponseEntity.ok(payslipDetail);
     }
 }

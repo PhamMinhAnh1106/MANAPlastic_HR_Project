@@ -2,10 +2,14 @@ package com.manaplastic.backend.payrollengine.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.manaplastic.backend.DTO.payroll.PayrollDetailDTO;
+import com.manaplastic.backend.entity.PayrollEntity;
+import com.manaplastic.backend.entity.UserEntity;
 import com.manaplastic.backend.payrollengine.component.ExpressionEvaluator;
 import com.manaplastic.backend.payrollengine.component.PayrollDataFetcher;
 import com.manaplastic.backend.payrollengine.model.ExpressionNode;
 import com.manaplastic.backend.payrollengine.repository.PayrollEngineRepository;
+import com.manaplastic.backend.repository.PayrollsRepository;
 import com.manaplastic.backend.repository.UserRepository;
 import com.manaplastic.backend.service.EmailService;
 import com.manaplastic.backend.service.PdfService;
@@ -39,6 +43,7 @@ public class PayrollEngineService {
     private EmailService emailService;
     @Autowired
     private ObjectMapper objectMapper; // Dùng để parse JSON từ DB
+    @Autowired private PayrollsRepository payrollsJPARepo;
 
     // Tính lương cho 1 nhân viên trong 1 tháng
     @Transactional
@@ -81,50 +86,64 @@ public class PayrollEngineService {
     }
 
     @Transactional
-    public void finalizePayrollAndSendMail(int month, int year) {
+    public void finalizePayrollAndSendMail(int month, int year) { // ĐANG LỖI HEADDER cho PDF
         String payPeriod = String.format("%d-%02d", year, month);
+        System.out.println(">>> BẮT ĐẦU CHỐT LƯƠNG & GỬI MAIL KỲ: " + payPeriod);
 
-        // Cập nhật trạng thái FINAL
-        String updateSql = "UPDATE payrolls SET status = 'FINAL' WHERE payperiod = ? AND status = 'DRAFT'";
-        jdbcTemplate.update(updateSql, payPeriod);
+        //  Lấy danh sách bảng lương bằng JPA (Thay vì SQL thuần)
+        List<PayrollEntity> payrolls = payrollsJPARepo.findAllByPayperiod(payPeriod);
 
-        // Lấy danh sách nhân viên cần gửi mail
-        // Chỉ lấy những người thực sự có bản ghi lương trong tháng này
-        String selectUsersSql = "SELECT p.userID, u.email, u.fullname " +
-                "FROM payrolls p " +
-                "JOIN users u ON p.userID = u.userID " +
-                "WHERE p.payperiod = ?";
+        if (payrolls.isEmpty()) {
+            System.out.println("Không có dữ liệu bảng lương nào để xử lý.");
+            return;
+        }
 
-        List<Map<String, Object>> users = jdbcTemplate.queryForList(selectUsersSql, payPeriod);
+        System.out.println("Tìm thấy " + payrolls.size() + " nhân viên.");
 
-        System.out.println("Tìm thấy " + users.size() + " nhân viên để gửi mail.");
-
-        // Duyệt và gửi mail
-        for (Map<String, Object> user : users) {
-            Integer userId = (Integer) user.get("userID");
-            String email = (String) user.get("email");
-            String fullname = (String) user.get("fullname");
+        for (PayrollEntity payroll : payrolls) {
+            // Lấy UserEntity trực tiếp từ quan hệ (Không cần query lại)
+            UserEntity user = payroll.getUserID();
 
             try {
+                // A. CẬP NHẬT TRẠNG THÁI FINAL
+                // Giả sử status là Enum hoặc String. Nếu là Enum thì dùng PayrollEntity.Status.FINAL
+                if (!"FINAL".equalsIgnoreCase(String.valueOf(payroll.getStatus()))) {
 
-                Map<String, Object> payslipData = payslipService.getMyPayslipPDF(userId, month, year);
-
-                if (payslipData == null) {
-                    System.err.println("WARN: Không tìm thấy dữ liệu lương chi tiết cho UserID: " + userId + ". Bỏ qua.");
-                    continue; // Bỏ qua vòng lặp này, chạy tiếp người sau
+                    payroll.setStatus("FINAL");
+                    payrollsJPARepo.save(payroll);
                 }
 
-                // Tạo PDF
-                byte[] pdfBytes = pdfService.generatePayslipPdf(payslipData);
+                // B. LẤY DỮ LIỆU LƯƠNG CHI TIẾT (DTO)
+                // Gọi hàm mới nhận vào UserEntity
+                PayrollDetailDTO payslipDTO = payslipService.getMyPayslipPDF(user, month, year);
+
+                if (payslipDTO == null) {
+                    System.err.println("WARN: DTO null cho User " + user.getId());
+                    continue;
+                }
+
+                // C. CHUYỂN ĐỔI DTO -> MAP (Để tương thích với PdfService cũ)
+                // Nếu PdfService của bạn chưa sửa để nhận DTO, ta convert sang Map
+                Map<String, Object> mapData = objectMapper.convertValue(payslipDTO, Map.class);
+
+                // D. TẠO PDF VÀ GỬI MAIL
+                byte[] pdfBytes = pdfService.generatePayslipPdf(mapData);
 
                 if (pdfBytes != null) {
-                    emailService.sendPayslipEmail(email, fullname, payPeriod, pdfBytes);
+                    emailService.sendPayslipEmail(
+                            user.getEmail(),
+                            user.getFullname(),
+                            payPeriod,
+                            pdfBytes
+                    );
+                    System.out.println("Đã gửi mail cho: " + user.getFullname());
                 }
+
             } catch (Exception e) {
-                System.err.println("Lỗi gửi mail cho " + fullname + ": " + e.getMessage());
+                System.err.println("Lỗi xử lý cho nhân viên " + user.getFullname() + ": " + e.getMessage());
                 e.printStackTrace();
             }
         }
-
+        System.out.println("<<< HOÀN TẤT QUÁ TRÌNH.");
     }
 }

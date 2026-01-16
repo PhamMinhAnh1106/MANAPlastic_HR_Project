@@ -1,6 +1,7 @@
 package com.manaplastic.backend.repository;
 
 import com.manaplastic.backend.entity.ContractEntity;
+import com.manaplastic.backend.entity.UserEntity;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -24,8 +25,8 @@ public interface ContractRepository extends JpaRepository<ContractEntity, Intege
     @Query("SELECT c FROM ContractEntity c WHERE c.userID.id = :userId ORDER BY c.startdate DESC")
     List<ContractEntity> findAllByUserId(@Param("userId") Integer userId);
 
-    @Query("SELECT c FROM ContractEntity c WHERE c.userID.id = :userId AND c.status = 'ACTIVE'")
-    Optional<ContractEntity> findActiveContractByUserId(@Param("userId") Integer userId);
+    @Query("SELECT c FROM ContractEntity c WHERE c.userID = :userId AND c.status = 'ACTIVE'")
+    Optional<ContractEntity> findActiveContractByUserId(@Param("userId") UserEntity userId);
 
     @Query("SELECT c FROM ContractEntity c WHERE c.enddate BETWEEN :today AND :thresholdDate AND c.status = 'ACTIVE' ORDER BY c.enddate ASC")
     List<ContractEntity> findExpiringContracts(@Param("today") LocalDate today, @Param("thresholdDate") LocalDate thresholdDate);

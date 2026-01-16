@@ -20,4 +20,12 @@ public interface OvertimeRequestRepository extends JpaRepository<OvertimeRequest
     List<OvertimeRequestEntity> findApprovedRequests(@Param("user") UserEntity user, @Param("date") LocalDate date, @Param("status") OvertimeRequestEntity.RequestStatus status);
 
     List<OvertimeRequestEntity> findByUseridAndDateAndStatus(UserEntity user, LocalDate date, OvertimeRequestEntity.RequestStatus status);
+    @Query("SELECT r FROM OvertimeRequestEntity r " +
+            "WHERE r.userid = :userId " +
+            "AND MONTH(r.date) = :month " +
+            "AND YEAR(r.date) = :year " +
+            "AND r.status = 'APPROVED'")
+    List<OvertimeRequestEntity> findApprovedRequestsByMonth(@Param("userId") UserEntity userId,
+                                                            @Param("month") int month,
+                                                            @Param("year") int year);
 }

@@ -36,7 +36,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/hr/contracts")
-@PreAuthorize("hasAuthority('HR')")
+@PreAuthorize("hasAnyAuthority('HR','Admin')")
 @CrossOrigin(origins = "*") // Cho phép Frontend gọi API
 public class ContractController {
 

@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/hr/contract/templates")
-@PreAuthorize("hasAuthority('HR')")
+@PreAuthorize("hasAnyAuthority('HR','Admin')")
 @CrossOrigin(origins = "*")
 public class ContractTemplateController {
 

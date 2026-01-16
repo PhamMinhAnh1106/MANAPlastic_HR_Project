@@ -16,7 +16,7 @@ public class PayrollDTO {
 
     private String payPeriod;
     private BigDecimal baseSalary;
-    private Double actualWorkDays;
+    private BigDecimal actualWorkDays;
 
     private BigDecimal totalOvertimePay;
     private BigDecimal totalAllowance;

@@ -302,7 +302,7 @@ public class ContractService {
     }
 
     private void validateContractDates(UserEntity employee, ContractCreateDTO request) {
-        Optional<ContractEntity> activeContractOpt = contractRepository.findActiveContractByUserId(employee.getId());
+        Optional<ContractEntity> activeContractOpt = contractRepository.findActiveContractByUserId(employee);
         if (activeContractOpt.isPresent()) {
             ContractEntity oldContract = activeContractOpt.get();
             // Ngày bắt đầu HĐ mới không được đè lên HĐ cũ

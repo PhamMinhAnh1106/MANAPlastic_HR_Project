@@ -16,9 +16,8 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.manaplastic.backend.entity.OvertimeRequestEntity.RequestStatus.*;
@@ -105,43 +104,103 @@ public class OvertimeService {
             throw new RuntimeException("Trạng thái đơn không hợp lệ để Manager duyệt.");
         }
 
+        updateOvertimeDetails(req, dto.getDetails());
+
         req.setStatus(PENDING_HR);
         req.setManagerApproverID(manager);
         req.setManagerApprovedAt(LocalDateTime.now());
 
-        if (dto.getFinalPaidHours() != null) {
-            req.setFinalPaidHours(dto.getFinalPaidHours());
-        }
-
+        if (dto.getNote() != null) req.setRejectReason(dto.getNote());
 
         otRepo.save(req);
     }
 
    // HR duyệt lần 2
-    @Transactional
-    public void approveByHR(Integer requestId, UserEntity hr, OvertimeApproveDTO dto) {
-        OvertimeRequestEntity req = otRepo.findById(requestId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn OT"));
+   @Transactional
+   public void approveByHR(Integer requestId, UserEntity hr, OvertimeApproveDTO dto) {
+       OvertimeRequestEntity req = otRepo.findById(requestId)
+               .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn OT"));
 
-        if (req.getStatus() != PENDING_HR) {
-            throw new RuntimeException("Đơn chưa được Manager duyệt.");
-        }
+       if (req.getStatus() != PENDING_HR) {
+           throw new RuntimeException("Đơn chưa được Manager duyệt.");
+       }
 
-        req.setStatus(APPROVED);
-        req.setHrApproverID(hr);
-        req.setHrApprovedAt(LocalDateTime.now());
 
-        // CHỐT SỐ GIỜ TRẢ LƯƠNG
-        if (dto.getFinalPaidHours() != null) {
-            req.setFinalPaidHours(dto.getFinalPaidHours());
-        } else {
-            // Nếu HR không nhập gì thì mặc định Final = Total hệ thống tính ban đầu
-            if (req.getFinalPaidHours() == null) {
-                req.setFinalPaidHours(req.getTotalHours());
+       updateOvertimeDetails(req, dto.getDetails());
+
+
+       if (req.getFinalPaidHours() == null) {
+           req.setFinalPaidHours(req.getTotalHours());
+       }
+
+
+       req.setStatus(APPROVED);
+       req.setHrApproverID(hr);
+       req.setHrApprovedAt(LocalDateTime.now());
+
+
+       otRepo.save(req);
+   }
+
+    private void updateOvertimeDetails(OvertimeRequestEntity req, List<OvertimeDetailUpdateDTO> detailDTOs) {
+        if (detailDTOs == null) return;
+
+        List<OvertimeRequestDetailEntity> currentDetails = req.getDetails();
+
+        // 1. XỬ LÝ XÓA (DELETE)
+        // Tìm những ID có trong DB nhưng KHÔNG có trong danh sách DTO gửi lên
+        // (Ví dụ: HR xóa bớt 1 dòng sai)
+        Set<Integer> dtoIds = detailDTOs.stream()
+                .map(OvertimeDetailUpdateDTO::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // RemoveIf sẽ tự động kích hoạt lệnh DELETE trong Database nếu orphanRemoval=true hoặc khi save req
+        currentDetails.removeIf(detail -> !dtoIds.contains(detail.getId()));
+
+        // Map để truy xuất nhanh khi update
+        Map<Integer, OvertimeRequestDetailEntity> currentMap = currentDetails.stream()
+                .collect(Collectors.toMap(OvertimeRequestDetailEntity::getId, Function.identity()));
+
+        for (OvertimeDetailUpdateDTO dto : detailDTOs) {
+            //  cap nhat
+            if (dto.getId() != null && currentMap.containsKey(dto.getId())) {
+
+                OvertimeRequestDetailEntity existing = currentMap.get(dto.getId());
+                existing.setStartTime(dto.getStartTime());
+                existing.setEndTime(dto.getEndTime());
+                existing.setHours(dto.getHours());
+
+                if (dto.getOvertimeTypeID() != null) {
+                    OvertimetypeEntity type = overtimeTypeRepo.findById(dto.getOvertimeTypeID())
+                            .orElseThrow(() -> new RuntimeException("Loại OT không tồn tại"));
+                    existing.setOvertimeTypeID(type);
+                }
+            } else {
+                // them moi
+                OvertimeRequestDetailEntity newDetail = new OvertimeRequestDetailEntity();
+                newDetail.setRequestID(req); // Link ngược lại cha
+                newDetail.setStartTime(dto.getStartTime());
+                newDetail.setEndTime(dto.getEndTime());
+                newDetail.setHours(dto.getHours());
+
+
+                OvertimetypeEntity type = overtimeTypeRepo.findById(dto.getOvertimeTypeID())
+                        .orElseThrow(() -> new RuntimeException("Chưa chọn loại OT cho dòng mới"));
+                newDetail.setOvertimeTypeID(type);
+
+
+                currentDetails.add(newDetail);
             }
         }
 
-        otRepo.save(req);
+        double newTotalFinalHours = 0.0;
+        for (OvertimeRequestDetailEntity detail : currentDetails) {
+            newTotalFinalHours += detail.getHours();
+        }
+
+        req.setFinalPaidHours(newTotalFinalHours);
+
     }
 
   // từ chối - dùng chung
@@ -310,6 +369,7 @@ public class OvertimeService {
         if (entity.getDetails() != null && !entity.getDetails().isEmpty()) {
             List<OvertimeDetailResponseDTO> detailDTOs = entity.getDetails().stream()
                     .map(detail -> new OvertimeDetailResponseDTO(
+                            detail.getId(),
                             detail.getOvertimeTypeID() != null ? detail.getOvertimeTypeID().getOtName() : "Unknown Type",
                             detail.getHours(),
                             detail.getStartTime(),

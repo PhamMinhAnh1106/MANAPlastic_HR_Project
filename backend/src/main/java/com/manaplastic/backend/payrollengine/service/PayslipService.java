@@ -1,221 +1,231 @@
 package com.manaplastic.backend.payrollengine.service;
 
-import com.manaplastic.backend.DTO.payroll.PayrollDTO;
 import com.manaplastic.backend.DTO.criteria.PayrollFilterCriteria;
-import com.manaplastic.backend.entity.PayrollEntity;
+import com.manaplastic.backend.DTO.payroll.PayrollComponentDTO;
+import com.manaplastic.backend.DTO.payroll.PayrollDTO;
+import com.manaplastic.backend.DTO.payroll.PayrollDetailDTO;
+import com.manaplastic.backend.entity.*;
 import com.manaplastic.backend.filters.PayrollFilter;
-import com.manaplastic.backend.repository.PayrollsRepository;
+import com.manaplastic.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class PayslipService {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private PayrollsRepository payrollRepository;
+    @Autowired private PayrollsRepository payrollRepository;
+    @Autowired private ContractRepository contractRepo;
+    @Autowired private ContractAllowancesRepository contractAllowanceRepo;
+    @Autowired private OvertimeRequestRepository otRequestRepo;
+    @Autowired private RewardPunishmentRepository rewardRepo;
+    @Autowired private UserRepository userRepository; // Cần dùng khi HR xem lương theo ID
 
-    // Lấy phiếu lương chi tiết
-    public Map<String, Object> getMyPayslip(Integer userId, int month, int year) {
+    public PayrollDetailDTO getPayrollDetail(UserEntity user, int month, int year) {
         String payPeriod = String.format("%d-%02d", year, month);
-        Map<String, Object> payslip = new HashMap<>();
+        YearMonth ym = YearMonth.of(year, month);
+        LocalDate startDate = ym.atDay(1);
+        LocalDate endDate = ym.atEndOfMonth();
 
-        String sqlHeader = """
-            SELECT p.*,
-                   u.fullname,
-                   u.username,
-                   u.jobtype,
-                   d.departmentname
-            FROM payrolls p
-            JOIN users u ON p.userID = u.userID
-            LEFT JOIN departments d ON u.departmentID = d.departmentID
-            WHERE p.userID = ? AND p.payperiod = ?
-        """;
+        // 1. LẤY SNAPSHOT TỪ BẢNG PAYROLLS
+        // Lưu ý: Repository cần hỗ trợ findByUserIDAndPayperiod(UserEntity user, String payPeriod)
+        PayrollEntity payroll = payrollRepository.findByUserIDAndPayperiod(user, payPeriod)
+                .orElseThrow(() -> new RuntimeException("Chưa có dữ liệu bảng lương cho kỳ " + payPeriod));
 
-        List<Map<String, Object>> headerList = jdbcTemplate.queryForList(sqlHeader, userId, payPeriod);
+        BigDecimal actualWorkDays = payroll.getActualworkdays();
+        BigDecimal baseSalary = payroll.getBasesalarysnapshot();
 
-        if (headerList.isEmpty()) {
-            payslip.put("status", "ESTIMATED");
-            // Nếu chưa có bảng lương, query thông tin user để hiển thị tạm
-            String sqlUser = "SELECT u.fullname,u.username, u.jobtype, d.departmentname FROM users u LEFT JOIN departments d ON u.departmentID = d.departmentID WHERE u.userID = ?";
-            try {
-                Map<String, Object> userInfo = jdbcTemplate.queryForMap(sqlUser, userId);
-                Map<String, Object> mockHeader = new HashMap<>(userInfo);
-                mockHeader.put("payperiod", payPeriod);
-                mockHeader.put("userID", userId);
-                payslip.put("header", mockHeader);
-            } catch (Exception e) {
-                payslip.put("header", Map.of("payperiod", payPeriod, "userID", userId));
-            }
-        } else {
-            payslip.put("header", headerList.get(0));
-            payslip.put("status", "FINAL");
+        // Mặc định chia 26
+        BigDecimal standardDays = BigDecimal.valueOf(26);
+
+        // Tính lương 1 giờ = (Lương cơ bản / 26) / 8
+        BigDecimal hourlyRate = BigDecimal.ZERO;
+        if (standardDays.compareTo(BigDecimal.ZERO) > 0) {
+            hourlyRate = baseSalary.divide(standardDays, 4, RoundingMode.HALF_UP)
+                    .divide(BigDecimal.valueOf(8), 4, RoundingMode.HALF_UP);
         }
 
-        //  Lấy chi tiết các biến
-        String sqlItems = """
-                SELECT r.rule_code, r.name, svc.value
-                FROM salary_variable_cache svc
-                JOIN salary_rule r ON svc.rule_id = r.rule_id  -- <--- JOIN theo rule_id
-                WHERE svc.employee_id = ?
-                  AND svc.payperiod = ?
-                  AND svc.rule_id IS NOT NULL -- Chỉ lấy kết quả Rule, không lấy Variable input
-                ORDER BY r.priority ASC
-                """;
+        // TÍNH PHỤ CẤP (ALLOWANCES) ---
+        List<PayrollComponentDTO> allowanceList = new ArrayList<>();
+        BigDecimal totalAllowanceCalculated = BigDecimal.ZERO;
 
-        List<Map<String, Object>> items = jdbcTemplate.queryForList(sqlItems, userId, payPeriod);
 
-        List<Map<String, Object>> incomes = new ArrayList<>();
-        List<Map<String, Object>> deductions = new ArrayList<>();
-        List<Map<String, Object>> companyCosts = new ArrayList<>();
-        BigDecimal netSalary = BigDecimal.ZERO;
+        Optional<ContractEntity> contractOpt = contractRepo.findActiveContractByUserId(user);
 
-        for (Map<String, Object> item : items) {
-            String code = (String) item.get("rule_code");
-            BigDecimal value = (BigDecimal) item.get("value");
+        if (contractOpt.isPresent()) {
+            List<ContractallowanceEntity> cAllowances = contractAllowanceRepo.findByContractID(contractOpt.get());
 
-            if (value.compareTo(BigDecimal.ZERO) == 0) continue;
+            // Tỷ lệ hưởng lương = Ngày thực tế / 26
+            BigDecimal ratio = BigDecimal.ZERO;
+            if (standardDays.compareTo(BigDecimal.ZERO) > 0) {
+                ratio = actualWorkDays.divide(standardDays, 4, RoundingMode.HALF_UP);
+            }
 
-            if ("NET_SALARY".equals(code)) {
-                netSalary = value;
-            } else if (code.endsWith("_COMP")) {
-                companyCosts.add(item);
-            } else if (code.endsWith("_EMP") || code.contains("TAX") || code.contains("PENALTY") || code.contains("DEDUCT")) {
-                deductions.add(item);
-            } else if (code.startsWith("TOTAL_") || code.endsWith("_SALARY") || code.endsWith("_DAYS") || code.equals("OT_TAX_EXEMPT")) {
-                // Giữ lại các biến quan trọng nếu muốn hiển thị (như Lương ngày công), còn lại ẩn
-                if (code.equals("WORK_SALARY")) incomes.add(item);
+            for (ContractallowanceEntity ca : cAllowances) {
+                BigDecimal baseAmount = ca.getAmount();
+                // Tiền thực nhận = Mức HĐ * Tỷ lệ
+                BigDecimal realAmount = baseAmount.multiply(ratio).setScale(0, RoundingMode.HALF_UP);
+
+                allowanceList.add(new PayrollComponentDTO(
+                        ca.getAllowanceName(),
+                        realAmount,
+                        actualWorkDays.doubleValue(),
+                        "Mức chuẩn: " + String.format("%,.0f", baseAmount)
+                ));
+                totalAllowanceCalculated = totalAllowanceCalculated.add(realAmount);
+            }
+        }
+
+        //  TÍNH OT (OVERTIME) ---
+        List<PayrollComponentDTO> otList = new ArrayList<>();
+        BigDecimal totalOtCalculated = BigDecimal.ZERO;
+
+        // Query OT theo ID user
+        List<OvertimeRequestEntity> otRequests = otRequestRepo.findApprovedRequestsByMonth(user, month, year);
+
+        for (OvertimeRequestEntity req : otRequests) {
+            for (OvertimeRequestDetailEntity detail : req.getDetails()) {
+                BigDecimal hours = BigDecimal.valueOf(detail.getHours());
+                BigDecimal rate = (detail.getOvertimeTypeID() != null) ? detail.getOvertimeTypeID().getRate() : BigDecimal.ONE;
+                String otName = (detail.getOvertimeTypeID() != null) ? detail.getOvertimeTypeID().getOtName() : "OT";
+
+                BigDecimal amount = hours.multiply(rate).multiply(hourlyRate).setScale(0, RoundingMode.HALF_UP);
+
+                otList.add(new PayrollComponentDTO(
+                        otName,
+                        amount,
+                        detail.getHours(),
+                        String.format("Ngày %02d/%02d (x%s)", req.getDate().getDayOfMonth(), month, rate)
+                ));
+                totalOtCalculated = totalOtCalculated.add(amount);
+            }
+        }
+
+        //  TÍNH THƯỞNG / PHẠT ---
+        List<PayrollComponentDTO> bonusList = new ArrayList<>();
+        List<PayrollComponentDTO> punishmentList = new ArrayList<>();
+        BigDecimal totalBonusCalc = BigDecimal.ZERO;
+        BigDecimal totalPunishCalc = BigDecimal.ZERO;
+
+        // Query Thưởng phạt theo ID user
+        List<RewardpunishmentdecisionEntity> decisions = rewardRepo.findByMonth(user, startDate, endDate);
+        for (RewardpunishmentdecisionEntity dec : decisions) {
+            PayrollComponentDTO item = new PayrollComponentDTO(
+                    dec.getReason(),
+                    dec.getAmount(),
+                    1.0,
+                    "Ngày QĐ: " + dec.getDecisionDate()
+            );
+
+            if (dec.getType() != null && "REWARD".equalsIgnoreCase(dec.getType().name())) {
+                bonusList.add(item);
+                totalBonusCalc = totalBonusCalc.add(dec.getAmount());
             } else {
-                incomes.add(item);
+                punishmentList.add(item);
+                totalPunishCalc = totalPunishCalc.add(dec.getAmount());
             }
         }
 
-        payslip.put("incomes", incomes);
-        payslip.put("deductions", deductions);
-        payslip.put("company_contributions", companyCosts);
-        payslip.put("net_salary", netSalary);
+        // TỔNG HỢP BẢO HIỂM NHÂN VIÊN ---
+        BigDecimal bhxh = payroll.getBhxhEmp() != null ? payroll.getBhxhEmp() : BigDecimal.ZERO;
+        BigDecimal bhyt = payroll.getBhytEmp() != null ? payroll.getBhytEmp() : BigDecimal.ZERO;
+        BigDecimal bhtn = payroll.getBhtnEmp() != null ? payroll.getBhtnEmp() : BigDecimal.ZERO;
+        BigDecimal totalInsuranceEmp = bhxh.add(bhyt).add(bhtn);
 
-        // chi tiết thưởng phạt
-        String startDate = year + "-" + month + "-01";
-        String endDate = year + "-" + month + "-31";
-        String sqlDetails = "SELECT Type, Reason, Amount, DecisionDate FROM rewardpunishmentdecisions WHERE UserID = ? AND Status IN ('APPROVED', 'PROCESSED') AND DecisionDate BETWEEN ? AND ?";
-        payslip.put("explanations", jdbcTemplate.queryForList(sqlDetails, userId, startDate, endDate));
 
-        return payslip;
+        return PayrollDetailDTO.builder()
+                .userId(user.getId())
+                .fullName(user.getFullname())
+                .departmentName(user.getDepartmentID() != null ? user.getDepartmentID().getDepartmentname() : "")
+                .jobType(user.getJobtype())
+                .payPeriod(payPeriod)
+                .status(payroll.getStatus() != null ? payroll.getStatus() : "DRAFT")
+
+                // Work Time
+                .baseSalary(baseSalary)
+                .standardWorkDays(standardDays)
+                .actualWorkDays(actualWorkDays)
+
+                // Income Summary
+                .totalAllowance(totalAllowanceCalculated)
+                .totalOvertimePay(totalOtCalculated)
+                .totalBonus(totalBonusCalc)
+                .totalPunishment(totalPunishCalc)
+                .totalIncome(payroll.getTotalincome())
+
+                // Tax & Deductions
+                .pit(payroll.getPit())
+                .bhxhEmp(bhxh)
+                .bhytEmp(bhyt)
+                .bhtnEmp(bhtn)
+                .totalInsuranceEmp(totalInsuranceEmp)
+
+                // Company Cost
+                .bhxhComp(payroll.getBhxhComp())
+                .bhytComp(payroll.getBhytComp())
+                .bhtnComp(payroll.getBhtnComp())
+
+                // FINAL NET
+                .netSalary(payroll.getNetsalary())
+
+                // Details Lists
+                .allowanceDetails(allowanceList)
+                .overtimeDetails(otList)
+                .bonusDetails(bonusList)
+                .punishmentDetails(punishmentList)
+                .build();
     }
 
 
-    public Map<String, Object> getMyPayslipPDF(Integer userId, int month, int year) {
-        String payPeriod = String.format("%d-%02d", year, month);
-        Map<String, Object> payslip = new HashMap<>();
-
-        // HEADER
-        String sqlHeader = """
-            SELECT 
-                p.userID, u.username, p.payperiod, p.netsalary, p.totalincome,
-                u.fullname, u.email, d.departmentname, u.jobtype as job_type 
-            FROM payrolls p
-            LEFT JOIN users u ON p.userID = u.userID
-            LEFT JOIN departments d ON u.departmentID = d.departmentID
-            WHERE p.userID = ? AND p.payperiod = ?
-        """;
-
-        try {
-            payslip.put("header", jdbcTemplate.queryForMap(sqlHeader, userId, payPeriod));
-        } catch (Exception e) {
-            return null;
-        }
-
-        //  ITEMS (Đã lọc sạch các biến rác từ DB )
-        String sqlItems = """
-            SELECT 
-                COALESCE(r.rule_code, v.Code) as code,
-                COALESCE(r.name, v.Name, 'Điều chỉnh') as item_name,
-                svc.value as item_value
-                
-            FROM salary_variable_cache svc
-            LEFT JOIN salary_rule r ON svc.rule_id = r.rule_id
-            LEFT JOIN salaryvariables v ON svc.variable_id = v.VariableID
-            WHERE svc.employee_id = ? 
-              AND svc.payperiod = ?
-              AND svc.value != 0
-              
-              --  (BLACKLIST)
-          
-              AND (
-                  -- Lấy code từ Rule hoặc Variable
-                  COALESCE(r.rule_code, v.Code) NOT IN (
-                      -- Các biến cấu hình hệ thống (Config)
-                      'BASIC_SALARY_STATE',       -- Lương cơ sở nhà nước
-                      'REGION_MIN_SALARY',        -- Lương tối thiểu vùng
-                      'INSURANCE_CAP_MULTIPLIER', -- Hệ số trần bảo hiểm
-                      'LUNCH_ALLOWANCE_LIMIT',    -- Giới hạn ăn ca miễn thuế
-                      'STD_DAYS',                 -- Ngày công chuẩn (thường hiện ở header rồi)
-                      
-                      -- Các tỷ lệ phần trăm (Rates)
-                      'RATE_BHXH_EMP', 'RATE_BHYT_EMP', 'RATE_BHTN_EMP', 
-                      'RATE_BHXH_COMP', 'RATE_BHYT_COMP', 'RATE_BHTN_COMP',
-                      'RATE_NIGHT_SHIFT',
-                      
-                      -- Các biến tính toán trung gian (Intermediate)
-                      'HOURLY_MONEY',             -- Lương 1 giờ (quy đổi)
-                      'TAX_EXEMPT_INCOME',        -- Thu nhập miễn thuế (ẩn đi cho gọn)
-                      'TAXABLE_INCOME',        -- Thu nhập tính thuế (ẩn đi cho gọn)
-                      'INSURANCE_AMT',            -- Tiền BH tổng (đã có chi tiết từng loại)
-                      'FAMILY_DEDUCTION',         -- Tổng giảm trừ gia cảnh (đã hiện số người phụ thuộc)
-                      'PERSONAL_DEDUCTION',       -- Mức giảm trừ bản thân (cố định 11tr)
-                      'DEPENDENT_DEDUCTION'       -- Mức giảm trừ NPT (cố định 4.4tr)
-                  )
-                  
-                  -- Loại bỏ các biến bắt đầu bằng từ khóa hệ thống
-                  AND COALESCE(r.rule_code, v.Code) NOT LIKE 'TEMP_%'  -- Chặn biến tạm
-              )
-              
-            ORDER BY svc.evaluated_at ASC
-        """;
-
-        List<Map<String, Object>> items = jdbcTemplate.queryForList(sqlItems, userId, payPeriod);
-        payslip.put("items", items);
-
-        return payslip;
+    // Xem phiếu lương của chính mình (API nhận @AuthenticationPrincipal UserEntity)
+    public PayrollDetailDTO getMyPayslip(UserEntity user, int month, int year) {
+        return getPayrollDetail(user, month, year);
     }
 
+    //  Xuất PDF (API nhận UserEntity)
+    public PayrollDetailDTO getMyPayslipPDF(UserEntity user, int month, int year) {
+        return getPayrollDetail(user, month, year);
+    }
 
+    // Xem lương của nhân viên khác (Dành cho HR/Admin - truyền ID)
+    public PayrollDetailDTO getPayrollDetailById(Integer userId, int month, int year) {
+        // Tìm UserEntity trước rồi mới gọi hàm Core
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên với ID: " + userId));
+        return getPayrollDetail(user, month, year);
+    }
+
+    // Danh sách lương (Filter Criteria - Giữ nguyên)
     public Page<PayrollDTO> getPayrollList(PayrollFilterCriteria criteria, Pageable pageable) {
         Specification<PayrollEntity> spec = PayrollFilter.filterBy(criteria);
         Page<PayrollEntity> pageResult = payrollRepository.findAll(spec, pageable);
-        return pageResult.map(entity -> PayrollDTO.builder()
 
+        return pageResult.map(entity -> PayrollDTO.builder()
                 .userId(entity.getUserID().getId())
                 .fullName(entity.getUserID().getFullname())
                 .departmentName(entity.getUserID().getDepartmentID() != null ? entity.getUserID().getDepartmentID().getDepartmentname() : "")
                 .jobType(entity.getUserID().getJobtype())
                 .payPeriod(entity.getPayperiod())
-
                 .baseSalary(entity.getBasesalarysnapshot())
                 .actualWorkDays(entity.getActualworkdays())
-                .totalIncome(entity.getTotalincome())   // Tổng thu nhập
-                .netSalary(entity.getNetsalary())       // Thực lĩnh
-
+                .totalIncome(entity.getTotalincome())
+                .netSalary(entity.getNetsalary())
                 .bhxhEmp(entity.getBhxhEmp())
                 .bhytEmp(entity.getBhytEmp())
                 .bhtnEmp(entity.getBhtnEmp())
-
                 .bhxhComp(entity.getBhxhComp())
                 .bhytComp(entity.getBhytComp())
                 .bhtnComp(entity.getBhtnComp())
-
                 .pit(entity.getPit())
                 .build()
         );

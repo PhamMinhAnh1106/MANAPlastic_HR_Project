@@ -42,7 +42,7 @@ public class AttendanceController {
     private String uploadDir;
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('HR','Manager','Employee')")
+    @PreAuthorize("isAuthenticated()")
     @RequiredPermission(PermissionConst.ATTENDANCE_VIEW_SELF)
     public ResponseEntity<Page<AttendanceDTO>> getMyAttendance(
             @ModelAttribute AttendanceFilterCriteria criteria,

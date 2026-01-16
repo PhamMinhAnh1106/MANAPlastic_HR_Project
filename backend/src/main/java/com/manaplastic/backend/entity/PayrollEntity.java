@@ -41,7 +41,7 @@ public class PayrollEntity {
 
     @ColumnDefault("0")
     @Column(name = "actualworkdays")
-    private Double actualworkdays;
+    private BigDecimal actualworkdays;
 
     @Column(name = "bhxh_emp", precision = 15, scale = 2)
     private BigDecimal bhxhEmp;

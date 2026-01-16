@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/hr/rewaPunis")
-@PreAuthorize("hasAuthority('HR')")
+@PreAuthorize("hasAnyAuthority('HR','Admin')")
 public class RewardPunishmentController {
 
     @Autowired

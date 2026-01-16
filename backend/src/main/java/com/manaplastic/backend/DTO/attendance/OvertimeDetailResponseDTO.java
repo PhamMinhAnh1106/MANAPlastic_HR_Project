@@ -10,6 +10,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OvertimeDetailResponseDTO {
+    private Integer id;
     private String overtimeTypeName;
     private Double hours;
     private LocalTime startTime;
