@@ -80,7 +80,7 @@ export class ContractManager implements OnInit, AfterViewInit, OnDestroy {
     {
       title: 'Vị trí & Lương',
       items: [
-        { code: '{{position}}' }, { code: '{{base_salary}}' }
+        { code: '{{position}}' }, { code: '{{base_salary}}' }, { code: '{{standard_hours}}' }
       ]
     },
     {

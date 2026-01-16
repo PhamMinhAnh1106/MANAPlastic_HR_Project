@@ -56,7 +56,8 @@ export interface CreateContractPayload {
   baseSalary: number;
   insuranceSalary?: number;
   insurancePercent: number;
-  allowanceToxicType: string;
+  // [CHANGED] Replaced allowanceToxicType with standardHours
+  standardHours: number;
   allowances: Allowance[];
 }
 
@@ -79,7 +80,7 @@ export const Role: role[] = [
 export interface ContractTemplate {
   id: number;
   // --- CHỈNH SỬA: Đổi từ 'name' sang 'contractname' ---
-  contractname: string;
+  name: string;
   type?: string;
   content?: string;
   isActive?: boolean;
@@ -156,7 +157,7 @@ export class Contracts implements OnInit {
     username: '',
     type: '',
     status: '',
-    allowanceToxicType: '',
+    // [REMOVED] allowanceToxicType filter
     // --- Đảm bảo viết thường ---
     startdate: '',
     enddate: ''
@@ -207,7 +208,7 @@ export class Contracts implements OnInit {
   showImagePreview = false;
   previewContentUrl: SafeUrl | SafeResourceUrl | null = null;
   fileType: 'image' | 'pdf' | null = null;
-  private currentBlobUrl: string | null = null;
+  currentBlobUrl: string | null = null; // Changed to public for download access
 
   // Pagination
   page: number = 0;
@@ -221,11 +222,7 @@ export class Contracts implements OnInit {
     { value: 'FIXED_TERM', label: 'Có thời hạn' },
     { value: 'PROBATION', label: 'Thử việc' }
   ];
-  allowanceToxicTypes = [
-    { value: 'NONE', label: 'Không áp dụng' },
-    { value: 'CASH', label: 'Tiền mặt' },
-    { value: 'IN_KIND', label: 'Hiện vật' }
-  ];
+  // [REMOVED] allowanceToxicTypes array
 
   constructor(
     private router: Router,
@@ -253,8 +250,6 @@ export class Contracts implements OnInit {
       const res: any = await getcontracttemplate();
       if (res && Array.isArray(res)) {
         this.listTemplates = res;
-      } else if (res && res.data && Array.isArray(res.data)) {
-        this.listTemplates = res.data;
       } else if (res && res.id) {
         this.listTemplates = [res];
       } else {
@@ -263,6 +258,7 @@ export class Contracts implements OnInit {
     } catch (e) {
       this.listTemplates = [];
     }
+    console.log(this.listTemplates);
     this.cdr.detectChanges();
   }
 
@@ -273,7 +269,9 @@ export class Contracts implements OnInit {
       signdate: '',
       startdate: '',
       enddate: null,
-      baseSalary: 0, insuranceSalary: 0, insurancePercent: 0, allowanceToxicType: 'NONE', allowances: []
+      baseSalary: 0, insuranceSalary: 0, insurancePercent: 0,
+      standardHours: 8, // Default standard hours
+      allowances: []
     };
   }
 
@@ -455,7 +453,9 @@ export class Contracts implements OnInit {
       baseSalary: c.baseSalary || c.basesalary || 0,
       insurancePercent: c.insurancePercent || 0,
       insuranceSalary: c.insuranceSalary || (c.baseSalary && c.insurancePercent ? (c.baseSalary * c.insurancePercent / 100) : 0),
-      allowanceToxicType: c.allowanceToxicType || 'NONE',
+
+      // [CHANGED] Map standardHours instead of allowanceToxicType
+      standardHours: c.standardHours || 8,
 
       // --- Đảm bảo viết thường: signdate, startdate, enddate ---
       signdate: this.formatDateForInput(c.signdate),
@@ -587,36 +587,117 @@ export class Contracts implements OnInit {
     this.cdr.detectChanges();
   }
 
-  // --- NEW METHOD: View Generated PDF ---
+  // --- MODIFIED: ROBUST BINARY HANDLING ---
   async viewPrintContract(id: number) {
     this.isloading = true;
     try {
-      // Gọi service lấy file blob/stream
       const response: any = await getContractPdfUrl(id);
+      let blobData: Blob | null = null;
 
-      // Xử lý dữ liệu trả về để tạo Blob
-      let blobData;
+      // 1. Check if it's already a Blob
       if (response instanceof Blob) {
         blobData = response;
-      } else if (response && response.data) {
-        blobData = new Blob([response.data], { type: 'application/pdf' });
-      } else {
-        // Trường hợp trả về text/string hoặc khác, cố gắng ép kiểu
+      }
+      // 2. Check if it's an ArrayBuffer
+      else if (response instanceof ArrayBuffer) {
         blobData = new Blob([response], { type: 'application/pdf' });
       }
+      // 3. Handle Axios-style response object (response.data)
+      else if (response && response.data) {
+        if (response.data instanceof Blob) {
+          blobData = response.data;
+        } else if (response.data instanceof ArrayBuffer) {
+          blobData = new Blob([response.data], { type: 'application/pdf' });
+        } else {
+          // Try to process data as string/buffer
+          blobData = this.processRawDataToBlob(response.data);
+        }
+      }
+      // 4. Handle direct string/object response
+      else {
+        blobData = this.processRawDataToBlob(response);
+      }
 
-      // Tạo URL và hiển thị popup
-      const url = URL.createObjectURL(blobData);
-      this.previewContentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-      this.fileType = 'pdf';
-      this.showImagePreview = true;
-      this.currentBlobUrl = url; // Lưu để revoke sau này
+      if (blobData) {
+        const url = URL.createObjectURL(blobData);
+        this.previewContentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+        this.fileType = 'pdf';
+        this.showImagePreview = true;
+        this.currentBlobUrl = url;
+      } else {
+        this.showNotification("Dữ liệu file không hợp lệ.", false);
+      }
+
     } catch (error) {
       console.error(error);
       this.showNotification("Không thể tải file in hợp đồng. Vui lòng thử lại sau.", false);
     } finally {
       this.isloading = false;
       this.cdr.detectChanges();
+    }
+  }
+
+  // Helper: Process diverse raw data types to Blob
+  private processRawDataToBlob(data: any): Blob {
+    // Handle Node.js Buffer JSON format { type: 'Buffer', data: [..] }
+    if (data && data.type === 'Buffer' && Array.isArray(data.data)) {
+      const byteArray = new Uint8Array(data.data);
+      return new Blob([byteArray], { type: 'application/pdf' });
+    }
+
+    // Handle String (Binary or Base64)
+    if (typeof data === 'string') {
+      // If it starts with %PDF, treat as raw binary string
+      if (data.startsWith('%PDF') || data.substring(0, 100).includes('%PDF')) {
+        const len = data.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          bytes[i] = data.charCodeAt(i);
+        }
+        return new Blob([bytes], { type: 'application/pdf' });
+      }
+
+      // Otherwise, try to decode as Base64
+      try {
+        // Simple check for hex dump strings "000000: ..." -> ignore or try to clean? 
+        // Assuming standard base64 here if not %PDF
+        const binaryString = atob(data);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        return new Blob([bytes], { type: 'application/pdf' });
+      } catch (e) {
+        // Fallback: Just treat as raw string if atob fails
+        // (This handles cases where the string IS raw binary but didn't have %PDF at start for some reason)
+        const len = data.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          bytes[i] = data.charCodeAt(i);
+        }
+        return new Blob([bytes], { type: 'application/pdf' });
+      }
+    }
+
+    // Fallback for simple Array of numbers
+    if (Array.isArray(data)) {
+      return new Blob([new Uint8Array(data)], { type: 'application/pdf' });
+    }
+
+    // Last resort: Stringify (likely incorrect for PDF but handles edge cases)
+    return new Blob([data], { type: 'application/pdf' });
+  }
+
+  // Method to download the current blob
+  downloadCurrentPdf() {
+    if (this.currentBlobUrl) {
+      const a = document.createElement('a');
+      a.href = this.currentBlobUrl;
+      a.download = `contract_print_${new Date().getTime()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
   }
 

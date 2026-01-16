@@ -234,18 +234,15 @@ export async function createContract(payload: CreateContractPayload) {
     }
 }
 
-export async function getContractPdfUrl(contractId: number): Promise<string> {
+export async function getContractPdfUrl(contractId: number) {
     try {
         // QUAN TRỌNG: Thêm responseType: 'blob' để axios hiểu đây là file binary
         const response = await api.get(`/hr/contracts/${contractId}/print`, { // Dùng endpoint /print như postman log của bạn
             responseType: 'blob'
         });
 
-        // Tạo một URL tạm thời từ Blob dữ liệu (PDF)
-        const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-
-        return pdfUrl; // Trả về blob:http://localhost... để gán vào iframe src
+        // Trả về dữ liệu Blob gốc thay vì tạo URL string tại đây
+        return response.data;
     } catch (error: any) {
         console.error("Lỗi tải PDF:", error);
         // Kiểm tra xem lỗi là do Auth hay do server

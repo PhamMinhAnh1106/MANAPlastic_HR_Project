@@ -80,15 +80,7 @@
                   <option *ngFor="let st of statusContract" [value]="st">{{translateContractStatus(st)}}</option>
               </select>
           </div>
-          <div class="form-group">
-              <label>Phụ cấp độc hại</label>
-              <select [(ngModel)]="filters.allowanceToxicType">
-                  <option value="">-- Tất cả --</option>
-                  <option value="NONE">Không áp dụng</option>
-                  <option value="CASH">Tiền mặt</option>
-                  <option value="IN_KIND">Hiện vật</option>
-              </select>
-          </div>
+          <!-- Đã xóa bộ lọc Phụ cấp độc hại -->
           <div class="form-group">
               <label>Từ ngày</label>
               <input type="date" [(ngModel)]="filters.startdate">
@@ -428,6 +420,17 @@
             </table>
             <ng-template #noData><div class="empty-state"><p>Không có dữ liệu.</p></div></ng-template>
           </div>
+          
+          <!-- PAGINATION CONTROLS -->
+          <div class="pagination-controls" *ngIf="totalPages > 0">
+              <button class="btn-page" [disabled]="page === 0" (click)="onPageChange(page - 1)">
+                  <span class="material-symbols-outlined">chevron_left</span>
+              </button>
+              <span class="page-info">Trang <strong>{{page + 1}}</strong> / {{totalPages}}</span>
+              <button class="btn-page" [disabled]="page >= totalPages - 1" (click)="onPageChange(page + 1)">
+                  <span class="material-symbols-outlined">chevron_right</span>
+              </button>
+          </div>
         </div>
       </div>
     </div>
@@ -482,7 +485,7 @@
                     <label>Mẫu Hợp đồng (Template)</label>
                     <select [(ngModel)]="editForm.templateId" class="custom-input-lg" [disabled]="isReadOnly">
                         <option [ngValue]="0">-- Chọn mẫu hợp đồng --</option>
-                        <option *ngFor="let t of listTemplates" [ngValue]="t.id">{{ t.contractname }}</option>
+                        <option *ngFor="let t of listTemplates" [ngValue]="t.id">{{ t.name }}</option>
                     </select>
                   </div>
               </div>
@@ -505,12 +508,11 @@
                   </div>
               </div>
 
+              <!-- UPDATED: Thay Phụ cấp độc hại bằng Standard Hours -->
               <div class="form-row">
                  <div class="form-group-lg full-width">
-                    <label>Phụ cấp độc hại</label>
-                    <select [(ngModel)]="editForm.allowanceToxicType" class="custom-input-lg" [disabled]="isReadOnly">
-                        <option *ngFor="let a of allowanceToxicTypes" [value]="a.value">{{ a.label }}</option>
-                    </select>
+                    <label>Giờ làm việc tiêu chuẩn (Standard Hours)</label>
+                    <input type="number" [(ngModel)]="editForm.standardHours" class="custom-input-lg" [disabled]="isReadOnly" placeholder="VD: 8">
                  </div>
               </div>
   
@@ -701,10 +703,21 @@
     <div class="modal-box image-modal-box">
       <div class="modal-header">
          <h3>Chi tiết</h3>
-         <button class="close-btn" (click)="closeImagePreview()"><span class="material-symbols-outlined">close</span></button>
+         <div style="display: flex; gap: 10px;">
+             <!-- Add Download Button -->
+             <button *ngIf="fileType === 'pdf'" class="btn-secondary" (click)="downloadCurrentPdf()" title="Tải xuống">
+                 <span class="material-symbols-outlined">download</span>
+             </button>
+             <button class="close-btn" (click)="closeImagePreview()"><span class="material-symbols-outlined">close</span></button>
+         </div>
       </div>
       <div class="modal-body image-body">
-          <div *ngIf="!isloading && previewContentUrl && fileType === 'pdf'" class="pdf-container"><iframe [src]="previewContentUrl" frameborder="0"></iframe></div>
+          <!-- Use Object for better PDF support -->
+          <div *ngIf="!isloading && previewContentUrl && fileType === 'pdf'" class="pdf-container">
+               <object [data]="previewContentUrl" type="application/pdf" width="100%" height="100%">
+                   <p>Trình duyệt của bạn không hỗ trợ xem PDF trực tiếp. Vui lòng <a [href]="previewContentUrl" download>tải xuống tại đây</a>.</p>
+               </object>
+          </div>
           <img *ngIf="!isloading && previewContentUrl && fileType === 'image'" [src]="previewContentUrl" class="preview-img">
           <div *ngIf="isloading" class="loading-state"><div class="spinner"></div></div>
       </div>

@@ -1008,3 +1008,47 @@ button {
         transform: rotate(360deg);
     }
 }
+
+// [NEW] Pagination Controls Styles
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e2e8f0;
+
+    .btn-page {
+        padding: 8px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+
+        &:hover:not([disabled]) {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        &:disabled {
+            background: #f8fafc;
+            color: #cbd5e1;
+            cursor: not-allowed;
+            border-color: #f1f5f9;
+        }
+    }
+
+    .page-info {
+        font-size: 0.9rem;
+        color: #64748b;
+
+        strong {
+            color: #1e293b;
+        }
+    }
+}
