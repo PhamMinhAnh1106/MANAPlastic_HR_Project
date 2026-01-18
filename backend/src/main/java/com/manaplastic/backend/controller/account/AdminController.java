@@ -54,6 +54,8 @@ public class AdminController {
                 .fullname(currentUser.getFullname())
                 .cccd(currentUser.getCccd())
                 .email(currentUser.getEmail())
+                .taxCode(currentUser.getTaxCode())
+                .socialInsuranceNumber(currentUser.getSocialInsuranceNumber())
                 .phonenumber(currentUser.getPhonenumber())
                 .gender(currentUser.getGender())
                 .birth(currentUser.getBirth())

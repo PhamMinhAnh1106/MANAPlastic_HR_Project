@@ -88,6 +88,14 @@ public class UserEntity implements UserDetails {
     @Column(name = "jobtype", nullable = false, length = 100)
     private String jobtype;
 
+    @Size(max = 20)
+    @Column(name = "taxCode", length = 20)
+    private String taxCode;
+
+    @Size(max = 20)
+    @Column(name = "socialInsuranceNumber", length = 20)
+    private String socialInsuranceNumber;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(this.roleID.getRolename()));

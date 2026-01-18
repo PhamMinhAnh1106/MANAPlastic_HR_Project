@@ -15,6 +15,8 @@ import java.util.List;
 public class ContractDTO {
     // --- Thông tin cơ bản Hợp đồng ---
     private Integer id;
+    private Integer contractTemplateId;
+    private String contractTemplateName;
     private String contractname;
     private String type; // Loại hợp đồng
     private BigDecimal basesalary;
@@ -38,6 +40,7 @@ public class ContractDTO {
     private Gender gender;
 
     // --- Thông tin Tổ chức ---
+    private Integer departmentId;
     private String departmentName;
     private String roleName;
 

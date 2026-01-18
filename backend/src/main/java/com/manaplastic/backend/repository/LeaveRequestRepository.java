@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface LeaveRequestRepository extends JpaRepository<LeaverequestEntity, Integer>, JpaSpecificationExecutor<LeaverequestEntity> {
@@ -40,4 +41,14 @@ public interface LeaveRequestRepository extends JpaRepository<LeaverequestEntity
             "OR (:end BETWEEN l.startdate AND l.enddate) " +
             "OR (l.startdate BETWEEN :start AND :end))")
     boolean existsOverlappingRequest(UserEntity user, LocalDate start, LocalDate end);
+
+    // Tìm đơn nghỉ phép đã duyệt của user bao trùm ngày hiện tại - cho chức năng tính lương hàng ngày (ngày nghỉ)
+    @Query("SELECT r FROM LeaverequestEntity r " +
+            "WHERE r.userID = :user " +
+            "AND :date BETWEEN r.startdate AND r.enddate " +
+            "AND r.status = 'APPROVED'")
+    Optional<LeaverequestEntity> findApprovedRequestForDate(
+            @Param("user") UserEntity user,
+            @Param("date") LocalDate date
+    );
 }

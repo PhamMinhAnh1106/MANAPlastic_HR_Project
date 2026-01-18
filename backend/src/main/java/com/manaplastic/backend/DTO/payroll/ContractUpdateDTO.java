@@ -3,7 +3,6 @@ package com.manaplastic.backend.DTO.payroll;
 import com.manaplastic.backend.constant.Gender;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,7 +29,7 @@ public class ContractUpdateDTO {
     private LocalDate endDate;
 
     private String status;
-    private Integer templateId;
+    private Integer contractTemplateId;
 
     private String fullname;
     private String cccd;
@@ -40,7 +39,6 @@ public class ContractUpdateDTO {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dob;
     private Gender gender;
-
     private Integer departmentId;
     private Integer roleId;
 

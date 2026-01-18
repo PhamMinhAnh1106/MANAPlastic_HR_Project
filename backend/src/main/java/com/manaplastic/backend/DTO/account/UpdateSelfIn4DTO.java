@@ -17,6 +17,8 @@ public class UpdateSelfIn4DTO {
     private String fullname;
     private String cccd;
     private String email;
+    private String taxCode;
+    private String socialInsuranceNumber;
     private String phonenumber;
     private Gender gender;
     private LocalDate birth;

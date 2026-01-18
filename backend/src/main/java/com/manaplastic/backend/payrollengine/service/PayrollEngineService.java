@@ -86,11 +86,11 @@ public class PayrollEngineService {
     }
 
     @Transactional
-    public void finalizePayrollAndSendMail(int month, int year) { // ĐANG LỖI HEADDER cho PDF
+    public void finalizePayrollAndSendMail(int month, int year) {
         String payPeriod = String.format("%d-%02d", year, month);
         System.out.println(">>> BẮT ĐẦU CHỐT LƯƠNG & GỬI MAIL KỲ: " + payPeriod);
 
-        //  Lấy danh sách bảng lương bằng JPA (Thay vì SQL thuần)
+        // 1. Lấy danh sách bảng lương
         List<PayrollEntity> payrolls = payrollsJPARepo.findAllByPayperiod(payPeriod);
 
         if (payrolls.isEmpty()) {
@@ -101,20 +101,15 @@ public class PayrollEngineService {
         System.out.println("Tìm thấy " + payrolls.size() + " nhân viên.");
 
         for (PayrollEntity payroll : payrolls) {
-            // Lấy UserEntity trực tiếp từ quan hệ (Không cần query lại)
             UserEntity user = payroll.getUserID();
 
             try {
-                // A. CẬP NHẬT TRẠNG THÁI FINAL
-                // Giả sử status là Enum hoặc String. Nếu là Enum thì dùng PayrollEntity.Status.FINAL
-                if (!"FINAL".equalsIgnoreCase(String.valueOf(payroll.getStatus()))) {
 
+                if (!"FINAL".equalsIgnoreCase(String.valueOf(payroll.getStatus()))) {
                     payroll.setStatus("FINAL");
                     payrollsJPARepo.save(payroll);
                 }
 
-                // B. LẤY DỮ LIỆU LƯƠNG CHI TIẾT (DTO)
-                // Gọi hàm mới nhận vào UserEntity
                 PayrollDetailDTO payslipDTO = payslipService.getMyPayslipPDF(user, month, year);
 
                 if (payslipDTO == null) {
@@ -122,11 +117,8 @@ public class PayrollEngineService {
                     continue;
                 }
 
-                // C. CHUYỂN ĐỔI DTO -> MAP (Để tương thích với PdfService cũ)
-                // Nếu PdfService của bạn chưa sửa để nhận DTO, ta convert sang Map
-                Map<String, Object> mapData = objectMapper.convertValue(payslipDTO, Map.class);
+                Map<String, Object> mapData = payslipService.convertDtoToPdfData(payslipDTO);
 
-                // D. TẠO PDF VÀ GỬI MAIL
                 byte[] pdfBytes = pdfService.generatePayslipPdf(mapData);
 
                 if (pdfBytes != null) {
@@ -136,7 +128,7 @@ public class PayrollEngineService {
                             payPeriod,
                             pdfBytes
                     );
-                    System.out.println("Đã gửi mail cho: " + user.getFullname());
+                    System.out.println("Đã gửi mail thành công cho: " + user.getFullname());
                 }
 
             } catch (Exception e) {

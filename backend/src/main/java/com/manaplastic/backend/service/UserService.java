@@ -47,9 +47,39 @@ public class UserService {
             userToUpdate.setFullname(request.getFullname());
         }
 
-        if (request.getPhonenumber() != null ) {
+        if (request.getTaxCode() != null && !request.getTaxCode().isEmpty()) {
+            String taxCodeClean = request.getTaxCode().trim();
 
-            if ( !request.getPhonenumber().matches("\\d{10,11}")){
+            if (taxCodeClean.length() != 10 && taxCodeClean.length() != 13) {
+                throw new IllegalArgumentException("Mã số thuế không hợp lệ (phải là 10 hoặc 13 số).");
+            }
+
+            if (!taxCodeClean.equals(userToUpdate.getTaxCode())) {
+                if (userRepository.existsByTaxCode(taxCodeClean)) {
+                    throw new IllegalArgumentException("Mã số thuế này đã được sử dụng bởi nhân viên khác.");
+                }
+                userToUpdate.setTaxCode(taxCodeClean);
+            }
+        }
+
+        if (request.getSocialInsuranceNumber() != null && !request.getSocialInsuranceNumber().isEmpty()) {
+            String bhxhClean = request.getSocialInsuranceNumber().trim();
+
+            if (bhxhClean.length() != 10) {
+                throw new IllegalArgumentException("Số BHXH không hợp lệ (phải đúng 10 số).");
+            }
+
+            if (!bhxhClean.equals(userToUpdate.getSocialInsuranceNumber())) {
+                if (userRepository.existsBySocialInsuranceNumber(bhxhClean)) {
+                    throw new IllegalArgumentException("Số BHXH này đã được sử dụng bởi nhân viên khác.");
+                }
+                userToUpdate.setSocialInsuranceNumber(bhxhClean);
+            }
+        }
+
+        if (request.getPhonenumber() != null) {
+
+            if (!request.getPhonenumber().matches("\\d{10,11}")) {
                 throw new IllegalArgumentException("Số điện thoại không hợp lệ (10 hoặc 11 số).");
             }
 
@@ -64,7 +94,7 @@ public class UserService {
         if (request.getEmail() != null && !request.getEmail().isEmpty()
                 && !request.getEmail().equals(userToUpdate.getEmail())) {
 
-            if(!request.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            if (!request.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
                 throw new IllegalArgumentException("Email có định dạng không hợp lệ.");
             }
 
@@ -81,14 +111,14 @@ public class UserService {
 
         if (request.getBirth() != null) {
 
-            if(Period.between(request.getBirth(), LocalDate.now()).getYears() < 18) {
+            if (Period.between(request.getBirth(), LocalDate.now()).getYears() < 18) {
                 throw new IllegalArgumentException("Bạn chưa đủ 18 tuổi.");
             }
 
             userToUpdate.setBirth(request.getBirth());
         }
 
-        if (request.getBankAccount() != null ) {
+        if (request.getBankAccount() != null) {
             userToUpdate.setBankaccount(request.getBankAccount());
         }
 
@@ -163,9 +193,39 @@ public class UserService {
             userToUpdate.setFullname(request.getFullname());
         }
 
+        if (request.getTaxCode() != null && !request.getTaxCode().isEmpty()) {
+            String taxCodeClean = request.getTaxCode().trim();
+
+            if (taxCodeClean.length() != 10 && taxCodeClean.length() != 13) {
+                throw new IllegalArgumentException("Mã số thuế không hợp lệ (phải là 10 hoặc 13 số).");
+            }
+
+            if (!taxCodeClean.equals(userToUpdate.getTaxCode())) {
+                if (userRepository.existsByTaxCode(taxCodeClean)) {
+                    throw new IllegalArgumentException("Mã số thuế này đã được sử dụng bởi nhân viên khác.");
+                }
+                userToUpdate.setTaxCode(taxCodeClean);
+            }
+        }
+
+        if (request.getSocialInsuranceNumber() != null && !request.getSocialInsuranceNumber().isEmpty()) {
+            String bhxhClean = request.getSocialInsuranceNumber().trim();
+
+            if (bhxhClean.length() != 10) {
+                throw new IllegalArgumentException("Số BHXH không hợp lệ (phải đúng 10 số).");
+            }
+
+            if (!bhxhClean.equals(userToUpdate.getSocialInsuranceNumber())) {
+                if (userRepository.existsBySocialInsuranceNumber(bhxhClean)) {
+                    throw new IllegalArgumentException("Số BHXH này đã được sử dụng bởi nhân viên khác.");
+                }
+                userToUpdate.setSocialInsuranceNumber(bhxhClean);
+            }
+        }
+
         if (request.getPhonenumber() != null) {
 
-            if ( !request.getPhonenumber().matches("\\d{10,11}")){
+            if (!request.getPhonenumber().matches("\\d{10,11}")) {
                 throw new IllegalArgumentException("Số điện thoại không hợp lệ (10 hoặc 11 số).");
             }
 
@@ -180,7 +240,7 @@ public class UserService {
         if (request.getEmail() != null && !request.getEmail().isEmpty()
                 && !request.getEmail().equals(userToUpdate.getEmail())) {
 
-            if(!request.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            if (!request.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
                 throw new IllegalArgumentException("Email có định dạng không hợp lệ.");
             }
 
@@ -196,7 +256,7 @@ public class UserService {
 
         if (request.getBirth() != null) {
 
-            if(Period.between(request.getBirth(), LocalDate.now()).getYears() < 18) {
+            if (Period.between(request.getBirth(), LocalDate.now()).getYears() < 18) {
                 throw new IllegalArgumentException("Bạn chưa đủ 18 tuổi.");
             }
 
@@ -318,6 +378,8 @@ public class UserService {
                 .username(entity.getUsername())
                 .fullname(entity.getFullname())
                 .email(entity.getEmail())
+                .taxCode(entity.getTaxCode())
+                .socialInsuranceNumber(entity.getSocialInsuranceNumber())
                 .phonenumber(entity.getPhonenumber())
                 .address(entity.getAddress())
                 .roleName(entity.getRoleID().getRolename())

@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
@@ -32,10 +33,10 @@ public class OvertimeRequestDetailEntity {
     private OvertimetypeEntity overtimeTypeID;
 
     @Column(name = "startTime")
-    private LocalTime startTime;
+    private LocalDateTime startTime;
 
     @Column(name = "endTime")
-    private LocalTime endTime;
+    private LocalDateTime endTime;
 
     @NotNull
     @Column(name = "hours", nullable = false)

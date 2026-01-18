@@ -25,27 +25,55 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class DailySalaryService {
 
-    @Autowired private AttendanceRepository attendanceRepo;
-    @Autowired private ContractRepository contractRepo;
-    @Autowired private OvertimeRequestRepository otRequestRepo;
-    @Autowired private OvertimeRequestDetailRepository otDetailRepo;
-    @Autowired private ExpressionEvaluator evaluator;
-    @Autowired private PayrollEngineRepository ruleRepo;
-    @Autowired private ObjectMapper objectMapper;
-    @Autowired private PayrollDataFetcher dataFetcher;
-
+    @Autowired
+    private AttendanceRepository attendanceRepo;
+    @Autowired
+    private ContractRepository contractRepo;
+    @Autowired
+    private OvertimeRequestRepository otRequestRepo;
+    @Autowired
+    private OvertimeRequestDetailRepository otDetailRepo;
+    @Autowired
+    private ExpressionEvaluator evaluator;
+    @Autowired
+    private PayrollEngineRepository ruleRepo;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private PayrollDataFetcher dataFetcher;
+    @Autowired
+    private LeaveRequestRepository leaveRequestRepo;
+    @Autowired
+    private UserRepository userRepo;
+    @Autowired
+    private ShiftRepository shiftRepo;
 
     @Transactional
     public void calculateAndSaveDailySalary(UserEntity user, LocalDate date) {
         // Lấy dữ liệu chấm công
         AttendanceEntity attendance = attendanceRepo.findByUserIDAndDate(user, date)
                 .orElse(null);
+        LeaverequestEntity approvedLeave = leaveRequestRepo.findApprovedRequestForDate(user, date)
+                .orElse(null);
 
+        // XỬ LÝ LOGIC "KHÔNG CHẤM CÔNG" - ngày nghỉ
         if (attendance == null) {
-            System.out.println("Không tìm thấy dữ liệu chấm công ngày " + date + " cho User: " + user.getId());
-            return;
-        }
+            if (approvedLeave != null) {
+                // Trường hợp: Nghỉ phép có đơn -> Tạo mới bản ghi Attendance
+                attendance = new AttendanceEntity();
+                attendance.setUserID(user);
+                attendance.setDate(date);
+                attendance.setStatus(AttendanceEntity.AttendanceStatus.ON_LEAVE);
 
+                // Lưu tạm để có ID
+                attendance = attendanceRepo.save(attendance);
+                System.out.println("   -> Tạo attendance mới cho ngày nghỉ phép: " + user.getUsername());
+            } else {
+                // Trường hợp: Không chấm công + Không có đơn -> Nghỉ không phép (ABSENT)
+                System.out.println("User " + user.getId() + " không đi làm, không có đơn ngày " + date);
+                return;
+            }
+        }
         // Lấy hợp đồng hiệu lực (Để đảm bảo nhân viên có HĐ Active)
         ContractEntity contract = contractRepo.findActiveContract(user.getId(), date);
         if (contract == null) {
@@ -54,7 +82,7 @@ public class DailySalaryService {
         }
 
         // KHỞI TẠO CONTEXT (Kết hợp SQL DB và Dữ liệu ngày)
-        Map<String, BigDecimal> context = buildDailyContext(user, attendance, date);
+        Map<String, BigDecimal> context = buildDailyContext(user, attendance, date, approvedLeave);
 
         // CHẠY ENGINE
         List<Map<String, Object>> rulesRaw = ruleRepo.fetchApprovedRules();
@@ -75,8 +103,7 @@ public class DailySalaryService {
             }
         }
 
-
-        BigDecimal finalDailySalary = context.getOrDefault("TOTAL_INCOME", BigDecimal.ZERO);
+        BigDecimal finalDailySalary = context.getOrDefault("DAILY_EARNING", BigDecimal.ZERO);
 
         attendance.setEstimatedSalary(finalDailySalary);
         attendanceRepo.save(attendance);
@@ -84,52 +111,97 @@ public class DailySalaryService {
         System.out.println("<<< ĐÃ LƯU (Gross Day): " + finalDailySalary + " VND");
     }
 
-    private Map<String, BigDecimal> buildDailyContext(UserEntity user, AttendanceEntity attendance, LocalDate date) {
-        //  Lấy toàn bộ biến tĩnh từ DB (Lương 1h, Hệ số đêm, Ngày chuẩn...)
+    private Map<String, BigDecimal> buildDailyContext(UserEntity user, AttendanceEntity attendance, LocalDate date, LeaverequestEntity approvedLeave) {
         Map<String, BigDecimal> context = dataFetcher.fetchContext(user.getId(), date.getMonthValue(), date.getYear());
-
-        // --- DEBUG LOG: Kiểm tra xem DB trả về gì ---
-        System.out.println("DEBUG DB VARS -> Hourly: " + context.get("HOURLY_MONEY") + " | RateNight: " + context.get("RATE_NIGHT_SHIFT"));
-
-        //  Tính toán lại các biến động theo ngày (GHI ĐÈ giá trị của tháng)
-        context.put("TOTAL_REWARD", BigDecimal.ZERO);   // Không cộng thưởng tháng
-        context.put("TOTAL_PENALTY", BigDecimal.ZERO);  // Không trừ phạt tháng
-//        context.put("TOTAL_ALLOWANCE", BigDecimal.ZERO); // Không cộng phụ cấp tháng (đã nằm trong Hourly Rate nếu có)
-
-        // Vô hiệu hóa tính Bảo hiểm & Thuế trong ngày (để tránh ra số âm)
-        // Cách làm: Set lương đóng bảo hiểm = 0 để công thức BHXH nhân ra 0
-        context.put("INSURANCE_SALARY", BigDecimal.ZERO);
-        context.put("PERSONAL_DEDUCTION", BigDecimal.ZERO); // Mức giảm trừ gia cảnh
-
-        //Giờ làm việc thực tế
-        BigDecimal workHours = calculateWorkHours(attendance.getCheckin(), attendance.getCheckout());
-        context.put("ACTUAL_WORK_HOURS", workHours); // Ghi đè
-
-        //Ngày công thực tế (0.5 hay 1.0)
+        BigDecimal workHours = BigDecimal.ZERO;
         BigDecimal realWorkDay = BigDecimal.ZERO;
-        if (workHours.compareTo(BigDecimal.valueOf(7)) >= 0) realWorkDay = BigDecimal.ONE;
-        else if (workHours.compareTo(BigDecimal.valueOf(3.5)) >= 0) realWorkDay = BigDecimal.valueOf(0.5);
-        context.put("REAL_WORK_DAYS", realWorkDay); // Ghi đè
+        boolean isPaidLeave = false;
 
-        //Tổng giờ OT quy đổi
+        //  ƯU TIÊN KIỂM TRA ĐƠN NGHỈ PHÉP (Leave Request) ---
+        // Truy vấn xem ngày hôm nay (date) user có đơn nào status = APPROVED không
+        if (approvedLeave != null) {
+            LeaverequestEntity.LeaveType type = approvedLeave.getLeavetype();
+
+            if (type == LeaverequestEntity.LeaveType.ANNUAL ||
+                    type == LeaverequestEntity.LeaveType.SICK ||
+                    type == LeaverequestEntity.LeaveType.MATERNITY ||
+                    type == LeaverequestEntity.LeaveType.PATERNITY) {
+
+                isPaidLeave = true;
+                workHours = BigDecimal.valueOf(8.0);
+                realWorkDay = BigDecimal.ONE;
+            }
+        }
+
+        //  CHẤM CÔNG THỰC TẾ (Chỉ chạy nếu KHÔNG phải nghỉ phép) ---
+        if (!isPaidLeave && attendance != null && attendance.getCheckin() != null && attendance.getCheckout() != null) {
+            workHours = calculateWorkHours(attendance.getCheckin(), attendance.getCheckout());
+            if (workHours.compareTo(BigDecimal.valueOf(7)) >= 0) realWorkDay = BigDecimal.ONE;
+            else if (workHours.compareTo(BigDecimal.valueOf(3.5)) >= 0) realWorkDay = BigDecimal.valueOf(0.5);
+        }
+
+        // GHI ĐÈ CÁC GIÁ TRỊ VÀO CONTEXT ---
+        // Reset các biến tích lũy tháng về 0 (để tránh cộng dồn sai trong ngày)
+        context.put("TOTAL_REWARD", BigDecimal.ZERO);
+        context.put("TOTAL_PENALTY", BigDecimal.ZERO);
+        context.put("INSURANCE_SALARY", BigDecimal.ZERO);
+        context.put("PERSONAL_DEDUCTION", BigDecimal.ZERO);
+        context.put("ACTUAL_WORK_HOURS", workHours);
+        context.put("REAL_WORK_DAYS", realWorkDay);
+
+        // TÍNH TOÁN CÁC KHOẢN PHỤ (OT, Đêm) ---
         BigDecimal dailyOtConverted = calculateDailyOtConverted(user, date);
-        context.put("TOTAL_OT_CONVERTED", dailyOtConverted); // Ghi đè
+        context.put("TOTAL_OT_CONVERTED", dailyOtConverted);
 
-        //  Tổng giờ đêm hôm nay
-        BigDecimal nightHours = calculateNightHours(attendance.getCheckin(), attendance.getCheckout());
-        context.put("TOTAL_NIGHT_HOURS", nightHours); // Ghi đè
+        // Tổng giờ đêm (Night Hours)
+        // Chỉ tính phụ cấp đêm nếu đi làm thực tế. Nếu nghỉ phép thì không có phụ cấp đêm. Nếu có OT để phân biệt voới người tự nguyện cống hiến
+        BigDecimal nightHours = BigDecimal.ZERO;
+        if (!isPaidLeave && attendance != null && attendance.getCheckin() != null && attendance.getCheckout() != null) {
 
-        System.out.println("DEBUG CALC -> WorkHours: " + workHours + " | NightHours: " + nightHours);
+            LocalDateTime checkIn = attendance.getCheckin();
+            LocalDateTime actualCheckOut = attendance.getCheckout();
+
+            // Mặc định: Giờ ra tính lương là giờ ra thực tế
+            LocalDateTime effectiveCheckOut = actualCheckOut;
+            LocalDateTime shiftEndTime = getShiftEndTime(attendance, date);
+
+            // NẾU về trễ hơn quy định VÀ KHÔNG có đơn OT (dailyOtConverted == 0)
+            if (shiftEndTime != null && actualCheckOut.isAfter(shiftEndTime) && dailyOtConverted.compareTo(BigDecimal.ZERO) == 0) {
+                // => Cắt giờ: Chỉ tính đến giờ hết ca
+                effectiveCheckOut = shiftEndTime;
+                System.out.println("   -> Cắt giờ ra từ " + actualCheckOut + " xuống " + shiftEndTime + " (Do không có OT)");
+            }
+            nightHours = calculateNightHours(checkIn, effectiveCheckOut);
+        }
+        context.put("TOTAL_NIGHT_HOURS", nightHours);
+
+        System.out.println("DEBUG CALC -> WorkHours: " + workHours + " | RealDays: " + realWorkDay + " | Leave: " + isPaidLeave);
 
         return context;
     }
 
     // --- CÁC HÀM HELPER (Logic tính toán thời gian) ---
-
     private BigDecimal calculateWorkHours(LocalDateTime in, LocalDateTime out) {
         if (in == null || out == null) return BigDecimal.ZERO;
         long minutes = Duration.between(in, out).toMinutes();
         return BigDecimal.valueOf(minutes).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
+    }
+
+    private LocalDateTime getShiftEndTime(AttendanceEntity attendance, LocalDate date) {
+        if (attendance.getShiftID() == null) return null; // Hoặc logic lấy ca mặc định
+
+        ShiftEntity shift = attendance.getShiftID();
+
+        if (shift == null) return null;
+
+        // Giả sử ShiftEntity có field endTime (LocalTime)
+        LocalDateTime endDateTime = date.atTime(shift.getEndtime());
+
+        // Xử lý ca đêm (Nếu End < Start -> Ca qua đêm -> Thuộc ngày hôm sau)
+        if (shift.getEndtime().isBefore(shift.getStarttime())) {
+            endDateTime = endDateTime.plusDays(1);
+        }
+        return endDateTime;
     }
 
     private BigDecimal calculateDailyOtConverted(UserEntity user, LocalDate date) {
@@ -183,33 +255,26 @@ public class DailySalaryService {
 
     @Scheduled(cron = "0 0 7 * * ?")
     public void autoCalculateDailySalary() {
-        // ngày cần tính (Là ngày hôm qua)
         LocalDate targetDate = LocalDate.now().minusDays(1);
+        System.out.println("--- JOB TÍNH LƯƠNG NGÀY: " + targetDate + " ---");
 
-        System.out.println("Bắt đầu job tính lương tự động cho ngày: " + targetDate);
-
-        List<AttendanceEntity> attendanceList = attendanceRepo.findAllByDate(targetDate);
-
-        if (attendanceList.isEmpty()) {
-            System.out.println("Không có dữ liệu chấm công ngày " + targetDate);
-            return;
-        }
-
+        List<UserEntity> activeUsers = userRepo.findAllActiveUsers();
         AtomicInteger successCount = new AtomicInteger(0);
-        AtomicInteger errorCount = new AtomicInteger(0);
 
-        attendanceList.forEach(att -> {
+        activeUsers.forEach(user -> {
             try {
-
-                calculateAndSaveDailySalary(att.getUserID(), targetDate);
+                // Gọi hàm tính:
+                // - Có attendance -> Tính
+                // - Không attendance nhưng có Phép -> Tự tạo attendance -> Tính
+                // - Không có gì -> Bỏ qua
+                calculateAndSaveDailySalary(user, targetDate);
                 successCount.getAndIncrement();
             } catch (Exception e) {
-                System.err.println("❌ Lỗi User " + att.getUserID().getId() + ": " + e.getMessage());
-                errorCount.getAndIncrement();
+                System.err.println("Lỗi User " + user.getUsername() + ": " + e.getMessage());
+                e.printStackTrace();
             }
         });
 
-        System.out.println(String.format("✅ Hoàn tất! Thành công: %d, Lỗi: %d",
-                successCount.get(), errorCount.get()));
+        System.out.println("Job hoàn tất. Đã xử lý: " + successCount.get() + " nhân viên.");
     }
 }

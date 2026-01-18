@@ -151,7 +151,7 @@ public class EmailService {
     }
 
     //Luồng gửi pass và username
-    public void sendAccountInfo(String toEmail, String username, String rawPassword) {
+    public void sendAccountInfo(String toEmail, String username, String rawPassword,String fullname) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper =
@@ -159,7 +159,7 @@ public class EmailService {
 
             helper.setFrom("noreply@manaplastic.com");
             helper.setTo(toEmail);
-            helper.setSubject("Thông tin tài khoản MANAPlastic");
+            helper.setSubject("Thông tin tài khoản MANAPlastic của nhân viên - " + fullname);
 
             String htmlContent = """
             <div style="font-family: Arial, sans-serif; line-height: 1.6;">
@@ -200,7 +200,7 @@ public class EmailService {
             helper.addInline("companyLogo", logo);
 
             mailSender.send(message);
-            System.out.println("Email đã gửi tới: " + toEmail);
+            System.out.println("Email đã gửi tới: " + toEmail + " (Nhân viên: " + fullname + " )" );
 
         } catch (Exception e) {
             System.err.println("Lỗi gửi email: " + e.getMessage());

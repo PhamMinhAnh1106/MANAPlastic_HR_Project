@@ -12,10 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -33,6 +30,7 @@ public class OvertimeService {
 
     // Mốc giờ bắt đầu tính Ca Đêm (22:00)
     private static final LocalTime NIGHT_START_TIME = LocalTime.of(22, 0);
+    private static final LocalTime NIGHT_END_TIME = LocalTime.of(6, 0);
 
     // Tạo tay
     @Transactional
@@ -78,8 +76,9 @@ public class OvertimeService {
         if (otRepo.existsByUseridAndDate(user, date)) return;
 
         long minutes = (long) (detectedHours * 60);
-        LocalTime endTime = actualOut.toLocalTime();
-        LocalTime startTime = endTime.minusMinutes(minutes);
+
+        LocalDateTime endTime = actualOut;
+        LocalDateTime startTime = endTime.minusMinutes(minutes);
 
         final int defaultTypeId = (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY) ? 2 : 1;
         OvertimetypeEntity defaultType = overtimeTypeRepo.findById(defaultTypeId)
@@ -144,10 +143,9 @@ public class OvertimeService {
 
     private void updateOvertimeDetails(OvertimeRequestEntity req, List<OvertimeDetailUpdateDTO> detailDTOs) {
         if (detailDTOs == null) return;
-
+        validateTimeSegments(req.getStartTime(), req.getEndTime(), detailDTOs);
         List<OvertimeRequestDetailEntity> currentDetails = req.getDetails();
 
-        // 1. XỬ LÝ XÓA (DELETE)
         // Tìm những ID có trong DB nhưng KHÔNG có trong danh sách DTO gửi lên
         // (Ví dụ: HR xóa bớt 1 dòng sai)
         Set<Integer> dtoIds = detailDTOs.stream()
@@ -163,9 +161,8 @@ public class OvertimeService {
                 .collect(Collectors.toMap(OvertimeRequestDetailEntity::getId, Function.identity()));
 
         for (OvertimeDetailUpdateDTO dto : detailDTOs) {
-            //  cap nhat
+            // Cập nhật
             if (dto.getId() != null && currentMap.containsKey(dto.getId())) {
-
                 OvertimeRequestDetailEntity existing = currentMap.get(dto.getId());
                 existing.setStartTime(dto.getStartTime());
                 existing.setEndTime(dto.getEndTime());
@@ -177,28 +174,21 @@ public class OvertimeService {
                     existing.setOvertimeTypeID(type);
                 }
             } else {
-                // them moi
+                // Them mới
                 OvertimeRequestDetailEntity newDetail = new OvertimeRequestDetailEntity();
-                newDetail.setRequestID(req); // Link ngược lại cha
+                newDetail.setRequestID(req);
                 newDetail.setStartTime(dto.getStartTime());
                 newDetail.setEndTime(dto.getEndTime());
                 newDetail.setHours(dto.getHours());
 
-
                 OvertimetypeEntity type = overtimeTypeRepo.findById(dto.getOvertimeTypeID())
                         .orElseThrow(() -> new RuntimeException("Chưa chọn loại OT cho dòng mới"));
                 newDetail.setOvertimeTypeID(type);
-
-
                 currentDetails.add(newDetail);
             }
         }
 
-        double newTotalFinalHours = 0.0;
-        for (OvertimeRequestDetailEntity detail : currentDetails) {
-            newTotalFinalHours += detail.getHours();
-        }
-
+        double newTotalFinalHours = currentDetails.stream().mapToDouble(OvertimeRequestDetailEntity::getHours).sum();
         req.setFinalPaidHours(newTotalFinalHours);
 
     }
@@ -221,7 +211,7 @@ public class OvertimeService {
 
   // Hàm tính toán số giờ OT ( OT 3 tiếng nhưng có thể có 2-3 loại OT )
     private void processAndSaveRequest(
-            UserEntity user, java.time.LocalDate date, LocalTime startTime, LocalTime endTime,
+            UserEntity user, java.time.LocalDate date, LocalDateTime startTime, LocalDateTime endTime,
             String reason, OvertimetypeEntity baseType,
             OvertimeRequestEntity.RequestStatus status, boolean isSystemGenerated,
             LocalDateTime actualCheckOut, UserEntity managerApprover
@@ -255,70 +245,74 @@ public class OvertimeService {
         }
 
 
-        boolean isCrossingNight = false;
-        if (endTime.isBefore(startTime)) isCrossingNight = true;
-        else if (startTime.isBefore(NIGHT_START_TIME) && endTime.isAfter(NIGHT_START_TIME)) isCrossingNight = true;
-
+//        LocalDateTime nightPivot = LocalDateTime.of(date, NIGHT_START_TIME);
+        // Xác định 2 mốc xoay chiều (Pivots)
+        LocalDateTime nightStartPivot = LocalDateTime.of(date, NIGHT_START_TIME); // 22:00 hôm nay
+        LocalDateTime nightEndPivot = LocalDateTime.of(date.plusDays(1), NIGHT_END_TIME); // 06:00 sáng hôm sau
         double calculatedTotalHours = 0;
 
-        if (isCrossingNight) {
-            // A. Giai đoạn 1: Ca Ngày
-            if (startTime.isBefore(NIGHT_START_TIME)) {
-                double h1 = Duration.between(startTime, NIGHT_START_TIME).toMinutes() / 60.0;
-                OvertimeRequestDetailEntity detail1 = new OvertimeRequestDetailEntity();
-                detail1.setOvertimeTypeID(baseType);
-                detail1.setStartTime(startTime);
-                detail1.setEndTime(NIGHT_START_TIME);
-                detail1.setHours(h1);
-                master.addDetail(detail1);
+        // KHÚC 1: Xử lý phần CA NGÀY (Trước 22:00)
+        // Nếu bắt đầu trước 22h, thì sẽ có 1 đoạn ban ngày
+        if (startTime.isBefore(nightStartPivot)) {
+            // Điểm kết thúc của khúc này là: Hoặc là EndTime (nếu về sớm), Hoặc là bị chặn ở 22h
+            LocalDateTime segmentEnd = endTime.isBefore(nightStartPivot) ? endTime : nightStartPivot;
+
+            double h1 = calculateMinutes(startTime, segmentEnd) / 60.0;
+            if (h1 > 0) {
+                // Dùng baseType (Loại ngày)
+                addDetailToMaster(master, baseType, startTime, segmentEnd, h1);
                 calculatedTotalHours += h1;
             }
-            // B. Giai đoạn 2: Ca Đêm
-            OvertimetypeEntity nightType = findNightShiftType(baseType);
-            long min2 = 0;
-            if (endTime.isBefore(startTime)) {
-                min2 = Duration.between(NIGHT_START_TIME, LocalTime.MAX).toMinutes() + Duration.between(LocalTime.MIN, endTime).toMinutes() + 1;
-            } else {
-                min2 = Duration.between(NIGHT_START_TIME, endTime).toMinutes();
-            }
-            double h2 = min2 / 60.0;
-            OvertimeRequestDetailEntity detail2 = new OvertimeRequestDetailEntity();
-            detail2.setOvertimeTypeID(nightType);
-            detail2.setStartTime(NIGHT_START_TIME);
-            detail2.setEndTime(endTime);
-            detail2.setHours(h2);
-            master.addDetail(detail2);
-            calculatedTotalHours += h2;
-        } else {
-            // Không giao thoa
-            double h = 0;
-            OvertimetypeEntity finalType = baseType;
-            if (endTime.isBefore(startTime)) {
-                long mins = Duration.between(startTime, LocalTime.MAX).toMinutes() + Duration.between(LocalTime.MIN, endTime).toMinutes() + 1;
-                h = mins / 60.0;
-            } else {
-                h = Duration.between(startTime, endTime).toMinutes() / 60.0;
-            }
-            if (!startTime.isBefore(NIGHT_START_TIME) || startTime.isBefore(LocalTime.of(6,0))) {
-                finalType = findNightShiftType(baseType);
-            }
-            OvertimeRequestDetailEntity detail = new OvertimeRequestDetailEntity();
-            detail.setOvertimeTypeID(finalType);
-            detail.setStartTime(startTime);
-            detail.setEndTime(endTime);
-            detail.setHours(h);
-            master.addDetail(detail);
-            calculatedTotalHours += h;
         }
 
-        // Set Total và Final mặc định ban đầu
+        // KHÚC 2: CA ĐÊM (22:00 -> 06:00)
+        // Logic: Có bất kỳ sự giao thoa nào với khung 22h-06h không?
+        // Start < 06h sáng sau VÀ End > 22h tối nay
+        if (startTime.isBefore(nightEndPivot) && endTime.isAfter(nightStartPivot)) {
+            LocalDateTime segmentStart = startTime.isAfter(nightStartPivot) ? startTime : nightStartPivot;
+            LocalDateTime segmentEnd = endTime.isBefore(nightEndPivot) ? endTime : nightEndPivot;
+
+            double h2 = calculateMinutes(segmentStart, segmentEnd) / 60.0;
+            if (h2 > 0) {
+                OvertimetypeEntity nightType = findNightShiftType(baseType);
+                addDetailToMaster(master, nightType, segmentStart, segmentEnd, h2);
+                calculatedTotalHours += h2;
+            }
+        }
+
+        // KHÚC 3: CA NGÀY (SAU 06:00 SÁNG HÔM SAU)
+        // Logic: Nếu End muộn hơn 06h sáng hôm sau
+        if (endTime.isAfter(nightEndPivot)) {
+            LocalDateTime segmentStart = startTime.isAfter(nightEndPivot) ? startTime : nightEndPivot;
+
+            double h3 = calculateMinutes(segmentStart, endTime) / 60.0;
+            if (h3 > 0) {
+                addDetailToMaster(master, baseType, segmentStart, endTime, h3);
+                calculatedTotalHours += h3;
+            }
+        }
+
         master.setTotalHours(calculatedTotalHours);
-        master.setFinalPaidHours(calculatedTotalHours); // Mặc định bằng Total, duyệt thì sửa sau
+        master.setFinalPaidHours(calculatedTotalHours);
 
         otRepo.save(master);
     }
 
-    // Helper mapping loại đêm (Giữ nguyên)
+    // Helper function để code gọn hơn, đỡ lặp lại việc new Entity
+    private void addDetailToMaster(OvertimeRequestEntity master, OvertimetypeEntity type, LocalDateTime start, LocalDateTime end, double hours) {
+        OvertimeRequestDetailEntity detail = new OvertimeRequestDetailEntity();
+        detail.setOvertimeTypeID(type);
+        detail.setStartTime(start);
+        detail.setEndTime(end);
+        detail.setHours(hours);
+        master.addDetail(detail);
+    }
+
+    private long calculateMinutes(LocalDateTime start, LocalDateTime end) {
+        if (start == null || end == null) return 0;
+        return Duration.between(start, end).toMinutes();
+    }
+    // Helper mapping loại đêm
     private OvertimetypeEntity findNightShiftType(OvertimetypeEntity originalType) {
         if (originalType == null) return null;
         Integer currentId = originalType.getId();
@@ -335,7 +329,7 @@ public class OvertimeService {
         return originalType;
     }
 
-    // Xem danh sách (Giữ nguyên)
+    // Xem danh sách
     public Page<OvertimeResponseDTO> getFilteredRequests(OvertimeFilterCriteria criteria, UserEntity currentUser, Pageable pageable) {
         Specification<OvertimeRequestEntity> spec = OvertimeRequestFilter.filterRequests(criteria, currentUser);
         Page<OvertimeRequestEntity> pageResult = otRepo.findAll(spec, pageable);
@@ -381,5 +375,52 @@ public class OvertimeService {
             dto.setDetails(new ArrayList<>());
         }
         return dto;
+    }
+    // THÊM: Hàm validate logic thời gian chặt chẽ
+    private void validateTimeSegments(LocalDateTime masterStart, LocalDateTime masterEnd, List<OvertimeDetailUpdateDTO> dtos) {
+        if (dtos == null || dtos.isEmpty()) return; // Hoặc throw exception tùy logic business
+
+        // 1. Check Master
+        if (!masterEnd.isAfter(masterStart)) {
+            throw new RuntimeException("Thời gian tổng không hợp lệ (Kết thúc phải sau Bắt đầu).");
+        }
+
+        long totalMasterMinutes = calculateMinutes(masterStart, masterEnd);
+        long totalDetailMinutes = 0;
+
+        // Tạo list tạm để sort
+        List<OvertimeDetailUpdateDTO> sortedList = new ArrayList<>(dtos);
+        sortedList.sort(Comparator.comparing(OvertimeDetailUpdateDTO::getStartTime));
+
+        for (int i = 0; i < sortedList.size(); i++) {
+            OvertimeDetailUpdateDTO current = sortedList.get(i);
+
+            // Check A: Thời gian con có nằm ngoài phạm vi cha không?
+            if (current.getStartTime().isBefore(masterStart) || current.getEndTime().isAfter(masterEnd)) {
+                throw new RuntimeException("Chi tiết số " + (i+1) + " nằm ngoài khoảng thời gian của đơn tổng.");
+            }
+
+            // Check B: Thời gian ngược
+            if (!current.getEndTime().isAfter(current.getStartTime())) {
+                throw new RuntimeException("Chi tiết số " + (i+1) + ": Giờ kết thúc phải sau giờ bắt đầu.");
+            }
+
+            totalDetailMinutes += calculateMinutes(current.getStartTime(), current.getEndTime());
+
+            // Check C: Trùng lặp (Overlap) với dòng kế tiếp
+            if (i < sortedList.size() - 1) {
+                OvertimeDetailUpdateDTO next = sortedList.get(i + 1);
+                if (current.getEndTime().isAfter(next.getStartTime())) {
+                    throw new RuntimeException("Phát hiện trùng lặp thời gian giữa các dòng chi tiết.");
+                }
+            }
+        }
+
+        // 3. SO SÁNH TỔNG (Bắt buộc khớp 100%)
+        if (totalDetailMinutes != totalMasterMinutes) {
+            throw new RuntimeException("Tổng thời gian chi tiết (" + totalDetailMinutes + " phút) " +
+                    "không khớp với thời gian tổng của đơn (" + totalMasterMinutes + " phút). " +
+                    "Vui lòng kiểm tra lại từng phút.");
+        }
     }
 }

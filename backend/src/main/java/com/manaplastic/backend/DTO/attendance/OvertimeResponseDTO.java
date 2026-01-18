@@ -15,8 +15,8 @@ import java.util.List;
 public class OvertimeResponseDTO {
     private Integer requestId;
     private LocalDate date;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private Double totalHours;
     private Double finalPaidHours;
     private OvertimeRequestEntity.RequestStatus status;

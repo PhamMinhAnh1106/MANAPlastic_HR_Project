@@ -23,7 +23,7 @@ public class OvertimeRequestFilter {
             else if ("Manager".equalsIgnoreCase(roleName)) {
                 // Manager: Xem của mình HOẶC của phòng ban mình quản lý
                 if (currentUser.getDepartmentID() != null) {
-                    predicates.add(cb.equal(root.get("departmentid"), currentUser.getDepartmentID()));
+                    predicates.add(cb.equal(root.get("departmentid"), currentUser.getDepartmentID().getId()));
                 } else {
                     // Manager không có phòng ban -> Chỉ xem được của mình
                     predicates.add(cb.equal(root.get("userid").get("id"), currentUser.getId()));

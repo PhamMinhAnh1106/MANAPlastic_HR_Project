@@ -52,10 +52,10 @@ public class OvertimeRequestEntity {
     private LocalDate date;
 
     @Column(name = "startTime")
-    private LocalTime startTime;
+    private LocalDateTime startTime;
 
     @Column(name = "endTime")
-    private LocalTime endTime;
+    private LocalDateTime endTime;
 
     @ColumnDefault("0")
     @Column(name = "totalHours")

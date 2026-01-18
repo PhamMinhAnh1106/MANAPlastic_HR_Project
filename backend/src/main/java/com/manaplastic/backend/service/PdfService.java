@@ -166,9 +166,9 @@ public class PdfService {
             footerTable.addCell(netValue);
             document.add(footerTable);
 
-            // Footer chữ ký
+            // Footer
             document.add(new Paragraph(" "));
-            Paragraph sign = new Paragraph("Ngày/Date: .......................................\nNgười nhận/Signature", new Font(bf, 10, Font.ITALIC));
+            Paragraph sign = new Paragraph("Nếu có sai xót vui lòng liên hệ phoòng HR! Xin cảm ơn.", new Font(bf, 10, Font.ITALIC));
             sign.setAlignment(Element.ALIGN_RIGHT);
             sign.setIndentationRight(50);
             document.add(sign);
@@ -181,8 +181,7 @@ public class PdfService {
         }
     }
 
-    // --- CÁC HÀM TIỆN ÍCH ---
-// Hàm này giúp biến null thành chuỗi rỗng "" hoặc giá trị mặc định, không bao giờ bị crash
+    // hedpler
     private String getSafeString(Object obj) {
         if (obj == null) return "";
         return obj.toString();

@@ -17,9 +17,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PayslipService {
@@ -229,5 +227,73 @@ public class PayslipService {
                 .pit(entity.getPit())
                 .build()
         );
+    }
+
+    public Map<String, Object> convertDtoToPdfData(PayrollDetailDTO dto) {
+        Map<String, Object> data = new HashMap<>();
+
+     // header
+        Map<String, Object> header = new HashMap<>();
+        header.put("username", String.valueOf(dto.getUserId()));
+        header.put("fullname", dto.getFullName());
+        header.put("departmentname", dto.getDepartmentName());
+        header.put("payperiod", dto.getPayPeriod());
+        header.put("totalincome", dto.getTotalIncome());
+        header.put("netsalary", dto.getNetSalary());
+
+        data.put("header", header);
+
+        // Chi tiết thu nhập & khấu trừ
+        List<Map<String, Object>> items = new ArrayList<>();
+
+
+        items.add(createPdfItem("Lương cơ bản / Base Salary", dto.getBaseSalary()));
+
+        if (dto.getAllowanceDetails() != null) {
+            for (PayrollComponentDTO comp : dto.getAllowanceDetails()) {
+                items.add(createPdfItem(comp.getName(), comp.getAmount()));
+            }
+        }
+
+        //  Tăng ca (OT)
+        if (dto.getOvertimeDetails() != null) {
+            for (PayrollComponentDTO comp : dto.getOvertimeDetails()) {
+                items.add(createPdfItem("OT: " + comp.getName(), comp.getAmount()));
+            }
+        }
+
+        //Thưởng
+        if (dto.getBonusDetails() != null) {
+            for (PayrollComponentDTO comp : dto.getBonusDetails()) {
+                items.add(createPdfItem("Thưởng: " + comp.getName(), comp.getAmount()));
+            }
+        }
+
+        // Phạt
+        if (dto.getPunishmentDetails() != null) {
+            for (PayrollComponentDTO comp : dto.getPunishmentDetails()) {
+                items.add(createPdfItem("Phạt: " + comp.getName(), comp.getAmount()));
+            }
+        }
+
+        // -- KHẤU TRỪ: Bảo hiểm
+        items.add(createPdfItem("Bảo hiểm Xã hội (BHXH)", dto.getBhxhEmp()));
+        items.add(createPdfItem("Bảo hiểm Y tế (BHYT)", dto.getBhytEmp()));
+        items.add(createPdfItem("Bảo hiểm Thất nghiệp (BHTN)", dto.getBhtnEmp()));
+
+        // -- KHẤU TRỪ: Thuế
+        items.add(createPdfItem("Thuế TNCN / Personal Income Tax", dto.getPit()));
+
+        data.put("items", items);
+
+        return data;
+    }
+
+    // Helper tạo map con cho từng dòng
+    private Map<String, Object> createPdfItem(String name, BigDecimal value) {
+        Map<String, Object> item = new HashMap<>();
+        item.put("item_name", name);
+        item.put("item_value", value != null ? value : BigDecimal.ZERO);
+        return item;
     }
 }

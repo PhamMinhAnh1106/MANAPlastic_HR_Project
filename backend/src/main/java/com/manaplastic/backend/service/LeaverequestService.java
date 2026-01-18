@@ -44,6 +44,8 @@ public class LeaverequestService {
     private ActivityLogRepository activityLogRepository;
     @Autowired
     private EmployeeOfficialScheduleRepository scheduleRepository;
+    @Autowired
+    private EmployeeDocumentRepository documentRepo;
 
     private String getShiftNameFromEnum(LeaverequestEntity.LeaveType type) {
         switch (type) {
@@ -87,6 +89,22 @@ public class LeaverequestService {
 
         if (leaveRequestRepository.existsOverlappingRequest(currentUserId, dto.startdate(), dto.enddate())) {
             throw new IllegalArgumentException("Bạn đã có đơn nghỉ phép trùng với khoảng thời gian này.");
+        }
+
+        if (reqType == LeaverequestEntity.LeaveType.MATERNITY) {
+            boolean isEligible = documentRepo.isDocumentActive(
+                    currentUserId.getId(),
+                    dto.startdate(), // Check tại thời điểm bắt đầu nghỉ
+                    EmployeeDocumentEntity.DocumentType.MEDICAL_PREGNANCY,
+                    EmployeeDocumentEntity.DocumentStatus.APPROVED
+            );
+
+            if (!isEligible) {
+                throw new IllegalArgumentException(
+                        "Không thể tạo đơn Thai sản: Hồ sơ thai sản (MEDICAL_PREGNANCY) của bạn chưa được duyệt " +
+                                "hoặc không có hiệu lực vào ngày " + dto.startdate()
+                );
+            }
         }
 
         // Tìm số dư phép tương ứng (VD: AL của năm 2025)

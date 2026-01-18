@@ -171,7 +171,7 @@ public class AdminService {
                 userRepository.save(user);
 
                 createInitialLeaveBalances(user);
-                emailService.sendAccountInfo(user.getEmail(), generatedUsername, rawPassword);
+                emailService.sendAccountInfo(user.getEmail(), generatedUsername, rawPassword,user.getFullname());
 
             } else {
                 //Cũ

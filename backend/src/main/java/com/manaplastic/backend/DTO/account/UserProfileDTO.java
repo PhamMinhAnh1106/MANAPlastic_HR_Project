@@ -33,6 +33,8 @@ public class UserProfileDTO {
     private String departmentName;
     private Integer skillGrade;
     private String jobType;
+    private String taxCode;
+    private String socialInsuranceNumber;
 //    private String constractName;
 
 }

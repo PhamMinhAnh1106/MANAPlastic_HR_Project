@@ -6,6 +6,7 @@ import com.manaplastic.backend.DTO.attendance.OvertimeRejectDTO;
 import com.manaplastic.backend.DTO.attendance.OvertimeResponseDTO;
 import com.manaplastic.backend.DTO.criteria.OvertimeFilterCriteria;
 import com.manaplastic.backend.constant.customAnotation.LogActivity;
+import com.manaplastic.backend.constant.customAnotation.LogicalOperator;
 import com.manaplastic.backend.constant.customAnotation.RequiredPermission;
 import com.manaplastic.backend.constant.permission.PermissionConst;
 import com.manaplastic.backend.entity.UserEntity;
@@ -72,8 +73,10 @@ public class OvertimeController {
 
     // QL duyệt
     @PutMapping("/manager/approve/{id}")
-    @PreAuthorize("hasAuthority('Manager')")
-    @RequiredPermission(PermissionConst.OVERTIME_APPROVE_MANAGER)
+    @PreAuthorize("hasAnyAuthority('Manager','HR')")
+    @RequiredPermission(
+            value = {PermissionConst.OVERTIME_APPROVE_MANAGER, PermissionConst.OVERTIME_APPROVE_HR},
+            logic = LogicalOperator.OR)
     @LogActivity(action = "OT_APPROVE_MANAGER", description = "Quản lý duyệt đơn OT")
     public ResponseEntity<?> managerApprove(
             @PathVariable Integer id,

@@ -33,4 +33,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer>, JpaS
     boolean existsById(Integer userId);
 
     boolean existsByCccd(String cccd);
+
+    boolean existsByTaxCode(String taxCodeClean);
+
+    boolean existsBySocialInsuranceNumber(String bhxhClean);
 }

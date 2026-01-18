@@ -11,7 +11,6 @@ import com.manaplastic.backend.filters.ContractFilter;
 import com.manaplastic.backend.repository.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.parser.Parser;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,25 +21,17 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.io.ByteArrayOutputStream;
@@ -49,7 +40,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.stream.Collectors;
 
 @Service
 public class ContractService {
@@ -531,6 +521,8 @@ public class ContractService {
 
         // Map các trường cơ bản của Contract
         dto.setId(entity.getId());
+        dto.setContractTemplateId(entity.getContractTemplate().getId());
+        dto.setContractTemplateName(entity.getContractTemplate().getName());
         dto.setContractname(entity.getContractname());
         dto.setType(entity.getType());
         dto.setBasesalary(entity.getBasesalary());
@@ -560,6 +552,7 @@ public class ContractService {
             // Lấy phòng ban
             if (user.getDepartmentID() != null) {
                 dto.setDepartmentName(user.getDepartmentID().getDepartmentname());
+                dto.setDepartmentId(user.getDepartmentID().getId());
             }
 
             // Lấy chức vụ
@@ -658,8 +651,8 @@ public class ContractService {
             contract.setWorkType(normalizedType);
         }
         // Cập nhật Template (Mẫu hợp đồng)
-        if (request.getTemplateId() != null) {
-            ContractTemplateEntity tpl = templateRepository.findById(request.getTemplateId())
+        if (request.getContractTemplateId() != null) {
+            ContractTemplateEntity tpl = templateRepository.findById(request.getContractTemplateId())
                     .orElseThrow(() -> new RuntimeException("Mẫu hợp đồng không tồn tại"));
             contract.setContractTemplate(tpl);
         }
@@ -696,6 +689,7 @@ public class ContractService {
             validateContractOverlap(contract.getUserID().getId(), start, contractId);
         }
         LocalDate end = request.getEndDate();
+
 
         if ("FIXED_TERM".equalsIgnoreCase(type)) {
             if (end == null && contract.getEnddate() != null) end = contract.getEnddate();

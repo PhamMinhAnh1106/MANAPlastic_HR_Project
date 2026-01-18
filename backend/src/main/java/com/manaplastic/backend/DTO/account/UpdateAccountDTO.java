@@ -21,6 +21,8 @@ public class UpdateAccountDTO {
     private String phonenumber;
     private String address;
     private String cccd;
+    private  String taxCode;
+    private String socialInsuranceNumber;
     private Gender gender;
     private LocalDate birth;
     private String bankAccount;
