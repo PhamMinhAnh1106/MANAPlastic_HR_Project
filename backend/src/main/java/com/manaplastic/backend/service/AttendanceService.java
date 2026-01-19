@@ -53,7 +53,9 @@ public class AttendanceService {
                 .attendanceId(entity.getId())
                 .userName(entity.getUserID().getUsername())
                 .fullNameUser(entity.getUserID().getFullname())
-                .departmentName(entity.getUserID().getDepartmentID().getDepartmentname())
+                .departmentName((entity.getUserID() != null && entity.getUserID().getDepartmentID() != null)
+                        ? entity.getUserID().getDepartmentID().getDepartmentname()
+                        : "Chưa có phòng ban")
                 .attendanceDate(String.valueOf(entity.getDate()))
                 .checkIn(entity.getCheckin() != null
                         ? entity.getCheckin().atZone(zoneId).toLocalDateTime()
@@ -66,7 +68,7 @@ public class AttendanceService {
                 .checkInImg(entity.getCheckinImgUrl())
                 .checkOutImg(entity.getCheckoutImgUrl())
                 .shiftId(entity.getShiftID() != null ? entity.getShiftID().getId() : null)
-                .shiftName(entity.getShiftID().getShiftname() == null ? "Trống" : entity.getShiftID().getShiftname())
+                .shiftName(entity.getShiftID() != null ? entity.getShiftID().getShiftname() : "Trống")
                 .status(String.valueOf(entity.getStatus()))
                 .estimatedSalary(entity.getEstimatedSalary())
                 .build();

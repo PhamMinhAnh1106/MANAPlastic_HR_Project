@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class AttendanceDTO {
-    private int attendanceId;
+    private Integer attendanceId;
     private String userName;
     private String fullNameUser;
     private String departmentName;
@@ -22,7 +22,7 @@ public class AttendanceDTO {
     private LocalDateTime checkOut;
     private String checkInImg;
     private String checkOutImg;
-    private int shiftId;
+    private Integer shiftId;
     private String shiftName;
     private String status;
     private BigDecimal estimatedSalary;

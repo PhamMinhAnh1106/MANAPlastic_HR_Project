@@ -8,6 +8,7 @@ package com.manaplastic.backend.DTO.criteria;
 //        String status
 //) {} // Quá phiền v không có Getter/Setter => mỗi lần làm gì đều phải tạo mới 1 Object (Chưa biết cách dùng tối ưu)
 
+import com.manaplastic.backend.entity.AttendanceEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,5 +22,5 @@ public class AttendanceFilterCriteria {
     private Integer year;
     private Integer departmentId;
     private Integer userId;
-    private String status;
+    private AttendanceEntity.AttendanceStatus status;
 }

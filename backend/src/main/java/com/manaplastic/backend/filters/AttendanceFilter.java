@@ -12,8 +12,8 @@ public class AttendanceFilter {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (criteria.getStatus() != null && !criteria.getStatus().isBlank()) {
-                predicates.add(cb.equal(root.get("status").as(String.class), criteria.getStatus()));
+            if (criteria.getStatus() != null) {
+                predicates.add(cb.equal(root.get("status"), criteria.getStatus()));
             }
 
             // Lọc theo Năm

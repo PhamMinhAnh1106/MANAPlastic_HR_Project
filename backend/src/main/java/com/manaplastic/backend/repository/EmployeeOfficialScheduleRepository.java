@@ -24,4 +24,6 @@ public interface EmployeeOfficialScheduleRepository extends JpaRepository<Employ
     List<EmployeeofficialscheduleEntity> findByEmployeeIDInAndMonthYear(List<UserEntity> employeesInDept, String monthYear);
 
     Optional<EmployeeofficialscheduleEntity> findByEmployeeIDAndDate(UserEntity employee, LocalDate date);
+
+    boolean existsByEmployeeIDAndDateBetween(UserEntity employee, LocalDate startDate, LocalDate endDate);
 }

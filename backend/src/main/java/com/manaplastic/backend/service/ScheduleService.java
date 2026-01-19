@@ -335,17 +335,7 @@ public class ScheduleService {
     @Transactional
     public void initializeScheduleForNewEmployee(Integer managerId, NewEmployeeScheduleDTO dto) {
 
-        UserEntity manager = getUserOrThrow(managerId);
-        Integer departmentId = manager.getDepartmentID().getId();
-
-        UserEntity employee = userRepository.findByUsername(dto.getUsername())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên với username: " + dto.getUsername()));
-
-        //  Manager và Employee phải cùng phòng ban
-        if (employee.getDepartmentID() == null || !employee.getDepartmentID().getId().equals(departmentId)) {
-            throw new SecurityException("Manager không có quyền xếp lịch cho nhân viên: " + employee.getFullname());
-        }
-
+        // Validate cơ bản
         if (dto.getStartDate() == null || dto.getEndDate() == null) {
             throw new RuntimeException("Vui lòng chọn ngày bắt đầu và ngày kết thúc.");
         }
@@ -353,71 +343,98 @@ public class ScheduleService {
             throw new RuntimeException("Ngày bắt đầu không được sau ngày kết thúc.");
         }
 
+        // Validate: Không cho phép xếp quá 3 tháng 1 lần (Tránh treo máy)
+        if (java.time.temporal.ChronoUnit.DAYS.between(dto.getStartDate(), dto.getEndDate()) > 90) {
+            throw new RuntimeException("Chỉ được phép khởi tạo lịch tối đa 90 ngày một lần.");
+        }
 
+        UserEntity manager = getUserOrThrow(managerId);
+        Integer departmentId = manager.getDepartmentID().getId();
+
+        UserEntity employee = userRepository.findByUsername(dto.getUsername())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên: " + dto.getUsername()));
+
+        //Validate Quyền hạn (Cùng phòng ban)
+        if (employee.getDepartmentID() == null || !employee.getDepartmentID().getId().equals(departmentId)) {
+            throw new SecurityException("Manager không có quyền xếp lịch cho nhân viên: " + employee.getFullname());
+        }
+
+        // Validate trùng lịch (CRITICAL)
+        boolean exists = officialRepository.existsByEmployeeIDAndDateBetween(employee, dto.getStartDate(), dto.getEndDate());
+        if (exists) {
+            throw new RuntimeException("Nhân viên " + employee.getFullname() + " đã có lịch trong khoảng thời gian này.");
+        }
+
+        // Lấy Main Shift
         ShiftEntity mainShift = null;
         if (dto.getShiftId() != null) {
             mainShift = shiftRepository.findById(dto.getShiftId())
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy ca làm việc chính với ID: " + dto.getShiftId()));
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy ca chính ID: " + dto.getShiftId()));
         }
-        //map cho ngày ngoại lệ
+
+        // Xử lý Map Exception & Validate Input ngày ngoại lệ
         Map<LocalDate, DraftRegistrationDTO> exceptionMap = new HashMap<>();
         if (dto.getSpecificDays() != null) {
+            Set<LocalDate> duplicateCheck = new HashSet<>();
+
             for (DraftRegistrationDTO exception : dto.getSpecificDays()) {
-                if (exception.getDate() != null) {
-                    exceptionMap.put(exception.getDate(), exception);
+                if (exception.getDate() == null) continue;
+
+                // Check trùng ngày trong List Input
+                if (!duplicateCheck.add(exception.getDate())) {
+                    throw new RuntimeException("Danh sách ngày ngoại lệ bị trùng lặp: " + exception.getDate());
                 }
+
+                // Check ngày nằm ngoài range
+                if (exception.getDate().isBefore(dto.getStartDate()) || exception.getDate().isAfter(dto.getEndDate())) {
+                    throw new RuntimeException("Ngày ngoại lệ " + exception.getDate() + " nằm ngoài khoảng thời gian đã chọn.");
+                }
+
+                exceptionMap.put(exception.getDate(), exception);
             }
         }
 
         List<EmployeeofficialscheduleEntity> schedulesToSave = new ArrayList<>();
 
-        // Vòng lặp từ StartDate -> EndDate
+
         for (LocalDate date = dto.getStartDate(); !date.isAfter(dto.getEndDate()); date = date.plusDays(1)) {
             EmployeeofficialscheduleEntity official = new EmployeeofficialscheduleEntity();
             official.setEmployeeID(employee);
             official.setDate(date);
-
             official.setMonthYear(date.format(MONTH_YEAR_FORMATTER));
             official.setApprovedByManagerid(manager);
             official.setPublishedDate(Instant.now());
 
-            // Trường hợp 1: Ngày này nằm trong danh sách ngoại lệ
+
             if (exceptionMap.containsKey(date)) {
                 DraftRegistrationDTO exceptionDto = exceptionMap.get(date);
-
                 if (exceptionDto.isDayOff()) {
                     official.setIsDayOff(true);
                     official.setShiftID(null);
                 } else if (exceptionDto.getShiftId() != null) {
                     ShiftEntity specificShift = shiftRepository.findById(exceptionDto.getShiftId())
-                            .orElseThrow(() -> new RuntimeException("Ca làm việc ngoại lệ không tồn tại ID: " + exceptionDto.getShiftId()));
-
+                            .orElseThrow(() -> new RuntimeException("Ca ngoại lệ không tồn tại ID: " + exceptionDto.getShiftId()));
                     official.setIsDayOff(false);
                     official.setShiftID(specificShift);
                 } else {
-                    // Ngoại lệ nhưng không set ca cũng ko set dayoff -> Fallback về ca chính
                     if (mainShift != null) {
                         official.setIsDayOff(false);
                         official.setShiftID(mainShift);
                     } else {
-                        // Không có ca chính luôn -> set nghỉ
                         official.setIsDayOff(true);
                         official.setShiftID(null);
                     }
                 }
-            }
-            // Trường hợp 2: Ngày thường (Dùng ca chính)
-            else {
+            } else {
+                // Ngày thường
                 if (mainShift != null) {
                     official.setIsDayOff(false);
                     official.setShiftID(mainShift);
                 } else {
-                    // Nếu không có ca chính và không phải ngoại lệ -> Mặc định là ngày nghỉ
                     official.setIsDayOff(true);
                     official.setShiftID(null);
                 }
             }
-
             schedulesToSave.add(official);
         }
 
