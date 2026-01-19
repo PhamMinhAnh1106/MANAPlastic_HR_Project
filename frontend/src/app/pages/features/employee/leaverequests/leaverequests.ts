@@ -7,6 +7,7 @@ import { leaverequestBalance, leaverequests } from '../../../../interface/leaver
 import { Deleteleaverequest, getBalanceleaverequest, getleaverequest } from '../../../../services/pages/features/employee/leaverequest.services';
 import { Alert } from '../../../shared/alert/alert';
 import { Comfirm } from '../../../shared/comfirm/comfirm';
+import { Loading } from '../../../shared/loading/loading';
 
 // Interface mở rộng để phục vụ hiển thị giao diện (thêm icon và màu)
 interface UILeaveBalance extends leaverequestBalance {
@@ -17,7 +18,7 @@ interface UILeaveBalance extends leaverequestBalance {
 @Component({
   selector: 'app-leaverequests',
   standalone: true,
-  imports: [CommonModule, Alert, Comfirm], // Gom NgFor, NgIf, NgClass vào CommonModule
+  imports: [CommonModule, Alert, Comfirm, Loading], // Gom NgFor, NgIf, NgClass vào CommonModule
   templateUrl: './leaverequests.html',
   styleUrl: './leaverequests.scss',
 })
@@ -139,14 +140,14 @@ export class Leaverequests implements OnInit {
     if (event === true) {
       this.isloading = true; // Hiện loading khi đang xóa
       try {
-        const res = await Deleteleaverequest(this.idToDelete) as { status: number, data: string };
+        const res: any = await Deleteleaverequest(this.idToDelete);
 
         if (res.status === 200) {
           this.showNotification("Xóa thành công!", true);
           // Reload lại danh sách sau khi xóa
           this.leaverequest = await this.getLeaverequest();
         } else {
-          this.showNotification(res.data || "Không thể xóa đơn này", false);
+          this.showNotification(res.response.data.message || "Không thể xóa đơn này", false);
         }
       } catch (error) {
         this.showNotification("Lỗi hệ thống khi xóa", false);

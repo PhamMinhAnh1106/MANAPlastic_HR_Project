@@ -27,14 +27,14 @@ function futureDateValidator(control: AbstractControl): ValidationErrors | null 
 @Component({
   selector: 'app-contract-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Loading, Alert, Comfirm, RouterModule], // Thêm RouterModule
+  imports: [CommonModule, ReactiveFormsModule, Loading, Alert, Comfirm, RouterModule],
   templateUrl: './contract-main-add.html',
   styleUrls: ['./contract-main-add.scss']
 })
 export class ContractCreate implements OnInit {
   constructor(
     private cdr: ChangeDetectorRef,
-    private router: Router // Inject Router
+    private router: Router
   ) { }
 
   private fb = inject(FormBuilder);
@@ -43,7 +43,6 @@ export class ContractCreate implements OnInit {
   departmentList = Department;
   roleList = Role;
 
-  // Lấy ngày hôm nay định dạng YYYY-MM-DD cho thuộc tính [min] input date
   get todayStr(): string {
     return new Date().toISOString().split('T')[0];
   }
@@ -57,7 +56,6 @@ export class ContractCreate implements OnInit {
   notifyType: boolean = true;
 
   currentContractId: number | null = null;
-  // Đã xóa safePdfUrl vì không còn phần preview
 
   sections = {
     config: true,
@@ -81,14 +79,10 @@ export class ContractCreate implements OnInit {
     email: ['a.nguyen@test.com', [Validators.email]],
     address: ['TP. Thủ Đức, TP. Hồ Chí Minh'],
 
-    // Validate required cho Select box
     departmentId: [1, [Validators.required]],
     roleId: [4, [Validators.required]],
 
     workType: ['FULLTIME'],
-    // Đã xóa allowanceToxicType
-
-    // Thêm validator futureDateValidator
     startDate: [this.todayStr, [Validators.required, futureDateValidator]],
     endDate: [''],
 
@@ -165,7 +159,13 @@ export class ContractCreate implements OnInit {
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
-  // Đã xóa showPreview và downloadPdf vì không còn UI tương ứng trong màn hình này
+  // --- ACTIONS ---
+
+  // Hàm đóng Modal
+  closeModal() {
+    // Quay lại danh sách hợp đồng
+    this.router.navigate(['/home/contracts']);
+  }
 
   resetForm() {
     this.confirmMessage = "Bạn có chắc muốn làm mới form? Dữ liệu chưa lưu sẽ mất.";
@@ -223,7 +223,7 @@ export class ContractCreate implements OnInit {
       endDate: formVal.endDate || null,
       baseSalary: Number(formVal.baseSalary),
       insurancePercent: Number(formVal.insurancePercent),
-      allowanceToxicType: '', // Đã xóa khỏi form, gửi chuỗi rỗng hoặc null tùy backend
+      allowanceToxicType: '',
       allowances: formVal.allowances
         .filter((a: any) => a.allowanceName && a.allowanceAmount)
         .map((a: any): Allowance => ({
@@ -245,8 +245,11 @@ export class ContractCreate implements OnInit {
         this.sections.config = false;
         this.showNotification(result.data.message, true);
 
-        // Tùy chọn: Sau khi tạo thành công có thể navigate về danh sách hoặc giữ nguyên
-        this.router.navigate(['/home/contracts']);
+        // Đóng modal sau khi lưu thành công (delay một chút để user đọc thông báo)
+        setTimeout(() => {
+          this.closeModal();
+        }, 1000);
+
       } else {
         this.showNotification(result.response.data.message, false);
       }

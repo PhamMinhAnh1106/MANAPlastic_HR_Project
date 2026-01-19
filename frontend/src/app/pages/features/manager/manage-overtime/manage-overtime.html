@@ -22,6 +22,103 @@
     </div>
   </div>
 
+  <!-- FILTER BAR -->
+  <div class="card filter-card">
+    <div class="filter-wrapper">
+      <!-- Keyword & Search Popup -->
+      <div class="filter-item">
+        <label>Nhân viên</label>
+        <div class="input-with-icon" style="position: relative;">
+          <span class="material-icons">search</span>
+          <input type="text" 
+                 [(ngModel)]="filters.userName" 
+                 (input)="onSearchUser($event)"
+                 (focus)="onSearchUser($event)"
+                 (blur)="closeSearchDropdown()"
+                 (keyup.enter)="loadData()" 
+                 placeholder="Nhập tên..." 
+                 class="form-control form-control-lg"
+                 autocomplete="off">
+          
+          <div class="user-search-dropdown" *ngIf="showUserSearchDropdown">
+             <ul>
+               <li *ngFor="let user of userSearchResults" (mousedown)="selectSearchUser(user)">
+                 <div class="search-avatar">
+                   {{ user.fullName ? user.fullName.charAt(0) : 'U' }}
+                 </div>
+                 <div class="search-info">
+                    <span class="name">{{ user.fullName || user.username }}</span>
+                    <span class="meta">{{ user.username }} - {{ user.departmentName || '---' }}</span>
+                 </div>
+               </li>
+             </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Department -->
+      <div class="filter-item">
+        <label>Phòng ban</label>
+        <select [(ngModel)]="filters.departmentId" class="form-control form-control-lg">
+          <option value="">-- Tất cả --</option>
+          <option *ngFor="let dept of departments" [value]="dept.departmentId">{{ dept.departmentName }}</option>
+        </select>
+      </div>
+
+      <!-- Status -->
+      <div class="filter-item">
+        <label>Trạng thái</label>
+        <select [(ngModel)]="filters.status" class="form-control form-control-lg">
+          <option value="">-- Tất cả --</option>
+          <option value="PENDING_MANAGER" *ngIf="currentRole === 'manager'">Chờ Manager</option>
+          <option value="PENDING_HR">Chờ HR</option>
+          <option value="APPROVED">Đã Duyệt</option>
+          <option value="REJECTED">Đã Từ Chối</option>
+        </select>
+      </div>
+
+      <!-- Date Range (POPUP) -->
+      <div class="filter-item" style="position: relative;">
+        <label>Thời gian</label>
+        <button class="form-control form-control-lg date-picker-btn" (click)="toggleDatePopup()">
+           <span class="material-icons" style="margin-right: 8px; color: #6b7280;">calendar_month</span>
+           <span [class.text-placeholder]="!filters.fromDate && !filters.toDate">
+             {{ dateRangeDisplay }}
+           </span>
+        </button>
+
+        <!-- Popup Chọn Ngày -->
+        <div class="date-range-popup" *ngIf="isDatePopupOpen">
+           <div class="popup-header">Thời Gian</div>
+           <div class="popup-body">
+              <div class="form-group">
+                 <label>Từ ngày</label>
+                 <input type="date" [(ngModel)]="tempFromDate" class="form-control">
+              </div>
+              <div class="form-group">
+                 <label>Đến ngày</label>
+                 <input type="date" [(ngModel)]="tempToDate" class="form-control">
+              </div>
+           </div>
+           <div class="popup-footer">
+              <button class="btn btn-secondary btn-sm" (click)="isDatePopupOpen = false">Đóng</button>
+              <button class="btn btn-primary btn-sm" (click)="applyDateRange()">Lưu</button>
+           </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="filter-actions">
+        <button (click)="loadData()" class="btn btn-primary btn-filter btn-lg" title="Tìm kiếm">
+          Lọc
+        </button>
+        <button (click)="resetFilters()" class="btn btn-secondary btn-filter btn-lg" title="Làm mới bộ lọc">
+          <span class="material-icons">restart_alt</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- TABLE LIST -->
   <div class="card table-card">
     <div class="table-responsive">
@@ -37,43 +134,53 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of requests">
-            <td>
-              <div class="user-info">
-                <div class="avatar">
-                  {{ item.employeeName ? item.employeeName.charAt(0) : '?' }}
-                </div>
-                <div class="details">
-                  <div class="name">{{ item.employeeName }}</div>
-                  <div class="id">{{ item.employeeId }}</div>
-                </div>
-              </div>
-            </td>
-            <td class="dept-name">{{ item.departmentName }}</td>
-            <td>
-              <div class="date-info">
-                <div class="date">{{ item.date | date:'dd/MM/yyyy' }}</div>
-                <div class="time">{{ item.startTime }} - {{ item.endTime }}</div>
-              </div>
-            </td>
-            <td class="text-center">
-              <span class="badge-hours">{{ item.totalHours }}h</span>
-            </td>
-            <td>
-              <span class="badge-status" [class]="getStatusClass(item.status)">
-                {{ item.status }}
-              </span>
-            </td>
-            <td class="text-right">
-              <button (click)="viewDetail(item)" class="btn-icon" title="Xem chi tiết">
-                <span class="material-icons">visibility</span>
-              </button>
-            </td>
-          </tr>
-          <tr *ngIf="requests.length === 0 && !isloading">
-            <td colspan="6" class="state-cell text-center">Không có dữ liệu</td>
-          </tr>
-        </tbody>
+  <ng-container *ngFor="let item of requests">
+    <tr *ngIf="!(currentRole === 'hr' && item.status === 'PENDING_MANAGER')">
+      <td>
+        <div class="user-info">
+          <div class="avatar">
+            {{ item.employeeName ? item.employeeName.charAt(0) : '?' }}
+          </div>
+          <div class="details">
+            <div class="name">{{ item.employeeName }}</div>
+            <div class="id">{{ item.employeeId }}</div>
+          </div>
+        </div>
+      </td>
+      <td class="dept-name">{{ item.departmentName }}</td>
+      <td>
+        <div class="date-info">
+          <div class="date">{{ item.startTime | date:'dd/MM/yyyy' }}</div>
+          <div class="time">
+            {{ item.startTime | date:'HH:mm' }} - {{ item.endTime | date:'HH:mm' }}
+          </div>
+        </div>
+      </td>
+      <td class="text-center">
+        <span class="badge-hours">{{ item.totalHours }}h</span>
+      </td>
+      <td>
+        <span class="badge-status" [class]="getStatusClass(item.status)">
+          {{ item.status }}
+        </span>
+      </td>
+      <td class="text-right">
+        <button (click)="viewDetail(item)" class="btn-icon" title="Xem chi tiết">
+          <span class="material-icons">visibility</span>
+        </button>
+      </td>
+    </tr>
+  </ng-container>
+
+  <tr *ngIf="requests.length === 0 && !isloading">
+    <td colspan="6" class="text-center">
+      <div class="empty-state">
+        <span class="material-icons">inbox</span>
+        <p>Không tìm thấy dữ liệu phù hợp</p> 
+      </div>
+    </td>
+  </tr>
+</tbody>
       </table>
     </div>
   </div>
@@ -139,8 +246,18 @@
                 <tbody>
                   <tr *ngFor="let d of selectedRequest.details">
                     <td>{{ d.overtimeTypeName }}</td>
-                    <td class="text-center mono">{{ d.startTime }}</td>
-                    <td class="text-center mono">{{ d.endTime }}</td>
+                    <td class="text-center">
+                      <div class="dt-display">
+                         <span class="dt-date">{{ d.startTime | date:'dd/MM/yyyy' }}</span>
+                         <span class="dt-time">{{ d.startTime | date:'HH:mm' }}</span>
+                      </div>
+                    </td>
+                    <td class="text-center">
+                      <div class="dt-display">
+                         <span class="dt-date">{{ d.endTime | date:'dd/MM/yyyy' }}</span>
+                         <span class="dt-time">{{ d.endTime | date:'HH:mm' }}</span>
+                      </div>
+                    </td>
                     <td class="text-right bold">{{ d.hours }}h</td>
                   </tr>
                 </tbody>
@@ -170,7 +287,7 @@
     </div>
   </div>
 
-  <!-- REVIEW MODAL -->
+  <!-- REVIEW MODAL (Approve/Reject) -->
   <div *ngIf="isReviewOpen" class="modal-overlay review-modal-overlay">
     <div class="modal-container modal-small">
       <div class="modal-header">
@@ -184,16 +301,62 @@
       
       <div class="modal-body">
         <form (submit)="submitReview()" class="create-form">
-          <div class="form-group">
-            <label>Số giờ được duyệt (Final Paid Hours)</label>
-            <input type="number" step="0.1" [(ngModel)]="reviewData.finalPaidHours" name="finalPaidHours" class="form-control font-bold text-blue-600" required>
-            <p class="text-xs text-gray-500 mt-1">Tổng giờ đăng ký ban đầu: {{ selectedRequest?.totalHours }}h</p>
-          </div>
           
-          <div class="form-group">
-            <label>Ghi chú / Lý do (Note)</label>
-            <textarea [(ngModel)]="reviewData.note" name="note" rows="3" class="form-control" placeholder="Nhập ghi chú cho nhân viên..." required></textarea>
-          </div>
+          <!-- FORM TỪ CHỐI -->
+          <ng-container *ngIf="reviewType === 'reject'">
+            <div class="form-group">
+              <label>Lý do từ chối (Bắt buộc)</label>
+              <textarea [(ngModel)]="rejectReason" name="reason" rows="4" class="form-control" placeholder="Nhập lý do từ chối..." required></textarea>
+            </div>
+          </ng-container>
+
+          <!-- FORM DUYỆT -->
+          <ng-container *ngIf="reviewType === 'approve'">
+            <div class="form-group">
+               <label class="mb-2">Chi tiết duyệt giờ:</label>
+               <div class="details-section" style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden;">
+                 <table class="detail-table" style="border: none;">
+                   <thead>
+                     <tr>
+                       <th>Thời gian bắt đầu</th>
+                       <th>Thời gian kết thúc</th>
+                       <th class="text-right">Giờ</th>
+                     </tr>
+                   </thead>
+                   <tbody>
+                     <tr *ngFor="let item of approveData.details; let i = index">
+                       <!-- UPDATE: Xếp chồng ngày và giờ (flex-col) -->
+                       <td style="min-width: 140px;">
+                          <div class="dt-edit-group vertical">
+                            <!-- Input Date -->
+                            <input type="date" [(ngModel)]="item.startDateStr" [name]="'startDate_' + i" (change)="calculateDuration(item)" class="form-control input-xs date-input" required>
+                            <!-- Input Time -->
+                            <input type="time" [(ngModel)]="item.startTimeStr" [name]="'startTime_' + i" (change)="calculateDuration(item)" class="form-control input-xs time-input" required>
+                          </div>
+                       </td>
+                       <td style="min-width: 140px;">
+                          <div class="dt-edit-group vertical">
+                             <!-- Input Date -->
+                             <input type="date" [(ngModel)]="item.endDateStr" [name]="'endDate_' + i" (change)="calculateDuration(item)" class="form-control input-xs date-input" required>
+                             <!-- Input Time -->
+                             <input type="time" [(ngModel)]="item.endTimeStr" [name]="'endTime_' + i" (change)="calculateDuration(item)" class="form-control input-xs time-input" required>
+                          </div>
+                       </td>
+                       <td class="text-right" style="vertical-align: middle;">
+                         <input type="number"  [(ngModel)]="item.hours" [name]="'hours_' + i" class="form-control text-right input-sm" style="font-weight: bold; color: #2563eb; width: 60px; float: right;" [disabled]="true">
+                       </td>
+                     </tr>
+                   </tbody>
+                 </table>
+               </div>
+               <p class="text-xs text-gray-500 mt-2">* Thay đổi thời gian sẽ tự động tính lại tổng số giờ.</p>
+            </div>
+
+            <div class="form-group mt-3">
+              <label>Ghi chú (Tùy chọn)</label>
+              <textarea [(ngModel)]="approveData.note" name="note" rows="2" class="form-control" placeholder="Nhập ghi chú..."></textarea>
+            </div>
+          </ng-container>
 
           <div class="modal-footer form-actions">
             <button type="button" (click)="isReviewOpen = false" class="btn btn-secondary">Hủy</button>
@@ -234,9 +397,8 @@
           <div class="form-group">
             <label>Loại OT</label>
             <select [(ngModel)]="newRequest.overtimetypeid" name="type" class="form-control">
-              <option [value]="1">Ngày thường (150%)</option>
-              <option [value]="2">Cuối tuần (200%)</option>
-              <option [value]="3">Ngày lễ (300%)</option>
+              <option value="" disabled selected>-- Chọn loại OT --</option>
+              <option *ngFor="let ot of overtimeTypes" [value]="ot.id">{{ ot.otName }}</option>
             </select>
           </div>
           <div class="form-group">
@@ -252,7 +414,7 @@
     </div>
   </div>
 
-  <!-- SCAN MODAL (Cập nhật dữ liệu) -->
+  <!-- SCAN MODAL -->
   <div *ngIf="isScanOpen" class="modal-overlay create-modal-overlay">
     <div class="modal-container modal-small">
       <div class="modal-header">

@@ -2,49 +2,68 @@
 <div class="overlay" (click)="closeForm()">
   <!-- Modal Box -->
   <div class="modal-box modal-animate" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Đăng ký nghỉ phép</h3>
-      <span class="material-symbols-outlined close-icon" (click)="closeForm()">close</span>
-    </div>
-
-    <div class="modal-body">
-      <!-- Loại phép -->
-      <div class="form-group">
-        <label>Loại phép <span class="required">*</span></label>
-        <select [(ngModel)]="leaveRequest.leavetype">
-          <option value="">Chọn loại phép</option>
-          <option *ngFor="let leave of leaveBalance" [value]="leave.leaveId">
-            {{ leave.leaveType }}
-          </option>
-        </select>
+    
+    <!-- Bắt đầu Form: Đặt tên form là leaveForm -->
+    <form #leaveForm="ngForm">
+      
+      <div class="modal-header">
+        <h3>Đăng ký nghỉ phép</h3>
+        <span class="material-symbols-outlined close-icon" (click)="closeForm()">close</span>
       </div>
 
-      <!-- Gom nhóm 2 ngày lại cho gọn -->
-      <div class="row-group">
+      <div class="modal-body">
+        <!-- Loại phép -->
         <div class="form-group">
-          <label>Ngày bắt đầu <span class="required">*</span></label>
-          <input type="date" [(ngModel)]="leaveRequest.startdate" />
+          <label>Loại phép <span class="required">*</span></label>
+          <!-- Thêm name="leavetype" và required -->
+          <select [(ngModel)]="leaveRequest.leavetype" name="leavetype" required>
+            <option value="">Chọn loại phép</option>
+            <option *ngFor="let leave of leaveBalance" [value]="leave.leaveId">
+              {{ leave.leaveType }}
+            </option>
+          </select>
         </div>
+
+        <!-- Gom nhóm 2 ngày lại cho gọn -->
+        <div class="row-group">
+          <div class="form-group">
+            <label>Ngày bắt đầu <span class="required">*</span></label>
+            <!-- Thêm name="startdate" và required -->
+            <input type="date" [min]="currentDate" [(ngModel)]="leaveRequest.startdate" name="startdate" required />
+          </div>
+          <div class="form-group">
+            <label>Ngày kết thúc <span class="required">*</span></label>
+            <!-- Thêm name="enddate" và required -->
+            <input type="date" [min]="currentDate" [(ngModel)]="leaveRequest.enddate" name="enddate" required />
+          </div>
+        </div>
+
+        <!-- Lý do -->
         <div class="form-group">
-          <label>Ngày kết thúc <span class="required">*</span></label>
-          <input type="date" [(ngModel)]="leaveRequest.enddate" />
+          <label>Lý do <span class="required">*</span></label>
+          <!-- Thêm name="reason" và required -->
+          <textarea rows="3" placeholder="Nhập lý do chi tiết..." [(ngModel)]="leaveRequest.reason" name="reason" required></textarea>
         </div>
       </div>
 
-      <!-- Lý do -->
-      <div class="form-group">
-        <label>Lý do <span class="required">*</span></label>
-        <textarea rows="3" placeholder="Nhập lý do chi tiết..." [(ngModel)]="leaveRequest.reason"></textarea>
+      <div class="modal-footer">
+        <!-- Thêm type="button" để tránh submit nhầm -->
+        <button type="button" class="btn btn-cancel" (click)="closeForm()">Hủy</button>
+        
+        <!-- Logic: Nút bị disable nếu form không hợp lệ (leaveForm.invalid) -->
+        <button 
+          type="button" 
+          class="btn btn-primary" 
+          (click)="submitLeaveRequest()" 
+          [disabled]="leaveForm.invalid">
+          Lưu dữ liệu
+        </button>
       </div>
-    </div>
 
-    <div class="modal-footer">
-      <button class="btn btn-cancel" (click)="closeForm()">Hủy</button>
-      <button class="btn btn-primary" (click)="submitLeaveRequest()">Lưu dữ liệu</button>
-    </div>
+    </form> <!-- Kết thúc Form -->
+
   </div>
 </div>
-<!-- ... code form cũ của bạn ở trên ... -->
 
 <!-- Overlay xác nhận -->
 <app-comfirm 

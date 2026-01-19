@@ -7,7 +7,7 @@ export async function GetAccountInfo(id: number, role: string, page: number, siz
         const res = await api.get(`/${role.toLowerCase()}/userFilter?page=${page}&size=${size}keyword=${id}`, {});
         return res.data;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 export async function GetOneAccountInfo(id: number | string, role: string,) {
@@ -15,7 +15,7 @@ export async function GetOneAccountInfo(id: number | string, role: string,) {
         const res = await api.get(`/${role.toLowerCase()}/userFilter?keyword=${id}`);
         return res.data;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -41,7 +41,7 @@ export async function UpdateAccounthr(formdata: information, role: string) {
             status: res.status
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
 
     }
 }

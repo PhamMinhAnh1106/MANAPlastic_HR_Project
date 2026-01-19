@@ -1,251 +1,254 @@
-<div class="main-layout">
+<!-- MODAL OVERLAY WRAPPER -->
+<div class="modal-overlay">
   
-  <!-- FORM PANEL: CENTERED & FULL WIDTH -->
-  <div class="form-panel">
+  <!-- MODAL CONTAINER (POPUP) -->
+  <div class="modal-container">
     
-    <div class="page-header">
-      <button class="btn-back" routerLink="/home/contracts">
-        <span class="material-symbols-outlined">arrow_back</span>
+    <!-- MODAL HEADER: Title Left, Close Right -->
+    <div class="modal-header">
+      <h4 class="modal-title">Soạn Hợp Đồng Mới</h4>
+      <button class="btn-close" (click)="closeModal()">
+        <span class="material-symbols-outlined">close</span>
       </button>
-      <h4 class="page-title">Soạn Hợp Đồng Mới</h4>
     </div>
 
-    <form [formGroup]="contractForm" (ngSubmit)="onSubmit()">
-      
-      <!-- SECTION 1: CẤU HÌNH -->
-      <div class="form-section">
-        <div class="section-header" (click)="toggleSection('config')">
-          <h5 class="section-title">1. Cấu hình Mẫu</h5>
-          <span class="material-symbols-outlined toggle-icon">
-            {{ sections.config ? 'expand_less' : 'expand_more' }}
-          </span>
-        </div>
+    <!-- SCROLLABLE CONTENT -->
+    <div class="modal-content-body">
+      <form [formGroup]="contractForm" (ngSubmit)="onSubmit()">
         
-        <div class="section-content animate-slide-down" *ngIf="sections.config">
-          <div class="form-row">
-            <div class="form-group col-half">
-              <label>Loại hợp đồng <span class="required">*</span></label>
-              <select formControlName="contractType" (change)="filterTemplates()">
-                <option value="FIXED_TERM">Có thời hạn (Fixed Term)</option>
-                <option value="INDEFINITE">Vô thời hạn (Indefinite)</option>
-              </select>
-            </div>
-            <div class="form-group col-half">
-              <label>Chọn Template <span class="required">*</span></label>
-              <select formControlName="templateId" [class.is-invalid]="isFieldInvalid('templateId')">
-                <option value="" disabled>-- Chọn mẫu --</option>
-                <option *ngFor="let t of filteredTemplates" [value]="t.templateID || t.id">
-                  {{ t.name }}
-                </option>
-              </select>
-              <p *ngIf="isFieldInvalid('templateId')" class="error-msg">Vui lòng chọn mẫu hợp đồng.</p>
-              <p *ngIf="filteredTemplates.length === 0" class="error-msg">Không có mẫu phù hợp</p>
-            </div>
+        <!-- SECTION 1: CẤU HÌNH -->
+        <div class="form-section">
+          <div class="section-header" (click)="toggleSection('config')">
+            <h5 class="section-title">1. Cấu hình Mẫu</h5>
+            <span class="material-symbols-outlined toggle-icon">
+              {{ sections.config ? 'expand_less' : 'expand_more' }}
+            </span>
           </div>
-        </div>
-      </div>
-
-      <!-- SECTION 2: HỒ SƠ -->
-      <div class="form-section">
-        <div class="section-header" (click)="toggleSection('profile')">
-          <h5 class="section-title text-green">2. Hồ sơ Nhân sự</h5>
-          <span class="material-symbols-outlined toggle-icon">
-            {{ sections.profile ? 'expand_less' : 'expand_more' }}
-          </span>
-        </div>
-
-        <div class="section-content animate-slide-down" *ngIf="sections.profile">
-          <div class="form-grid">
-            <div class="form-group col-full">
-              <label>Họ và tên <span class="required">*</span></label>
-              <input type="text" formControlName="fullname" [class.is-invalid]="isFieldInvalid('fullname')">
-              <div *ngIf="isFieldInvalid('fullname')" class="error-msg">Họ tên là bắt buộc.</div>
-            </div>
-            
-            <div class="form-group col-half">
-              <label>CCCD (12 số) <span class="required">*</span></label>
-              <input type="text" formControlName="cccd" [class.is-invalid]="isFieldInvalid('cccd')">
-              <div *ngIf="contractForm.get('cccd')?.hasError('required') && isFieldInvalid('cccd')" class="error-msg">Nhập số CCCD.</div>
-              <div *ngIf="contractForm.get('cccd')?.hasError('pattern') && isFieldInvalid('cccd')" class="error-msg">CCCD phải có đúng 12 chữ số.</div>
-            </div>
-
-            <div class="form-group col-half">
-              <label>Ngày sinh <span class="required">*</span></label>
-              <input type="date" formControlName="dob" [class.is-invalid]="isFieldInvalid('dob')">
-              <div *ngIf="isFieldInvalid('dob')" class="error-msg">Chọn ngày sinh.</div>
-            </div>
-
-            <div class="form-group col-half">
-              <label>Giới tính</label>
-              <select formControlName="gender">
-                <option value="MALE">Nam</option>
-                <option value="FEMALE">Nữ</option>
-                <option value="KHAC">Khác</option>
-              </select>
-            </div>
-
-            <div class="form-group col-half">
-              <label>SĐT</label>
-              <input type="text" formControlName="phone" [class.is-invalid]="isFieldInvalid('phone')">
-              <div *ngIf="contractForm.get('phone')?.hasError('pattern') && isFieldInvalid('phone')" class="error-msg">SĐT không hợp lệ.</div>
-            </div>
-
-            <div class="form-group col-full">
-              <label>Email</label>
-              <input type="email" formControlName="email" [class.is-invalid]="isFieldInvalid('email')">
-              <div *ngIf="contractForm.get('email')?.hasError('email') && isFieldInvalid('email')" class="error-msg">Email sai định dạng.</div>
-            </div>
-
-            <div class="form-group col-full">
-              <label>Địa chỉ thường trú</label>
-              <input type="text" formControlName="address">
-            </div>
-
-            <!-- PHÒNG BAN -->
-            <div class="form-group col-half">
-              <label>Phòng ban <span class="required">*</span></label>
-              <select formControlName="departmentId" [class.is-invalid]="isFieldInvalid('departmentId')">
-                <option *ngFor="let dep of departmentList" [value]="dep.departmentId">
-                  {{ dep.departmentName }}
-                </option>
-              </select>
-              <div *ngIf="isFieldInvalid('departmentId')" class="error-msg">Vui lòng chọn phòng ban.</div>
-            </div>
-
-            <!-- CHỨC VỤ -->
-            <div class="form-group col-half">
-              <label>Chức vụ <span class="required">*</span></label>
-              <select formControlName="roleId" [class.is-invalid]="isFieldInvalid('roleId')">
-                <option *ngFor="let r of roleList" [value]="r.roleId">
-                  {{ r.roleName }}
-                </option>
-              </select>
-              <div *ngIf="isFieldInvalid('roleId')" class="error-msg">Vui lòng chọn chức vụ.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SECTION 3: LƯƠNG -->
-      <div class="form-section">
-        <div class="section-header" (click)="toggleSection('salary')">
-          <h5 class="section-title text-yellow">3. Chế độ Lương & Việc làm</h5>
-          <span class="material-symbols-outlined toggle-icon">
-            {{ sections.salary ? 'expand_less' : 'expand_more' }}
-          </span>
-        </div>
-        
-        <div class="section-content animate-slide-down" *ngIf="sections.salary">
-          <div class="form-grid">
-            <div class="form-group col-half">
-              <label>Hình thức <span class="required">*</span></label>
-              <select formControlName="workType">
-                <option value="FULLTIME">Toàn thời gian</option>
-                <option value="PART_TIME">Bán thời gian</option>
-              </select>
-            </div>
-
-            <!-- Đã xóa input Độc hại -->
-
-            <!-- NGÀY BẮT ĐẦU -->
-            <div class="form-group col-half">
-              <label>Ngày bắt đầu <span class="required">*</span></label>
-              <input type="date" formControlName="startDate" 
-                     [min]="todayStr" 
-                     [class.is-invalid]="isFieldInvalid('startDate')">
-              <div *ngIf="contractForm.get('startDate')?.hasError('required') && isFieldInvalid('startDate')" class="error-msg">
-                Chọn ngày bắt đầu.
+          
+          <div class="section-content animate-slide-down" *ngIf="sections.config">
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label>Loại hợp đồng <span class="required">*</span></label>
+                <select formControlName="contractType" (change)="filterTemplates()">
+                  <option value="FIXED_TERM">Có thời hạn (Fixed Term)</option>
+                  <option value="INDEFINITE">Vô thời hạn (Indefinite)</option>
+                </select>
               </div>
-              <div *ngIf="contractForm.get('startDate')?.hasError('pastDate') && isFieldInvalid('startDate')" class="error-msg">
-                Ngày bắt đầu không được trong quá khứ.
+              <div class="form-group col-half">
+                <label>Chọn Template <span class="required">*</span></label>
+                <select formControlName="templateId" [class.is-invalid]="isFieldInvalid('templateId')">
+                  <option value="" disabled>-- Chọn mẫu --</option>
+                  <option *ngFor="let t of filteredTemplates" [value]="t.templateID || t.id">
+                    {{ t.name }}
+                  </option>
+                </select>
+                <p *ngIf="isFieldInvalid('templateId')" class="error-msg">Vui lòng chọn mẫu hợp đồng.</p>
+                <p *ngIf="filteredTemplates.length === 0" class="error-msg">Không có mẫu phù hợp</p>
               </div>
             </div>
-
-            <div class="form-group col-half">
-              <label>Ngày kết thúc</label>
-              <input type="date" formControlName="endDate" [min]="contractForm.get('startDate')?.value">
-            </div>
-
-            <div class="form-group col-half">
-              <label>Lương cơ bản (VNĐ) <span class="required">*</span></label>
-              <input type="number" class="text-bold-green" formControlName="baseSalary" [class.is-invalid]="isFieldInvalid('baseSalary')">
-              <div *ngIf="isFieldInvalid('baseSalary')" class="error-msg">Lương > 0.</div>
-            </div>
-
-            <div class="form-group col-half">
-              <label>% Đóng BHXH</label>
-              <input type="number" formControlName="insurancePercent" [class.is-invalid]="isFieldInvalid('insurancePercent')">
-              <div *ngIf="isFieldInvalid('insurancePercent')" class="error-msg">0 - 100.</div>
-            </div>
           </div>
         </div>
-      </div>
 
-      <!-- SECTION 4: PHỤ CẤP -->
-      <div class="form-section">
-        <div class="section-header" (click)="toggleSection('allowance')">
-           <div class="header-left">
-             <h5 class="section-title">4. Phụ cấp</h5>
-             <span *ngIf="allowances.length > 0 && !sections.allowance" class="badge-count">
-                {{allowances.length}} mục
-             </span>
-           </div>
-           <div class="header-right">
-             <button *ngIf="sections.allowance" type="button" class="btn-mini-add" (click)="addAllowance(); $event.stopPropagation()">
-               <span class="material-symbols-outlined add-icon">add</span> Thêm
-             </button>
-             <span class="material-symbols-outlined toggle-icon">
-                {{ sections.allowance ? 'expand_less' : 'expand_more' }}
-             </span>
-           </div>
-        </div>
+        <!-- SECTION 2: HỒ SƠ -->
+        <div class="form-section">
+          <div class="section-header" (click)="toggleSection('profile')">
+            <h5 class="section-title text-green">2. Hồ sơ Nhân sự</h5>
+            <span class="material-symbols-outlined toggle-icon">
+              {{ sections.profile ? 'expand_less' : 'expand_more' }}
+            </span>
+          </div>
 
-        <div class="section-content animate-slide-down" *ngIf="sections.allowance">
-          <div formArrayName="allowances">
-            <div *ngFor="let item of allowances.controls; let i = index" [formGroupName]="i" class="allowance-row">
-              
-              <div class="col-name">
-                <input type="text" formControlName="allowanceName" placeholder="Tên phụ cấp"
-                  [class.is-invalid]="item.get('allowanceName')?.invalid && item.get('allowanceName')?.touched">
+          <div class="section-content animate-slide-down" *ngIf="sections.profile">
+            <div class="form-grid">
+              <div class="form-group col-full">
+                <label>Họ và tên <span class="required">*</span></label>
+                <input type="text" formControlName="fullname" [class.is-invalid]="isFieldInvalid('fullname')">
+                <div *ngIf="isFieldInvalid('fullname')" class="error-msg">Họ tên là bắt buộc.</div>
               </div>
               
-              <div class="col-amount">
-                <input type="number" formControlName="allowanceAmount" placeholder="Số tiền"
-                  [class.is-invalid]="item.get('allowanceAmount')?.invalid && item.get('allowanceAmount')?.touched">
+              <div class="form-group col-half">
+                <label>CCCD (12 số) <span class="required">*</span></label>
+                <input type="text" formControlName="cccd" [class.is-invalid]="isFieldInvalid('cccd')">
+                <div *ngIf="contractForm.get('cccd')?.hasError('required') && isFieldInvalid('cccd')" class="error-msg">Nhập số CCCD.</div>
+                <div *ngIf="contractForm.get('cccd')?.hasError('pattern') && isFieldInvalid('cccd')" class="error-msg">CCCD phải có đúng 12 chữ số.</div>
               </div>
-              
-              <div class="col-tax">
-                 <input type="checkbox" formControlName="isTaxable">
-                 <span>Thuế</span>
+
+              <div class="form-group col-half">
+                <label>Ngày sinh <span class="required">*</span></label>
+                <input type="date" formControlName="dob" [class.is-invalid]="isFieldInvalid('dob')">
+                <div *ngIf="isFieldInvalid('dob')" class="error-msg">Chọn ngày sinh.</div>
               </div>
-              
-              <div class="col-action">
-                <button type="button" class="btn-delete" (click)="removeAllowance(i)">
-                  <span class="material-symbols-outlined">delete</span>
-                </button>
+
+              <div class="form-group col-half">
+                <label>Giới tính</label>
+                <select formControlName="gender">
+                  <option value="MALE">Nam</option>
+                  <option value="FEMALE">Nữ</option>
+                  <option value="KHAC">Khác</option>
+                </select>
+              </div>
+
+              <div class="form-group col-half">
+                <label>SĐT</label>
+                <input type="text" formControlName="phone" [class.is-invalid]="isFieldInvalid('phone')">
+                <div *ngIf="contractForm.get('phone')?.hasError('pattern') && isFieldInvalid('phone')" class="error-msg">SĐT không hợp lệ.</div>
+              </div>
+
+              <div class="form-group col-full">
+                <label>Email</label>
+                <input type="email" formControlName="email" [class.is-invalid]="isFieldInvalid('email')">
+                <div *ngIf="contractForm.get('email')?.hasError('email') && isFieldInvalid('email')" class="error-msg">Email sai định dạng.</div>
+              </div>
+
+              <div class="form-group col-full">
+                <label>Địa chỉ thường trú</label>
+                <input type="text" formControlName="address">
+              </div>
+
+              <!-- PHÒNG BAN -->
+              <div class="form-group col-half">
+                <label>Phòng ban <span class="required">*</span></label>
+                <select formControlName="departmentId" [class.is-invalid]="isFieldInvalid('departmentId')">
+                  <option *ngFor="let dep of departmentList" [value]="dep.departmentId">
+                    {{ dep.departmentName }}
+                  </option>
+                </select>
+                <div *ngIf="isFieldInvalid('departmentId')" class="error-msg">Vui lòng chọn phòng ban.</div>
+              </div>
+
+              <!-- CHỨC VỤ -->
+              <div class="form-group col-half">
+                <label>Chức vụ <span class="required">*</span></label>
+                <select formControlName="roleId" [class.is-invalid]="isFieldInvalid('roleId')">
+                  <option *ngFor="let r of roleList" [value]="r.roleId">
+                    {{ r.roleName }}
+                  </option>
+                </select>
+                <div *ngIf="isFieldInvalid('roleId')" class="error-msg">Vui lòng chọn chức vụ.</div>
               </div>
             </div>
           </div>
-          <div *ngIf="allowances.length === 0" class="empty-allowance">
-            Chưa có phụ cấp nào
+        </div>
+
+        <!-- SECTION 3: LƯƠNG -->
+        <div class="form-section">
+          <div class="section-header" (click)="toggleSection('salary')">
+            <h5 class="section-title text-yellow">3. Chế độ Lương & Việc làm</h5>
+            <span class="material-symbols-outlined toggle-icon">
+              {{ sections.salary ? 'expand_less' : 'expand_more' }}
+            </span>
+          </div>
+          
+          <div class="section-content animate-slide-down" *ngIf="sections.salary">
+            <div class="form-grid">
+              <div class="form-group col-half">
+                <label>Hình thức <span class="required">*</span></label>
+                <select formControlName="workType">
+                  <option value="FULLTIME">Toàn thời gian</option>
+                  <option value="PART_TIME">Bán thời gian</option>
+                </select>
+              </div>
+
+              <!-- NGÀY BẮT ĐẦU -->
+              <div class="form-group col-half">
+                <label>Ngày bắt đầu <span class="required">*</span></label>
+                <input type="date" formControlName="startDate" 
+                       [min]="todayStr" 
+                       [class.is-invalid]="isFieldInvalid('startDate')">
+                <div *ngIf="contractForm.get('startDate')?.hasError('required') && isFieldInvalid('startDate')" class="error-msg">
+                  Chọn ngày bắt đầu.
+                </div>
+                <div *ngIf="contractForm.get('startDate')?.hasError('pastDate') && isFieldInvalid('startDate')" class="error-msg">
+                  Ngày bắt đầu không được trong quá khứ.
+                </div>
+              </div>
+
+              <div class="form-group col-half">
+                <label>Ngày kết thúc</label>
+                <input type="date" formControlName="endDate" [min]="contractForm.get('startDate')?.value">
+              </div>
+
+              <div class="form-group col-half">
+                <label>Lương cơ bản (VNĐ) <span class="required">*</span></label>
+                <input type="number" class="text-bold-green" formControlName="baseSalary" [class.is-invalid]="isFieldInvalid('baseSalary')">
+                <div *ngIf="isFieldInvalid('baseSalary')" class="error-msg">Lương > 0.</div>
+              </div>
+
+              <div class="form-group col-half">
+                <label>% Đóng BHXH</label>
+                <input type="number" formControlName="insurancePercent" [class.is-invalid]="isFieldInvalid('insurancePercent')">
+                <div *ngIf="isFieldInvalid('insurancePercent')" class="error-msg">0 - 100.</div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <hr class="separator">
+        <!-- SECTION 4: PHỤ CẤP -->
+        <div class="form-section">
+          <div class="section-header" (click)="toggleSection('allowance')">
+             <div class="header-left">
+               <h5 class="section-title">4. Phụ cấp</h5>
+               <span *ngIf="allowances.length > 0 && !sections.allowance" class="badge-count">
+                  {{allowances.length}} mục
+               </span>
+             </div>
+             <div class="header-right">
+               <button *ngIf="sections.allowance" type="button" class="btn-mini-add" (click)="addAllowance(); $event.stopPropagation()">
+                 <span class="material-symbols-outlined add-icon">add</span> Thêm
+               </button>
+               <span class="material-symbols-outlined toggle-icon">
+                  {{ sections.allowance ? 'expand_less' : 'expand_more' }}
+               </span>
+             </div>
+          </div>
 
-      <div class="form-actions">
-        <button type="submit" class="btn-submit" [disabled]="isloading">
-          <span *ngIf="!isloading" class="material-symbols-outlined">save</span>
-          <span>Lưu Hồ Sơ</span>
-        </button>
-        
-        <button type="button" class="btn-reset" (click)="resetForm()">
-          <span class="material-symbols-outlined refresh-icon">refresh</span> Làm mới form
-        </button>
-      </div>
+          <div class="section-content animate-slide-down" *ngIf="sections.allowance">
+            <div formArrayName="allowances">
+              <div *ngFor="let item of allowances.controls; let i = index" [formGroupName]="i" class="allowance-row">
+                
+                <div class="col-name">
+                  <input type="text" formControlName="allowanceName" placeholder="Tên phụ cấp"
+                    [class.is-invalid]="item.get('allowanceName')?.invalid && item.get('allowanceName')?.touched">
+                </div>
+                
+                <div class="col-amount">
+                  <input type="number" formControlName="allowanceAmount" placeholder="Số tiền"
+                    [class.is-invalid]="item.get('allowanceAmount')?.invalid && item.get('allowanceAmount')?.touched">
+                </div>
+                
+                <div class="col-tax">
+                   <input type="checkbox" formControlName="isTaxable">
+                   <span>Thuế</span>
+                </div>
+                
+                <div class="col-action">
+                  <button type="button" class="btn-delete" (click)="removeAllowance(i)">
+                    <span class="material-symbols-outlined">delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="allowances.length === 0" class="empty-allowance">
+              Chưa có phụ cấp nào
+            </div>
+          </div>
+        </div>
 
-    </form>
+        <hr class="separator">
+
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" [disabled]="isloading">
+            <span *ngIf="!isloading" class="material-symbols-outlined">save</span>
+            <span>Lưu Hồ Sơ</span>
+          </button>
+          
+          <button type="button" class="btn-reset" (click)="resetForm()">
+            <span class="material-symbols-outlined refresh-icon">refresh</span> Làm mới
+          </button>
+        </div>
+
+      </form>
+    </div>
   </div>
 </div>
 

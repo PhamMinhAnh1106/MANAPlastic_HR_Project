@@ -35,7 +35,7 @@ export async function changePassword(oldPassword: string, newPassword: string, r
             status: res.status
         };
     } catch (e) {
-        return "co loi xay ra" + e;
+        return e;
     }
 }
 

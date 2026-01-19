@@ -21,7 +21,7 @@ export async function RegisterScheduleEmployee(forms: registerShiftRoute) {
             status: res.status
         };
     } catch (error) {
-        return `co loi xay ra ` + error;
+        return error;
     }
 }
 export async function GetScheduleEmployeeDraft(month_year: string) {
@@ -29,7 +29,7 @@ export async function GetScheduleEmployeeDraft(month_year: string) {
         const res = await api.get(`/user/shiftSchedule/myDraft?month_year=${month_year}`)
         return res.data;
     } catch (error) {
-        return `co loi xay ra ` + error;
+        return error;
     }
 }
 export async function GetScheduleEmployeeoffice(month_year: string) {
@@ -37,7 +37,7 @@ export async function GetScheduleEmployeeoffice(month_year: string) {
         const res = await api.get(`/user/shiftSchedule/myOfficial?month_year=${month_year}`,)
         return res.data;
     } catch (error) {
-        return `co loi xay ra ` + error;
+        return error;
     }
 }
 export async function GetScheduleManagerdraft(month_year: string) {
@@ -45,7 +45,7 @@ export async function GetScheduleManagerdraft(month_year: string) {
         const res = await api.get(`/manager/shiftSchedule/drafts?month_year=${month_year}`,)
         return res.data;
     } catch (error) {
-        return `co loi xay ra ` + error;
+        return error;
     }
 }
 export async function GetScheduleManageroffice(month_year: string) {
@@ -53,7 +53,7 @@ export async function GetScheduleManageroffice(month_year: string) {
         const res = await api.get(`/manager/shiftSchedule/official?month_year=${month_year}`,)
         return res.data;
     } catch (error) {
-        return `co loi xay ra ` + error;
+        return error;
     }
 }
 
@@ -70,7 +70,7 @@ export async function ChangeScheduleDraftManager(forms: ChangeSchedule) {
             status: res.status
         }
     } catch (error) {
-        return `co loi xay ra ` + error;
+        return error;
     }
 }
 // export async function ChangeScheduleOfficeManager(forms: ChangeSchedule) {
@@ -86,7 +86,7 @@ export async function ChangeScheduleDraftManager(forms: ChangeSchedule) {
 //             status: res.status
 //         }
 //     } catch (error) {
-//         return `co loi xay ra ` + error;
+//         return  error;
 //     }
 // }
 
@@ -98,7 +98,7 @@ export async function UpSchedule(month_year: string) {
             status: res.status
         }
     } catch (error) {
-        return `co loi xay ra ` + error;
+        return error;
 
     }
 }

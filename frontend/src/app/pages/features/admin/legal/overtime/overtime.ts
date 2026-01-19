@@ -115,10 +115,10 @@ export class Overtime implements OnInit {
         this.Onalert('Xóa thành công!', true);
         this.overtimeList = this.overtimeList.filter(x => x.id !== id);
       } else {
-        this.Onalert('Xóa thất bại', false);
+        this.Onalert(res.data, false);
       }
-    } catch (error) {
-      this.Onalert('Đã xảy ra lỗi khi xóa', false);
+    } catch (error: any) {
+      this.Onalert(error.response.data.message || "Đã xảy ra lỗi khi xóa", false);
     } finally {
       this.isloading = false;
       this.cdr.detectChanges();
@@ -181,10 +181,10 @@ export class Overtime implements OnInit {
         this.closeModal();
         await this.loadData();
       } else {
-        this.Onalert(res?.message || 'Lưu thất bại', false);
+        this.Onalert(res?.reponse.data.message || 'Lưu thất bại', false);
       }
-    } catch (error) {
-      this.Onalert('Có lỗi xảy ra khi lưu', false);
+    } catch (error: any) {
+      this.Onalert(error, false);
     } finally {
       this.submitting = false;
       this.cdr.detectChanges();

@@ -37,73 +37,102 @@ $text-muted: #6b7280;
     }
 }
 
-// --- Layout ---
-.main-layout {
+// --- MODAL LAYOUT ---
+
+// 1. Overlay (Lớp phủ mờ)
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    min-height: 100%;
-    background-color: $gray-bg;
-    font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-    padding: 2rem 1rem;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); // Màu đen mờ
+    backdrop-filter: blur(4px); // Hiệu ứng blur
+    z-index: 1000;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center; // Căn giữa màn hình
+    padding: 1rem;
+    animation: fadeIn 0.2s ease-out;
 }
 
-// --- Form Panel (Centered) ---
-.form-panel {
+// 2. Container (Hộp Modal)
+.modal-container {
     width: 100%;
-    max-width: 900px; // Giới hạn chiều rộng để không quá dài
+    max-width: 700px; // Thu nhỏ lại (trước đây 900px)
+    max-height: 90vh; // Không vượt quá chiều cao màn hình
     background-color: $white;
-    padding: 2rem;
     border-radius: 0.75rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; // Để bo tròn góc và header
+    animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.page-header {
+// 3. Modal Header
+.modal-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
-    gap: 1rem;
-}
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid $gray-border;
+    background-color: $white;
 
-.btn-back {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: transparent;
-    border: 1px solid $gray-border;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    color: $text-muted;
-    transition: all 0.2s;
-
-    &:hover {
-        background-color: $gray-bg;
-        color: $primary-color;
-        border-color: $primary-color;
+    .modal-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: $text-main;
+        margin: 0;
     }
 
-    .material-symbols-outlined {
-        font-size: 24px;
+    .btn-close {
+        @include flex-center;
+        background-color: transparent;
+        border: none;
+        color: $text-muted;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 50%;
+        transition: all 0.2s;
+
+        &:hover {
+            background-color: #fee2e2; // Đỏ nhạt khi hover
+            color: $danger-color;
+            transform: rotate(90deg);
+        }
+
+        .material-symbols-outlined {
+            font-size: 24px;
+        }
     }
 }
 
-.page-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: $text-main;
-    margin: 0;
+// 4. Modal Body (Scrollable)
+.modal-content-body {
+    flex: 1;
+    overflow-y: auto; // Cho phép cuộn nội dung bên trong
+    padding: 1.5rem;
+    background-color: #f9fafb;
+
+    // Tùy chỉnh thanh cuộn
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #d1d5db;
+        border-radius: 3px;
+    }
 }
 
-// --- Form Elements ---
+// --- Form Elements (Compact Style) ---
 .form-section {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     border: 1px solid $gray-border;
     border-radius: 0.5rem;
     background-color: $white;
-    padding: 1.5rem; // Tăng padding một chút cho thoáng
+    padding: 1rem; // Giảm padding
 
     .section-header {
         display: flex;
@@ -128,7 +157,7 @@ $text-muted: #6b7280;
     }
 
     .section-title {
-        font-size: 1rem;
+        font-size: 0.95rem;
         font-weight: 700;
         text-transform: uppercase;
         color: $text-muted;
@@ -147,11 +176,11 @@ $text-muted: #6b7280;
         color: #9ca3af;
         transition: transform 0.2s;
         margin-left: 0.75rem;
-        font-size: 24px;
+        font-size: 20px;
     }
 
     .badge-count {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         background-color: #dbeafe;
         color: $primary-color;
         padding: 0.125rem 0.5rem;
@@ -160,7 +189,7 @@ $text-muted: #6b7280;
     }
 
     .section-content {
-        margin-top: 1.5rem;
+        margin-top: 1rem;
     }
 }
 
@@ -168,24 +197,24 @@ $text-muted: #6b7280;
 .form-row {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    gap: 1.5rem; // Tăng khoảng cách giữa các cột
+    gap: 1rem; // Giảm khoảng cách
 }
 
 .form-group {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
 
     label {
         display: block;
-        font-size: 0.875rem;
+        font-size: 0.8rem;
         font-weight: 600;
         color: $text-main;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.35rem;
     }
 
     input,
     select {
         width: 100%;
-        padding: 0.625rem 0.875rem; // Tăng padding input cho dễ nhập
+        padding: 0.5rem 0.75rem; // Giảm padding input
         border: 1px solid #d1d5db;
         border-radius: 0.375rem;
         font-size: 0.875rem;
@@ -198,17 +227,8 @@ $text-muted: #6b7280;
             box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
         }
 
-        &:disabled {
-            background-color: $gray-bg;
-            color: $text-muted;
-        }
-
         &.is-invalid {
             border-color: $danger-color;
-
-            &:focus {
-                box-shadow: 0 0 0 3px rgba($danger-color, 0.1);
-            }
         }
 
         &.text-bold-green {
@@ -225,14 +245,14 @@ $text-muted: #6b7280;
 .error-msg {
     font-size: 0.75rem;
     color: $danger-color;
-    margin-top: 0.375rem;
+    margin-top: 0.25rem;
 }
 
-// Column Sizes - Responsive
+// Column Sizes
 .col-half {
     grid-column: span 12;
 
-    @media (min-width: 768px) {
+    @media (min-width: 640px) {
         grid-column: span 6;
     }
 }
@@ -241,26 +261,11 @@ $text-muted: #6b7280;
     grid-column: span 12;
 }
 
-.col-two-thirds {
-    grid-column: span 12;
-
-    @media (min-width: 768px) {
-        grid-column: span 8;
-    }
-}
-
-.col-one-third {
-    grid-column: span 12;
-
-    @media (min-width: 768px) {
-        grid-column: span 4;
-    }
-}
-
+// Mini Add Button
 .btn-mini-add {
     @include btn-base;
     font-size: 0.75rem;
-    padding: 0.25rem 0.75rem;
+    padding: 0.25rem 0.5rem;
     background-color: #eff6ff;
     color: $primary-color;
     border: 1px solid #bfdbfe;
@@ -272,27 +277,27 @@ $text-muted: #6b7280;
     .add-icon {
         font-size: 16px;
         margin-right: 4px;
-        font-weight: bold;
     }
 }
 
+// Allowance Row
 .allowance-row {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; // Không xuống dòng để gọn hơn
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 0.75rem;
-    padding: 0.75rem;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
     background-color: #f9fafb;
-    border-radius: 0.5rem;
+    border-radius: 0.375rem;
     border: 1px dashed #d1d5db;
 
     .col-name {
-        flex: 1 1 200px;
+        flex: 2;
     }
 
     .col-amount {
-        flex: 1 1 150px;
+        flex: 1.5;
     }
 
     .col-tax {
@@ -300,9 +305,8 @@ $text-muted: #6b7280;
         display: flex;
         flex-direction: column;
         align-items: center;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         color: $text-muted;
-        gap: 0.25rem;
     }
 
     .col-action {
@@ -313,49 +317,47 @@ $text-muted: #6b7280;
             border: none;
             color: $danger-color;
             cursor: pointer;
-            padding: 8px;
-            border-radius: 4px;
-            transition: background-color 0.2s;
+            padding: 4px;
 
             &:hover {
-                background-color: #fee2e2;
                 color: #991b1b;
             }
 
             .material-symbols-outlined {
-                font-size: 20px;
+                font-size: 18px;
             }
         }
     }
 
-    input {
-        width: 100%;
-        padding: 0.5rem;
-        font-size: 0.875rem;
-        border: 1px solid #d1d5db;
-        border-radius: 0.25rem;
+    // Responsive cho allowance
+    @media (max-width: 640px) {
+        flex-wrap: wrap;
+
+        .col-name,
+        .col-amount {
+            flex: 1 1 100%;
+        }
     }
 }
 
 .empty-allowance {
     text-align: center;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     color: #9ca3af;
     font-style: italic;
-    padding: 1rem;
+    padding: 0.5rem;
 }
 
 .separator {
-    margin: 2rem 0;
+    margin: 1.5rem 0;
     border: 0;
     border-top: 1px solid $gray-border;
 }
 
 .form-actions {
     display: flex;
-    flex-direction: row; // Nằm ngang trên desktop
-    gap: 1rem;
-    padding-bottom: 0;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
 
     .btn-submit {
         @include btn-base;
@@ -363,17 +365,12 @@ $text-muted: #6b7280;
         flex: 2;
         background-color: $primary-color;
         color: white;
-        padding: 0.875rem;
-        font-size: 1rem;
+        padding: 0.75rem;
+        font-size: 0.95rem;
 
         &:hover {
             background-color: $primary-hover;
             transform: translateY(-1px);
-        }
-
-        .material-symbols-outlined {
-            font-size: 20px;
-            margin-right: 8px;
         }
     }
 
@@ -389,23 +386,36 @@ $text-muted: #6b7280;
             background-color: #f9fafb;
             border-color: #9ca3af;
         }
-
-        .refresh-icon {
-            font-size: 20px;
-            margin-right: 8px;
-        }
     }
 }
 
 // --- Animations ---
-.animate-slide-down {
-    animation: slideDown 0.3s ease-out;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @keyframes slideDown {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(-5px);
     }
 
     to {

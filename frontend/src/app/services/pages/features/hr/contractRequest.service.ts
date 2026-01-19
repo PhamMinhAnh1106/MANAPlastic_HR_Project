@@ -7,7 +7,7 @@ export async function getContractRequests(keyword: string) {
         const res = await api.get(`/user/contractRequests?keyword=${keyword}`);
         return res.data;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -16,7 +16,7 @@ export async function getContractHistoryVersion(id: number) {
         const res = await api.get(`/user/contractRequests/history/contract/${id}`);
         return res.data;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 
 }
@@ -33,7 +33,7 @@ export async function ManageContractRequest(id: number, body: ContractRequest) {
             status: res.status
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 

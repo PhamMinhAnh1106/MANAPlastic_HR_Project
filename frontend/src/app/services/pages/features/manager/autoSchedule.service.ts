@@ -6,7 +6,7 @@ export async function RequirementsAutoSchedule(forms: reqAutoSchedule) {
         const res = await api.post("/manager/requirements", forms);
         return res.status;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -18,7 +18,7 @@ export async function AutoAssignSchedule(month_year: string) {
             status: res.status
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -27,7 +27,7 @@ export async function GetRequirementsAutoSchedule() {
         const res = await api.get("/manager/requirements");
         return res.data;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -36,7 +36,7 @@ export async function CheckAutoAssignSchedule(month_year: string) {
         const res = await api.get(`/manager/shiftSchedule/drafts/validate?month_year=${month_year}`);
         return res.data;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -56,6 +56,6 @@ export async function updateRuleData(form: formRule) {
         const res = await api.put(`/manager/requirements/${form.requirementId}`, form);
         return res.data;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }

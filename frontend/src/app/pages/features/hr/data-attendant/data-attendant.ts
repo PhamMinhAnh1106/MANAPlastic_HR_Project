@@ -202,21 +202,30 @@ export class DataAttendant implements OnInit {
   async approve() {
     if (!this.selectedRequest) return;
     // this.isloading = true; // Uncomment nếu muốn hiện loading toàn trang khi duyệt
-    const res = await ApproveAttendanceRequest(this.selectedRequest.requestId);
-    console.log("Approve Result:", res);
-    // this.isloading = false;
-    this.closeDetailModal();
-    this.loadData(this.data?.number || 0, 10);
+    const res: any = await ApproveAttendanceRequest(this.selectedRequest.requestId);
+    if (res.status === 200) {
+      this.Onalert(res.data, true);
+      // this.isloading = false;
+      this.closeDetailModal();
+      this.loadData(this.data?.number || 0, 10);
+    } else {
+      this.Onalert(res.response.data.message, false);
+    }
+
   }
 
   async confirmReject() {
     if (!this.selectedRequest || !this.rejectComment) return;
     // this.isloading = true;
-    const res = await RejectAttendanceRequest(this.selectedRequest.requestId, this.rejectComment);
-    console.log("Reject Result:", res);
-    // this.isloading = false;
-    this.closeDetailModal();
-    this.loadData(this.data?.number || 0, 10);
+    const res: any = await RejectAttendanceRequest(this.selectedRequest.requestId, this.rejectComment);
+    if (res.status === 200) {
+      this.Onalert(res.data, true);
+      this.closeDetailModal();
+      this.loadData(this.data?.number || 0, 10);
+    } else {
+      this.Onalert(res.response.data.message, false);
+    }
+
   }
 
   openAddModal() { this.isAdding = true; }

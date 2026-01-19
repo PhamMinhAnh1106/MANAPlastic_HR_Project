@@ -13,7 +13,7 @@ export async function CheckContractByIdEmployee(id: number) {
             status: res.status
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -25,7 +25,7 @@ export async function FillterContract(query: string, page: number, size: number)
             status: res.status
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 export async function FillterContractByIdEmployee(id: number) {
@@ -36,7 +36,7 @@ export async function FillterContractByIdEmployee(id: number) {
             status: res.status
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 export async function ExportFileDataContracts(query: string) {
@@ -87,7 +87,7 @@ export async function AddNewContract(formData: FormData) {
             status: res.status
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -96,7 +96,7 @@ export async function getNotificationContract() {
         const res = await api.get(`/hr/contracts/expiringNoti`);
         return res.data;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -138,7 +138,7 @@ export async function getcontracttemplate() {
         const res = await api.get(`/hr/contract/templates`);
         return res.data;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -148,7 +148,7 @@ export async function getcontracttemplatebyid(id: number) {
         const res = await api.get(`/hr/contract/templates/${id}`);
         return res.data;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 //Cập nhật mẫu hợp đồng
@@ -168,7 +168,7 @@ export async function updatecontracttemplate(id: number, template: contracttempl
             status: res.status
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -187,7 +187,7 @@ export async function createcontracttemplate(template: contracttemplatecreate) {
             status: res.status
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 ////// trang hợp đồng lao động 
@@ -249,6 +249,6 @@ export async function getContractPdfUrl(contractId: number) {
         if (error.response && error.response.status === 401) {
             return "co loi xay ra: Hết phiên đăng nhập";
         }
-        return "co loi xay ra " + (error.message || error);
+        return (error.message || error);
     }
 }

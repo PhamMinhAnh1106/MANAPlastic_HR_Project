@@ -24,11 +24,20 @@ $danger: #ef4444;
     box-sizing: border-box;
 }
 
-// Reset box-sizing globally for this component to prevent overflow
+// Reset box-sizing
 *,
 *::before,
 *::after {
     box-sizing: border-box;
+}
+
+// --- FIX ALERT VISIBILITY ---
+// Đây là đoạn code quan trọng để alert hiển thị trên modal
+::ng-deep app-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 99999 !important; // Z-index cực cao để đè lên overlay
 }
 
 .page-container {
@@ -69,9 +78,8 @@ $danger: #ef4444;
     display: flex;
     gap: 10px;
 
-    // --- SEARCH BOX MODIFIED FOR DROPDOWN ---
     .search-box {
-        position: relative; // Quan trọng để định vị dropdown
+        position: relative;
         display: flex;
         align-items: center;
 
@@ -86,7 +94,7 @@ $danger: #ef4444;
             padding: 10px 12px 10px 36px;
             border: 1px solid $border;
             border-radius: 8px;
-            width: 250px; // Tăng width một chút cho đẹp
+            width: 250px;
             outline: none;
             transition: all 0.2s;
 
@@ -96,7 +104,6 @@ $danger: #ef4444;
             }
         }
 
-        // Mini Spinner
         .spinner-mini {
             position: absolute;
             right: 10px;
@@ -114,10 +121,9 @@ $danger: #ef4444;
             }
         }
 
-        // --- DROPDOWN SUGGESTIONS ---
         .suggestions-dropdown {
             position: absolute;
-            top: 100%; // Nằm ngay dưới input
+            top: 100%;
             left: 0;
             background: white;
             border: 1px solid $border;
@@ -139,20 +145,6 @@ $danger: #ef4444;
 
                 &:hover {
                     background-color: #f1f5f9;
-                }
-
-                .s-avatar {
-                    width: 32px;
-                    height: 32px;
-                    border-radius: 50%;
-                    background: #e0e7ff;
-                    color: $primary;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 14px;
-                    font-weight: 600;
-                    flex-shrink: 0;
                 }
 
                 .s-info {
@@ -327,7 +319,6 @@ button {
 
 .table-responsive {
     overflow-x: auto;
-    // Đảm bảo bảng hiển thị đúng khi có popup đè lên (nếu cần)
     min-height: 300px;
 }
 
@@ -576,49 +567,42 @@ button {
 // --- 5. MODAL ---
 .overlay {
     position: fixed;
-    inset: 0; // Thay cho top/left/width/height 100%
+    inset: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 1000;
     display: flex;
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(2px);
-    padding: 20px; // Thêm padding để modal không dính sát mép màn hình khi thu nhỏ
+    padding: 20px;
 }
 
 .modal-box {
     background: $bg-white;
     width: 90%;
     max-width: 800px;
-    // Sử dụng display flex column cho chính modal-box
     display: flex;
     flex-direction: column;
-
-    // Giới hạn chiều cao và cho phép co giãn
     max-height: 90vh;
     height: auto;
-
     border-radius: 16px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     animation: zoomIn 0.3s ease;
-    overflow: hidden; // Bo góc
+    overflow: hidden;
     position: relative;
 
-    // --- FIX TRÀN FORM ---
-    // Vì thẻ <form> nằm ngay dưới modal-box, ta phải biến nó thành Flex Container
-    // để header/body/footer bên trong hoạt động đúng logic scroll
     form {
         display: flex;
         flex-direction: column;
         height: 100%;
-        max-height: 100%; // Quan trọng: kế thừa max-height của cha
-        overflow: hidden; // Để border-radius của cha không bị che
+        max-height: 100%;
+        overflow: hidden;
         width: 100%;
     }
 }
 
 .modal-header {
-    flex-shrink: 0; // Không được co lại
+    flex-shrink: 0;
     padding: 20px 24px;
     border-bottom: 1px solid $border;
     display: flex;
@@ -653,10 +637,9 @@ button {
 }
 
 .modal-body {
-    // Flex 1 để chiếm hết không gian còn lại và đẩy footer xuống đáy
     flex: 1;
-    overflow-y: auto; // Chỉ scroll vùng này
-    min-height: 0; // Fix lỗi flexbox không scroll trên một số trình duyệt
+    overflow-y: auto;
+    min-height: 0;
     padding: 24px;
 
     .form-grid {
@@ -701,7 +684,6 @@ button {
             }
         }
 
-        // Fix input style
         input:not([type="radio"]):not([type="checkbox"]),
         select {
             width: 100%;
@@ -743,7 +725,6 @@ button {
         }
     }
 
-    // Radio Group
     .radio-group {
         display: flex;
         gap: 20px;
@@ -771,7 +752,7 @@ button {
 }
 
 .modal-footer {
-    flex-shrink: 0; // Không được co lại
+    flex-shrink: 0;
     padding: 16px 24px;
     border-top: 1px solid $border;
     display: flex;
@@ -780,7 +761,6 @@ button {
     background: #f8fafc;
 }
 
-// Animations
 @keyframes slideDown {
     from {
         opacity: 0;
@@ -805,7 +785,6 @@ button {
     }
 }
 
-// Empty State
 .empty-state {
     padding: 60px 0;
     text-align: center;

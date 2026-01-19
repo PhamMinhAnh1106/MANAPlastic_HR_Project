@@ -8,7 +8,7 @@ export async function getOtpByEmail(email: string) {
             status: res.status
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 
 }
@@ -21,7 +21,7 @@ export async function checkOtpByEmail(email: string, otp: string) {
             status: res.status
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 
 }
@@ -33,7 +33,7 @@ export async function resetNewPassword(resetToken: string, newPassword: string) 
             status: res.status
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 
 }

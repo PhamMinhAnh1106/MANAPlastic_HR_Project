@@ -354,7 +354,7 @@
 
           <div class="form-group">
             <label>Số tài khoản <span class="text-danger">*</span></label>
-            <input [(ngModel)]="selectedEmployee.bankAccount" name="bankAccount" required #bankAccount="ngModel"
+            <input type="number" [(ngModel)]="selectedEmployee.bankAccount" name="bankAccount" required #bankAccount="ngModel"
                    [class.invalid]="bankAccount.invalid && (bankAccount.dirty || bankAccount.touched)"/>
              <div *ngIf="bankAccount.invalid && (bankAccount.dirty || bankAccount.touched)" class="error-msg">
                Vui lòng nhập số tài khoản.

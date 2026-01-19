@@ -105,7 +105,4 @@
   (hidden)="isalert = false">
 </app-alert>
 
-<!-- Loading Overlay (Tùy chọn nếu bạn muốn hiện khi đang tải) -->
-<div class="loading-overlay" *ngIf="isloading">
-    <div class="spinner">Loading...</div>
-</div>
+<app-loading *ngIf="isloading"></app-loading>

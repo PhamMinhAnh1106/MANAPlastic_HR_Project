@@ -39,8 +39,6 @@ const MENU_MASTER_DATA = [
   { id: 15, name: "Quản Lý Cấu Hình Luật", path: "/home/law", icon: "gavel" },
   { id: 16, name: "Quản Lý Hoạt Động", path: "/home/activity-logs", icon: "event_note" },
   { id: 17, name: "Quản Lý Hồ Sơ", path: "/home/user/Mydocuments", icon: "document_search" },
-
-
 ];
 
 // Helper để lấy thông tin item nhanh theo ID
@@ -247,7 +245,7 @@ export class Home implements OnInit {
           buildGroup("edit_calendar", "/home/user/attendance", [4, 5, 18]),
 
           // Nghỉ phép - ID: 7, 6
-          buildGroup("flight_takeoff", "/home/leaverequest", [7, 6]),
+          buildGroup("flight_takeoff", "/home/leaverequest", [7]),
 
           // Hồ sơ - ID: 17
           buildGroup("document_search", "/home/user/Mydocuments", [17]),

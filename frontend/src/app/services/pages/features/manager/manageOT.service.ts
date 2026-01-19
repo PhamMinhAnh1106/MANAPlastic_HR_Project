@@ -25,12 +25,12 @@ export interface OverTimeRequest {
     updatedAt: string,
     details: OverTimeDetail[]
 }
-export async function GetOverTimeRequest() {
+export async function GetOverTimeRequest(query: string) {
     try {
-        const res = await api.get("/user/overTimeRequest");
+        const res = await api.get(`/user/overTimeRequest?${query}`);
         return res.data;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 
 }
@@ -64,13 +64,20 @@ export async function ScanDailyOt(date: string) {
             status: res.status
         };
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
+export interface DetailsApprove {
+    id: number,
+    hours: number,
+    overtimeTypeID: number,
+    startTime: string,
+    endTime: string
+}
 export interface ApproveOverTimeRequestI {
-    finalPaidHours: string,
-    note: string
+    note: string,
+    details: DetailsApprove[]
 }
 export async function ApproveOverTimeRequest(body: ApproveOverTimeRequestI, requestId: number, role: string) {
     try {
@@ -85,7 +92,11 @@ export async function ApproveOverTimeRequest(body: ApproveOverTimeRequestI, requ
 
 }
 
-export async function RejectOverTimeRequest(requestId: number, body: ApproveOverTimeRequestI) {
+
+export interface RejectRequest {
+    reason: string
+}
+export async function RejectOverTimeRequest(requestId: number, body: RejectRequest) {
     try {
         const res = await api.put(`/user/overTimeRequest/reject/${requestId}`, body);
         return {

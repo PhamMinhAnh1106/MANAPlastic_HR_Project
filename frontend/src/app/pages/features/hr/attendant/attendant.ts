@@ -41,11 +41,24 @@ interface attendance {
 })
 export class Attendant implements OnInit {
 
+  currentDate: string;
   constructor(
     private cdr: ChangeDetectorRef,
     private cookie: CookieService,
     private sanitizer: DomSanitizer // Inject Sanitizer
-  ) { }
+  ) {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = ('0' + (today.getMonth() + 1)).slice(-2);
+    const day = ('0' + today.getDate()).slice(-2);
+
+    this.currentDate = `${year}-${month}-${day}`;
+  }
+
+
+
+
+
 
   role: string = "";
   id: number = 0;
@@ -109,7 +122,7 @@ export class Attendant implements OnInit {
 
   // Data cho Filter
   months = Array.from({ length: 12 }, (_, i) => i + 1);
-  years = [2023, 2024, 2025];
+  years = [2023, 2024, 2025, 2026, 2027];
   departments = [
     { id: 1, name: 'Phòng Ban Nhân Sự' },
     { id: 2, name: 'Phòng Ban IT' },

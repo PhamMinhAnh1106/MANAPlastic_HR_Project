@@ -1,29 +1,12 @@
-import { Component, OnInit, inject, Injectable, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
-import { HttpClient, HttpClientModule, HttpErrorResponse } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { catchError, firstValueFrom, throwError } from 'rxjs';
-import { chukiluong, getChukiluong, postChukiluong, putChukiluong } from '../../../../../services/pages/features/admin/legal.service';
+import { chukiluong, ChuKyLuongItem, getChukiluong, postChukiluong, putChukiluong } from '../../../../../services/pages/features/admin/legal.service';
 import { Alert } from '../../../../shared/alert/alert';
 import { Comfirm } from '../../../../shared/comfirm/comfirm';
 import { Loading } from '../../../../shared/loading/loading';
 
-// --- INTERFACES & TYPES ---
-export interface ChuKyLuongItem {
-  id: number;
-  month: number;
-  year: number;
-  cycleStartDate: string;
-  cycleEndDate: string;
-  standardWorkDays: number;
-}
 
-export interface ChuKiLuongForm {
-  year?: string;
-  standardWorkDays?: number;
-  cycleStartDay?: number;
-  isCyclePreviousMonth?: boolean;
-}
 
 // --- MAIN COMPONENT ---
 @Component({
@@ -64,13 +47,13 @@ export class chukyluong implements OnInit {
   constructor(private cdr: ChangeDetectorRef) {
     this.generateForm = this.fb.group({
       year: [this.currentYear, Validators.required],
-      standardWorkDays: [24, [Validators.required, Validators.min(0)]],
+      standardWorkDays: [24, [Validators.required, Validators.min(24)]],
       cycleStartDay: [1, [Validators.required, Validators.min(1), Validators.max(31)]],
       isCyclePreviousMonth: [false]
     });
 
     this.editForm = this.fb.group({
-      standardWorkDays: [0, [Validators.required, Validators.min(0)]]
+      standardWorkDays: [0, [Validators.required, Validators.min(24)]]
     });
   }
 

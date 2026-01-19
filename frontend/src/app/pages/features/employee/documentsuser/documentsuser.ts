@@ -2,11 +2,13 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { CookieService } from 'ngx-cookie-service';
+
+// Import các component/service gốc của dự án
 import { Alert } from '../../../shared/alert/alert';
 import { Comfirm } from '../../../shared/comfirm/comfirm';
 import { Loading } from '../../../shared/loading/loading';
 import { DocumentItem, getDocumentEmployeebyid, getDocumentFile, getDocumentsByUserId, getListDocumentEmployee, getMyDocuments, uploadProfile } from '../../../../services/pages/documentUser.service';
-import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-root',
@@ -85,14 +87,12 @@ export class Documentsuser implements OnInit {
     // Determine initial tab
     const storedTab = sessionStorage.getItem('activeTab');
     if (storedTab && ['approval', 'search', 'personal'].includes(storedTab)) {
-      // Nếu là Employee mà cố truy cập tab HR -> force về personal
       if (this.currentRole !== 'hr' && (storedTab === 'approval' || storedTab === 'search')) {
         this.switchTab('personal');
       } else {
         this.activeTab = storedTab;
       }
     } else {
-      // Default tabs
       this.activeTab = (this.currentRole === 'hr') ? 'approval' : 'personal';
     }
 
@@ -104,12 +104,10 @@ export class Documentsuser implements OnInit {
     this.activeTab = tab;
     sessionStorage.setItem('activeTab', tab);
 
-    // Reset search state when leaving search tab
     if (tab !== 'search') {
       this.hasSearched = false;
       this.searchedDocuments = [];
     }
-
     this.loadData();
   }
 
@@ -117,7 +115,6 @@ export class Documentsuser implements OnInit {
   async loadData() {
     this.isloading = true;
     try {
-      // Load data based on Active Tab
       if (this.activeTab === 'approval' && this.currentRole === 'hr') {
         const data = await getListDocumentEmployee();
         this.hrDocuments = Array.isArray(data) ? data : [];
@@ -126,8 +123,6 @@ export class Documentsuser implements OnInit {
         const data = await getMyDocuments();
         this.myDocuments = Array.isArray(data.content) ? data.content : [];
       }
-      // 'search' tab doesn't load data initially
-
     } catch (error) {
       console.error(error);
       this.Onalert('Lỗi tải dữ liệu', false);
@@ -213,19 +208,38 @@ export class Documentsuser implements OnInit {
     });
   }
 
-  // --- File Viewing ---
+  // =========================================================
+  // FIX: XỬ LÝ BLOB ĐỂ HIỂN THỊ FILE PDF
+  // =========================================================
   async viewFile(filename: string) {
     if (!filename) return;
     this.isloading = true;
     try {
-      const blob = await getDocumentFile(filename);
-      if (blob instanceof Blob) {
-        const url = URL.createObjectURL(blob);
-        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-        this.showPreviewModal = true;
+      const response = await getDocumentFile(filename); // Gọi API
+
+      let blob: Blob;
+
+      if (response instanceof Blob) {
+        // Optimization: If it's already a Blob, you often don't need to wrap it again
+        blob = response;
+      } else if (response) {
+        // It is not a Blob, but it is not null (e.g., a string or buffer)
+        blob = new Blob([response as BlobPart], { type: 'application/pdf' });
+      } else {
+        // 'response' is null or undefined. Create an empty Blob.
+        blob = new Blob([], { type: 'application/pdf' });
       }
+
+      // Tạo Object URL để nhúng vào iframe
+      const url = window.URL.createObjectURL(blob);
+
+      // Sanitize URL để Angular chấp nhận
+      this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      this.showPreviewModal = true;
+
     } catch (error) {
-      this.Onalert('Lỗi khi tải file.', false);
+      console.error(error);
+      this.Onalert('Lỗi khi tải file xem trước.', false);
     } finally {
       this.isloading = false;
       this.cdr.detectChanges();
@@ -234,6 +248,7 @@ export class Documentsuser implements OnInit {
 
   closePreview() {
     this.showPreviewModal = false;
+    // Dọn dẹp URL khi đóng modal (Optional, nhưng tốt cho memory)
     this.previewUrl = null;
   }
 
@@ -241,23 +256,40 @@ export class Documentsuser implements OnInit {
     if (!filename) return;
     this.isloading = true;
     try {
-      const blob = await getDocumentFile(filename);
-      if (blob instanceof Blob) {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+      const response = await getDocumentFile(filename);
+
+      let blob: Blob;
+
+      if (response instanceof Blob) {
+        // Optimization: If it's already a Blob, you often don't need to wrap it again
+        blob = response;
+      } else if (response) {
+        // It is not a Blob, but it is not null (e.g., a string or buffer)
+        blob = new Blob([response as BlobPart], { type: 'application/pdf' });
+      } else {
+        // 'response' is null or undefined. Create an empty Blob.
+        blob = new Blob([], { type: 'application/pdf' });
       }
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
     } catch (error) {
+      console.error(error);
       this.Onalert('Lỗi tải xuống.', false);
     } finally {
       this.isloading = false;
       this.cdr.detectChanges();
     }
   }
+  // =========================================================
 
   // --- Approval Logic ---
   openApprovalModal(documentID: number, doc: DocumentItem, action: string) {
@@ -285,7 +317,7 @@ export class Documentsuser implements OnInit {
 
         if (res.status == 200) {
           this.showApprovalModal = false;
-          this.Onalert(res.data, true);
+          this.Onalert(`${actionText} hồ sơ thành công!`, true);
           this.loadData();
           return;
         }

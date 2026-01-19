@@ -7,7 +7,7 @@ export async function getleaverequest() {
         const res = await api.get("/user/leaverequest/myRequest");
         return res.data;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 // lay thong tin ngay phep nghi con lai
@@ -16,7 +16,7 @@ export async function getBalanceleaverequest() {
         const res = await api.get("/user/leaverequest/myBalances");
         return res.data;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -36,7 +36,7 @@ export async function Registerleaverequest(forms: leaverequestRegister) {
             data: res.data
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 //xoa don phep
@@ -48,7 +48,7 @@ export async function Deleteleaverequest(idRequest: number) {
             data: res.data
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -59,7 +59,7 @@ export async function getleaverequestManage(username: string, page: number, size
         return res.data;
 
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 export async function Approveleaverequest(idRequest: number) {
@@ -70,7 +70,7 @@ export async function Approveleaverequest(idRequest: number) {
             data: res.data
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 export async function Rejectleaverequest(idRequest: number) {
@@ -81,6 +81,6 @@ export async function Rejectleaverequest(idRequest: number) {
             data: res.data
         }
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }

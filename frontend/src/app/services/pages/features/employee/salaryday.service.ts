@@ -11,7 +11,7 @@ export async function GetDateSalary() {
         const res = await api.get("/user/DailySalary/daily");
         return res.data;
     } catch (error) {
-        return `co loi xay ra ` + error;
+        return error;
     }
 }
 
@@ -27,7 +27,7 @@ export async function GetMonthlySalary(month: number, year: number) {
         const res = await api.get(`/user/DailySalary/monthlyTotal?month=${month}&year=${year}`);
         return res.data;
     } catch (error) {
-        return `co loi xay ra ` + error;
+        return error;
     }
 }
 
@@ -36,6 +36,6 @@ export async function RecalculateSalary(month: number, year: number) {
         const res = await api.post(`/user/DailySalary/recalculate?month=${month}&year=${year}`);
         return res.data;
     } catch (error) {
-        return `co loi xay ra ` + error;
+        return error;
     }
 }

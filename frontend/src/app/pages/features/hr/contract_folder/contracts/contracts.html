@@ -483,7 +483,7 @@
                   <div class="form-group-lg">
                     <!-- SỬA TEMPLATE SELECT -->
                     <label>Mẫu Hợp đồng (Template)</label>
-                    <select [(ngModel)]="editForm.templateId" class="custom-input-lg" [disabled]="isReadOnly">
+                    <select [(ngModel)]="editForm.contractTemplateId" class="custom-input-lg" [disabled]="isReadOnly">
                         <option [ngValue]="0">-- Chọn mẫu hợp đồng --</option>
                         <option *ngFor="let t of listTemplates" [ngValue]="t.id">{{ t.name }}</option>
                     </select>
@@ -605,8 +605,17 @@
    
                <div class="form-row">
                    <div class="form-group-lg half">
-                       <label>Phòng ban (ID)</label>
-                       <input type="number" [(ngModel)]="editForm.departmentId" class="custom-input-lg" [disabled]="isReadOnly">
+                       <label>Phòng ban </label>
+                                    <select 
+                [(ngModel)]="editForm.departmentId" 
+                class="custom-input-lg" 
+                [disabled]="isReadOnly"
+                name="departmentId">
+                <option [value]="null" disabled>-- Chọn phòng ban --</option>
+                <option *ngFor="let dept of departments" [value]="dept.departmentId">
+                    {{ dept.departmentName }}
+                </option>
+                </select>
                    </div>
                    <div class="form-group-lg half">
                        <label>Chức vụ (Role)</label>

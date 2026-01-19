@@ -63,17 +63,34 @@ export async function getMyDocuments() {
         return error;
     }
 }
-export async function getDocumentFile(filename: string) {
+export async function getDocumentFile(filename: string): Promise<Blob | null> {
     try {
         const res = await api.get(`/user/documents/files/${filename}`, {
-            responseType: 'blob' // Bắt buộc phải có để báo đây là file, không phải JSON
+            responseType: 'blob', // Quan trọng: Báo cho axios biết đây là dữ liệu nhị phân
         });
-        return res.data;
+
+        // Tạo Blob mới kèm theo type là application/pdf để đảm bảo trình duyệt hiểu đúng
+        // ngay cả khi server trả về header không chuẩn.
+        return new Blob([res.data], { type: 'application/pdf' });
     } catch (error) {
-        return error;
+        console.error("Lỗi khi tải file PDF:", error);
+        return null; // Hoặc throw error tùy cách bạn handle lỗi
     }
 }
 
+
+export async function openPdfViewer(filename: string) {
+    const pdfBlob = await getDocumentFile(filename);
+
+    if (pdfBlob) {
+
+        const fileUrl = window.URL.createObjectURL(pdfBlob);
+
+        window.open(fileUrl, '_blank');
+    } else {
+        alert("Không thể tải file PDF.");
+    }
+}
 
 //// upload hồ sơ có file pdf
 export interface UploadDocument {

@@ -170,9 +170,8 @@ export class LeavePolicies implements OnInit {
       this.closeModal();
 
     } catch (error: any) {
-      this.errorMessage.set(`Lỗi: ${error.message || 'Hệ thống đang bận'}`);
-      this.Onalert(error.message || "Đã xảy ra lỗi, vui lòng thử lại.", false);
-
+      this.errorMessage.set(`Lỗi: ${error.response.data.message || 'Hệ thống đang bận'}`);
+      this.Onalert(error.response.data.message || "Đã xảy ra lỗi, vui lòng thử lại.", false);
     } finally {
       this.isloading = false;
       this.isSaving = false;

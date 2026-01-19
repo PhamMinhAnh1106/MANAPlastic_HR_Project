@@ -104,6 +104,7 @@ export class Schedule implements OnInit {
   // Edit Shift Popup (Manager)
   selectedShiftData: any = null;
   shiftId: number | null = null;
+  selectedShiftType: number = 8; // Mặc định là 8H
   reason: string = '';
   list: any[] = [];
 
@@ -198,13 +199,22 @@ export class Schedule implements OnInit {
     }
   }
 
+  // === CẬP NHẬT LOGIC TẠI ĐÂY ===
   prepareDayShiftMap() {
     this.dayShiftMap = {};
     if (!this.dayData || this.dayData.length === 0) return;
+
     if (this.role === 'employee') {
       this.dayData.forEach(d => {
         const date = d.date;
-        this.dayShiftMap[date] = [{ shiftName: d.shiftName, shiftId: d.shiftId, isDayOff: d.isDayOff }];
+        // Kiểm tra nếu shiftId >= 53 (AL, SL...) HOẶC có property dayOff = true thì ẩn
+        const isDayOff = d.isDayOff || d.dayOff || (d.shiftId >= 53);
+
+        this.dayShiftMap[date] = [{
+          shiftName: d.shiftName,
+          shiftId: d.shiftId,
+          isDayOff: isDayOff
+        }];
       });
     } else if (this.role === 'manager') {
       this.dayData.forEach((emp: userSchedule) => {
@@ -212,12 +222,16 @@ export class Schedule implements OnInit {
         emp.drafts.forEach(shift => {
           const date = shift.date;
           if (!this.dayShiftMap[date]) this.dayShiftMap[date] = [];
+
+          // Kiểm tra tương tự cho Manager (thêm check shift.dayOff)
+          const isDayOff = shift.isDayOff || shift.dayOff || (shift.shiftId >= 53);
+
           this.dayShiftMap[date].push({
             employeeId: emp.employeeId,
             employeeFullName: emp.employeeFullName,
             shiftName: shift.shiftName || 'OFF',
             shiftId: shift.shiftId,
-            isDayOff: shift.isDayOff
+            isDayOff: isDayOff
           });
         });
       });
@@ -244,7 +258,10 @@ export class Schedule implements OnInit {
           isDayOff: false,
           shifts: this.dayShiftMap[dateStr] || []
         };
-        if (dayObj.shifts && dayObj.shifts.length > 0) dayObj.isDayOff = dayObj.shifts[0].isDayOff;
+        // Logic cũ: lấy trạng thái ngày nghỉ của ca đầu tiên
+        if (dayObj.shifts && dayObj.shifts.length > 0) {
+          dayObj.isDayOff = dayObj.shifts[0].isDayOff;
+        }
         week.push(dayObj);
         current.setDate(current.getDate() + 1);
       }
@@ -286,10 +303,48 @@ export class Schedule implements OnInit {
       oldShiftId: shift.shiftId,
       isDayOff: shift.isDayOff
     };
-    this.shiftId = shift.shiftId;
-    this.changeType(8);
+
+    const currentShiftId = shift.shiftId;
+
+    // --- LOGIC MỚI: Tự động phát hiện loại ca (8H/6H) ---
+
+    // 1. Nếu là ca nghỉ phép (>=53) -> Reset form, không chọn ca nào
+    if (currentShiftId >= 53) {
+      this.shiftId = null;
+      this.selectedShiftType = 8; // Mặc định về 8H
+      this.changeType(8);
+      return;
+    }
+
+    // 2. Nếu là ca thường, kiểm tra xem nó thuộc 8H hay 6H
+    this.list = [];
+    scheduleList(8, this.list);
+    const foundIn8H = this.list.some(s => s.shift_id == currentShiftId);
+
+    if (foundIn8H) {
+      this.selectedShiftType = 8;
+      this.shiftId = currentShiftId;
+    } else {
+      this.list = [];
+      scheduleList(6, this.list);
+      const foundIn6H = this.list.some(s => s.shift_id == currentShiftId);
+
+      if (foundIn6H) {
+        this.selectedShiftType = 6;
+        this.shiftId = currentShiftId;
+      } else {
+        this.selectedShiftType = 8;
+        this.changeType(8);
+        this.shiftId = currentShiftId;
+      }
+    }
   }
-  changeType(hours: number) { scheduleList(hours, this.list); }
+
+  changeType(hours: number) {
+    this.selectedShiftType = hours;
+    this.list = []; // Clear list cũ trước khi load
+    scheduleList(hours, this.list);
+  }
 
   async saveShift() {
     this.isconfirm = true;
@@ -358,22 +413,17 @@ export class Schedule implements OnInit {
   // -- Search User Functions --
   onSearchUser(event: any) {
     const value = event.target.value;
-    // Nếu rỗng thì ẩn dropdown
     if (!value || value.trim() === '') {
       this.showUserSearchDropdown = false;
       this.userSearchResults = [];
       return;
     }
-    // Push vào subject để debounce
     this.searchSubject.next(value);
   }
 
   async performUserSearch(username: string) {
     try {
-      // Gọi hàm API được yêu cầu
       const res = await findUserbyUsername(username) as any[];
-
-      // Giới hạn 5 kết quả
       if (res && Array.isArray(res)) {
         this.userSearchResults = res.slice(0, 5);
         this.showUserSearchDropdown = this.userSearchResults.length > 0;
@@ -390,16 +440,12 @@ export class Schedule implements OnInit {
   }
 
   selectSearchUser(user: any) {
-    // Gán giá trị vào form
     this.newEmployeeForm.username = user.username || user.fullName || '';
     this.showUserSearchDropdown = false;
   }
 
-  // Click outside to close (nếu cần thiết, có thể thêm directive sau)
-
   openAddEmployeePopup() {
     this.showAddEmployeePopup = true;
-    // Reset form
     this.newEmployeeForm = {
       username: '',
       startDate: '',
@@ -415,18 +461,15 @@ export class Schedule implements OnInit {
     this.showAddEmployeePopup = false;
   }
 
-  // Thêm dòng ngày đặc biệt
   addSpecificDay() {
     this.newEmployeeForm.specificDays.push({ date: '', shiftId: 0 });
   }
 
-  // Xóa dòng ngày đặc biệt
   removeSpecificDay(index: number) {
     this.newEmployeeForm.specificDays.splice(index, 1);
   }
 
   async submitNewEmployee() {
-    // 1. Validate cơ bản
     if (!this.newEmployeeForm.username || !this.newEmployeeForm.startDate || !this.newEmployeeForm.endDate || !this.newEmployeeForm.shiftId) {
       this.Onalert("Vui lòng điền tên, ngày bắt đầu, ngày kết thúc và ca chính!", false);
       return;
@@ -437,7 +480,6 @@ export class Schedule implements OnInit {
       return;
     }
 
-    // 2. Validate Special Days
     const invalidSpecificDay = this.newEmployeeForm.specificDays.find(d => !d.date || !d.shiftId);
     if (invalidSpecificDay) {
       this.Onalert("Vui lòng điền đầy đủ thông tin cho các ngày ngoại lệ!", false);
@@ -447,7 +489,6 @@ export class Schedule implements OnInit {
     this.isloading = true;
 
     try {
-      // 3. Construct Payload
       const payload: any = {
         username: this.newEmployeeForm.username,
         startDate: this.newEmployeeForm.startDate,
@@ -455,7 +496,8 @@ export class Schedule implements OnInit {
         shiftId: Number(this.newEmployeeForm.shiftId),
         specificDays: this.newEmployeeForm.specificDays.map(d => ({
           date: d.date,
-          shiftId: Number(d.shiftId)
+          shiftId: Number(d.shiftId),
+          dayoff: Number(d.shiftId) >= 53
         }))
       };
 

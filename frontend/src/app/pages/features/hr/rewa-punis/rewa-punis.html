@@ -140,10 +140,30 @@
       
       <div class="modal-body">
         <div class="form-grid-2">
-            <div class="form-group">
-                <label class="form-label">Mã Nhân Viên <span style="color:red">*</span></label>
-                <input type="number" [(ngModel)]="currentItem.userID" class="form-input">
+            <!-- PHẦN TÌM KIẾM USER ĐÃ ĐƯỢC CHỈNH SỬA -->
+            <div class="form-group" style="position: relative;">
+                <label class="form-label">Nhân Viên <span style="color:red">*</span></label>
+                <input type="text" 
+                       [value]="searchDisplayValue" 
+                       (input)="onInputSearchUser($event)"
+                       placeholder="Nhập tên hoặc mã nhân viên..." 
+                       class="form-input"
+                       autocomplete="off">
+                
+                <!-- DROPDOWN KẾT QUẢ -->
+                <ul *ngIf="showUserSearchDropdown" class="search-dropdown">
+                    <li *ngFor="let user of userSearchResults" (click)="selectSearchUser(user)">
+                        <div class="user-info">
+                            <span class="name">{{ user.fullName || user.username }}</span>
+                            <span class="id">#{{ user.id || user.userID }}</span>
+                        </div>
+                    </li>
+                    <li *ngIf="userSearchResults.length === 0" class="no-results">
+                        Không tìm thấy nhân viên
+                    </li>
+                </ul>
             </div>
+
             <div class="form-group">
                 <label class="form-label">Ngày Quyết Định</label>
                 <input type="date" [(ngModel)]="currentItem.decisionDate" class="form-input">
@@ -160,7 +180,7 @@
             </div>
             <div class="form-group">
                 <label class="form-label">Số Tiền <span style="color:red">*</span></label>
-                <input type="number" [(ngModel)]="currentItem.amount" class="form-input">
+                <input type="number" min="0" [(ngModel)]="currentItem.amount" class="form-input">
             </div>
         </div>
 
@@ -173,7 +193,7 @@
              <div class="form-group">
                 <label class="form-label">Trạng Thái</label>
                 <select [(ngModel)]="currentItem.status" class="form-input">
-                      <option value="PENDING">Chờ duyệt</option>
+                    <option value="PENDING">Chờ duyệt</option>
                     <option value="APPROVED">Đã duyệt</option>
                     <option value="CANCELLED">Từ chối</option>
                     <option value="PROCESSED">Đã xử lý</option>

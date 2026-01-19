@@ -1,11 +1,16 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
 import { FormsModule } from "@angular/forms";
+// Import các service từ dự án của bạn (sẽ báo lỗi trên preview nhưng đúng với local)
 import { AddRewaPunis, DeleteRewaPunis, GetRewaPunis, RewaPunis, UpdateRewaPunis } from "../../../../services/pages/features/hr/rewaPunis.service";
 import { Loading } from "../../../shared/loading/loading";
 import { Alert } from "../../../shared/alert/alert";
 import { Comfirm } from "../../../shared/comfirm/comfirm";
 
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+// Import file utils tìm kiếm user
+import { findUserbyUsername } from "../../../../utils/finduser.utils";
 
 @Component({
   selector: 'app-rewa-punis',
@@ -37,8 +42,23 @@ export class RewaPunisComponent implements OnInit {
   editingId: number | null = null;
   itemToDelete: RewaPunis | null = null;
 
+  // --- USER SEARCH STATE ---
+  searchSubject = new Subject<string>();
+  userSearchResults: any[] = [];
+  showUserSearchDropdown = false;
+  // Biến hiển thị tên trên input (VD: "Nguyen Van A - #123")
+  searchDisplayValue: string = '';
+
   ngOnInit() {
     this.fetchData();
+
+    // Cấu hình debounce cho tìm kiếm user (chờ 300ms sau khi gõ mới gọi API)
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(keyword => {
+      this.performUserSearch(keyword);
+    });
   }
 
   // --- API METHODS ---
@@ -82,6 +102,62 @@ export class RewaPunisComponent implements OnInit {
     this.fetchData();
   }
 
+  // --- USER SEARCH LOGIC ---
+  onInputSearchUser(event: any) {
+    const value = event.target.value;
+    this.searchDisplayValue = value;
+
+    if (!value || value.trim() === '') {
+      this.showUserSearchDropdown = false;
+      this.userSearchResults = [];
+      // Nếu xóa hết text tìm kiếm, có thể reset userID hoặc giữ nguyên tùy logic
+      return;
+    }
+    // Đẩy giá trị vào subject để debounce
+    this.searchSubject.next(value);
+  }
+
+  async performUserSearch(keyword: string) {
+    try {
+      // Gọi hàm từ finduser.utils.ts
+      const res: any = await findUserbyUsername(keyword);
+
+      // Kiểm tra kết quả trả về (giả sử API trả về mảng user hoặc object chứa mảng)
+      let users = [];
+      if (Array.isArray(res)) {
+        users = res;
+      } else if (res && Array.isArray(res.data)) {
+        users = res.data;
+      }
+
+      if (users.length > 0) {
+        this.userSearchResults = users.slice(0, 5); // Lấy tối đa 5 kết quả
+        this.showUserSearchDropdown = true;
+      } else {
+        this.userSearchResults = [];
+        this.showUserSearchDropdown = false;
+      }
+    } catch (error) {
+      console.error("Search user error:", error);
+      this.userSearchResults = [];
+      this.showUserSearchDropdown = false;
+    }
+    this.cdr.detectChanges();
+  }
+
+  selectSearchUser(user: any) {
+    // Mapping dữ liệu user vào form
+    // Giả sử user object có id/userID và fullName/username
+    this.currentItem.userID = user.id || user.userID;
+
+    // Cập nhật text hiển thị
+    const name = user.fullName || user.username || '';
+    this.searchDisplayValue = `${name} (#${this.currentItem.userID})`;
+
+    // Ẩn dropdown
+    this.showUserSearchDropdown = false;
+  }
+
   // --- CUSTOM ALERT & CONFIRM LOGIC ---
   Onalert(message: string, type: boolean) {
     this.isalert = true;
@@ -91,7 +167,6 @@ export class RewaPunisComponent implements OnInit {
 
   onDelete(item: RewaPunis) {
     this.itemToDelete = item;
-    // Hiển thị userID để người dùng biết đang xóa của ai, nhưng logic xóa sẽ dùng rewaid
     this.confirmMessage = `Bạn có chắc chắn muốn xóa phiếu của nhân viên #${item.userID}?`;
     this.isconfirm = true;
   }
@@ -102,7 +177,6 @@ export class RewaPunisComponent implements OnInit {
     if (result && this.itemToDelete) {
       this.isloading = true;
       try {
-        // CẬP NHẬT: Dùng rewaid để xóa
         const res: any = await DeleteRewaPunis(this.itemToDelete.rewaid);
 
         if (typeof res === 'string' && res.includes('co loi xay ra')) {
@@ -126,27 +200,33 @@ export class RewaPunisComponent implements OnInit {
   // --- MODAL & FORM LOGIC ---
   getEmptyItem(): RewaPunis {
     return {
-      rewaid: 0, // CẬP NHẬT: Thêm rewaid
+      rewaid: 0,
       userID: 0,
       type: 'REWARD',
       reason: '',
       decisionDate: new Date().toISOString().split('T')[0],
       amount: 0,
       isTaxExempt: false,
-      status: 'Pending'
+      status: 'PENDING'
     };
   }
 
   openModal(item?: RewaPunis) {
+    // Reset trạng thái search
+    this.showUserSearchDropdown = false;
+    this.userSearchResults = [];
+
     if (item) {
       this.isEditMode = true;
       this.currentItem = { ...item };
-      // CẬP NHẬT: Lấy rewaid làm ID để sửa
       this.editingId = item.rewaid;
+      // Nếu đang sửa, hiển thị ID lên ô search để user biết
+      this.searchDisplayValue = item.userName ? `${item.userName} (#${item.userID})` : `#${item.userID}`;
     } else {
       this.isEditMode = false;
       this.currentItem = this.getEmptyItem();
       this.editingId = null;
+      this.searchDisplayValue = '';
     }
     this.showModal = true;
   }
@@ -157,30 +237,43 @@ export class RewaPunisComponent implements OnInit {
 
   async saveData() {
     if (!this.currentItem.userID || !this.currentItem.amount) {
-      this.Onalert('Vui lòng nhập ID nhân viên và số tiền', false);
+      this.Onalert('Vui lòng chọn nhân viên và nhập số tiền', false);
       return;
     }
 
     this.isloading = true;
-    let result: any;
-    console.log(this.editingId)
+
     try {
+      let result: any;
+
       if (this.isEditMode && this.editingId) {
-        // CẬP NHẬT: Gọi API update với rewaid (editingId)
         result = await UpdateRewaPunis(this.editingId, this.currentItem);
       } else {
-        // result = await AddRewaPunis(this.currentItem);
+        result = await AddRewaPunis(this.currentItem);
       }
 
-      if (typeof result === 'string' && result.includes('co loi xay ra')) {
-        this.Onalert(result, false);
-      } else {
-        this.Onalert(this.isEditMode ? "Cập nhật thành công!" : "Thêm mới thành công!", true);
+      console.log("API Result:", result);
+
+      // --- KHẮC PHỤC LỖI STATUS 200 NHƯNG VẪN VÀO CATCH ---
+      // Kiểm tra kỹ các trường hợp thành công
+      const isSuccess = result === 200 || result?.status === 200 || result?.success === true;
+
+      if (isSuccess) {
+        this.Onalert(this.isEditMode ? "Cập nhật thành công!" : "Tạo mới thành công!", true);
         this.closeModal();
         this.fetchData();
+      } else {
+        // Chỉ cố gắng lấy message lỗi nếu không phải là thành công
+        // Sử dụng optional chaining (?.) để tránh lỗi undefined
+        const errorMsg = result?.response?.data?.message || result?.message || "Có lỗi xảy ra từ phía server";
+        this.Onalert(errorMsg, false);
       }
-    } catch (error) {
-      this.Onalert("Có lỗi xảy ra", false);
+
+    } catch (error: any) {
+      console.error("SaveData Error:", error);
+      // Fallback an toàn cho catch
+      const errorMsg = error?.response?.data?.message || "Có lỗi xảy ra (Lỗi hệ thống)";
+      this.Onalert(errorMsg, false);
     } finally {
       this.isloading = false;
       this.cdr.detectChanges();

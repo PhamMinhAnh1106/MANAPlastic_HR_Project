@@ -37,15 +37,35 @@
         </select>
       </div>
 
-      <!-- Employee Select (Only HR) -->
-      <div class="form-group emp-select" *ngIf="role === 'HR' && activeTab === 'EMP_PAYSLIP'">
-        <label>Chọn Nhân Viên</label>
-        <select [(ngModel)]="selectedEmpId">
-          <option value="">-- Chọn nhân viên --</option>
-          <option *ngFor="let user of auditUsers" [value]="user.userID">
-            {{user.username}} - {{user.fullname}} - {{user.userID}}
-          </option>
-        </select>
+      <!-- Employee Search (UPDATED) -->
+      <div class="form-group emp-select search-wrapper" *ngIf="role === 'HR' && activeTab === 'EMP_PAYSLIP'">
+        <label>Tìm Nhân Viên</label>
+        
+        <div class="input-container">
+          <input type="text"
+                 [(ngModel)]="selectedEmpDisplay"
+                 (input)="onSearchUser($event)"
+                 (blur)="onInputBlur()"
+                 placeholder="Nhập tên hoặc username..."
+                 autocomplete="off"
+                 class="search-input">
+                 
+          <!-- Loading spinner -->
+          <i class="fa-solid fa-spinner fa-spin search-loading" *ngIf="isSearching"></i>
+        </div>
+
+        <!-- Dropdown Results -->
+        <div class="search-dropdown" *ngIf="showUserSearchDropdown">
+          <ul>
+            <li *ngFor="let user of userSearchResults" (click)="selectSearchUser(user)">
+              <div class="user-row">
+                <span class="u-name">{{ user.username }}</span>
+                <span class="u-full">{{ user.fullname || user.fullName }}</span>
+                <span class="u-id">#{{ user.userID }}</span>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <!-- Actions -->
@@ -65,12 +85,12 @@
       <div class="spinner"></div>
     </div>
 
-    <!-- 1. Trạng thái lỗi -->
+    <!-- 1. Error State -->
     <div class="alert alert-error" *ngIf="errorMsg">
       <i class="fa-solid fa-circle-exclamation"></i> {{ errorMsg }}
     </div>
 
-    <!-- 2. Trạng thái chờ (Chưa tìm kiếm) -->
+    <!-- 2. Empty State -->
     <div class="empty-state" *ngIf="!payslipData && !loading && !errorMsg">
       <div class="icon-box">
         <i class="fa-solid fa-receipt"></i>
@@ -79,7 +99,7 @@
       <p>Dữ liệu bảng lương sẽ được hiển thị tại đây</p>
     </div>
 
-    <!-- 3. Nội dung chính (Có dữ liệu) -->
+    <!-- 3. Main Content -->
     <div class="payslip-content" *ngIf="payslipData">
       
       <!-- Watermark -->
@@ -90,7 +110,7 @@
         <div class="brand-info">
           <div class="logo-area">
             <div class="logo-box">
-              <span class="material-symbols-outlined">bookmark_stacks</span>
+              <span class="material-symbols-outlined">payments</span>
             </div>
             <span class="brand-name">MANAPLASTIC</span>
           </div>
@@ -108,29 +128,28 @@
       <div class="employee-info-section">
         <div class="info-grid">
           <div class="info-item">
-            <label>Mã NV / Username</label>
-            <p>{{ payslipData.header.username }} (ID: {{ payslipData.header.userID }})</p>
+            <label>Mã NV (User ID)</label>
+            <p>{{ payslipData.userId }}</p>
           </div>
           <div class="info-item col-span-2">
             <label>Họ và tên</label>
-            <p class="text-large">{{ payslipData.header.fullname }}</p>
+            <p class="text-large">{{ payslipData.fullName }}</p>
           </div>
           <div class="info-item">
             <label>Phòng ban</label>
-            <p>{{ payslipData.header.departmentname }}</p>
+            <p>{{ payslipData.departmentName }}</p>
           </div>
           <div class="info-item">
             <label>Lương Cơ Bản</label>
-            <!-- Sử dụng basesalarysnapshot -->
-            <p>{{ payslipData.header.basesalarysnapshot | number:'1.0-0' }} ₫</p>
+            <p>{{ payslipData.baseSalary | number:'1.0-0' }} ₫</p>
           </div>
           <div class="info-item">
             <label>Loại HĐ</label>
-            <p>{{ payslipData.header.jobtype }}</p>
+            <p>{{ payslipData.jobType }}</p>
           </div>
           <div class="info-item">
             <label>Ngày công (TT/Chuẩn)</label>
-            <p>{{ payslipData.header.actualworkdays }} / {{ payslipData.header.standardworkdays }}</p>
+            <p>{{ payslipData.actualWorkDays }} / {{ payslipData.standardWorkDays }}</p>
           </div>
         </div>
       </div>
@@ -148,11 +167,16 @@
             <div class="card-body">
               <table class="data-table">
                 <tbody>
-                  <tr *ngFor="let item of filterItems(payslipData.incomes)">
-                    <td>{{ item.name }}</td>
+                   <!-- Loop through calculated income items -->
+                  <tr *ngFor="let item of incomeItems">
+                    <td>
+                        {{ item.name }}
+                        <div *ngIf="item.note" class="text-xs text-gray-400 italic">{{ item.note }}</div>
+                    </td>
                     <td>{{ item.value | number:'1.0-0' }} ₫</td>
                   </tr>
-                  <tr *ngIf="!payslipData.incomes || filterItems(payslipData.incomes).length === 0">
+                  
+                  <tr *ngIf="incomeItems.length === 0">
                     <td colspan="2" class="text-center italic text-gray-400 py-4">Không có phát sinh thu nhập</td>
                   </tr>
                 </tbody>
@@ -160,7 +184,7 @@
             </div>
             <div class="card-footer income-footer">
               <span>Tổng Thu Nhập</span>
-              <span class="total-value">{{ payslipData.header.totalincome | number:'1.0-0' }} ₫</span>
+              <span class="total-value">{{ payslipData.totalIncome | number:'1.0-0' }} ₫</span>
             </div>
           </div>
 
@@ -173,35 +197,38 @@
             <div class="card-body">
               <table class="data-table">
                 <tbody>
-                  <tr *ngFor="let item of filterItems(payslipData.deductions)">
+                  <tr *ngFor="let item of deductionItems">
                     <td>{{ item.name }}</td>
                     <td>-{{ item.value | number:'1.0-0' }} ₫</td>
+                  </tr>
+                  <tr *ngIf="deductionItems.length === 0">
+                    <td colspan="2" class="text-center italic text-gray-400 py-4">Không có khoản khấu trừ</td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
-            <div class="sub-info" *ngIf="taxableIncome !== 0">
+            <div class="sub-info" *ngIf="payslipData.taxableIncome !== null && payslipData.taxableIncome !== 0">
               <div class="row-between">
                 <span>TN Chịu thuế (Taxable):</span>
-                <span>{{ taxableIncome | number:'1.0-0' }} ₫</span>
+                <span>{{ payslipData.taxableIncome | number:'1.0-0' }} ₫</span>
               </div>
             </div>
 
             <div class="card-footer deduction-footer">
               <span>Tổng Khấu Trừ</span>
-              <span class="total-value">-{{ totalCalculatedDeduction | number:'1.0-0' }} ₫</span>
+              <span class="total-value">-{{ totalDeduction | number:'1.0-0' }} ₫</span>
             </div>
           </div>
         </div>
 
-        <!-- Company Cost: Dùng mảng company_contributions từ data -->
-        <div class="company-cost-section" *ngIf="payslipData.company_contributions && payslipData.company_contributions.length > 0">
+        <!-- Company Cost -->
+        <div class="company-cost-section" *ngIf="companyCostItems.length > 0">
           <div class="divider-title">
             <span>Phúc lợi & Chi phí công ty chi trả</span>
           </div>
           <div class="cost-grid">
-            <div *ngFor="let item of payslipData.company_contributions">
+            <div *ngFor="let item of companyCostItems">
               <span>{{ item.name }}</span>
               <span>{{ item.value | number:'1.0-0' }} ₫</span>
             </div>
@@ -209,15 +236,14 @@
         </div>
 
         <!-- Net Salary -->
-        <!-- Thêm class negative để xử lý style nếu lương âm -->
-        <div class="net-salary-banner" [class.negative]="payslipData.net_salary < 0">
+        <div class="net-salary-banner" [class.negative]="payslipData.netSalary < 0">
           <div class="net-label">
             <p class="title">Thực lĩnh cuối cùng (Net Salary)</p>
             <p class="subtitle no-print">
-              {{ payslipData.net_salary < 0 ? 'Số tiền nhân viên cần hoàn lại công ty' : 'Số tiền sẽ được chuyển vào tài khoản ngân hàng' }}
+              {{ payslipData.netSalary < 0 ? 'Số tiền nhân viên cần hoàn lại công ty' : 'Số tiền sẽ được chuyển vào tài khoản ngân hàng' }}
             </p>
           </div>
-          <div class="net-value">{{ payslipData.net_salary | number:'1.0-0' }} VND</div>
+          <div class="net-value">{{ payslipData.netSalary | number:'1.0-0' }} VND</div>
         </div>
 
         <!-- Footer -->
@@ -228,7 +254,7 @@
           </div>
           <div class="sig-block">
             <p class="sig-title">Xác Nhận Của Nhân Viên</p>
-            <p>{{ payslipData.header.fullname }}</p>
+            <p>{{ payslipData.fullName }}</p>
           </div>
         </div>
 

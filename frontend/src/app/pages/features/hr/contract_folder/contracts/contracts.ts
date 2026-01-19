@@ -20,6 +20,7 @@ import { getContractFile } from '../../../../../utils/getimage.utils';
 import { buildQueryParams } from '../../../../../utils/filters.utils';
 import { ActiveaddAccount } from '../../../../../services/pages/features/admin/addAccount.service';
 import { ContractRequest, CreateContractRequest, CreateContractrequest, getContractHistoryVersion, getContractRequests, ManageContractRequest } from '../../../../../services/pages/features/hr/contractRequest.service';
+import { Department } from '../../../../../interface/user/user.interface';
 
 // --- INTERFACES ---
 export interface Allowance {
@@ -47,7 +48,7 @@ export interface CreateContractPayload {
   gender: string;
   contractType: string;
   workType: string;
-  templateId: number;
+  contractTemplateId: number;
   // --- CHỈNH SỬA: Đảm bảo viết thường (d) cho các biến ngày ---
   signdate?: string;
   startdate: string;
@@ -123,6 +124,7 @@ declare const api: any;
   styleUrls: ['./contracts.scss'],
 })
 export class Contracts implements OnInit {
+  departments = Department;
   tab: string = 'search';
   isloading: boolean = false;
   employeeId: string = '';
@@ -248,6 +250,7 @@ export class Contracts implements OnInit {
   async fetchTemplates() {
     try {
       const res: any = await getcontracttemplate();
+
       if (res && Array.isArray(res)) {
         this.listTemplates = res;
       } else if (res && res.id) {
@@ -258,14 +261,13 @@ export class Contracts implements OnInit {
     } catch (e) {
       this.listTemplates = [];
     }
-    console.log(this.listTemplates);
     this.cdr.detectChanges();
   }
 
   getEmptyEditForm(): EditContractParams {
     return {
       // --- Đảm bảo viết thường ---
-      id: 0, userId: null, departmentId: 0, roleId: 0, fullname: '', contractname: '', cccd: '', email: '', phone: '', address: '', dob: '', gender: 'MALE', contractType: 'FIXED_TERM', workType: 'FULLTIME', templateId: 0,
+      id: 0, userId: null, departmentId: 0, roleId: 0, fullname: '', contractname: '', cccd: '', email: '', phone: '', address: '', dob: '', gender: 'MALE', contractType: 'FIXED_TERM', workType: 'FULLTIME', contractTemplateId: 0,
       signdate: '',
       startdate: '',
       enddate: null,
@@ -448,7 +450,7 @@ export class Contracts implements OnInit {
       contractname: c.contractName || c.contractname || '',
       contractType: c.type || c.contractType || 'FIXED_TERM',
       workType: c.workType || 'FULLTIME',
-      templateId: c.templateId || 0,
+      contractTemplateId: c.contractTemplateId || 0,
 
       baseSalary: c.baseSalary || c.basesalary || 0,
       insurancePercent: c.insurancePercent || 0,

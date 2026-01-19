@@ -16,7 +16,7 @@ export async function GetRewaPunis(params: string, page: number, size: number) {
         const res = await api.get(`/hr/rewaPunis?page=${page}&size=${size}&${params}`);
         return res.data;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -25,7 +25,7 @@ export async function DetailRewaPunis(param: number) {
         const res = await api.get(`/hr/rewaPunis/${param}`);
         return res.data;
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -37,7 +37,7 @@ export async function AddRewaPunis(data: RewaPunis) {
             status: res.status
         };
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 
@@ -49,7 +49,7 @@ export async function UpdateRewaPunis(param: number, data: RewaPunis) {
             status: res.status
         };
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }
 export async function DeleteRewaPunis(param: number) {
@@ -60,6 +60,6 @@ export async function DeleteRewaPunis(param: number) {
             status: res.status
         };
     } catch (error) {
-        return "co loi xay ra " + error;
+        return error;
     }
 }

@@ -13,6 +13,6 @@ export async function ActiveaddAccount(pdfFile: File, id: number) {
             status: res.status
         }
     } catch (e) {
-        return "co loi xay ra " + e;
+        return e;
     }
 }

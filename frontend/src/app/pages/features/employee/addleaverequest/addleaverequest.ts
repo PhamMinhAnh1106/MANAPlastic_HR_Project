@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { leaverequestRegister } from '../../../../interface/leaverequest.interface';
@@ -20,17 +20,25 @@ import { Loading } from '../../../shared/loading/loading';
   styleUrl: './addleaverequest.scss',
 })
 export class ADdleaverequest {
-  constructor(private router: Router) { }
+  cdr = inject(ChangeDetectorRef);
+  currentDate: string;
 
-  // --- 1. KHAI BÁO BIẾN CHO HIỆU ỨNG ---
+  constructor(private router: Router) {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = ('0' + (today.getMonth() + 1)).slice(-2);
+    const day = ('0' + today.getDate()).slice(-2);
+
+    this.currentDate = `${year}-${month}-${day}`;
+  }
+
+  // --- VARIABLES ---
   isloading = false;
   isconfirm = false;
   isalert = false;
   confirmMessage = '';
   notifyMessage = '';
-  // SỬA LẠI: notifyType chỉ nhận boolean (true = success, false = error/warning)
   notifyType: boolean = true;
-  // ------------------------------------------------
 
   leaveBalance = [
     { leaveId: "ANNUAL", leaveType: "AL (Anually Leave)" },
@@ -47,59 +55,54 @@ export class ADdleaverequest {
     reason: ''
   };
 
-  // --- 2. HÀM KIỂM TRA TRƯỚC KHI GỬI ---
+  // Hàm này giờ chỉ còn dùng để bật popup xác nhận
+  // Vì nút Lưu đã bị disable nếu thiếu dữ liệu, nên check logic if ở đây là dự phòng an toàn
   preSubmitCheck() {
     if (!this.leaveRequest.leavetype || !this.leaveRequest.startdate || !this.leaveRequest.enddate || !this.leaveRequest.reason) {
-      // Warning -> false
       this.showAlert("Vui lòng nhập đầy đủ thông tin!", false);
       return;
     }
-    // Mở popup xác nhận
     this.confirmMessage = "Bạn có chắc chắn muốn gửi đơn đăng ký này?";
     this.isconfirm = true;
   }
 
-  // --- 3. HÀM XỬ LÝ KẾT QUẢ XÁC NHẬN ---
   async onConfirmResult(confirmed: boolean) {
-    this.isconfirm = false; // Đóng popup
+    this.isconfirm = false;
     if (confirmed) {
-      await this.submitLeaveRequest(); // Nếu đồng ý thì mới gọi API
+      await this.submitLeaveRequest();
     }
   }
 
-  // --- 4. CẬP NHẬT HÀM SUBMIT ---
   async submitLeaveRequest() {
-    // Bật loading
+    // Nếu gọi trực tiếp từ nút Save (đã check valid form), ta có thể gửi luôn
+    // Hoặc gọi preSubmitCheck() nếu muốn hiện popup Confirm trước khi gửi.
+    // Hiện tại code HTML đang gọi trực tiếp submitLeaveRequest(), mình giữ nguyên để không đổi luồng của bạn.
+
     this.isloading = true;
 
     try {
-      const res = await Registerleaverequest(this.leaveRequest) as { status: number, data: string };
-
-      // Tắt loading khi có kết quả
+      const res: any = await Registerleaverequest(this.leaveRequest);
       this.isloading = false;
 
       if (res.status == 201) {
-        // Success -> true
         this.showAlert(res.data, true);
-
-        // Đợi 1.5s cho người dùng đọc thông báo rồi mới chuyển trang
         setTimeout(() => {
           this.router.navigate(["/home/leaverequest"]);
         }, 1500);
         return;
       }
 
-      // Error -> false
-      this.showAlert(res.data, false);
+      this.showAlert(res.response.data.message, false);
 
-    } catch (error) {
+    } catch (error: any) {
       this.isloading = false;
-      // Error -> false
-      this.showAlert("Lỗi hệ thống, vui lòng thử lại sau!", false);
+      this.showAlert(error, false);
+      console.log(error);
+    } finally {
+      this.cdr.detectChanges();
     }
   }
 
-  // --- 5. HÀM HELPER HIỂN THỊ ALERT (ĐÃ SỬA TYPE) ---
   showAlert(message: string, type: boolean) {
     this.notifyMessage = message;
     this.notifyType = type;
