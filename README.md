@@ -2,7 +2,7 @@
 
 > **Mô tả:** Dự án xây dựng Website quản lý nhân sự cho công ty sản xuất bao bì nhựa MANAPlastic, tích hợp ứng dụng chấm công QR Code.
 
-* **Live Demo:** [https://erpmini.cloud](https://erpmini.cloud)
+* **Live Demo - Sponsor By Hola Group:** [https://erpmini.cloud](https://erpmini.cloud)
 * **Timesheet theo dõi tiến độ:** [Google Spreadsheet](https://docs.google.com/spreadsheets/d/1Ouz-jxjV6gg4vwenk94TxB3wv66ZlYrlJ33Hpq8s_h8/edit?gid=0#gid=0)
 
 ---
