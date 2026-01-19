@@ -338,17 +338,18 @@ public class LeaverequestService {
             leaveBalanceRepository.save(balance);
         } else {
             // Nếu năm sau chưa có leave balance, tự động tạo
-            LeavebalanceEntity newBalance = new LeavebalanceEntity();
-            newBalance.setId(id);
-            newBalance.setUserID(user);
-            newBalance.setLeaveType(leaveType);
-
-
-            newBalance.setTotalGranted(0);
-            newBalance.setCarriedOver(0);
-            newBalance.setDaysUsed((int) daysToDeduct);
-
-            leaveBalanceRepository.save(newBalance);
+//            LeavebalanceEntity newBalance = new LeavebalanceEntity();
+//            newBalance.setId(id);
+//            newBalance.setUserID(user);
+//            newBalance.setLeaveType(leaveType);
+//
+//
+//            newBalance.setTotalGranted(0);
+//            newBalance.setCarriedOver(0);
+//            newBalance.setDaysUsed((int) daysToDeduct);
+//
+//            leaveBalanceRepository.save(newBalance);
+            throw new RuntimeException("Chưa có dữ liệu ngày phép cho năm " + year + ". Vui lòng liên hệ HR hoặc chạy job quyết toán năm.");
         }
     }
 
@@ -497,6 +498,12 @@ public class LeaverequestService {
         List<UserEntity> users = userRepository.findAllActiveUsers();
 
         for (UserEntity user : users) {
+
+            if (user.getHiredate() == null) {
+                System.err.println("Cảnh báo: User " + user.getUsername() + " (ID: " + user.getId() + ") chưa có ngày vào làm (hiredate). Bỏ qua tính toán.");
+                continue;
+            }
+
             int thamNien = newYear - user.getHiredate().getYear();
             int phepTon = calculateCarryOver(user.getId(), newYear - 1);
 

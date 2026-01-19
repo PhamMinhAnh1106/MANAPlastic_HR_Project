@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserSuggestionDTO {
+    private Integer userID;
     private String username;
     private String fullname;
 }

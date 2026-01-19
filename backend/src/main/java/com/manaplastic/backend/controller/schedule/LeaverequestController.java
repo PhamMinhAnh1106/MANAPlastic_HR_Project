@@ -159,4 +159,17 @@ public class LeaverequestController {
         List<LeaveBalanceDTO> balances = leaverequestService.getMyLeaveBalances(currentUser);
         return ResponseEntity.ok(balances);
     }
+
+    @PostMapping("/user/leaverequest/generate-new-year")
+    @PreAuthorize("hasAnyAuthority('HR','Admin')")
+    public ResponseEntity<String> triggerGenerateNewYear() {
+        try {
+            // Gọi hàm logic trong Service
+            leaverequestService.generateLeaveBalanceForNewYear();
+            return ResponseEntity.ok("Đã chạy trigger tạo phép năm mới thành công (cho năm hiện tại).");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Lỗi khi chạy trigger: " + e.getMessage());
+        }
+    }
 }

@@ -362,7 +362,7 @@ public class UserService {
             return cb.and(predicates.toArray(new Predicate[0]));
         };
         return userRepository.findAll(spec).stream()
-                .map(user -> new UserSuggestionDTO(user.getUsername(), user.getFullname()))
+                .map(user -> new UserSuggestionDTO(user.getId(),user.getUsername(), user.getFullname()))
                 .collect(Collectors.toList());
     }
 
